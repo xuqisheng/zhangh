@@ -1,0 +1,25 @@
+#!/bin/bash 
+
+# confirmation
+if [ ! -f "/root/mode/dump/portals_Inc.sql" ]; then
+   /root/mode/modemsg migratecfg "Please check if the dump name is correct" && exit 1
+fi
+
+if [ `/root/mode/traceps "crond"` = 'suc' ]; then
+   export HBLACKBOX2=1
+fi
+
+if /root/mode/confirm "Are you sure to do incremental load" more; then
+   # execute the incremental sql
+   {
+   /root/mode/modemsg mirgatecfg "Executing incremental sql ......" more
+   echo "migratecfg begin at `LANG=en_US;date`"
+   export HNoBiNlOg=DaNgEr
+   export Hmysql_force=YeS
+   /root/mode/seecfg /root/mode/dump/portals_Inc.sql
+   echo "migratecfg end at `LANG=en_US;date`"
+   } 2>&1 | tee -a /root/zhangh/logs/migratecfg.log
+fi
+
+# end
+

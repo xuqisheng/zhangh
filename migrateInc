@@ -1,0 +1,20 @@
+#!/bin/bash
+
+if [ ! -f /root/mode/dumpattr ]; then
+  echo "This is no dumpattr script!!!" && exit 1
+fi
+
+Hbinfile=`/root/mode/dumpattr -b "/root/mode/dump/portals.sql"`
+
+rm -Rf /root/mode/dump/portals_Inc.sql
+
+if [ -z "$Hbinfile" ]; then
+   /root/mode/modemsg migrateInc "Please check if the dump file exists!" more
+   exit 1
+fi
+
+echo "migrateInc begin at `LANG=en_US;date`"
+
+/root/mode/dumpattr -i $Hbinfile > /root/mode/dump/portals_Inc.sql
+
+echo "migrateInc end at `LANG=en_US;date`"

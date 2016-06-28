@@ -1,0 +1,34 @@
+#!/bin/bash
+# ===============================================
+# Function:
+#   ssh execute command demo 
+# Date:
+#   :2015-04-27
+# ===============================================
+shopt -s expand_aliases
+alias ssh='ssh -q'
+
+if [ -z "$1" ]; then
+  /root/zhangh/hmsg dokeep "Please provide ssh code or ip !!!" more
+  exit
+fi
+
+if [ -z "$2" ]; then
+  /root/zhangh/hmsg dokeep "Please provide ssh execute command!!!" more
+  exit
+fi
+
+if echo "$1" | grep "root" > /dev/null; then
+  Hcode=`echo "$1" | sed -e "s/root@//"`
+else
+  Hcode=$1
+fi
+scp -Cp /root/zhangh/$2 $Hcode:/root/
+{
+echo
+echo "=================== Server $Hcode ===================="
+echo
+} | tee /$1.tmp
+ssh $1 "/root/$2" | tee -a /$1.tmp
+ssh $1 "rm -f /root/$2"
+rm -f /$1.tmp

@@ -1,0 +1,18 @@
+#!/bin/bash
+
+. /root/mode/mysqldip
+
+rm -Rf /root/mode/dump/portals*.sql
+
+# edm ...
+
+/root/zhangh/migratezlf
+
+Hportaldbs=`/root/mode/seecfg -s "show databases like 'portal%'"`
+
+# multiple databases
+
+echo "# mode generated header" > /root/mode/dump/portals.sql
+mysqldump -uroot $Hmodepass -h$HMYSQLDIP --opt --single-transaction --master-data=2 -F -R --add-drop-database --databases $Hportaldbs >> /root/mode/dump/portals.sql
+
+

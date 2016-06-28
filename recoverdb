@@ -1,0 +1,82 @@
+#!/bin/bash
+# ===============================================
+# Function:
+#   Recover sdump tables into pms 
+# Date:
+#   2016-06-21
+# Such as:
+#	/root/zhangh/recoverdb portal_f
+# ===============================================
+
+export HBLACKBOX2=1
+export HNoBiNlOg=DaNgEr
+export Hmysql_force=YeS
+
+# get options
+HOPTIONS=""
+while (echo "'$1'"  | grep -E  -e "^'-" > /dev/null)
+do
+   HOPTIONS="$HOPTIONS$1"
+   shift 
+done
+
+# get mysql server ip
+
+. /root/mode/mysqldip
+
+# set option 
+
+if echo "'$HOPTIONS" | grep -E -e "-p" >/dev/null; then
+   HSMODE="-p"
+elif echo "'$HOPTIONS" | grep -E -e "-m" >/dev/null; then
+   HSMODE="-m"
+fi
+
+# Default database to dump is portal or portal_f
+
+if [ -z "$1" ]; then
+   HDBNAME=portal
+   if [ -z `/root/mode/seecfg -s $HMYSQLDIP "show databases like '$HDBNAME'" | grep -i "^$HDBNAME"` ]; then
+      HDBNAME=portal_f
+      if [ -z `/root/mode/seecfg -s $HMYSQLDIP "show databases like '$HDBNAME'" | grep -i "^$HDBNAME"` ]; then
+         echo "Neither Database portal nor database portal_f exists at $HMYSQLDIP2!" && exit 1
+      fi
+   fi
+else
+   HDBNAME="$1"
+   if [ -z `/root/mode/seecfg -s $HMYSQLDIP "show databases like '$HDBNAME'" | grep -i "^$HDBNAME"` ]; then
+       echo "Database $HDBNAME doesn't exist at $HMYSQLDIP2!" && exit 1
+   fi
+fi
+
+if [ ! -f /root/mode/sdump -o ! -f /root/mode/sload ]; then
+  echo "This is no sdump or sload script!!!" && exit 1 
+fi
+
+if [ ! -z `/root/mode/seecfg -s $HMYSQLDIP "show databases like 'portal_group'" | grep -i "portal_group"` ]; then
+   /root/mode/seecfg "drop database portal_group"
+fi
+
+if [ ! -z `/root/mode/seecfg -s $HMYSQLDIP "show databases like 'portal_member'" | grep -i "portal_member"` ]; then
+   /root/mode/seecfg "drop database portal_member"
+fi
+
+{
+  echo
+  echo "sload begin at `LANG=en_US;date`"
+  echo
+
+  if [ "$HSMODE" = "-p" ]; then 
+    /root/mode/sload -f -R $HDBNAME /fenku/dumps --exclude-tables `cat /root/zhangh/tb_nodata.txt`
+  elif [ "$HSMODE" = "-m" ]; then
+    /root/mode/sload -f -R $HDBNAME /fenku/dumps --include-tables `cat /root/zhangh/tb_recover.txt`
+  fi
+
+  echo
+  echo "sload end at `LANG=en_US;date`"
+  echo
+} 2>&1 | tee -a /root/zhangh/logs/sloadpms.log
+
+
+
+
