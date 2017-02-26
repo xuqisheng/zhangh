@@ -1,4 +1,4 @@
-##
+#
 . /root/zhangh/hcfg/haliases
 #
 for i in `cat /root/zhangh/sshcodes.txt | grep -v "^#" | grep -E "^${1:-.*}$"`; do
