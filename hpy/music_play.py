@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # coding=utf-8
 from Tkinter import *
-#import Tkinter
+# import Tkinter     # 两种导入方法的区别: 此行这一种导入在后续编码时，需写模块.函数  上一行在使用时，可以直接函数名,推荐上一行这种
 import tkMessageBox
 import urllib
 import json
@@ -9,7 +9,6 @@ import mp3play
 import time
 import threading
 import random
-import string
 
 def music():
     text = entry.get()
@@ -21,7 +20,7 @@ def music():
     url = 'http://s.music.163.com/search/get/?type=1&s=%s&limit=9' % text
     print url
     html = urllib.urlopen(url).read()
-    #print type(html)
+    # print type(html)
     text = json.loads(html)
     music_list = text['result']['songs']
     for ls in music_list:
@@ -36,13 +35,13 @@ def music():
 
 def play():
     index = listbox.curselection()[0]
-    #print index
+    # print index
     filename = r'%s.mp3' %random.randint(1000,9999)
-    #print url_list[index]
+    # print url_list[index]
     urllib.urlretrieve(url_list[index],filename)
     mp3 = mp3play.load(filename=filename)
     mp3.play()
-    #time.sleep(10)
+    # time.sleep(10)
     time.sleep(mp3.seconds())
     mp3.stop()
 
@@ -52,14 +51,11 @@ def th(event):
     thr = threading.Thread(target=play)
     thr.start()
 
-
-#Tk().mainloop()  ### 实例窗口对象（创建窗口）
-root = Tk()
-#top = Tk()
+root = Tk()     # 实例窗口对象（创建窗口）
 root.title('Python Music播放器')
-#root.geometry('300x200+800+400')
+# root.geometry('300x200+800+400')
 root.geometry('+900+300')
-entry = Entry(root)  ### 创建一个输入框 布局：显示的方式和位置
+entry = Entry(root)  # 创建一个输入框 布局：显示的方式和位置
 entry.pack()
 button = Button(root,text='搜 索',command=music)
 button.pack()
@@ -69,7 +65,7 @@ listbox.bind('<Double-Button-1>',th)
 listbox.pack()
 lable = Label(root,text='欢迎使用Python Music播放器',fg='red')
 lable.pack()
-mainloop()  ### 显示窗口
+mainloop()  # 显示窗口
 
 if __name__ == '__main__':
     pass
