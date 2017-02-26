@@ -9,6 +9,8 @@ import mp3play
 import time
 import threading
 import random
+import string
+
 
 def music():
     text = entry.get()
@@ -67,5 +69,5 @@ lable = Label(root,text='欢迎使用Python Music播放器',fg='red')
 lable.pack()
 mainloop()  # 显示窗口
 
-if __name__ == '__main__':
+if __name__ == '__main__':  # Make a script both importable and executable 此脚本模块既可导入到别的模块中使用，也可被自己执行
     pass
