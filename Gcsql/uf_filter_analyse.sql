@@ -15,7 +15,7 @@ BEGIN
 	-- Rmtype:ST,SD,SK#ta_code:9000,9001,9005#RateCode:FIT,COR,RACK#code:ALL#	
 	-- 解释: 
 	-- 范例: SELECT uf_filter_analyse('Rmtype:ST,SD,SK#ta_code:9000,9001,9005#RateCode:FIT,COR,RACK#code:ALL#','Rmtype')
-	-- 作者：张惠 2016/08/10
+	-- 作者：zhangh 2016/08/10
 	-- ==================================================================
 	DECLARE var_pos				INT;
 	DECLARE var_index			INT;

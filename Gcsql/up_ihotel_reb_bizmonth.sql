@@ -14,7 +14,7 @@ BEGIN
 	-- 用途：biz_month 会计周期数据生成(针对会计日期为自然月客户) 
 	-- 解释: CALL up_ihotel_reb_bizmonth(酒店集团id,开始年份,生成几年数据)
 	-- 范例: CALL up_ihotel_reb_bizmonth(1,2015,10)
-	-- 作者：张惠 2014.10.31
+	-- 作者：zhangh 2014.10.31
 	-- ==================================================================
 	DECLARE done_cursor 	INT DEFAULT 0;
 	DECLARE var_hotel_id 	INT;

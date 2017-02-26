@@ -13,7 +13,7 @@ BEGIN
 	-- =========================================================
 	-- 日志查询配置初始化
 	-- 2016.7
-	-- 作者:张惠
+	-- 作者:zhangh
 	-- =========================================================
 	-- 日志大类 | 可自行扩展
 	DELETE FROM code_base WHERE hotel_group_id = arg_hotel_group_id AND hotel_id = arg_hotel_id AND parent_code = 'log_type_class';

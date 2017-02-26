@@ -13,7 +13,7 @@ BEGIN
 	-- =============================================================================
 	-- 用途:更新指定日期前所有单子的hotel_id成负数，类似删除工作
 	-- 解释:CALL up_ihotel_update_alltable(集团id,酒店id,开始日期)
-	-- 作者:张惠 2015-11-03
+	-- 作者:zhangh 2015-11-03
 	-- =============================================================================
 
 	UPDATE account_close_history SET hotel_id = - arg_hotel_id WHERE hotel_group_id = arg_hotel_group_id AND hotel_id = arg_hotel_id AND gen_biz_date < arg_biz_date;	

@@ -11,7 +11,7 @@ BEGIN
 	-- =========================================================
 	--  报表中心表report_center的添加或修改
 	-- 
-	-- 作者：张惠
+	-- 作者：zhangh
 	-- =========================================================
 	-- 更新
 	UPDATE report_center a,report_center b SET a.rep_define = b.rep_define,a.param_win=b.param_win WHERE a.hotel_group_id = b.hotel_group_id 

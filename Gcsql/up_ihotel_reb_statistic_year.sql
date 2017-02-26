@@ -14,7 +14,7 @@ BEGIN
 	-- ==================================================================
 	-- 用途：重建 statistic_y 数据
 	-- 范例: CALL up_ihotel_reb_statistic_year(1,101,2015,'SAL')
-	-- 作者：张惠  2015-05-26
+	-- 作者：zhangh  2015-05-26
 	-- ==================================================================	
 	DECLARE done_cursor 	INT DEFAULT 0;
 	DECLARE var_begin_date	DATETIME;
