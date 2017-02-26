@@ -1,0 +1,7 @@
+2007/04/24 11:13:06:172 select a.obj,a.descript,b.descript,0 ok  
+from foxlangobj a, 
+	  foxlangobj b
+where a.obj *= b.obj and ( a.obj = 'w_gds_bos_accounting' or a.obj like 'w_gds_bos_accounting.%' or a.obj = 'uo_toolbar_2' or a.obj like 'uo_toolbar_2.%' or a.obj = 'd_gl_pfc_button_2' or a.obj like 'd_gl_pfc_button_2.%' or a.obj = 'd_gds_bos_pccode_accnt' or a.obj like 'd_gds_bos_pccode_accnt.%' or a.obj = 'd_gds_bos_dish_unchk' or a.obj like 'd_gds_bos_dish_unchk.%' or a.obj = 'd_gds_bos_folio_unchk' or a.obj like 'd_gds_bos_folio_unchk.%' or a.obj = 'd_gds_bos_folio_head' or a.obj like 'd_gds_bos_folio_head.%' ) and 
+		a.langid = :an_langid0  and 
+		b.langid = :an_langid1 
+

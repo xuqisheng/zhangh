@@ -1,0 +1,8 @@
+_com_p_统计vip卡使用次数;
+(exec p_cq_spo_vip_use_place '#datebeg!请输入统计开始日期!#Bdate1##','#dateend!请输入统计截止日期!#Bdate1##'  resultset=char07_1,char07_2,char20_3,char03_4,char20_5,mone6,mone7,mone8);
+char07_1:卡号;char07_2:序号;char20_3:卡名;char03_4:场地号;char20_5:场地;mone6:预定次数;mone7:场地使用;mone8:开单消费
+headerds=[header=4 player=3 summary=1 styles=box footer=1]
+computes=p_yshu:'页次  ' + string(page(),'0')+'/'+string(pagecount(),'0'):header:3::mone8:mone8::border="0" alignment="1"!
+texttext=t_title:#hotel#:header:1::char07_1:mone8::border="0" alignment="2" font.height="-12" font.italic="1"!
+texttext=t_title1:统计vip卡使用次数:header:2::char07_1:mone8::border="0" alignment="2" font.height="-12" font.italic="2"!
+texttext=t_bdate:打印时间 #pdate#:header:3::char07_1:char3_4::alignment="0" border="0"!

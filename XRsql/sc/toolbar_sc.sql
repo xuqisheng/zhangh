@@ -1,0 +1,63 @@
+
+// toolbar_cat 
+delete toolbar_cat where appid='7';
+INSERT INTO toolbar_cat VALUES ('accounts','客户','Accounts','7','01','res','T','',10);
+INSERT INTO toolbar_cat VALUES ('contacts','联系人','Contacts','7','02','2authemp','T','',20);
+INSERT INTO toolbar_cat VALUES ('activity','销售日记','Activity','7','08','2wksel','T','',80);
+INSERT INTO toolbar_cat VALUES ('info','信息查询','Information','7','09','query','T','',90);
+INSERT INTO toolbar_cat VALUES ('other','其他','Other','7','10','flower','T','',100);
+INSERT INTO toolbar_cat VALUES ('exit','退出','Exit','7','','exit','T','',800);
+select * from toolbar_cat where appid='7' order by sequence, code;
+
+
+// toolbar 
+delete toolbar where appid='7';
+INSERT INTO toolbar VALUES ('7','accounts','newres','新建会议预订','New Reservation','response','','w_gds_sc_master','AMETR','F','',10);
+INSERT INTO toolbar VALUES ('7','accounts','guestlist','预订会议列表','Resrv. List','sheet','','w_gds_sc_master_list_sc','66','F','',20);
+INSERT INTO toolbar VALUES ('7','accounts','asklist','销售问询','Sales Inquiry','response','','w_gds_turnaway_list','','F','',25);
+INSERT INTO toolbar VALUES ('7','accounts','guests','客户档案','Profiles','sheet','','w_gds_guest_list_sc','','F','',35);
+INSERT INTO toolbar VALUES ('7','accounts','meetroom','场地日记','Conference Rooms','response','','w_sc_event_diary','','F','',50);
+INSERT INTO toolbar VALUES ('7','accounts','events','活动列表','Events','sheet','','w_sc_activity_list','66','F','',70);
+INSERT INTO toolbar VALUES ('7','accounts','infomation','公共信息','Public Informatins','response','','w_gl_information','','F','',80);
+INSERT INTO toolbar VALUES ('7','activity','newres','新建会议预订','New Reservation','response','','w_gds_sc_master','AMETR','F','',10);
+INSERT INTO toolbar VALUES ('7','activity','guestlist','预订会议列表','Resrv. List','sheet','','w_gds_sc_master_list_sc','','F','',20);
+INSERT INTO toolbar VALUES ('7','activity','asklist','销售问询','Sales Inquiry','response','','w_gds_turnaway_list','','F','',25);
+INSERT INTO toolbar VALUES ('7','activity','guests','客户档案','Profiles','sheet','','w_gds_guest_list_sc','','F','',35);
+INSERT INTO toolbar VALUES ('7','activity','events','活动列表','Events','sheet','','w_sc_activity_list','66','F','',70);
+INSERT INTO toolbar VALUES ('7','activity','infomation','公共信息','Public Informatins','response','','w_gl_information','','F','',80);
+INSERT INTO toolbar VALUES ('7','contacts','newres','新建会议预订','New Reservation','response','','w_gds_sc_master','AMETR','F','',10);
+INSERT INTO toolbar VALUES ('7','contacts','guestlist','预订会议列表','Resrv. List','sheet','','w_gds_sc_master_list_sc','66','F','',20);
+INSERT INTO toolbar VALUES ('7','contacts','asklist','销售问询','Sales Inquiry','response','','w_gds_turnaway_list','','F','',25);
+INSERT INTO toolbar VALUES ('7','contacts','guests','客户档案','Profiles','sheet','','w_gds_guest_list_sc','','F','',35);
+INSERT INTO toolbar VALUES ('7','contacts','events','活动列表','Events','sheet','','w_sc_activity_list','66','F','',70);
+INSERT INTO toolbar VALUES ('7','contacts','infomation','公共信息','Public Informatins','response','','w_gl_information','','F','',80);
+INSERT INTO toolbar VALUES ('7','diary','newres','新建会议预订','New Reservation','response','','w_gds_sc_master','AMETR','F','',10);
+INSERT INTO toolbar VALUES ('7','diary','guestlist','预订会议列表','Resrv. List','sheet','','w_gds_sc_master_list_sc','66','F','',20);
+INSERT INTO toolbar VALUES ('7','diary','asklist','销售问询','Sales Inquiry','response','','w_gds_turnaway_list','','F','',25);
+INSERT INTO toolbar VALUES ('7','diary','guests','客户档案','Profiles','sheet','','w_gds_guest_list_sc','','F','',35);
+INSERT INTO toolbar VALUES ('7','diary','meetroom','场地日记','Conference Rooms','response','','w_sc_event_diary','','F','',50);
+INSERT INTO toolbar VALUES ('7','diary','events','活动列表','Events','sheet','','w_sc_activity_list','66','F','',70);
+INSERT INTO toolbar VALUES ('7','diary','infomation','公共信息','Public Informatins','response','','w_gl_information','','F','',80);
+INSERT INTO toolbar VALUES ('7','info','meetroom','场地日记','Meeting Rooms','response','','w_sc_event_diary','','F','',10);
+INSERT INTO toolbar VALUES ('7','info','rent','租赁服务','Rental','sheet','','w_res_av_bmp','','F','',20);
+INSERT INTO toolbar VALUES ('7','info','message','留言&去向','Msg. & Loc.','sheet','','w_trace_leaveword_list','','F','',30);
+INSERT INTO toolbar VALUES ('7','info','printmsg','留言打印','Print Messages','response','','w_trace_leaveword_print','','F','',40);
+INSERT INTO toolbar VALUES ('7','info','events','活动列表','Events','sheet','','w_sc_activity_list','66','F','',50);
+INSERT INTO toolbar VALUES ('7','info','log','日志查询','Logs','','','','','F','',70);
+INSERT INTO toolbar VALUES ('7','info','autorep','报表专家','Report Expert','sheet','','w_gds_auto_report','','F','',80);
+INSERT INTO toolbar VALUES ('7','info','adtrep','稽核报表','Audit Reports','sheet','','w_gds_audit_report','','F','',90);
+INSERT INTO toolbar VALUES ('7','other','external','外部程序','External','response','','w_gds_extraprg','','F','',20);
+INSERT INTO toolbar VALUES ('7','other','calc','计算器','Calculation','response','','w_gds_calculator','','F','',30);
+INSERT INTO toolbar VALUES ('7','other','printer','设置打印机','Printer Setup','system','','','','F','',50);
+INSERT INTO toolbar VALUES ('7','other','runsta','运行状态','Station Status','response','','w_gds_runsta','','F','',60);
+INSERT INTO toolbar VALUES ('7','other','mail','职员消息','Mail','response','','w_trace_master','','F','',70);
+INSERT INTO toolbar VALUES ('7','other','logbook','交班记录','Log Book','response','','w_trace_master','','F','',80);
+INSERT INTO toolbar VALUES ('7','other','password','更换密码','Password','response','','w_cyj_set_passwd','','F','',90);
+INSERT INTO toolbar VALUES ('7','pubmkt','ratedate','房价日历','Rate Calendar','response','','w_gds_rmrate_calendar','','F','',20);
+INSERT INTO toolbar VALUES ('7','pubmkt','ratedef','房价明细码','Rate Define','response','','w_gds_rmratedef_list','','F','',30);
+INSERT INTO toolbar VALUES ('7','pubmkt','ratecode','房价码定义','Rate Code','response','','w_gds_rmratecode_list','','F','',40);
+INSERT INTO toolbar VALUES ('7','pubmkt','guests','客户档案','Profiles','sheet','','w_gds_guest_list_sc','','F','',90);
+INSERT INTO toolbar VALUES ('7','pubmkt','guestdiary','活动日记','Sales Diary','sheet','','w_sc_activity_diarysheet','','F','',100);
+INSERT INTO toolbar VALUES ('7','recept','arrival','本日到达','Today Arrivals','sheet','','w_gds_master_list_arr','','F','',10);
+INSERT INTO toolbar VALUES ('7','recept','guestlist','在住宾客列表','In-House List','sheet','','w_gds_master_list_inhouse','','F','',30);
+select * from toolbar where appid='7' order by cat, sequence, code;

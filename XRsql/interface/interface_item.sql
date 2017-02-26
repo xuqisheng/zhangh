@@ -1,0 +1,61 @@
+
+INSERT INTO interface VALUES (
+	'03',
+	'01',
+	'T',
+	'.150',
+	'NCR-餐饮接口程序',
+	'',
+	'w_cq_pos_com',
+	'餐饮接口',
+	'1',
+	'',
+	'本地端口号：(原)5807(现)6419');
+INSERT INTO interface VALUES (
+	'02',
+	'01',
+	'F',
+	'',
+	'东屋-门锁接口程序',
+	'',
+	'w_cq_interface_door',
+	'门锁接口',
+	'0',
+	'',
+	'动态连接库');
+INSERT INTO interface VALUES (
+	'03',
+	'02',
+	'F',
+	'',
+	'NCR-会员接口程序',
+	'',
+	'w_cq_pos_com_vipcard',
+	'会员接口',
+	'1',
+	'',
+	'本地端口号：6419');
+INSERT INTO interface VALUES (
+	'01',
+	'01',
+	'F',
+	'0.22',
+	'PMS-接口程序',
+	'',
+	'w_cq_phone_chgclass',
+	'PMS接口',
+	'0',
+	'',
+	'华为虚拟网，文件共享方式');
+INSERT INTO interface VALUES (
+	'03',
+	'03',
+	'F',
+	'0.22',
+	'Kempinski - 餐饮接口',
+	'',
+	'w_cq_pos_pms',
+	'Kempinski - 餐饮接口',
+	'3',
+	'',
+	'串口通讯');

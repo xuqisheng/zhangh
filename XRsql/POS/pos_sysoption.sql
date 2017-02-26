@@ -1,0 +1,40 @@
+INSERT INTO sysoption(catalog,item,value,remark) VALUES (	'pos',	'dsc_sttype',	'yy',	'是否在底表的餐饮营业合计中扣除优惠额');
+INSERT INTO sysoption(catalog,item,value,remark) VALUES (	'pos',	'map',	'XR',	'当前餐位图选用种类');
+INSERT INTO sysoption(catalog,item,value,remark) VALUES (	'pos',	'plu_amount_fmt',	'0.00',	'?');
+INSERT INTO sysoption(catalog,item,value,remark) VALUES (	'pos',	'order_sort_max',	'5',	'pos 5.05 前用');
+INSERT INTO sysoption(catalog,item,value,remark) VALUES (	'pos',	'obtain_cs',	'No',	'? 好像不用了');
+INSERT INTO sysoption(catalog,item,value,remark) VALUES (	'pos',	'detail_savedays',	'1',	'pos_detail_jie，pos_detail_jie保存时间');
+INSERT INTO sysoption(catalog,item,value,remark) VALUES (	'pos',	'p_mode',	'?',	'折扣与服务费的计算顺序。目前没用');
+INSERT INTO sysoption(catalog,item,value,remark) VALUES (	'pos',	'cusno_fix_tranlog',	't',	'pos 5.05 前用');
+INSERT INTO sysoption(catalog,item,value,remark) VALUES (	'pos',	'tranlog_fix_mode',	't',	'pos 5.05 前用');
+INSERT INTO sysoption(catalog,item,value,remark) VALUES (	'pos',	'dish_card_line',	'1',	'厨房打印，每次打印行数');
+INSERT INTO sysoption(catalog,item,value,remark) VALUES (	'pos',	'input_billno',	'F',	'餐饮打单时是否输入单号');
+INSERT INTO sysoption(catalog,item,value,remark) VALUES (	'pos',	'banquet_print',	'dw',	'餐饮预定，菜式打印时是否采用datawindow打印，可以预览');
+INSERT INTO sysoption(catalog,item,value,remark) VALUES (	'pos',	'ccd_scanner_prefix',	'##99',	'?');
+INSERT INTO sysoption(catalog,item,value,remark) VALUES (	'pos',	'table_share',	'T',	'餐台是否可以共享');
+INSERT INTO sysoption(catalog,item,value,remark) VALUES (	'pos',	'showtimes',	'10',	'餐位图中计时提起提醒分钟数');
+INSERT INTO sysoption(catalog,item,value,remark) VALUES (	'pos',	'emp_manage',	'F',	'是否要进行员工资源管理（主要用于康乐）');
+INSERT INTO sysoption(catalog,item,value,remark) VALUES (	'pos',	'have_yule_system',	'f',	'是否启用康乐系统');
+INSERT INTO sysoption(catalog,item,value,remark) VALUES (	'pos',	'pluid',	'1',	'当前菜谱序号');
+INSERT INTO sysoption(catalog,item,value,remark) VALUES (	'pos',	'reserve_remark',	'R999999999',	'预定备注模板');
+INSERT INTO sysoption(catalog,item,value,remark) VALUES (	'pos',	'earnest',	'F',	'是否打印定金收据');
+INSERT INTO sysoption(catalog,item,value,remark) VALUES (	'pos',	'deptno',	'20',	'餐饮部门号');
+INSERT INTO sysoption(catalog,item,value,remark) VALUES (	'pos',	'costate',	'0.3',	'系统默认菜品的成本率（输入菜谱时确定菜的默认成本额）');
+INSERT INTO sysoption(catalog,item,value,remark) VALUES (	'pos',	'breakfast_pay',	'BKF',	'早餐券对应付款码');
+INSERT INTO sysoption(catalog,item,value,remark) VALUES (	'pos',	'table_bmp_pen_width',	'5',	'餐位图二包厢图标边框宽度');
+INSERT INTO sysoption(catalog,item,value,remark) VALUES (	'pos',	'print_server',	'2.39',	'打印服务器地址');
+INSERT INTO sysoption(catalog,item,value,remark) VALUES (	'pos',	'print_plu',	'1',	'厨房打印菜谱编辑的两种方式');
+INSERT INTO sysoption(catalog,item,value,remark) VALUES (	'pos',	'toucher',	'Y',	'是否有触摸屏');
+INSERT INTO sysoption(catalog,item,value,remark) VALUES (	'pos',	'touch_map',	'TOUCH',	'触摸屏餐位图选用种类');
+INSERT INTO sysoption(catalog,item,value,remark) VALUES (	'pos',	'show_room_no',	'N',	'餐位图二包厢是否要显示号码');
+INSERT INTO sysoption(catalog,item,value,remark) VALUES (	'pos',	'all_bmp_file',	'c:\syhis\tblbmp\table2.bmp',	'餐位图三所用背景图');
+INSERT INTO sysoption(catalog,item,value,remark) VALUES (	'pos',	'show_room_in_all',	'y',	'餐位图三中包厢是否要在餐厅信息图中显示');
+INSERT INTO sysoption(catalog,item,value,remark) VALUES (	'pos',	'pos_hdate',	'1000',	'?');
+INSERT INTO sysoption(catalog,item,value,remark) VALUES (	'pos',	'plu_select',	'2',	'pluid, 可以不要');
+INSERT INTO sysoption(catalog,item,value,remark) VALUES (	'pos',	'posstation',	'1',	'登录系统，是否允许对非有效性工作站进行定义');
+INSERT INTO sysoption(catalog,item,value,remark) VALUES (	'pos',	'print_set',	'0',	'打印机设置：0为横向打印，1为竖向打印');
+INSERT INTO sysoption(catalog,item,value,remark) VALUES (	'pos',	'print_count',	'1',	'每次打印菜的个数');
+insert into sysoption(catalog,item,value,remark) VALUES (   'pos',   'touch_plu_sort_by','name1', '触摸点菜菜谱显示次序');
+
+
+

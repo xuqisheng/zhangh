@@ -1,0 +1,19 @@
+/*
+
+_com_p_aaa;
+(select foliono,sfoliono,site,sta,setnumb,pccode,name,fee,fee_base,fee_serve,fee_tax,fee_disc,reason,refer,bdate,log_date,empno1,shift1,empno2,shift2 from bos_folio where charindex(pccode,'GDS')>0 order by foliono);
+foliono:单号;sfoliono:手工号;site:地点;sta:状态;setnumb:结账号;pccode:费用码;name:名称;fee:费用=8=0.00;fee_base:基本费=8=0.00;fee_serve:服务费=6=0.00;fee_tax:附加费=6=0.00;fee_disc:折扣=6=0.00;reason:理由;refer:参考=10;bdate:营业日期=6=yy/mm/dd;log_date:入账日期=14=yy/mm/dd hh|mm|ss;empno1:建立;shift1:班次;empno2:销单;shift2:班次
+headerds=[header=4 summary=1 styles=box]
+computes=c_yshu:'页次('+string(page(),'0')+'/'+string(pagecount(),'0')+')':header:3::empno2:shift2::alignment="2" border="0"!
+computes=s_0:sum( fee for all ):summary:1::fee:fee::alignment="1" format="0.00"!
+computes=s_1:sum( fee_base for all ):summary:1::fee_base:fee_base::alignment="1" format="0.00"!
+computes=s_2:sum( fee_serve for all ):summary:1::fee_serve:fee_serve::alignment="1" format="0.00"!
+computes=s_3:sum( fee_tax for all ):summary:1::fee_tax:fee_tax::alignment="1" format="0.00"!
+computes=s_4:sum( fee_disc for all ):summary:1::fee_disc:fee_disc::alignment="1" format="0.00"!
+computes=s_5:sum( shift2 for all ):summary:1::shift2:numb10_5::alignment="1" format="0.00"!
+texttext=t_title:#hotel#:header:1::foliono:shift2::border="0" alignment="2" font.height="-12" font.italic="1"!
+texttext=t_title1:BOS费用单据一览表:header:2::foliono:shift2::border="0" alignment="2" font.height="-12" font.italic="1"!
+texttext=t_heji:合计:summary:1::foliono:name::border="2"!
+texttext=t_date:打印时间 #pdate#:header:3::foliono:name::alignment="0" border="0"!
+
+*/

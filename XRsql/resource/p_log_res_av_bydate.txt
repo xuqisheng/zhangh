@@ -1,0 +1,3 @@
+会议室预留日志查询报表
+
+会议室操作日志;(exec p_log_res_av_bydate '#date1!请输入开始日期!#bdate1##','#date2!请输入终止日期!#bdate0##',#langid#  resultset=char100,char600,char10,char16,char60_1,char60_2,char101,date20);char100:单号;char600:会议室=30;char10:项目;char16:描述;char60_1:原值=20;char60_2:新值=20;char101:工号;date20:日期=20=yyyy/mm/dd hh|mm|ss

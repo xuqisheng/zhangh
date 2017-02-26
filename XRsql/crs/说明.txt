@@ -1,0 +1,33 @@
+==================================================
+数据库中需要包含的内容，执行以下ＳＱＬ补充
+（正常情况下，数据库已经包含这些内容）
+==================================================
+	hotelinfo.sql
+	foxtheme.sql
+	Z_app.sql
+	Z_guest.sql
+	Z_master.sql
+	
+	crs_syncctrl.sql
+	guest_sync.sql
+
+	p_crs_getresno.sql
+	p_crs_master_des_maint.sql
+	p_crs_guest_income_accnt.sql
+	p_guest_income_resum.sql
+	p_guest_income_resum_accnt.sql
+	p_crs_dlmaster.sql
+	
+	p_sync_guest_list_crs.sql
+	p_sync_guest_list_today.sql
+
+
+==================================================
+中央数据库
+从在用的数据库直接使用备份恢复创建数据库
+执行以下ＳＱＬ补充 
+==================================================
+	中央专用\dat_auto_report.sql
+	中央专用\dat_sheet.sql
+
+==================================================
