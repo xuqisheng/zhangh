@@ -12,24 +12,20 @@ import random
 import string
 
 def music():
-    text1 = entry.get()
-    text = text1
+    text = entry.get()
+    text = urllib.quote(text.encode("utf-8"))
     if not text:
         tkMessageBox.showinfo('温馨提示','请输入歌曲名字或者歌手')
         return
-    else:
-        print type(text)
-        print text
-        #text2 = urllib.quote(text)
-        #print type(text2)
-        #print text2
 
-    url = 'http://s.music.163.com/search/get/?type=1&s=%s&limit=9' %(entry.get())
+    url = 'http://s.music.163.com/search/get/?type=1&s=%s&limit=9' % text
     print url
     html = urllib.urlopen(url).read()
     #print type(html)
     text = json.loads(html)
     music_list = text['result']['songs']
+    for ls in music_list:
+        print ls
     print music_list
     global url_list
     url_list = []
@@ -74,3 +70,6 @@ listbox.pack()
 lable = Label(root,text='欢迎使用Python Music播放器',fg='red')
 lable.pack()
 mainloop()  ### 显示窗口
+
+if __name__ == '__main__':
+    pass
