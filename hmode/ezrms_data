@@ -1,0 +1,169 @@
+#!/bin/bash
+# ------------------------------------------------------------------------------
+# function:
+#          ezrms data preparation
+# ------------------------------------------------------------------------------
+# usages:
+#        ./ezrms_data [<apachemode>] <sqldir> <db|dbtr> <htlcode> <biz_date>
+# ------------------------------------------------------------------------------
+# e.g.  :
+#        ./ezrms_data                          
+#        ./ezrms_data apache
+#        ./ezrms_data apache  /ezrms_sql
+#        ./ezrms_data apache  /ezrms_sql  db
+#        ./ezrms_data apache  /ezrms_sql  db  eng
+#        ./ezrms_data apache  /ezrms_sql  db  eng '2013-12-25'
+# ------------------------------------------------------------------------------
+
+#
+
+. /root/mode/apachemode
+
+# apache existence check 
+
+[ -d /usr/local/$Hapachemode/conf ] || exit 1
+
+# sql file directory
+
+Hsqldir=${1:-/ezrms_sql}
+
+if [ ! -d "$Hsqldir" ]; then
+   /root/mode/modemsg ezrms_data "sql file directory '$Hsqldir' doesn't exist!" more
+   exit 1
+fi
+Hezkeep=
+if echo "$Hsqldir" | grep -E 'keepold' >/dev/null; then
+   Hezkeep=1
+fi
+
+# ip and database 
+
+if [ "$2" = "" -o "$2" = "db" ]; then
+   HmydbR=$HdbR
+   HmydbN=$HdbN
+   Hmydbmark=db
+elif [ "$2" = "dbtr" ]; then
+   HmydbR=$HdbRtr
+   HmydbN=$HdbNtr
+   Hmydbmark=dbtr
+else
+   /root/mode/modemsg ezrms_data "db parameter must be 'db','dbtr' or empty!" more
+   exit 1
+fi
+
+# htlcode filter
+
+if [ -z "$3" ]; then
+   Hhtlcodecond="1=1"
+else
+   Hhtlcodecond="code='$3'"
+fi
+
+# biz_date 
+
+if [ -n "$4" ]; then
+   Hbdate12=`/root/mode/seecfg -s $HmydbR "select date_format('$4','%Y%m%d')"`
+   if [ "$Hbdate12" = "NULL" ]; then
+      /root/mode/modemsg ezrms_data "Invalid biz_date '$4'" more
+      exit 1
+   fi
+   Hbdate11=`echo $Hbdate12 | sed -re 's/^(....)(..)(..)$/\1-\2-\3/'`
+fi
+
+# ezrms data directory
+
+mkdir -p /usr/local/$Hapachemode/htdocs/ezrms_data
+
+#
+
+Holdir="/root/mode/tmp/Holdir$$"
+Holsql="/root/mode/tmp/Holsql$$.sql"
+mkdir -p $Holdir
+
+#
+
+/root/mode/seecfg -s $HmydbR \
+          "select hotel_group_id,
+                  (select lower(b.code) from hotel_group b where b.id=hotel.hotel_group_id) as hotel_group_code,
+                  id as hotel_id,
+                  lower(code) as hotel_code,
+                  (select adddate(b.biz_date,-1) from audit_flag b where b.hotel_group_id=hotel.hotel_group_id and b.hotel_id=hotel.id) as bdate 
+                  from hotel where $Hhtlcodecond order by hotel_group_id,id" $HmydbN |  
+while read -r Hgid Hgcode Hhid Hhcode Hbdate21; do
+   Hbdate21=`echo $Hbdate21 | sed -re "s/^(.{10}).*/\1/"` 
+   Hbdate22=`echo $Hbdate21 | sed -re "s/^(....).(..).(..).*/\1\2\3/"` 
+   if [ -z "$Hbdate11" ]; then
+      Hbdate31="$Hbdate21" 
+      Hbdate32="$Hbdate22" 
+   elif [ "$Hbdate11" \> "$Hbdate21" ]; then
+      Hbdate31="$Hbdate21" 
+      Hbdate32="$Hbdate22" 
+   else
+      Hbdate31="$Hbdate11" 
+      Hbdate32="$Hbdate12" 
+   fi
+
+   #
+
+   /root/mode/modemsg ezrms_data "Generating ezrms data for hotel '$Hhcode' from group '$Hgcode' on '$Hbdate31'" more
+
+   #
+   
+   rm -f $Holdir/*
+   find -L "$Hsqldir" -name "*.sql" | sed -re "s/\.sql$//" | sort | sed -re "s/$/.sql/" | 
+   while read -r i;do
+      [ ! -r "$i" ] && continue 
+      j=`echo "$i" | sed -re 's/.*\/(.*)\.sql/\1/' | tr 'a-z' 'A-Z'`
+      J=$Hbdate32$j
+      echo "FILE:$j.TXT"                        > $Holdir/$J.txt
+      echo "DATE:`date '+%Y%m%d %H:%M:%S'`"    >> $Holdir/$J.txt
+      echo "VERSION:1.0"                       >> $Holdir/$J.txt
+      echo "GENDATE:$Hbdate32"                 >> $Holdir/$J.txt
+
+      # column heads
+      
+      Hmycols=`cat "$i" |
+               grep -P "^[ \t]*----cols----:"     |
+               sed -re "s/^[ \t]*----cols----://" |  
+               tr -d "[]"           |
+               sed -re 's/$/,/'     |
+               sed -re '$ s/,$//'   |
+               tr -d "\r\n\t "      |
+               tr "a-z" "A-Z"       |
+               sed -re 's/^/"/'     |
+               sed -re 's/$/"/'     |
+               sed -re 's/,/","/g'`
+      echo $Hmycols  >> $Holdir/$J.txt
+
+      #
+
+      cat $Holdir/$J.txt | sed -re "s/$/\r/"   >  $Holdir/$J$$.txt
+      mv -f $Holdir/$J$$.txt $Holdir/$J.txt
+
+      cat "$i" | 
+      sed -re "s/##gh#/\(hotel_group_id=#group_id# and hotel_id=#hotel_id#\)/g" |
+      sed -re "s/#([a-z])#gh#/\(\1.hotel_group_id=#group_id# and \1.hotel_id=#hotel_id#\)/g" |
+      sed -re "s/#([a-z])([a-z])#gh#/\(\1\.hotel_group_id=\2\.hotel_group_id and \1\.hotel_id=\2\.hotel_id\)/g" |
+      sed -re "s/#hotel_group_id#/$Hgid/g"        |
+      sed -re "s/#group_id#/$Hgid/g"              |
+      sed -re "s/#hotel_id#/$Hhid/g"              | 
+      sed -re "s/#bdate#/'$Hbdate31'/g"           | 
+      sed -re "s/#biz_date#/'$Hbdate31'/g"        > $Holsql
+      echo "$i"
+      /root/mode/seecfg -z $HmydbR $Holsql $HmydbN >> $Holdir/$J.txt
+   done
+   cd $Holdir
+   mkdir -p /usr/local/$Hapachemode/htdocs/ezrms_data/$Hmydbmark/$Hgcode/$Hhcode/$Hbdate32
+   if [ -z "$Hezkeep" ]; then
+      rm   -fR /usr/local/$Hapachemode/htdocs/ezrms_data/$Hmydbmark/$Hgcode/$Hhcode/$Hbdate32/*
+   fi
+   mv -f $Holdir/*.txt /usr/local/$Hapachemode/htdocs/ezrms_data/$Hmydbmark/$Hgcode/$Hhcode/$Hbdate32 2>/dev/null
+
+done
+
+#
+
+rm -fR $Holdir
+rm -f  $Holsql
+
+#

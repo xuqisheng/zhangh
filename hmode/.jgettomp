@@ -1,0 +1,37 @@
+#!/bin/bash
+# ------------------------------------------------------------------
+# function:
+#          get the category and various attributes of a tomcat 
+# usages  :
+#          ./.jgettomp <tomcat>
+# ------------------------------------------------------------------
+
+#
+
+/root/mode/check_tomcat $1 || exit 1
+
+#
+
+cd /usr/local/$1/conf
+if /root/mode/isctom $1; then
+   if ! cat server.xml | grep -E "<!-- apache[1-7] -->" >/dev/null; then
+      echo -n "apache "
+   else
+      echo -n `cat server.xml | grep -E "<!-- apache[1-7]? -->" | sed -re "s/.*<!-- (apache[1-7]?) -->.*/\1/" | sed -n "1 p"`
+   fi
+else
+   if ! /root/mode/isNtom $1; then
+      echo -n "single "
+   else
+      echo -n "Single "
+   fi
+fi
+if [ ${#1} -le 10 ]; then
+   Htom="$1          "
+   Htom=${Htom:0:10}
+else
+   Htom="$1"
+fi
+#
+echo " $Htom `/root/mode/.tomdirs \"$1\"`"
+

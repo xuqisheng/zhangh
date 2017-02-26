@@ -1,0 +1,24 @@
+#!/bin/bash
+
+# get options
+
+HOPTIONS=""
+while (echo "'$1'"  | grep -E  -e "^'-" > /dev/null)
+do
+   HOPTIONS="$HOPTIONS$1"
+   shift
+done
+
+# execute various checks 
+
+if [ -z "$HOPTIONS" ] || echo "'$HOPTIONS" | grep -E -e "(-c)(-|$)" >/dev/null; then
+   /root/mode/health_check_cpu
+fi
+if [ -z "$HOPTIONS" ] || echo "'$HOPTIONS" | grep -E -e "(-m)(-|$)" >/dev/null; then
+   /root/mode/health_check_memory
+fi
+if [ -z "$HOPTIONS" ] || echo "'$HOPTIONS" | grep -E -e "(-d)(-|$)" >/dev/null; then
+   /root/mode/health_check_disk
+fi
+
+#

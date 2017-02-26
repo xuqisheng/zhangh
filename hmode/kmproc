@@ -1,0 +1,53 @@
+#!/bin/bash
+
+# exclusive execution with no wait mode
+
+/root/mode/withyou $$ kmproc 1 && exit
+
+# get mysql server ip
+
+. /root/mode/mysqldip
+
+# check MySQL server connectivity
+
+/root/mode/seecfg $HMYSQLDIP "" mysql 2>/dev/null || exit 1
+
+# parameter range high limit and low limit in seconds
+
+Hrange_h=600
+Hrange_l=100
+
+# default value in seconds
+
+Hkmproc_parm=${1:-480}
+
+# parameter check 
+
+if echo "$Hkmproc_parm"  | grep -E  "^[0-9]+$" >/dev/null; then
+   if [ $Hkmproc_parm -lt $Hrange_l ]; then
+      echo "Parameter should be integer greater than or equal to $Hrange_l!" && exit
+   elif [ $Hkmproc_parm -gt $Hrange_h ]; then
+      echo "Parameter should be integer less than or equal to $Hrange_h!"    && exit
+   fi
+else
+   echo "parameter must be an integer!" && exit 1
+fi
+
+# filter and do kill
+# No kill log for the present
+
+/root/mode/seecfg -s $HMYSQLDIP "show processlist" |
+grep -Pi  "\t[0-9]+\t(Preparing|locked|null|User sleep|Sending data|Copying to tmp table( on dis[ck])?)\t((\(| |\\\\t)*select|create +temporary +table)" | grep -Piv "40001 SQL_NO_CACHE" |
+sed -re "s/^([0-9]+)\t([^\t]+\t){3}([^\t]+\t)([0-9]+)\t.*/\4 \1 \3/" | sort -nr | 
+while read -r Hexec_len Hm_thread Hm_cmd;do
+   if [ $Hexec_len -ge $Hkmproc_parm ]; then
+      if [ "$Hm_cmd" != "Killed" ]; then
+         /root/mode/seecfg $HMYSQLDIP "kill $Hm_thread"
+      fi
+   else
+      break
+   fi
+done
+
+# end 
+

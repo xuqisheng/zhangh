@@ -1,0 +1,81 @@
+#!/bin/bash
+# ------------------------------------
+# ./testobject <object> [<dbname>]
+# Test if the given object exists
+# ------------------------------------
+
+# get mysql server ip
+
+. /root/mode/mysqldip
+
+#
+
+HDBNAME=${2:-foxhis}
+HOBJECT="$1"
+HOBJECTSRC="$1"
+
+# item check 
+
+HNEG="z"
+if (echo "$HOBJECT"  | grep -E  "^\[#+.*\]$" > /dev/null); then
+   HNEG="n"
+fi
+HOBJECT=`echo "$HOBJECT" | sed -re "s/^\[#*(.*)\]$/\1/"`
+HOBJECTT=`echo "$HOBJECT" | sed -re "s/[\.\:].*//"`
+HOBJECTF=`echo "$HOBJECT" | sed -re "s/^[^\.]+\.(.*)/\1/"`
+HOBJECTI=`echo "$HOBJECT" | sed -re "s/^[^:]+:(.*)/\1/"`
+[ "$HOBJECT" = "$HOBJECTF" ] &&  HOBJECTF=""
+[ "$HOBJECT" = "$HOBJECTI" ] &&  HOBJECTI=""
+if echo "$HOBJECTT" | grep -i "^f@" >/dev/null; then
+   HTTYPE=f
+   HOBJECTT=${HOBJECTT:2}
+   HEXIST=`/root/mode/seecfg -s $HMYSQLDIP "select 1 from mysql.proc where db='$HDBNAME' and name='$HOBJECTT' and type='FUNCTION'"`
+elif echo "$HOBJECTT" | grep -i "^p@" >/dev/null; then
+   HTTYPE=p
+   HOBJECTT=${HOBJECTT:2}
+   HEXIST=`/root/mode/seecfg -s $HMYSQLDIP "select 1 from mysql.proc where db='$HDBNAME' and name='$HOBJECTT' and type='PROCEDURE'"`
+else
+   HTTYPE=t
+   HEXIST=`/root/mode/seecfg -s $HMYSQLDIP "select 1 from information_schema.tables where table_schema='$HDBNAME' and table_name='$HOBJECTT'"`
+fi
+if [ -n "$HEXIST" -a "$HTTYPE" = "t" ]; then 
+   if [ -n "$HOBJECTF" ]; then 
+      HOBJECTFP=`echo "$HOBJECTF" | sed -re "s/^([^[]+)(.*)/\2/"`
+      HOBJECTF=`echo "$HOBJECTF" | sed -re "s/^([^[]+)(.*)/\1/"`
+      HWCOND="column_name='$HOBJECTF'"
+      while [ -n "$HOBJECTFP" ];do
+         HOBJECTFP1=`echo "$HOBJECTFP" | sed -re "s/^\[(type=[^][]+|nullable=[^][]+|null|default='[^%]*%')\](.*)/\1/"` 
+         HOBJECTFP=`echo "$HOBJECTFP" | sed -re "s/^\[(type=[^][]+|nullable=[^][]+|null|default='[^%]*%')\](.*)/\2/"` 
+         if echo "$HOBJECTFP1" | grep -i "^null$" >/dev/null; then
+            HCLASS=null
+         else
+            HCLASS=`echo "$HOBJECTFP1" | sed -re "s/([^=]*)=(.*)/\1/"`
+            HVALUE=`echo "$HOBJECTFP1" | sed -re "s/([^=]*)=(.*)/\2/"`
+         fi
+         if echo "$HCLASS" | grep -i "^type$" >/dev/null; then
+            HWCOND="$HWCOND and column_type = '$HVALUE'"
+         elif echo "$HCLASS" | grep -i "^nullable$" >/dev/null; then
+            HWCOND="$HWCOND and is_nullable = '$HVALUE'"
+         elif echo "$HCLASS" | grep -i "^null$" >/dev/null; then
+            HWCOND="$HWCOND and column_default is null"
+         elif echo "$HCLASS" | grep -i "^default$" >/dev/null; then
+            HVALUE=`echo $HVALUE | sed -re "s/^'(.*)%'$/\1/" | sed -re "s/HrYqHfHbYhSc/%/g"`
+            HWCOND="$HWCOND and concat('a',column_default,'a')='a${HVALUE}a'"
+         fi
+      done
+      HEXIST=`/root/mode/seecfg -s $HMYSQLDIP "select 1 from information_schema.columns
+                                                        where table_schema='$HDBNAME'
+                                                              and table_name='$HOBJECTT'
+                                                              and $HWCOND"`
+   elif [ -n "$HOBJECTI" ]; then 
+      HEXIST=`/root/mode/testkey $HMYSQLDIP "$HOBJECTT" "$HOBJECTI" $HDBNAME`
+   fi
+fi
+
+if [ -$HNEG "$HEXIST" ]; then
+   [ -n "$HMODEDEBUG" ] && /root/mode/modemsg testobject "Item $HOBJECTSRC failed to pass check"
+   exit 1
+else
+   exit 0
+fi
+

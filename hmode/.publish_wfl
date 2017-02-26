@@ -1,0 +1,487 @@
+#!/bin/bash
+# --------------------------------------------------------------------------
+# function:
+#          1.This is a new cluster release script writen for WFL
+# --------------------------------------------------------------------------
+# remarks:
+#          1.multiple app servers supported  
+#          2.applicable to both iHotel version and thef version
+# --------------------------------------------------------------------------
+
+#
+
+export LANG=zh_CN.UTF-8
+
+# 1.mode utilities check
+
+if [ ! -f /root/mode/modemsg ]; then
+   echo 
+   echo "Mode utilities are required!"
+   echo 
+   exit 1
+fi
+
+# --------------------------------------------------------------------------
+# 2.apache and its corresponding build.properties
+# --------------------------------------------------------------------------
+
+. /root/mode/apachemode
+if [ ! -d /usr/local/$Hapachemode/htdocs ];then
+   /root/mode/modemsg publish_wfl "gcserver$Hapachetail should be installed first!" more
+   exit 1
+fi
+if [ ! -f /root/antDep/build$Hapachetail.properties ]; then
+   /root/mode/modemsg publish_wfl "File /root/antDep/build$Hapachetail.properties doesn't exist" more
+   exit 1
+fi
+Hdbroot=`/root/mode/mod_config /root/antDep/build$Hapachetail.properties "db.root" "#Get#"` 
+Hdbtrroot=`/root/mode/mod_config /root/antDep/build$Hapachetail.properties "dbtr.root" "#Get#"` 
+Hdbport=`/root/mode/mod_config /root/antDep/build$Hapachetail.properties "db.port" "#Get#"` 
+Hdbtrport=`/root/mode/mod_config /root/antDep/build$Hapachetail.properties "dbtr.port" "#Get#"` 
+Hurl=$Hdbroot:$Hdbport
+Hurl1=$Hdbtrroot:$Hdbtrport
+Hdb=`/root/mode/mod_config /root/antDep/build$Hapachetail.properties "db.name" "#Get#"` 
+Hdb1=`/root/mode/mod_config /root/antDep/build$Hapachetail.properties "dbtr.name" "#Get#"` 
+Husr=`/root/mode/mod_config /root/antDep/build$Hapachetail.properties "db.usr" "#Get#"`
+Husr1=`/root/mode/mod_config /root/antDep/build$Hapachetail.properties "dbtr.usr" "#Get#"`
+Hpwd=`/root/mode/mod_config /root/antDep/build$Hapachetail.properties "db.pwd" "#Get#"`
+Hpwd1=`/root/mode/mod_config /root/antDep/build$Hapachetail.properties "dbtr.pwd" "#Get#"`
+Hdbmj=`/root/mode/mod_config /root/antDep/build$Hapachetail.properties "db.monjava" "#Get#"` 
+Hdbmj1=`/root/mode/mod_config /root/antDep/build$Hapachetail.properties "dbtr.monjava" "#Get#"` 
+Hsvnurl=`/root/mode/mod_config /root/antDep/build$Hapachetail.properties "svn.url" "#Get#"` 
+
+# --------------------------------------------------------------------------
+# 3.iHotel/thef version and its release options
+# --------------------------------------------------------------------------
+
+Hver=$1
+Hparms=$2
+
+# --------------------------------------------------------------------------
+# 4.version check
+# --------------------------------------------------------------------------
+
+if [ -z "$Hver" ]; then
+   /root/mode/modemsg publish_wfl "Version string must be given!" more
+   exit 1
+elif echo "$Hver" | grep -E "^[0-9]+(\.[0-9]+)*$" >/dev/null; then
+   Hvermode=i
+   # iHotel version 
+elif [ "$Hver" = "thef" ]; then
+   Hvermode=f
+   # thef version
+else
+   /root/mode/modemsg publish_wfl "Er......,version '$Hver' is yet to be developed!" more
+   exit 1
+fi
+
+# ----------------------------------------------------------------------------------
+# 5.crosss check -- svn client existency,iHotel/thef version existency at svn server  
+# ----------------------------------------------------------------------------------
+
+if [ -z "$Hparms" ]; then
+   Hparms=CJFD
+fi
+if echo "$Hparms" | grep -E "[cC]" >/dev/null; then
+
+   # svn client installation check
+
+   if [ ! -x /usr/bin/svn ]; then
+      /root/mode/modemsg publish_wfl "SVN client should be installed first!Version 1.6.11 or later is recommended" more
+      exit 1
+   fi
+
+   # iHotel/thef version existency check
+
+   if [ "$Hvermode" = "i" ]; then
+      if ! svn ls ${Hsvnurl}/release/publish_build >/dev/null; then
+         exit 1
+      fi
+      if [ `svn ls ${Hsvnurl}/release/publish_build/$Hver 2>/dev/null | wc -l` -eq 0 ]; then
+         /root/mode/modemsg publish_wfl "iHotel version $Hver doesn't exist" more
+         exit 1
+      fi
+   else
+      if ! svn ls ${Hsvnurl}/thef >/dev/null; then
+         exit 1
+      fi
+   fi
+fi
+
+# ----------------------------------------------------------------------------------
+# 6.cross check -- iHotel/thef version vs database name check
+# ----------------------------------------------------------------------------------
+
+if [ "$Hvermode" = "i" -a "$Hdb" = "portal_f" ]; then
+   /root/mode/modemsg publish_wfl "There may be errors in /root/antDep/build$Hapachetail.properties"  
+   if ! /root/mode/confirm "Are you sure the iHotel version $Hver is using database 'portal_f'" more; then
+      exit 1
+   fi
+elif [ "$Hvermode" = "f" -a "$Hdb" != "portal_f" ]; then
+   /root/mode/modemsg publish_wfl "There may be errors in /root/antDep/build$Hapachetail.properties"  
+   if ! /root/mode/confirm "Are you sure the f version is using database '$Hdb'" more; then
+      exit 1
+   fi
+fi
+
+# ----------------------------------------------------------------------------------
+# 7.neccessary check when no svn checkout will be done
+# ----------------------------------------------------------------------------------
+
+if ! echo "$Hparms" | grep -E "[cC]" >/dev/null; then
+   if [ "$Hvermode" = "i" ]; then
+      if [ ! -f /root/wflcz/export/htdocs/update/update_air.xml ]; then
+         /root/mode/modemsg publish_wfl "You didn't choose to check out iHotel version '$Hver',and there is no desired files in local disk!" more
+        exit 1
+      fi
+      Hwflver=`cat /root/wflcz/export/htdocs/update/update_air.xml | grep -E "versionNumber" | sed -re "s/.*<versionNumber>(.*)<\/versionNumber>.*/\1/"`
+      if [ "$Hver" != "$Hwflver" ]; then
+         /root/mode/modemsg publish_wfl "You didn't choose to check out your entered version '$Hver',and the already checked out version was '$Hwflver'!" more
+         exit 1 
+      fi
+   elif [ "$Hvermode" = "f" ]; then
+      if [ ! -d /root/thef/ipms/WEB-INF ]; then
+         /root/mode/modemsg publish_wfl "You didn't choose to check out thef,and there is no desired files in local disk!" more
+         exit 1
+      fi
+   fi
+fi
+
+# ----------------------------------------------------------------------------------
+# 8.prechecks done,go on to confirmation process
+# ----------------------------------------------------------------------------------
+
+if ! /root/mode/confirm "Are you sure to release version $Hver to gcserver$Hapachetail"; then
+   exit 1
+fi
+
+# ----------------------------------------------------------------------------------
+# 9.confirm what to do 
+# ----------------------------------------------------------------------------------
+
+Hmsg="You really want to "
+if echo "$Hparms" | grep -E "[cC]" >/dev/null; then
+   Hmsg="$Hmsg,check out version $Hver"
+fi
+if echo "$Hparms" | grep -E "[jJ]" >/dev/null; then
+   Hmsg="$Hmsg,deploying Java"
+fi
+if echo "$Hparms" | grep -E "[hHfF]" >/dev/null; then
+   Hmsg="$Hmsg,deploying Flex"
+fi
+if echo "$Hparms" | grep -E "[dD]" >/dev/null; then
+   Hmsg="$Hmsg,execute SQLs"
+fi
+Hcoloncnt=`echo "$Hmsg" | sed -re "s/[^,]/ /g" | wc -w`
+if [ $Hcoloncnt -eq 0 ]; then
+   /root/mode/modemsg publish_wfl "You will do nothing!" more
+   exit
+elif [ $Hcoloncnt -eq 1 ]; then
+   Hmsg=`echo "$Hmsg" | sed -re "s/,//g"`
+elif [ $Hcoloncnt -eq 2 ]; then
+   Hmsg=`echo "$Hmsg" | sed -re "s/,//" | sed -re "s/,/ and /"`
+else
+   Hmsg=`echo "$Hmsg" | sed -re "s/,//" | sed -re "s/,([^,]+)$/ and \1/"`
+fi
+if ! /root/mode/confirm "$Hmsg" more; then
+   exit 1
+fi
+
+# ----------------------------------------------------------------------------------
+# 10.Here comes the real work
+# ----------------------------------------------------------------------------------
+
+if [ "$Hvermode" = "f" ]; then
+
+   # publish thef version
+
+   Hwflbdate=`LANG=en_US;date`
+
+   #
+
+   if echo "$Hparms" | grep -E "[cC]" >/dev/null; then
+
+      mkdir -p /root/thef0
+
+      /root/mode/modemsg publish_wfl "Checking out thef ......" more
+
+      # checkout to /root/thef0
+
+      cd /root/thef0
+
+      if [ ! -d ipms ]; then
+         svn co ${Hsvnurl}/thef/release/ipms ipms
+      else
+         svn switch ${Hsvnurl}/thef/release/ipms ipms
+      fi
+      if [ ! -d f-resource ]; then
+         svn co ${Hsvnurl}/thef/release/f-resource f-resource
+      else
+         svn switch ${Hsvnurl}/thef/release/f-resource f-resource
+      fi
+      if [ ! -d wdpms ]; then
+         svn co ${Hsvnurl}/thef/release/wdpms wdpms
+      else
+         svn switch ${Hsvnurl}/thef/release/wdpms wdpms
+      fi
+      if [ ! -d fsql ]; then
+         svn co ${Hsvnurl}/thef/release/fsql fsql
+      else
+         svn switch ${Hsvnurl}/thef/release/fsql fsql
+      fi
+    
+      # export to /root/thef
+
+      rm -fR /root/thef
+      mkdir -p /root/thef
+
+      svn export /root/thef0/ipms         /root/thef/ipms
+      svn export /root/thef0/f-resource   /root/thef/f-resource
+      svn export /root/thef0/wdpms        /root/thef/wdpms
+      svn export /root/thef0/fsql         /root/thef/fsql
+   fi
+    
+   # java 
+
+   echo "$Hparms" | grep -E "[jJ]" >/dev/null &&
+   {
+   /root/mode/modemsg publish_wfl "Deploying Java ......" more
+
+   cd /usr/local
+   for i in `ls -d tomcat*/ 2>/dev/null | sed -re "s/\/$//" `;do
+      /root/mode/check_tomcat $i || continue
+      if ! /root/mode/isatom $i $Hapachemode; then
+         continue
+      fi
+      /root/mode/stop_tomcat $i
+      if /root/mode/tctomcat $i 2>/dev/null | grep -E '^at unknown' >/dev/null; then
+         /root/mode/modemsg publish_wfl "Current user '$USER' has no authoriry to stop $i!"
+         /root/mode/modemsg publish_wfl "Aborting ..." more
+         exit
+      fi
+
+      # rm obsolete apps
+      
+      ls -1d /usr/local/$i/webapps/ipms* 2>/dev/null | grep -Ev "/usr/local/$i/webapps/ipms[1]?$" | xargs rm -fR
+
+      #
+
+      Hipmsloop=0
+      while [ $Hipmsloop -lt 2 ]; do
+         if [ $Hipmsloop -eq 0 ]; then
+            Hipmstail=
+            HURL=$Hurl
+            HDB=$Hdb
+            HUSR=$Husr
+            HPWD=$Hpwd
+            HDBMJ=$Hdbmj
+         else
+            Hipmstail=1
+            HURL=$Hurl1
+            HDB=$Hdb1
+            HUSR=$Husr1
+            HPWD=$Hpwd1
+            HDBMJ=$Hdbmj1
+         fi
+         rm -fR  /usr/local/$i/webapps/ipms$Hipmstail
+         mkdir -p /usr/local/$i/webapps/ipms$Hipmstail
+         cp -fR /root/thef/ipms/* /usr/local/$i/webapps/ipms$Hipmstail
+         if [ -f /usr/local/$i/webapps/ipms$Hipmstail/WEB-INF/classes/config/jdbc.mysql.properties ]; then
+            cat /usr/local/$i/webapps/ipms$Hipmstail/WEB-INF/classes/config/jdbc.mysql.properties |
+            sed -re "s/^(jdbc\.url.*\/\/)(.*)(\/)(.*)/\1$HURL\3$HDB/" |
+            sed -re "s/^(jdbc\.username=)(.*)/\1$HUSR/" |
+            sed -re "s/^(jdbc\.password=)(.*)/\1$HPWD/" |
+            tr -d "\r" > /root/mode/tmp/f$$.tmp
+            cp -f  /root/mode/tmp/f$$.tmp /usr/local/$i/webapps/ipms$Hipmstail/WEB-INF/classes/config/jdbc.mysql.properties
+         fi
+         # ------------------------------------------------------------------------------
+         # added for the allowToLog and millisecondsForLog options
+         #                                                               -- 2014-08-14 --
+         # ------------------------------------------------------------------------------
+         if [ -f /usr/local/$i/webapps/ipms$Hipmstail/WEB-INF/classes/config/config.properties ]; then
+            if [ -n "$HDBMJ" ]; then
+               HDBMJa=`echo $HDBMJ | sed -re "s/(.*),(.*)/\1/"`
+               HDBMJb=`echo $HDBMJ | sed -re "s/(.*),(.*)/\2/"`
+               cat /usr/local/$i/webapps/ipms$Hipmstail/WEB-INF/classes/config/config.properties |
+               sed -r -e "s/^(allowToLog=)(.*)/\1$HDBMJa/" -e "s/^(millisecondsForLog=)(.*)/\1$HDBMJb/" | tr -d "\r" > /root/mode/tmp/f$$.tmp
+               cp -f  /root/mode/tmp/f$$.tmp /usr/local/$i/webapps/ipms$Hipmstail/WEB-INF/classes/config/config.properties
+            fi
+         fi
+         Hipmsloop=$[$Hipmsloop+1]
+      done
+      /root/mode/start_tomcat $i
+   done
+   rm -f /root/mode/tmp/f$$.tmp
+   /root/mode/gcserver$Hapachetail apache
+   }
+
+   # flex
+
+   echo "$Hparms" | grep -E "[hHfF]" >/dev/null &&
+   {
+   /root/mode/modemsg publish_wfl "Deploying htdocs/thef ......" more
+   
+   mkdir -p /usr/local/$Hapachemode/htdocs/thef
+   mkdir -p /usr/local/$Hapachemode/htdocs/wdpms
+
+   rm -fR /usr/local/$Hapachemode/htdocs/thef/*
+   cp -fR /root/thef/f-resource/* /usr/local/$Hapachemode/htdocs/thef/
+   rm -fR /usr/local/$Hapachemode/htdocs/wdpms/*
+   cp -fR /root/thef/wdpms/* /usr/local/$Hapachemode/htdocs/wdpms/
+   }
+    
+   # SQLs
+
+   echo "$Hparms" | grep -E "[dD]" >/dev/null &&
+   {
+
+   /root/mode/modemsg publish_wfl "Executing SQLs ......" more
+
+   /root/mode/updatedb.sh $Hdbroot   /root/thef/fsql  $Hdb
+   /root/mode/updatedb.sh $Hdbtrroot /root/thef/fsql  $Hdb1
+   }
+
+
+   # End
+
+   Hwfledate=`LANG=en_US;date`
+   /root/mode/modemsg publish_wfl "Began at $Hwflbdate"
+   /root/mode/modemsg publish_wfl "Ended at $Hwfledate" less
+  
+   exit 
+fi
+
+# publish iHotel version
+
+Hwflbdate=`LANG=en_US;date`
+
+#
+
+mkdir -p /root/wflcz
+
+# checkout part 
+
+if echo "$Hparms" | grep -E "[cC]" >/dev/null; then
+
+   cd /root/wflcz
+   if [ -d checkout ]; then
+      svn switch   ${Hsvnurl}/release/publish_build/$Hver checkout
+   else
+      svn checkout ${Hsvnurl}/release/publish_build/$Hver checkout
+   fi
+   Herrno=$?
+   if [ $Herrno -ne 0 ]; then
+      exit 1
+   fi
+   rm -fR export
+   svn export checkout export
+fi
+
+# java part
+
+if echo "$Hparms" | grep -E "[jJ]" >/dev/null; then
+   [ -d /root/wflcz/export ] || exit 1 
+   /root/mode/modemsg publish_wfl "Deploying Java ......" more
+   cd /usr/local
+   for i in `ls -d tomcat*/ 2>/dev/null | sed -re "s/\/$//" `;do
+      /root/mode/check_tomcat $i || continue
+      if ! /root/mode/isatom $i $Hapachemode; then
+         continue
+      fi
+      /root/mode/stop_tomcat $i
+      if /root/mode/tctomcat $i 2>/dev/null | grep -E '^at unknown' >/dev/null; then
+         /root/mode/modemsg publish_wfl "Current user '$USER' has no authoriry to stop $i!"
+         /root/mode/modemsg publish_wfl "Aborting ..." more
+         exit
+      fi
+
+      # rm obsolete apps
+      
+      ls -1d /usr/local/$i/webapps/ipms* 2>/dev/null | grep -Ev "/usr/local/$i/webapps/ipms[1]?$" | xargs rm -fR
+
+      #
+
+      Hipmsloop=0
+      while [ $Hipmsloop -lt 2 ]; do 
+         if [ $Hipmsloop -eq 0 ]; then
+            Hipmstail=
+            HURL=$Hurl
+            HDB=$Hdb
+            HUSR=$Husr
+            HPWD=$Hpwd
+            HDBMJ=$Hdbmj
+         else
+            Hipmstail=1
+            HURL=$Hurl1
+            HDB=$Hdb1
+            HUSR=$Husr1
+            HPWD=$Hpwd1
+            HDBMJ=$Hdbmj1
+         fi
+         rm -fR  /usr/local/$i/webapps/ipms$Hipmstail
+         mkdir -p /usr/local/$i/webapps/ipms$Hipmstail
+         cp -fR /root/wflcz/export/ipms/* /usr/local/$i/webapps/ipms$Hipmstail
+
+         if [ -f /usr/local/$i/webapps/ipms$Hipmstail/WEB-INF/classes/config/jdbc.mysql.properties ]; then
+            cat /usr/local/$i/webapps/ipms$Hipmstail/WEB-INF/classes/config/jdbc.mysql.properties |
+            sed -re "s/^(jdbc\.url.*\/\/)(.*)(\/)(.*)/\1$HURL\3$HDB/" |
+            sed -re "s/^(jdbc\.username=)(.*)/\1$HUSR/" |
+            sed -re "s/^(jdbc\.password=)(.*)/\1$HPWD/" |
+            tr -d "\r" > /root/mode/tmp/f$$.tmp
+            cp -f  /root/mode/tmp/f$$.tmp /usr/local/$i/webapps/ipms$Hipmstail/WEB-INF/classes/config/jdbc.mysql.properties
+         fi
+
+         # ------------------------------------------------------------------------------
+         # added for the allowToLog and millisecondsForLog options
+         #                                                               -- 2014-08-14 --
+         # ------------------------------------------------------------------------------
+         if [ -f /usr/local/$i/webapps/ipms$Hipmstail/WEB-INF/classes/config/config.properties ]; then
+            if [ -n "$HDBMJ" ]; then
+               HDBMJa=`echo $HDBMJ | sed -re "s/(.*),(.*)/\1/"`
+               HDBMJb=`echo $HDBMJ | sed -re "s/(.*),(.*)/\2/"`
+               cat /usr/local/$i/webapps/ipms$Hipmstail/WEB-INF/classes/config/config.properties |
+               sed -r -e "s/^(allowToLog=)(.*)/\1$HDBMJa/" -e "s/^(millisecondsForLog=)(.*)/\1$HDBMJb/" | tr -d "\r" > /root/mode/tmp/f$$.tmp
+               cp -f  /root/mode/tmp/f$$.tmp /usr/local/$i/webapps/ipms$Hipmstail/WEB-INF/classes/config/config.properties
+            fi
+         fi
+
+         Hipmsloop=$[$Hipmsloop+1]
+      done
+      /root/mode/start_tomcat $i
+   
+   done
+   rm -f /root/mode/tmp/f$$.tmp
+   /root/mode/gcserver$Hapachetail apache
+fi
+
+# htdocs part
+
+if echo "$Hparms" | grep -E "[hHfF]" >/dev/null; then
+   [ -d /root/wflcz/export ] || exit 1 
+   /root/mode/modemsg publish_wfl "Deploying htdocs ......" more
+   cp -fR /root/wflcz/export/htdocs/* /usr/local/$Hapachemode/htdocs
+   cd /usr/local/$Hapachemode/htdocs/update
+   cp -f iHotel.air iHotel$Hver.air
+fi
+
+# sql part
+
+if echo "$Hparms" | grep -E "[dD]" >/dev/null; then
+   [ -d /root/wflcz/export ] || exit 1 
+   /root/mode/modemsg publish_wfl "Executing SQLs ......" more
+   /root/mode/updatedb.sh $Hdbroot   /root/wflcz/export/database/updatestructsql  $Hdb
+   /root/mode/updatedb.sh $Hdbroot   /root/wflcz/export/database/updatedatasql    $Hdb
+   /root/mode/updatedb.sh $Hdbtrroot /root/wflcz/export/database/updatestructsql  $Hdb1
+   /root/mode/updatedb.sh $Hdbtrroot /root/wflcz/export/database/updatedatasql    $Hdb1
+fi
+
+#
+
+Hwfledate=`LANG=en_US;date`
+/root/mode/modemsg publish_wfl "Began at $Hwflbdate"
+/root/mode/modemsg publish_wfl "Ended at $Hwfledate" less
+echo
+
+# end 
+
+

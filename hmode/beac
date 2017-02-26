@@ -1,0 +1,67 @@
+#!/bin/sh
+# -------------------------------------------------------------------------------------
+# ./beac [-c] [<mysql-server-ip>] <dbname> <hotelcodepattern>
+# -------------------------------------------------------------------------------------
+
+# check reentrance
+
+if [ -x /etc/ifconfig ]; then
+   HSHTMP=""
+else
+   HSHTMP="sh.*"
+fi
+MYFILE="/root/mode/tmp/hrybeac$$.tmp"
+ps -ef > $MYFILE
+if [ `grep -E "${HSHTMP}beac" $MYFILE | grep -v "exectask beac" | wc -l` -gt 1 ]; then
+   rm -f $MYFILE 
+   echo "Another beac task is running!" && exit 1
+elif [ `grep -E "${HSHTMP}each" $MYFILE | grep -v "exectask each" | wc -l` -gt 1 ]; then
+   rm -f $MYFILE 
+   echo "There is each task running!" && exit 1
+fi
+rm -f $MYFILE 
+
+# get options
+
+HOPTIONS=""
+while (echo "'$1'"  | grep -E  -e "^'-" > /dev/null)
+do
+   HOPTIONS="$HOPTIONS$1"
+   shift 
+done
+
+# get mysql server ip 
+
+. /root/mode/mysqldip
+
+# Default database to check is portal
+
+HDBNAME=${1:-portal}
+HCDPATT=${2:-'.*'}
+
+# $HDBNAME must exist 
+
+if [ -z `/root/mode/seecfg -s $HMYSQLDIP "show databases like '$HDBNAME'"|grep -i "^$HDBNAME"` ]; then
+   echo "Database $HDBNAME doesn't exist in MySQL server at $HMYSQLDIP2!" && exit 1
+fi
+
+# $HDBNAME must be gc ipms 
+
+if [ -z `/root/mode/seecfg -s $HMYSQLDIP "show tables from \\\`$HDBNAME\\\` like 'audit\_flag'"` ]; then
+   echo "Database $HDBNAME IS NOT a gc ipms!!!" && exit 1
+fi
+if [ "$HOPTIONS" = "-c" ]; then
+   >/root/mode/logs/each.log
+   >/root/mode/logs/each_detail.log
+fi
+/root/mode/seecfg -s $HMYSQLDIP "select hotel_group_id,id,code from hotel order by hotel_group_id,id" $HDBNAME | grep -Pi "\t($HCDPATT)$" | 
+while read -r i;do
+   Hgid=`echo "$i" | sed -re "s/^([^\t]+).*/\1/"`
+   Hhid=`echo "$i" | sed -re "s/^([^\t]+\t){1}([^\t]+).*/\2/"`
+   Hcode=`echo "$i" | sed -re "s/^([^\t]+\t){2}([^\t]+).*/\2/"`
+   echo "Checking hotel_group_id << $Hgid >> hotel_id << $Hhid >> ......" 
+   /root/mode/each $HMYSQLDIP $HDBNAME $Hcode
+done
+
+#
+

@@ -1,0 +1,12 @@
+#!/bin/bash
+# ------------------------------------------------------------------
+# function:
+#          return tomcat type
+# ------------------------------------------------------------------
+
+cd /usr/local/$1/conf
+if cat server.xml | grep -E "<!-- ModeN mark -->" >/dev/null; then
+   exit 0
+fi
+exit 1
+

@@ -1,0 +1,52 @@
+#!/bin/bash 
+# ------------------------------------------------------------------
+# function:
+#           tomcat heap memory limit
+# usage   :
+#           ./tomhl
+# ------------------------------------------------------------------
+
+# preparations
+
+if uname -a | grep "_64 " >/dev/null; then
+   Hosver=64
+else
+   Hosver=32
+fi
+
+if /usr/local/jdk6/bin/java -version 2>&1 | grep -E "64-Bit" >/dev/null; then
+   Hjvver=64
+else
+   Hjvver=32
+fi
+
+# 
+
+if [ $Hosver -eq 64 ]; then
+   if [ $Hjvver -eq 64 ]; then
+      # limit to 4000 to protect OS,although more memory can be allocated 
+      HTOMHLIMIT=4000
+   else
+      if cat /etc/redhat-release 2>/dev/null | grep -E "Red Hat .* release 6.[0-9] \(Santiago\)" >/dev/null; then
+         HTOMHLIMIT=2200
+      else
+         HTOMHLIMIT=2500
+      fi
+   fi
+else
+   if [ $Hjvver -eq 64 ]; then
+      # 64-bit java at 32bit OS.This is wrong java installation 
+      HTOMHLIMIT=2000
+   else
+      HTOMHLIMIT=2000
+   fi
+fi
+
+#
+
+if /usr/local/jdk6/bin/java -version 2>&1 | grep -E " Client VM " >/dev/null; then
+  Hjvcvm=yes
+fi
+
+#
+

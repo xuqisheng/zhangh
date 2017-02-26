@@ -1,0 +1,136 @@
+#!/bin/bash
+# ------------------------------------------------------
+# function:
+#          fix various linux bugs
+# ------------------------------------------------------
+
+# exclusive execution with wait mode
+
+/root/mode/modepv lbugfix $$ " /bin/bash .*/lbugfix"
+
+# centos 5.8 bug with system-config-network 
+
+if [ -f /etc/redhat-release ]; then
+   if cat /etc/redhat-release | grep -E " release 5\.8.*" > /dev/null; then
+      # ---------------------------------------
+      # 5.8 release
+      # This bug is fixed in 5.9 release
+      # ---------------------------------------
+      Hfname=/usr/share/system-config-network/netconfpkg/NCHardwareList.py
+      if [ -f $Hfname ]; then
+         cat $Hfname | 
+         sed -re "s/(dev\.Type),/str\(\1\),/" |
+         sed -re "s/(dev.Name)\)\)$/str\(\1\)\)\)/" > /root/mode/tmp/hfixtmp$$.tmp
+         cp -f /root/mode/tmp/hfixtmp$$.tmp $Hfname
+         rm -f /root/mode/tmp/hfixtmp$$.tmp
+      fi
+   fi
+   if [ -f /etc/init.d/network ]; then
+      chkconfig network on
+      if [ -f /etc/init.d/NetworkManager ]; then
+         # -----------------------------------------------------------------------------------------------------
+         # if  NetworkManager is started and NM_CONTROLLED=yes in file /etc/sysconfig/network-scripts/ifcfg-ethX
+         # network card will be managed by NetworkManager 
+         # -----------------------------------------------------------------------------------------------------
+         # we prefer /etc/init.d/network 
+         # -----------------------------------------------------------------------------------------------------
+         chkconfig NetworkManager off
+      fi
+   fi
+fi
+
+# -----------------------------------------------------------------------------------------------------------------
+# grep 
+# -----------------------------------------------------------------------------------------------------------------
+# 'grep -E' and 'grep -G' has better porformance than 'grep -P'.Use 'grep -E' or 'grep -G' whenever possible.
+# -----------------------------------------------------------------------------------------------------------------
+# 'grep -Pi' has far better performance than 'grep -Ei' and 'grep -Gi',when the pattern space is large.
+# use 'grep -Pi' if option -i is a must and the pattern space is large.
+# -----------------------------------------------------------------------------------------------------------------
+# but we must fix the 'grep -Pi' bug in CentOS 6.6 and later versions
+# -----------------------------------------------------------------------------------------------------------------
+# We replace CentOS 6.6 'grep' with CentOS 6.4 'grep'
+# The CentOS 6.6 'grep' has bug with -Pi
+# -----------------------------------------------------------------------------------------------------------------
+# We replace CentOS 6.x version 2.20 'grep' with CentOS 6.4 version 2.6.3 'grep'
+# The CentOS x.x 'grep' version 2.20, when used with -P option,has serious bug related with locale 
+# -----------------------------------------------------------------------------------------------------------------
+
+if [ -f /etc/redhat-release ]; then
+   # 6.6
+   if cat /etc/redhat-release | grep -E " release 6\.6.*" > /dev/null; then
+      if uname -a | grep -E ' x86_64 ' >/dev/null; then
+         cmp /bin/grep /root/mode/impfile/linux/64/grep &>/dev/null || cp -fp /root/mode/impfile/linux/64/grep /bin
+      else
+         cmp /bin/grep /root/mode/impfile/linux/32/grep &>/dev/null || cp -fp /root/mode/impfile/linux/32/grep /bin
+      fi
+   fi
+   # 6.x others
+   if cat /etc/redhat-release | grep -E " release 6\.[0-9].*" > /dev/null; then
+      if grep -V | grep -E "^(grep \(GNU grep\)|GNU grep) 2\.[0-9]{2}" >/dev/null; then
+         # The result of grep with -P option is highly related with current locale setting
+         # This is a new bug
+         # We replace it with our grep 
+         if uname -a | grep -E ' x86_64 ' >/dev/null; then
+            cmp /bin/grep /root/mode/impfile/linux/64/grep &>/dev/null || cp -fp /root/mode/impfile/linux/64/grep /bin
+         else
+            cmp /bin/grep /root/mode/impfile/linux/32/grep &>/dev/null || cp -fp /root/mode/impfile/linux/32/grep /bin
+         fi
+      fi
+   fi
+fi
+
+
+# CentOS bash bug
+
+if env x='() { :;}; echo vulnerable' bash -c "echo this is a test" 2>&1 | grep vulnerable >/dev/null; then
+   if cat /etc/redhat-release | grep -E " release 5\..*" > /dev/null; then
+      if !  uname -a | grep "_64 " >/dev/null; then
+         [ -f /root/packages/bash-3.2-33.el5.1.i386.rpm ] && rpm -Uvh /root/packages/bash-3.2-33.el5.1.i386.rpm
+      else
+         [ -f /root/packages/bash-3.2-33.el5.1.x86_64.rpm ] && rpm -Uvh /root/packages/bash-3.2-33.el5.1.x86_64.rpm
+      fi
+   elif cat /etc/redhat-release | grep -E " release 6\..*" > /dev/null; then
+      if !  uname -a | grep "_64 " >/dev/null; then
+         [ -f /root/packages/bash-4.1.2-15.el6_5.1.i686.rpm ] && rpm -Uvh /root/packages/bash-4.1.2-15.el6_5.1.i686.rpm
+         [ -f /root/packages/bash-doc-4.1.2-15.el6_5.1.i686.rpm ] && rpm -Uvh /root/packages/bash-doc-4.1.2-15.el6_5.1.i686.rpm
+      else
+         [ -f /root/packages/bash-4.1.2-15.el6_5.1.x86_64.rpm ] && rpm -Uvh /root/packages/bash-4.1.2-15.el6_5.1.x86_64.rpm
+         [ -f /root/packages/bash-doc-4.1.2-15.el6_5.1.x86_64.rpm ] && rpm -Uvh /root/packages/bash-doc-4.1.2-15.el6_5.1.x86_64.rpm
+      fi
+   fi
+fi
+
+# /etc/hosts bug of Ali & Tencent
+
+/root/mode/mnthosts 
+
+# fix openssl bug
+
+if [ -f /etc/redhat-release ]; then
+   if cat /etc/redhat-release | grep -E " release 6\..*" > /dev/null; then
+      if rpm -qa | grep -E "openssl-1\.0\.1[a-f]?" >/dev/null; then
+         if ! rpm -q --changelog openssl | grep -B 1 " CVE-2014-0160 " >/dev/null; then
+            if /root/mode/.netok; then
+               yum -y install openssl
+            fi
+         fi
+      fi
+   fi
+fi
+
+
+# fix /etc/bashrc of tencent new CentOS releases
+
+if cat /etc/bashrc | grep -P "^export PROMPT_COMMAND=\"history -a\"[ \t]*$" >/dev/null; then
+   # tencent new release of CentOS 
+   cat /etc/bashrc | sed -re "/^export PROMPT_COMMAND=\"history -a\"[ \t]*$/ r /root/mode/impfile/fix_tencent/mode_bashrc_segment" |
+   sed -re "/^export PROMPT_COMMAND=\"history -a\"[ \t]*$/ d" > /root/mode/tmp/Hetcbashrc$$.tmp
+   if ! cmp -s /root/mode/tmp/Hetcbashrc$$.tmp /etc/bashrc 2>/dev/null; then
+      cp -f /root/mode/tmp/Hetcbashrc$$.tmp /etc/bashrc
+   fi
+   rm -f /root/mode/tmp/Hetcbashrc$$.tmp
+fi
+
+#
+

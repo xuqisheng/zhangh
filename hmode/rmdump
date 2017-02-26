@@ -1,0 +1,110 @@
+#!/bin/bash
+# ----------------------------------------------------------
+# function:
+#          remove history dumps according to certain rule
+# usage   :
+#         ./rmdump <dbname> <current date> [<dump-dir>]
+# ----------------------------------------------------------
+# e.g.    :
+#         ./rmdump portal "2011-12-16" 
+#         ./rmdump portal "2011-12-16" /root/mode/dump   
+#         ./rmdump portal "2011-12-16" /mydumpdir
+# ----------------------------------------------------------
+
+. /root/mode/mysqldip
+
+HDBNAME="$1"
+HDATE1="$2"
+
+# dump directory 
+
+if [ -z "$3" ]; then
+   Hdumpdir=/root/mode/dump
+elif [ -d "$3" ]; then
+   Hdumpdir="$3"
+else
+   exit 1
+fi
+
+# dump mode
+
+if [ ! -f /etc/mdumpmode ]; then
+   Hdmode=D
+   Hdintv=7
+else
+   Hdmpmode=`cat /etc/mdumpmode`
+   if echo $Hdmpmode | grep -E "^[d|D][234567]$" >/dev/null; then
+      Hdmode=`expr substr $Hdmpmode 1 1`
+      Hdintv=`expr substr $Hdmpmode 2 1`
+   else
+      Hdmode=D
+      Hdintv=7
+   fi
+fi
+
+#
+
+HD1=`expr substr $HDATE1 9 2`
+HM1=`expr substr $HDATE1 6 2`
+HY1=`expr substr $HDATE1 1 4`
+
+HDATE2=`/root/mode/seecfg -s $HMYSQLDIP "select date_add('$HDATE1',interval -$Hdintv day)"`
+HD2=`expr substr $HDATE2 9 2`
+
+HDATEL=`/root/mode/seecfg -s $HMYSQLDIP "select date_add('$HDATE1',interval -1 day)"`
+
+HDATE3=`/root/mode/seecfg -s $HMYSQLDIP "select date_add('$HDATE1',interval -1 year)"`
+
+# remove extra dumps of last day,preserving the latest one
+
+for i in `ls -1 "$Hdumpdir"/$HDBNAME-${HDATEL}_[0-9][0-9][0-9].sql 2>/dev/null`;do
+    if ! /root/mode/comdump "$i"; then
+       /root/mode/modelog "$0 $* [remove incomplete dumps] rm -f $i"
+       rm -f "$i"
+   fi
+done
+
+if [ `ls -1 "$Hdumpdir"/$HDBNAME-${HDATEL}_[0-9][0-9][0-9].sql 2>/dev/null | wc -l` -gt 1 ]; then
+   ls -1 "$Hdumpdir"/$HDBNAME-${HDATEL}_[0-9][0-9][0-9].sql | sed -re "$ d" | sed -re "s/^(.*)/rm -f \1/" | bash
+fi
+
+# remove history dumps 
+
+# remove The $HDBNAME standard dumps of ${HDATE2}
+
+if [ "$HD2" != "01" ]; then
+   rm -f "$Hdumpdir"/$HDBNAME-${HDATE2}_[0-9][0-9][0-9].sql
+elif [ "$Hdmode" = "D" ]; then
+   rm -f "$Hdumpdir"/$HDBNAME-${HDATE2}_[0-9][0-9][0-9].sql
+fi
+
+# remove the $HDBNAME standard dumps before ${HDATE2}
+
+# --------------------------------------------------------------------------------------------
+# enhanced on 2015-11-29,with strict d2-d7 mdumpmode rules obeyed
+# --------------------------------------------------------------------------------------------
+
+cd "$Hdumpdir"
+for k in `ls -1 $HDBNAME-[0-9][0-9][0-9][0-9]-[0-9][0-9]-[0-9][0-9]_[0-9][0-9][0-9].sql 2>/dev/null`; do
+    if [ "$k" \< "$HDBNAME-${HDATE2}" ]; then
+       if [ "$Hdmode" = "D" ]; then
+          rm -f "$k"
+       else
+          if ! echo "$k" | grep -E "$HDBNAME-[0-9][0-9][0-9][0-9]-[0-9][0-9]-01_[0-9][0-9][0-9]\.sql" >/dev/null; then
+             rm -f "$k"
+          elif echo "$k" | grep -E "$HDBNAME-[0-9][0-9][0-9][0-9]-01-01_[0-9][0-9][0-9]\.sql" >/dev/null; then
+             :
+          else
+             Hdatepart=`echo "$k" | sed -re "s/$HDBNAME-([0-9]{4}-[0-9]{2}-[0-9]{2})_[0-9]{3}\.sql/\1/"`
+             if [ "$Hdatepart" = "$HDATE3" ]; then
+                rm -f "$k"
+             elif [ "$Hdatepart" \< "$HDATE3" ]; then
+                rm -f "$k"
+             fi
+          fi
+       fi
+    fi
+done
+
+#
+

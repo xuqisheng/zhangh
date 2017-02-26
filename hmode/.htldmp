@@ -1,0 +1,13 @@
+#!/bin/bash 
+# --------------------------------------------------------------------------
+# function:
+#          dump data of a hotel
+# usages:
+#          ./.htldmp <mysqld-ip> <dbname> <hotel_id> <dumpname.sql>
+# e.g.  :  
+#          ./.htldmp 6.15 portal_f 6 /h6.sql
+# --------------------------------------------------------------------------
+
+/root/mode/.htltool --dump "$@"
+
+

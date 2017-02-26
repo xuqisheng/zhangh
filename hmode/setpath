@@ -1,0 +1,62 @@
+#!/bin/bash 
+# -----------------------------------------------------------
+# function:
+#           set required path in /root/.bashrc file
+# -----------------------------------------------------------
+
+# exclusive execution with wait mode
+
+/root/mode/modepv setpath $$ " /bin/bash .*/setpath"
+
+# remove and save to tmp
+
+cat /root/.bashrc | sed -re "/(JAVA_|ANT_|xtrabackup)/ d" > /root/mode/tmp/hpath$$.tmp
+
+# add(a) to tmp
+
+[ -d /usr/local/jdk6 ] &&
+{
+cat >> /root/mode/tmp/hpath$$.tmp << 'EOF'
+export JAVA_HOME=/usr/local/jdk6
+export JRE_HOME=$JAVA_HOME/jre
+export CLASSPATH=.:$JAVA_HOME/jre/lib:$JAVA_HOME/lib/tools.jar
+if ! echo $PATH | grep -E -q "(^|:)$JAVA_HOME/bin(:|$)";then export PATH=$JAVA_HOME/bin:$PATH;fi
+EOF
+}
+
+# add(b) to tmp
+
+[ -d /usr/local/ant ] &&
+{
+cat >> /root/mode/tmp/hpath$$.tmp << 'EOF'
+export ANT_HOME=/usr/local/ant
+if ! echo $PATH | grep -E -q "(^|:)$ANT_HOME/bin(:|$)";then export PATH=$ANT_HOME/bin:$PATH;fi
+EOF
+}
+
+# add(c) to tmp
+
+[ -d /usr/local/xtrabackup ] &&
+{
+cat >> /root/mode/tmp/hpath$$.tmp << 'EOF'
+if ! echo $PATH | grep -E -q "(^|:)/usr/local/xtrabackup/bin(:|$)";then export PATH=/usr/local/xtrabackup/bin:$PATH;fi
+EOF
+}
+
+# copy tmp back to /root/.bashrc
+
+if ! cmp /root/mode/tmp/hpath$$.tmp /root/.bashrc &>/dev/null; then
+   cp -f /root/mode/tmp/hpath$$.tmp /root/.bashrc
+fi
+rm -f /root/mode/tmp/hpath$$.tmp
+
+# delete old path from /etc/profile
+
+if cat /etc/profile | grep JAVA > /dev/null; then
+   cat /etc/profile | sed -re "/(JAVA|ANT)/ d" > /root/mode/tmp/hpath$$.tmp
+   cp -f /root/mode/tmp/hpath$$.tmp /etc/profile
+   rm -f /root/mode/tmp/hpath$$.tmp
+fi
+
+# end
+

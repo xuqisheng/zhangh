@@ -1,0 +1,50 @@
+#!/bin/bash
+# ----------------------------------------------------------------------
+# function:
+#          configure tomcat and mysql server memory
+# e.g.:
+#          ./config_mem max     --- maximal memory allocation mode
+#          ./config_mem min     --- mimimal memory allocation mode
+#          ./config_mem         --- mimimal memory allocation mode
+# ----------------------------------------------------------------------
+
+#
+
+/root/mode/modelog "$0 $*"
+
+#
+
+if [ -z "$1" ]; then
+   if [ -f /etc/modemem ]; then
+      . /etc/modemem
+   else
+      HMEMMODE=min
+   fi
+elif [ "$1" = "max" ]; then
+   HMEMMODE=max
+else
+   HMEMMODE=min
+fi
+export HMEMMODE
+
+#
+
+/root/mode/cpumem -l
+
+#
+
+if [ "$HNCONFIRM_MODE" = 'y' ]; then
+   :
+else
+   /root/mode/confirm "Are you sure to reconfigure tomcat and mysql server memory in ${HMEMMODE}imal mode" || exit 
+fi 
+
+echo "export HMEMMODE=$HMEMMODE" > /etc/modemem
+
+/root/mode/config_tomcat || exit 1
+/root/mode/config_mysql || exit 1
+
+echo
+echo "You should restart tomcat and mysql server for new configuration to take effect!"
+echo
+

@@ -1,0 +1,46 @@
+#!/bin/bash
+#-----------------------------------------------------------------------
+# function:
+#           monitor load process 
+# usage   :
+#           ./monload <loadprocessid> <IP> <database>
+# ----------------------------------------------------------------------
+
+# test process
+
+if ! ps -ef | grep -E "^[^ ]+ +$1 +.*seecfg" >/dev/null; then
+   exit 1
+fi
+
+# local ip addresses 
+
+if [ "$2" = "localhost" ]; then
+   Hlip="($2)"
+elif [ "$2" = "127.0.0.1" ]; then
+   Hlip="($2):[0-9]+"
+else
+   Hlip="$(/root/mode/getstrips):[0-9]+"
+fi
+
+# get status 
+
+Hinsmark="(INSERT INTO|insert  into)"
+Hmlfile=/root/mode/tmp/hmonload$$.tmp
+/root/mode/seecfg $2 "show processlist" > $Hmlfile
+if cat $Hmlfile | grep -Pi  "^(\|[^\|]*){2}\| *$Hlip *\| *$3 *(\|[^\|]*){3}\| *$Hinsmark \`" > /dev/null; then
+    Hletter=$(
+    LANG=en_US;
+    cat $Hmlfile | 
+    grep -Pi "^(\|[^\|]*){2}\| *$Hlip *\| *$3 *(\|[^\|]*){3}\| *$Hinsmark \`" |
+    sed -nre "1 p" |
+    sed -re "s/^(\|[^\|]*){2}\| *$Hlip *\| *$3 *(\|[^\|]*){3}\| *$Hinsmark \`(.).*/\5/" |
+    tr "A-Z" "a-z")
+    echo -n $Hletter
+fi
+
+#
+
+rm -f $Hmlfile
+
+# end 
+

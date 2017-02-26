@@ -1,0 +1,29 @@
+#!/bin/bash
+# -------------------------------------------------
+# function:
+#           install mysql start/stop script
+# -------------------------------------------------
+
+if [ -f /etc/mfloatip ]; then
+   # high availability system 
+   if [ -f /etc/init.d/mysql ]; then
+      /sbin/chkconfig --del mysql >/dev/null 2>&1
+      rm -f /etc/init.d/mysql
+   fi
+else
+   # normal system 
+   if [ ! -x /usr/sbin/mysqld ]; then
+      /root/mode/modemsg inst_mysql_service "MySQL start/stop service will not be installed"
+      /sbin/chkconfig --del mysql >/dev/null 2>&1
+      rm -f /etc/init.d/mysql
+   else
+      rm -f /etc/init.d/mysql;ln -s /root/mode/mysql /etc/init.d/mysql
+      /sbin/chkconfig --add mysql >/dev/null 2>&1
+      /sbin/chkconfig mysql off >/dev/null 2>&1
+      /sbin/chkconfig --level 35 mysql on >/dev/null 2>&1
+   fi
+fi
+
+# end
+
+

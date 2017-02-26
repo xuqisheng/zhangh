@@ -1,0 +1,204 @@
+#!/bin/sh
+# -------------------------------------------------------------------------------------
+# ./dbinit [<mysql-server-ip>] <dbname> <hotel_code>
+# e.g.:
+#       ./dbinit portal 20
+#       ./dbinit 6.13 portal 20
+# -------------------------------------------------------------------------------------
+exit
+# check reentrance
+
+if [ -x /etc/ifconfig ]; then
+   HSHTMP=""
+else
+   HSHTMP="sh.*"
+fi
+MYFILE="/root/mode/tmp/hrydbinit$$.tmp"
+ps -ef > $MYFILE
+if [ `grep -E "${HSHTMP}dbinit" $MYFILE | grep -v "exectask dbinit" | wc -l` -gt 1 ]; then
+   rm -f $MYFILE 
+   echo "Another dbinit task is running!" && exit 1
+fi
+rm -f $MYFILE 
+
+# get options
+
+HOPTIONS=""
+while (echo "'$1'"  | grep -E  -e "^'-" > /dev/null)
+do
+   HOPTIONS="$HOPTIONS$1"
+   shift 
+done
+
+# get mysql server ip 
+
+. /root/mode/mysqldip
+
+# database name
+
+HDBNAME=$1
+if [ -z "$HDBNAME" ]; then
+   echo "Database name must be provided!" && exit 1
+fi
+
+# $HDBNAME must exist 
+
+if [ -z `/root/mode/seecfg -s $HMYSQLDIP "show databases like '$HDBNAME'"|grep -i "^$HDBNAME"` ]; then
+   echo "Database $HDBNAME doesn't exist!" && exit 1
+fi
+
+# $HDBNAME must be gc ipms 
+
+if [ -z `/root/mode/seecfg -s $HMYSQLDIP "show tables from \\\`$HDBNAME\\\` like 'audit\_flag'"` ]; then
+   echo "Database $HDBNAME IS NOT a gc ipms!!!" && exit 1
+fi
+
+# hotel_id
+
+HHOTELID=$2
+
+if [ -z "$HHOTELID" ]; then
+   echo "Hotel id must be provided!" && exit 1
+fi
+
+if (echo "$HHOTELID"  | grep -E  "^[0-9]+$" > /dev/null); then
+   if [ "$HHOTELID" -le 0 ]; then
+      echo "Hotel id must be greater than 0" && exit 1
+   fi
+else
+   echo "Hotel id must be positive integer" && exit 1
+fi
+
+HHOTEL_ID=`/root/mode/seecfg -s $HMYSQLDIP "select id from \\\`$HDBNAME\\\`.hotel where id=$HHOTELID"`
+HHOTELDES=`/root/mode/seecfg -s $HMYSQLDIP "select descript from \\\`$HDBNAME\\\`.hotel where id=$HHOTELID"`
+HGROUP_ID=`/root/mode/seecfg -s $HMYSQLDIP "select hotel_group_id from \\\`$HDBNAME\\\`.hotel where id='$HHOTEL_ID'"`
+
+if [ -z "$HHOTEL_ID" ]; then
+   echo "Hotel id $HHOTELID doesn't exist in table hotel!" && exit 1
+fi
+
+HGROUPDES=`/root/mode/seecfg -s $HMYSQLDIP "select descript from \\\`$HDBNAME\\\`.hotel_group where id='$HGROUP_ID'"`
+if [ -z "$HGROUPDES" ]; then
+   echo "Hotel group id $HGROUP_ID doesn't exist in table hotel_group!" && exit 1
+fi
+
+if [ "$HNCONFIRM_MODE" = 'y' ]; then
+   :
+else
+   /root/mode/confirm "Are you sure to init hotel $HHOTELDES(id=$HHOTEL_ID) in group $HGROUPDES(groupid=$HGROUP_ID) at $HMYSQLDIP2" || exit 1 
+fi 
+
+# 
+
+HTMPALL="/root/mode/tmp/hhryall$$.tmp"
+HTMPCODE="/root/mode/tmp/hhrycode$$.tmp"
+HTMPPARM="/root/mode/tmp/hhryparm$$.tmp"
+HTMPINIT="/root/mode/tmp/hhryinit$$.tmp"
+HTMPSQL="/root/mode/tmp/hhrysql$$.sql"
+HTMPPROC="hhryproc$$"
+
+/root/mode/seecfg -s $HMYSQLDIP "select table_name from tables where table_schema='$HDBNAME' and not( \
+                   table_name LIKE 'pbcat%' \
+                OR table_name IN('_google_position', '_gridbox_demo',\
+                                 '_input_code_samples', '_code_maint', 'code_table', 'table_info', 'table_fields')) " information_schema > $HTMPALL
+
+
+/root/mode/seecfg -s $HMYSQLDIP "select table_name from tables where table_schema='$HDBNAME' and ( \
+                   table_name LIKE 'code_%' \
+		OR table_name IN ('ar_cycle', 'card_calc_define', 'card_calc_date', 'card_type', 'card_station')\
+		OR table_name IN ('room_class', 'room_dayuse_define', 'room_filter', 'room_floor', 'room_no', 'room_type', 'sales_man', 'sales_group' )\
+		OR table_name IN ('phone_callno', 'phone_charge_code', 'phone_extno', 'phone_params', 'phone_period_discount', 'phone_service_code')) " \
+                information_schema > $HTMPCODE
+
+
+/root/mode/seecfg -s $HMYSQLDIP "select table_name from tables where table_schema='$HDBNAME' and ( \
+
+                table_name LIKE 'sys%'\
+		OR table_name LIKE 'report_%' \
+		OR table_name LIKE 'search_%' \
+		OR (table_name LIKE 'user%' AND table_name <> 'user_note') \
+		OR (table_name LIKE 'work_%' AND table_name NOT LIKE 'work_station_status%') \
+		OR table_name IN ('audit_flag', 'audit_process', 'audit_step', 'biz_month', 'bill_define',\
+                                  'bill_scene_link', 'bill_template', 'bill_printer', 'guest_comb_item', 'locale', \
+		                  'log_info_config', 'log_operation_code', 'room_map_index', 'room_status_define', \
+                                  'room_status_index', 'rsv_limit','tab_toolbar', 'toolbar', 'toolbar_favourite',\
+                                  'velocity_template', 'log_info_config', 'log_info_code', 'room_sta_class', 'data_reconstruct',\
+ 			          'rep_jour_rule', 'rep_audit_index_define'))" \
+                information_schema > $HTMPPARM
+
+#
+
+cat $HTMPALL $HTMPCODE $HTMPPARM | sort | uniq -u > $HTMPINIT
+cat $HTMPINIT |
+while read -r i; do
+   HTBNAME=$i
+
+   if /root/mode/seecfg -s $HMYSQLDIP "describe \`$HTBNAME\`" $HDBNAME | grep -i "^hotel_id	" >/dev/null; then
+      if /root/mode/seecfg -s $HMYSQLDIP "describe \`$HTBNAME\`" $HDBNAME | grep -i "^hotel_group_id	" >/dev/null; then
+         :
+      else
+         continue
+      fi
+   else
+      continue
+   fi
+  
+   /root/mode/seecfg -s $HMYSQLDIP "delete from \`$HTBNAME\` where hotel_group_id=$HGROUP_ID and hotel_id = $HHOTEL_ID" $HDBNAME
+   
+done
+
+# adjust parameters etc.
+
+
+HBDATE=`/root/mode/seecfg -s $HMYSQLDIP "select curdate()"`
+HRDATE=`/root/mode/seecfg -s $HMYSQLDIP "select adddate('$HBDATE',-1)"`
+
+cat > $HTMPSQL << EOF
+delimiter hryhby
+create procedure $HTMPPROC()
+begin
+   IF NOT EXISTS(SELECT 1 FROM sys_option WHERE hotel_id='$HHOTEL_ID' AND catalog='system' AND item='biz_date') THEN 
+      INSERT sys_option(hotel_group_id, hotel_id, catalog, item, set_value) VALUES('$HGROUP_ID', '$HHOTEL_ID', 'system', 'biz_date', '$HBDATE'); 
+   ELSE
+      UPDATE sys_option SET set_value='$HBDATE' WHERE hotel_group_id='$HGROUP_ID' AND hotel_id='$HHOTEL_ID' AND catalog='system' AND item='biz_date' ; 
+   END IF;
+
+   IF NOT EXISTS(SELECT 1 FROM audit_flag WHERE hotel_id='$HHOTEL_ID') THEN 
+      INSERT audit_flag(hotel_group_id, hotel_id, biz_date, biz_date1, is_rmposted, station_rmcheck, station_rmpost, rmpost_biz_date, rmpost_datetime,is_audit, audit_user, station_audit,is_exclude_part, station_exclude_part, is_can_checkout, is_keypart, is_year_first_day, is_month_first_day) 
+    VALUES('$HGROUP_ID', '$HHOTEL_ID', '$HBDATE', '$HBDATE', 'F', '', '', '$HRDATE', '$HRDATE','F', '', '', 'F', '', 'T', 'F', 'F', 'F'); 
+   ELSE
+      UPDATE audit_flag SET biz_date='$HBDATE', biz_date1='$HBDATE', is_rmposted='F', station_rmcheck='', station_rmpost='', rmpost_biz_date='$HRDATE',             rmpost_datetime='$HRDATE',is_audit='F', audit_user='', station_audit='', is_exclude_part='F', station_exclude_part='', is_can_checkout='T',is_keypart='F'     ,is_year_first_day='F', is_month_first_day='F'
+      WHERE hotel_id='$HHOTEL_ID'; 	
+   END IF;
+	
+   UPDATE sys_extra_id SET pos_cur = 0, modify_user = 'ADMIN', modify_datetime = NOW()
+ 	  WHERE hotel_group_id='$HGROUP_ID' AND hotel_id='$HHOTEL_ID'; 
+	
+
+   DELETE FROM room_sta WHERE hotel_group_id='$HGROUP_ID' AND hotel_id='$HHOTEL_ID';
+
+   INSERT room_sta(hotel_group_id, hotel_id, rmno_id, rmno, sta, sta_occ, sta_tmp, ci_num_pre, ci_num, ci_accnts, empty_days, list_order, create_user, create_datetime, modify_user, modify_datetime)
+        SELECT '$HGROUP_ID', '$HHOTEL_ID', a.id, a.code, 'R', 'V', '', 0, 0, '', 0, a.list_order, 'ADMIN', NOW(), 'ADMIN', NOW() FROM room_no a 
+		 WHERE hotel_group_id='$HGROUP_ID' AND hotel_id='$HHOTEL_ID';
+   DELETE FROM real_time_room_sta WHERE hotel_group_id='$HGROUP_ID' AND hotel_id='$HHOTEL_ID';
+   INSERT INTO real_time_room_sta (hotel_group_id, hotel_id, building, FLOOR, rmno, rmno_inner, rmtype, rmclass, room_sta, occ_sta, 
+                                   is_add_bed, is_vip, is_secret, is_message, is_tmp, is_free, is_union, is_foreign, is_arr, is_dep,
+                                   is_live, is_exceed_limit, is_future, reser_type, feature)
+         SELECT a.hotel_group_id, a.hotel_id, a.building, a.floor, a.code, a.code_inner, a.rmtype, a.rmclass, b.sta, b.sta_occ, 
+		'F', 'F', 'F', 'F', 'F', 'F', 'F', 'F', 'F', 'F', 'F', 'F', 'F', '', ''
+		FROM room_no a,room_sta b 
+	 WHERE a.hotel_group_id='$HGROUP_ID' AND a.hotel_id='$HHOTEL_ID' AND a.hotel_group_id=b.hotel_group_id AND a.hotel_id=b.hotel_id AND a.code=b.rmno;
+END; hryhby
+DELIMITER ;
+EOF
+
+#
+
+/root/mode/seecfg -s $HMYSQLDIP "$HTMPSQL" $HDBNAME
+/root/mode/seecfg -s $HMYSQLDIP "call $HTMPPROC" $HDBNAME
+/root/mode/seecfg -s $HMYSQLDIP "drop procedure $HTMPPROC" $HDBNAME
+
+#
+
+rm -f $HTMPALL;rm -f $HTMPCODE;rm -f $HTMPPARM;rm -f $HTMPINIT;rm -f $HTMPSQL
+

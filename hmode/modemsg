@@ -1,0 +1,25 @@
+#!/bin/bash
+# ------------------------------------------------------------------
+# function:
+#          display mode error message through /dev/stderr to screen
+#
+# ------------------------------------------------------------------
+
+if [ -z "$2" ]; then
+   read -r Hpipe
+   [ -z "$Hpipe" ] && exit
+else
+   Hpipe="$2"
+fi
+{
+if [ -z "$3" -o "$3" = "more" ]; then
+   echo
+fi
+echo "[mode $1]:  $Hpipe" 
+if [ "$3" = "more" -o "$3" = "reverse" ]; then
+   echo
+fi
+} >&2 
+
+#
+

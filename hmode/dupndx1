@@ -1,0 +1,164 @@
+#!/bin/bash
+# ---------------------------------------------------------------------------------------------------------------
+# function:
+#          1.display the table and its indexes according to options
+#             "-a"        # all tables will be displayed
+#             no options  # only tables with redundant indexes
+#             "-P"        # only tables with redundant indexes and primary key
+#             "-p"        # only tables with redundant indexes,but without primary key
+#          2.drop redundant indexes using pt when option '-d' is given 
+# ---------------------------------------------------------------------------------------------------------------
+# usages  :
+#          ./dupndx1 [<options>] [<MySQL-server-ip>] <dbname> <tbname> 
+# ---------------------------------------------------------------------------------------------------------------
+# e.g.    :
+#          ./dupndx1 192.168.0.50 portal_f_pms master_base
+#          ./dupndx1 portal_f_pms master_base
+#          ./dupndx1 -d portal_f_pms master_base    
+# ---------------------------------------------------------------------------------------------------------------
+# remarks:
+#          The option '-d' will make dupndx1 drop redundant indexes automaticly if
+#          a.there exists redundant indexes;
+#          b.there exists primary key;
+#          c.pt has been installed at local server.
+# ---------------------------------------------------------------------------------------------------------------
+
+# get options
+
+HOPTIONS=""
+while (echo "'$1'"  | grep -E  -e "^'-" > /dev/null)
+do
+   HOPTIONS="$HOPTIONS$1"
+   shift
+done
+
+#
+
+. /root/mode/mysqldip 
+
+#
+
+HDB="$1"
+HTAB="$2"
+
+#
+
+if [ -z "$3" ]; then
+   # database name
+   if [ -z "$HDB" ]; then
+      /root/mode/modemsg dupndx1 "Database name must be provided!" more
+      exit 1
+   fi
+   # $HDB must exist
+   if [ -z `/root/mode/seecfg -s $HMYSQLDIP "show databases like '$HDB'"|grep -i "^$HDB"` ]; then
+      /root/mode/modemsg dupndx1 "Database '$HDB' doesn't exist in MySQL server at $HMYSQLDIP" more
+      exit 1
+   fi
+   # test table name
+   if [ -n "$HTAB" ]; then
+      if ! /root/mode/testobjects $HMYSQLDIP "[$HTAB]" "$HDB"; then
+         /root/mode/modemsg dupndx1 "Table '$HTAB' doesn't exist!" more
+         exit 1
+      fi
+   else
+      /root/mode/modemsg dupndx1 "Table name must be provided!" more
+      exit 1
+   fi
+fi
+
+# table index information
+
+Hindex=$(/root/mode/seecfg -s $HMYSQLDIP "show create table \`$HTAB\`" "$HDB" | sed -re "s/\\\\n/\n/g" | 
+sed -nre "/^ *(PRIMARY|UNIQUE)? *KEY/ p" |
+sed -re "s/PRIMARY KEY/primarykey \`primary\`/" |
+sed -re "s/UNIQUE KEY/uniquekey/" |
+sed -re "s/KEY/key/" |
+sed -re "s/^ *(primarykey|uniquekey|key) \`([^\`]+)\` \((.*)\)( +[a-zA-Z]+)*[,]?$/\1:\2:\3/" |
+sed -re "s/\`//g")
+
+# get index information 
+
+Hi_file=/root/mode/tmp/Hindexinfo_file$$.tmp
+>$Hi_file
+Hloop=0
+echo "$Hindex" |
+while read -r Haindex;do
+   Hloop=$[Hloop+1]
+   #
+   Hkeytype=`echo $Haindex | sed -re "s/(.*):(.*):(.*)/\1/"`
+   Hkeyname=`echo $Haindex | sed -re "s/(.*):(.*):(.*)/\2/"`
+   Hkeyexpr=`echo $Haindex | sed -re "s/(.*):(.*):(.*)/\3/"`
+   #
+   Hkeytype1="$Hkeytype               "
+   Hkeytype1=${Hkeytype1:0:15}
+   #
+   Hkeyname1=$Hkeyname
+   if [ ${#Hkeyname1} -le 45 ]; then
+      Hkeyname1="$Hkeyname1                                                "
+      Hkeyname1=${Hkeyname1:0:45}
+   fi
+   #
+   if [ "$Hkeytype" = "primarykey" ]; then 
+      Hdropintent="             "
+   else
+      Hinkeys1=`echo "$Hindex" | sed -re "$Hloop d" | sed -re "s/$/,/" | grep -i "^.*:.*:$Hkeyexpr,."`
+      Hinkeys2=`echo "$Hindex" | sed -nre "1,$Hloop p" | sed -re "$Hloop d" | sed -re "s/$/,/" | grep -i "^.*:.*:$Hkeyexpr,"`
+      if [ -n "$Hinkeys1" ]; then
+         Hdropintent="(drop intent)"
+      elif [ -n "$Hinkeys2" ]; then 
+         Hdropintent="(drop intent)"
+      else
+         Hdropintent="             "
+      fi
+   fi
+   echo "$Hkeytype1 $Hkeyname1 $Hdropintent $Hkeyexpr" >> $Hi_file
+done
+
+# display index information according to options
+
+Htodisp=
+if echo "$HOPTIONS" | grep -E -e "-a(-|$)" >/dev/null; then
+   Htodisp=1
+elif cat $Hi_file 2>/dev/null | grep -E "\(drop intent\)" >/dev/null; then
+   if echo "$HOPTIONS" | grep -E -e "-P(-|$)" >/dev/null; then
+      if cat $Hi_file 2>/dev/null | grep -E "^primarykey " >/dev/null; then
+         Htodisp=1
+      fi
+   elif echo "$HOPTIONS" | grep -E -e "-p(-|$)" >/dev/null; then
+      if ! cat $Hi_file 2>/dev/null | grep -E "^primarykey " >/dev/null; then
+         Htodisp=1
+      fi
+   else
+      Htodisp=1
+   fi
+fi
+if [ -n "$Htodisp" ]; then
+   echo
+   echo "table << $HTAB >>"
+   echo
+   cat $Hi_file
+fi
+
+# drop redundant indexes using pt
+
+if echo "$HOPTIONS" | grep -E -e "-d(-|$)" >/dev/null; then
+   # drop option satisfied
+   if cat $Hi_file 2>/dev/null | grep -E "\(drop intent\)" >/dev/null; then
+      # there exist indexes with '(drop intent)' flag
+      if cat $Hi_file 2>/dev/null | grep -E "^primarykey " >/dev/null; then
+         # there exists primarykey
+         Hindexes_to_drop=`cat $Hi_file 2>/dev/null | grep -E "\(drop intent\)" | awk '{print $2}' | sed -re "s/(.*)/drop index \\\`\1\\\`,/" | sed -re "$ s/,$//" | tr -d '\n'`
+         # use pt to drop redundant indexes
+         echo
+         /root/mode/ptmode $HMYSQLDIP --e --alter "$Hindexes_to_drop" D="$HDB",t="$HTAB"
+      fi
+   fi
+fi
+
+# rm tmp file
+
+rm -f $Hi_file
+
+# end
+
+

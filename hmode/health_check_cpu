@@ -1,0 +1,33 @@
+#!/bin/bash 
+# ----------------------------------------------------
+# function: do cpu related check
+# usages  :
+#          ./health_check_cpu
+#          /root/mode/health_check_cpu
+# ----------------------------------------------------
+
+#
+
+Hcpucores=`/root/mode/cpucores`
+
+#
+
+Htop=`top -b -n 1 | head -n 3`
+Hload1=`echo "$Htop" | head -n 1 | sed -re "s/.*load average: *([^,]+), *([^,]+), *([^,]+)/\1/"` 
+Hload2=`echo "$Htop" | head -n 1 | sed -re "s/.*load average: *([^,]+), *([^,]+), *([^,]+)/\2/"` 
+Hload3=`echo "$Htop" | head -n 1 | sed -re "s/.*load average: *([^,]+), *([^,]+), *([^,]+)/\3/"` 
+Hwa=`echo "$Htop" | tail -n 1 | sed -re "s/.* +([^ ]+)%wa.*/\1/"` 
+
+# 
+
+Hloadper=`echo "scale=3;$Hload3/$Hcpucores*100" | bc -l`
+if [ $(echo "$Hloadper >= 80.00" | bc) -eq 1 ]; then
+   if [ $(echo "$Hwa >= 60.00" | bc) -eq 1 ]; then
+      echo "cpu#ModeD#high cpu load - $Hload1 $Hload2 $Hload3 on $Hcpucores core server - probably caused by disk throttle"
+   else
+      echo "cpu#ModeD#high cpu load - $Hload1 $Hload2 $Hload3 on $Hcpucores core server"
+   fi
+fi 
+
+# end of cpu checks
+

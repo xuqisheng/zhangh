@@ -1,0 +1,16 @@
+#!/bin/bash
+# ---------------------------------------
+#
+# --------------------------------------
+
+HHOSTTMP="/root/mode/tmp/hhosttmp$$.tmp"
+cat /etc/hosts |
+sed "/gcipms.gicp.net/ d" |
+sed "$ a $1   gcipms.gicp.net" > $HHOSTTMP
+cp -f $HHOSTTMP /etc/hosts
+
+# 
+
+rm -f $HHOSTTMP
+
+

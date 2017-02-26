@@ -1,0 +1,75 @@
+#!/bin/bash
+#-------------------------------------------------------
+# function:
+#          test app server and mysql server speed 
+# usage   :
+#          /root/mode/tspeed
+#          /root/mode/tspeed 1
+#          /root/mode/tspeed 10
+#          /root/mode/tspeed 100
+#-------------------------------------------------------
+
+trap "" INT
+
+#
+
+. /root/mode/mysqldip 
+
+# 
+
+if [ -z "$1" ]; then
+   Hrecno=10000
+elif echo "$1" | grep -E "^(1|10|100)$" >/dev/null; then
+   Hrecno=$[10000*$1]
+   if [ "$1" = "100" ]; then
+      /root/mode/confirm "Are you sure to insert $Hrecno records at MySQL server $HMYSQLDIP2" hellohby || exit 1
+   fi
+else
+   Hrecno=100000
+fi
+
+# create sql
+
+cat > /root/mode/tmp/tspeed$$.sql << EOF
+delimiter hryhby
+drop procedure if exists p_hry_tspeed$$ hryhby
+create procedure p_hry_tspeed$$()
+begin
+declare hloop int; 
+create table tspeed$$(
+tvar bigint(20) default 0
+);
+set hloop = 0; 
+while hloop < $Hrecno do
+   insert into tspeed$$ select hloop;
+   set hloop = hloop + 1; 
+end while; 
+drop table tspeed$$;
+endhryhby
+delimiter ;
+call p_hry_tspeed$$();
+drop procedure p_hry_tspeed$$;
+EOF
+
+# find a database to test speed
+
+Hts_db=`/root/mode/seecfg -s $HMYSQLDIP "show databases" | grep -Ev "(information_schema|mysql|performance_schema)" | sort | head -n 1`
+if [ -z "$Hts_db" ]; then
+   Hts_db=mysql
+fi
+
+# execute sql
+
+a=`date +%s.%N`
+/root/mode/seecfg $HMYSQLDIP /root/mode/tmp/tspeed$$.sql $Hts_db
+Hret=$?
+b=`date +%s.%N`
+if [ $Hret -eq 0 ]; then
+   /root/mode/modemsg tspeed "It spent `echo \"scale=9; $b-$a\" | bc` seconds to insert $Hrecno records into database $Hts_db at MySQL server $HMYSQLDIP2" more
+fi
+
+#
+
+rm -f /root/mode/tmp/tspeed$$.sql
+
+

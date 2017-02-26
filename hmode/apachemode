@@ -1,0 +1,28 @@
+#!/bin/bash 
+
+#
+
+if echo "$1" | grep -E "^apache[1-7]?$" >/dev/null; then
+   Hapachemode=$1
+   Hapachetail=`echo $1 | sed -re "s/apache(.*)/\1/"`
+   shift
+else
+   Hapachemode=apache
+   Hapachetail=
+fi
+
+# 
+
+if [ -f /root/antDep/build$Hapachetail.properties ]; then
+   HdbR=`/root/mode/mod_config /root/antDep/build$Hapachetail.properties "db.root" "#Get#"`
+   HdbRtr=`/root/mode/mod_config /root/antDep/build$Hapachetail.properties "dbtr.root" "#Get#"`
+   HdbN=`/root/mode/mod_config /root/antDep/build$Hapachetail.properties "db.name" "#Get#"`
+   HdbNtr=`/root/mode/mod_config /root/antDep/build$Hapachetail.properties "dbtr.name" "#Get#"`
+else
+   HdbR=
+   HdbRtr=
+   HdbN=portal
+   HdbNtr=portal_tr
+fi
+
+

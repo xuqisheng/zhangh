@@ -1,0 +1,55 @@
+#!/bin/bash
+# -----------------------------------------------------------------------
+# functions:
+#           display table and its columns 
+# usage    :
+#           ./tabprop [<mysql-server-ip>] <dbname> <tablename> <dispmode>
+# -----------------------------------------------------------------------
+
+# get mysql server ip
+
+. /root/mode/mysqldip 
+
+# 
+
+HDBNAME=${1:-targetdb2}
+HTABNAME=${2:-pccode}
+
+# $HDBNAME must exist 
+
+if [ -z `/root/mode/seecfg -s $HMYSQLDIP "show databases like '$HDBNAME'"|grep -i "^$HDBNAME"` ]; then
+  /root/mode/modemsg tabprop "Database $HDBNAME doesn't exist!" more && exit 1
+fi
+
+# $HTABNAME must exist 
+
+HTABTEST=`/root/mode/seecfg -s $HMYSQLDIP "show tables from \\\`$HDBNAME\\\` like '$HTABNAME'"|grep -i "^$HTABNAME"`
+if [ -z "$HTABTEST" ]; then
+   /root/mode/modemsg tabprop "Table $HTABNAME doesn't exist!" more && exit 1
+fi
+
+# 
+
+/root/mode/seecfg -s $HMYSQLDIP "show columns from \`$HTABNAME\` from \`$HDBNAME\`" | 
+sed -re "s/^([^\t]+).*/\1/g" | 
+if [ "$3" = "null" ]; then
+   sed -re "s/(.*)/ifnull\(\`\1\`,'##'\),/"
+elif   [ "$3" = "1" ]; then
+   sed -re "s/^/\[$HTABNAME\./g" | sed -re "s/$/\]/g"
+elif [ "$3" = "0" ]; then
+   sed -re "s/$/\\+/g"
+elif [ "$3" = "2" ]; then
+   sed -re "s/$/\,/g"
+elif [ "$3" = "2a" ]; then
+   sed -re "s/^/a\./g" | sed -re "s/$/\,/g"
+elif [ "$3" = "2b" ]; then
+   sed -re "s/^/b\./g" | sed -re "s/$/\,/g"
+else
+   sed -re "s/^/\[$HDBNAME\.$HTABNAME\./g" | sed -re "s/$/\]/g"
+fi |  
+sed -e "$ s/,$//" | tr -d "\n"
+
+# end
+
+
+

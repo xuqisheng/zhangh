@@ -1,0 +1,65 @@
+#!/bin/bash 
+# ----------------------------------------------------
+# function: do disk related check
+# usages  : 
+#          ./health_check_disk
+#          /root/mode/health_check_disk
+# ----------------------------------------------------
+
+Hdisks=`(LANG=C;df) | grep -Ev "^((dev)?tmpfs|Filesystem)" | grep -Ev "(/media|/boot)" | sed -re "s/$/HrYeNd/" | tr -d '\n' | sed -re "s/(\/dev\/[^ ]+)HrYeNd/\1/g" | sed -re "s/HrYeNd/\n/g"`
+Hdiskcnt=`echo "$Hdisks" | wc -l`
+
+# --------------------------------------------------------------
+# 1.echo disks with disk stress 
+# --------------------------------------------------------------
+
+echo "$Hdisks" | grep -E ".* (100|[9][56789])% /[^ ]*$" | sed -re "s/^([^ ]+).* ([^ ]+) +([^ ]+)$/disk#ModeD#disk space warning - \1 used \2 of space/"
+
+# --------------------------------------------------------------
+# 2.echo disks not defined in /etc/fstab
+# --------------------------------------------------------------
+
+while read -r H1 H2 H3 H4 H5 H6;do
+   if ! cat /etc/fstab 2>/dev/null | grep -P "(^$H1[ \t]|[ \t]$H6[ \t])" >/dev/null; then
+      if [ -f /etc/mfloatip ] && [ "$H6" != "/" ]; then
+         if find -L "$H6" -name ibdata1 | grep '/mysql/ibdata1' >/dev/null; then
+            continue
+         fi
+      fi
+      echo "disk#ModeD#automount - $H1 is not defined in /etc/fstab"
+   fi
+done <<< "$Hdisks"
+
+# --------------------------------------------------------------
+# 3.echo directories with no symbolic links.For cloud linux only
+# --------------------------------------------------------------
+
+if hostname | grep -E '^(AY|iZ|VM)' >/dev/null && [ $Hdiskcnt -gt 1 ]; then
+   # MySQL installation check
+   if [ -x /usr/sbin/mysqld ]; then
+      if [ ! -h /var/lib/mysql ]; then
+         echo "disk#ModeD#cloud linux - /var/lib/mysql is not a symbolic link"
+      fi
+   fi
+   # /root/mode/dump check
+   if [ ! -h /root/mode/dump ]; then
+      echo "disk#ModeD#cloud linux - /root/mode/dump is not a symbolic link"
+   fi
+   cd /usr/local
+   # tomcat check
+   for i in `ls -d tomcat*/ 2>/dev/null | sed -re "s/\/$//"`;do
+       /root/mode/check_tomcat $i &>/dev/null || continue 
+       if [ ! -h $i ]; then
+          echo "disk#ModeD#cloud linux - /usr/local/$i is not a symbolic link"
+       fi
+   done
+   # apache check
+   for i in `ls -d apache*/ 2>/dev/null | sed -re "s/\/$//"`;do
+       if [ ! -h $i ]; then
+          echo "disk#ModeD#cloud linux - /usr/local/$i is not a symbolic link"
+       fi
+   done
+fi
+
+# end of disk checks
+

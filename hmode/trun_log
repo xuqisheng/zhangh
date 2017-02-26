@@ -1,0 +1,26 @@
+#!/bin/bash
+# ------------------------------------------------------
+# function:
+#          truncate log file "$1"
+# ------------------------------------------------------
+
+#
+
+[ -z "$1" ] && exit 
+[ ! -f "$1" ] && exit
+
+#
+
+Hreslines=10000
+Htail_lines=`tail -n $[$Hreslines+2] "$1" | sed -n "$ ="`
+[ -z "$Htail_lines" ] && exit 
+if [ $Htail_lines -ge $[$Hreslines+2] ]; then
+   (echo "Mode trun_log event at `LANG=en_US;date`";tail -n $Hreslines "$1") > /root/mode/tmp/hgenerallogtmp$$.tmp
+   cp -f /root/mode/tmp/hgenerallogtmp$$.tmp "$1"
+   rm -f /root/mode/tmp/hgenerallogtmp$$.tmp
+fi
+
+# end
+
+
+

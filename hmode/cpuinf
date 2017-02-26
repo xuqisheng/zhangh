@@ -1,0 +1,24 @@
+#!/bin/bash 
+
+Hphycpus=`cat /proc/cpuinfo | grep "physical id" | sort -u | wc -l`
+if [ $Hphycpus -gt 0 ]; then
+   if [ `cat /proc/cpuinfo | grep "cpu cores" | sort -u | wc -l` -gt 1 ]; then
+      echo "${Hphycpus} CPUs"
+      cat /proc/cpuinfo | grep "cpu cores" | sort -u
+      cat /proc/cpuinfo | grep "siblings"  | sort -u 
+      echo "total processors: `cat /proc/cpuinfo | grep processor | wc -l`"
+      exit 
+   fi
+   Hcores=`cat /proc/cpuinfo | grep "cpu cores" | sort -u | sed -re "s/^[^0-9]+([0-9]+)/\1/"`
+   Hsiblings=`cat /proc/cpuinfo | grep "siblings" | sort -u | sed -re "s/^[^0-9]+([0-9]+)/\1/"`
+   Hht=$[$Hsiblings/$Hcores]
+   echo -n "${Hphycpus} CPU * ${Hcores} cores"
+   if [ $Hht -gt 1 ]; then
+      echo -n " * ${Hht} HT"
+   fi
+   echo " = `cat /proc/cpuinfo | grep processor | wc -l` logical processor(s)"
+else
+   echo "Virtual machine: `cat /proc/cpuinfo | grep processor | wc -l` logical processor(s)"
+fi 
+
+

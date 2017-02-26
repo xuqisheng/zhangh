@@ -1,0 +1,119 @@
+#!/bin/bash
+
+Hhrytomcat=$1
+
+# -------------------------------------------------
+# monitor java -> mysql connection pool
+# -------------------------------------------------
+# monitor 'OutOfMemoryError'
+# Houtofmem = 0                         --->   No OutOfMemoryError
+# Houtofmem = -1                        --->   OutOfMemoryError of 'GC overhead limit exceeded' 
+# Houtofmem >= 1 and Houtofmem < 10000  --->   OutOfMemoryError caused by specific requests
+# Houtofmem >= 10000                    --->   OutOfMemoryError serious or unknown
+# -------------------------------------------------
+
+#
+
+Hsrchpat="(wait millis [0-9]+, active ([0-9]+), maxActive \2,|Mode start mark |OutOfMemoryError|unable to create new native thread|\[BlazeDS\]Java heap space|mmap failed for CEN and END part of zip file)"
+Houtofmem=0
+Hpoolfull=0
+Htestfile=/root/mode/tmp/Houtofmemtest$$
+Htestfile2=/root/mode/tmp/Houtofmemtest2$$
+tail -n 2000 /usr/local/$Hhrytomcat/logs/catalina.out 2>/dev/null | grep -E "$Hsrchpat" > $Htestfile
+
+# check java -> mysql connection pool
+
+if grep -E 'wait millis [0-9]+, active ([0-9]+), maxActive \1,' $Htestfile >/dev/null; then
+   # java -> mysql connection pool
+   Hblackmark=`cat $Htestfile 2>/dev/null | grep -Pn "Mode start mark " | sed -n "$ p" | sed -re "s/^([0-9]+):.*/\1/"`
+   if [ "$Hblackmark" = "" ]; then
+      Hpoolfull=1
+   else
+      cat $Htestfile 2>/dev/null | sed -n "$Hblackmark,$ p" | grep -E "$Hsrchpat" > $Htestfile2
+      if cat $Htestfile2 | grep -E 'wait millis [0-9]+, active ([0-9]+), maxActive \1,' >/dev/null; then
+         Hpoolfull=1
+      fi
+   fi
+fi
+
+# check OutOfMemoryError
+
+if [ $Hpoolfull -eq 0 ]; then
+   if grep -E 'OutOfMemoryError' $Htestfile >/dev/null; then
+      # OutOfMemoryError
+      Hblackmark=`cat $Htestfile 2>/dev/null | grep -Pn "Mode start mark " | sed -n "$ p" | sed -re "s/^([0-9]+):.*/\1/"`
+      if [ "$Hblackmark" = "" ]; then
+         # No 'Mode start mark '
+         if cat $Htestfile | grep -E 'OutOfMemoryError' | grep -Ev 'OutOfMemoryError: GC overhead limit exceeded' >/dev/null; then
+            # real OutOfMemoryError 
+            if cat $Htestfile | grep -E '\[BlazeDS\]Java heap space' >/dev/null; then
+               Houtofmem=$[$Houtofmem+1]
+            fi
+            if cat $Htestfile | grep -E 'mmap failed for CEN and END part of zip file' >/dev/null; then
+               Houtofmem=$[$Houtofmem+2]
+            fi
+            if cat $Htestfile | grep -E 'unable to create new native thread' >/dev/null; then
+               Houtofmem=$[$Houtofmem+4]
+            fi
+            if [ $Houtofmem -eq 0 ]; then
+               Houtofmem=10000
+            fi
+         else
+            # OutOfMemoryError: GC overhead limit exceeded
+            # This is only a warning  
+            Houtofmem=-1
+         fi
+      else
+         cat $Htestfile 2>/dev/null | sed -n "$Hblackmark,$ p" | grep -E "$Hsrchpat" > $Htestfile2
+         if cat $Htestfile2 | grep -E 'OutOfMemoryError' | grep -Ev 'OutOfMemoryError: GC overhead limit exceeded' >/dev/null; then
+            # real OutOfMemoryError since latest 'Mode start mark '
+            if cat $Htestfile2 | grep -E '\[BlazeDS\]Java heap space' >/dev/null; then
+               Houtofmem=$[$Houtofmem+1]
+            fi
+            if cat $Htestfile2 | grep -E 'mmap failed for CEN and END part of zip file' >/dev/null; then
+               Houtofmem=$[$Houtofmem+2]
+            fi
+            if cat $Htestfile2 | grep -E 'unable to create new native thread' >/dev/null; then
+               Houtofmem=$[$Houtofmem+4]
+            fi
+            if [ $Houtofmem -eq 0 ]; then
+               Houtofmem=10000
+            fi
+         elif cat $Htestfile2 | grep -E 'OutOfMemoryError: GC overhead limit exceeded' >/dev/null; then 
+            # OutOfMemoryError: GC overhead limit exceeded since latest 'Mode start mark '
+            # This is only a warning  
+            Houtofmem=-1
+         fi
+      fi
+   fi
+fi
+rm -f $Htestfile
+rm -f $Htestfile2
+
+#
+
+if [ $Hpoolfull -eq 1 ]; then
+   # serious   
+   echo "up with [Java2MysqlConnectionPoolFull - this tomcat should be restarted]"
+elif [ $Houtofmem -ge 10000 ]; then
+   # serious OutOfMemoryError  
+   echo "up with [OutOfMemoryError - this tomcat should be restarted]"
+elif [ `cat /root/mode/.tomlogs/$Hhrytomcat 2>/dev/null | wc -l` -gt 0 ]; then
+   # tomcat startup error,some apps may not work well
+   echo "up with context(s) [`echo \`cat /root/mode/.tomlogs/$Hhrytomcat 2>/dev/null\``] not working"
+elif [ $Houtofmem -eq -1 ]; then
+   # OutOfMemoryError: GC overhead limit exceeded
+   # This is only a warning  
+   echo "up with [Low garbage collecting efficiency - OutOfMemoryErrorTrend]"
+elif [ $Houtofmem -gt 0 ]; then
+   # OutOfMemoryError caused by specific requests
+   echo "up with [OutOfMemoryError-$Houtofmem]"
+else
+   # tomcat is running fine
+   echo "up"
+fi
+
+# end
+
+
+

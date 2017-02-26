@@ -1,0 +1,17 @@
+#!/bin/bash
+# ------------------------------------------------------------------
+# function:
+#          test if this is a cluster tomcat
+# ------------------------------------------------------------------
+
+cd /usr/local/$1/conf
+Hclike=`cat server.xml | grep -E "address=\"22[48]\.0" | wc -l`
+if [ $Hclike -eq 0 ]; then
+   exit 1
+fi
+Hrno=`cat server.xml | tr -d "\r\n" | sed -re "s/(<\/Cluster>[ \t]*-->)/\1\n/g" | wc -l`
+if [ $Hclike -gt $Hrno ]; then
+   exit 0
+fi
+exit 1
+

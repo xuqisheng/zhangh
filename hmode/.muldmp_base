@@ -1,0 +1,93 @@
+#!/bin/bash 
+# -----------------------------------------------------------------------------------------
+# function:
+#          dump structures and data of public tables,
+#               structures of group/hotel tables
+#               and all procedures/functions
+# usages  :
+#          ./.muldmp_base <mysqld-ip> <dbname> <base_dump.sql>
+# -----------------------------------------------------------------------------------------
+# e.g.    :  
+#          ./.muldmp_base 6.15 portal /base.sql
+# -----------------------------------------------------------------------------------------
+
+# get options
+
+HOPTIONS=""
+while (echo "'$1'"  | grep -E  -e "^'-" > /dev/null)
+do
+   HOPTIONS="$HOPTIONS$1"
+   shift 
+done
+
+# get mysql server ip 
+
+. /root/mode/mysqldip
+
+# database name
+
+HDBNAME="$1"
+if [ -z "$HDBNAME" ]; then
+   /root/mode/modemsg muldmp_base "Database name must be provided!" more
+   exit 1
+fi
+
+# $HDBNAME must exist 
+
+if [ -z `/root/mode/seecfg -s $HMYSQLDIP "show databases like '$HDBNAME'"|grep -i "^$HDBNAME"` ]; then
+   /root/mode/modemsg muldmp_base "Database '$HDBNAME' doesn't exist in MySQL server at $HMYSQLDIP" more
+   exit 1
+fi
+
+# $HDBNAME must be gc ipms 
+
+if [ -z `/root/mode/seecfg -s $HMYSQLDIP "show tables from \\\`$HDBNAME\\\` like 'audit\_flag'"` ]; then
+   /root/mode/modemsg muldmp_base "Database '$HDBNAME' IS NOT a gc ipms!" more
+   exit 1
+fi
+
+# dump name
+
+if [ -z "$2" ]; then
+   /root/mode/modemsg muldmp_base "Please provide a dump name ending with \".sql\""  more
+   exit 1
+elif echo "$2" | grep "\.sql$" >/dev/null; then
+   HDUMPNAME="$2"
+else
+   /root/mode/modemsg muldmp_base "User designated dump name must end with \".sql\""  more
+   exit 1
+fi
+
+# confirmation 
+
+/root/mode/modemsg muldmp_base "base part" 
+/root/mode/modemsg muldmp_base "MySQL server ip   : $HMYSQLDIP" less
+/root/mode/modemsg muldmp_base "Database          : $HDBNAME"   less
+/root/mode/modemsg muldmp_base "dump name         : $HDUMPNAME" less
+
+/root/mode/confirm "Are you sure that the information above is completely right" more || exit 1 
+
+# --------------------------------------------
+# Here is the body,very short in fact 
+# --------------------------------------------
+
+{
+echo
+echo "############# muldmp_base $HOPTIONS $HMYSQLDIP $* #############"
+echo
+
+echo "dump base part of database $HDBNAME at $HMYSQLDIP began at `LANG=en_US;date`"
+echo
+
+mysqldump -uroot $Hmodepass -h$HMYSQLDIP --opt    --single-transaction    $HDBNAME `/root/mode/find_tables $HMYSQLDIP $HDBNAME 00 | grep -Ev '^hotel_group$'` > "$HDUMPNAME"
+mysqldump -uroot $Hmodepass -h$HMYSQLDIP --opt -d --single-transaction    $HDBNAME `/root/mode/find_tables $HMYSQLDIP $HDBNAME 00 | grep -E  '^hotel_group$'` >>  "$HDUMPNAME"
+mysqldump -uroot $Hmodepass -h$HMYSQLDIP --opt -d --single-transaction    $HDBNAME `/root/mode/find_tables $HMYSQLDIP $HDBNAME 10` >> "$HDUMPNAME"
+mysqldump -uroot $Hmodepass -h$HMYSQLDIP --opt -d --single-transaction -R $HDBNAME `/root/mode/find_tables $HMYSQLDIP $HDBNAME 11` >> "$HDUMPNAME"
+
+echo
+echo "dump base part of database $HDBNAME at $HMYSQLDIP ended at `LANG=en_US;date`"
+echo
+} 2>&1 | tee -a /root/mode/logs/muldmp_base.log
+
+# end
+

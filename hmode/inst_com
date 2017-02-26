@@ -1,0 +1,58 @@
+#!/bin/bash
+# --------------------------------------------------------------------------------------------
+# function:
+#           Install and configure what are required by both app server and MySQL server 
+# --------------------------------------------------------------------------------------------
+
+# maintain /etc/hosts 
+
+/root/mode/mnthosts
+
+# manage linux services 
+
+/root/mode/srvman
+
+# mail
+
+/root/mode/mntmail
+
+# set tomezone etc.
+
+/root/mode/settz
+
+# disable usbnet
+
+/root/mode/disusb
+
+# set /etc/sysctl.conf
+
+/root/mode/msysctl
+
+# enca etc.
+
+/root/mode/inst_misc
+
+# set_cron
+
+/root/mode/set_cron
+
+# config sshd
+
+/root/mode/config_sshd
+
+# linux bux fixes
+
+/root/mode/lbugfix
+
+# cpu policy
+
+/root/mode/cpufreq
+
+# setpath
+
+/root/mode/setpath
+
+#
+
+
+

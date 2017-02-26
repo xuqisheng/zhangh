@@ -1,0 +1,119 @@
+#!/bin/bash
+# -------------------------------------------------
+# function:
+#          set cpu policy
+# -------------------------------------------------
+# remarks:
+#          We ONLY use maximal cpu performance now
+# -------------------------------------------------
+
+# exclusive execution with wait mode
+
+/root/mode/modepv cpufreq $$ " /bin/bash .*/cpufreq"
+
+# Our mode is performance
+
+Hcg=performance
+
+# static part 
+
+[ -f /etc/sysconfig/cpuspeed ] && /root/mode/mod_config /etc/sysconfig/cpuspeed "GOVERNOR=$Hcg"
+
+# dynamic part 
+
+# Do nothing with virtual machine
+
+if /root/mode/cpuinf | grep "Virtual machine" >/dev/null; then
+   if [ "$1" = "-l" ]; then
+      /root/mode/modemsg cpufreq "No cpufreq support for virtual machine!" more
+   fi
+   exit 
+fi
+
+# CentOS 6.x specific
+
+if [ -f /etc/redhat-release ]; then
+   if cat /etc/redhat-release | grep -E " release 6\..*" > /dev/null; then
+      chkconfig cpuspeed on
+      /etc/init.d/cpuspeed restart >/dev/null 2>&1
+      exit
+   fi
+fi
+
+# CentOS 5.x specific
+
+if [ -f /etc/redhat-release ]; then
+   if cat /etc/redhat-release | grep -E " release 5\..*" > /dev/null; then
+      # --------------------
+      # static/dynamic 
+      # --------------------
+      # static part
+      mkdir -p /etc/modprobe.d
+      echo "options processor ignore_ppc=1" > /etc/modprobe.d/ignore_ppc.conf
+      # dynamic part
+      echo 1 > /sys/module/processor/parameters/ignore_ppc
+      # configure cpuspeed 
+      chkconfig cpuspeed off                2>/dev/null
+      /etc/init.d/cpuspeed start >/dev/null 2>&1
+      /etc/init.d/cpuspeed stop  >/dev/null 2>&1
+      exit
+   fi
+fi
+
+# No cpufreq support
+
+if [ `ls -l /sys/devices/system/cpu/cpu*/cpufreq 2>/dev/null | wc -l` -eq 0 ]; then
+   if [ "$1" = "-l" ]; then
+      /root/mode/modemsg cpufreq "No cpufreq support for this machine!" more
+   fi
+   exit
+fi
+
+# set as we wish
+
+if [ -f /usr/bin/cpufreq-selector ]; then
+   # case 1
+   i=0
+   j=`/root/mode/cpucores`
+   while [ $i -lt $j ];do
+      /usr/bin/cpufreq-selector -c $i -g $Hcg
+      i=$[$i+1]
+   done
+   if [ "$1" = "-l" ]; then
+      /root/mode/modemsg cpufreq "Set to '$Hcg' cpu policy using cpufreq-selector!" more
+   fi
+   exit
+elif [ -f /usr/bin/cpufreq-set ]; then
+   # case 2
+   i=0
+   j=`/root/mode/cpucores`
+   while [ $i -lt $j ];do
+      /usr/bin/cpufreq-set -c $i -g $Hcg
+      i=$[$i+1]
+   done
+   if [ "$1" = "-l" ]; then
+      /root/mode/modemsg cpufreq "Set to '$Hcg' cpu policy using cpufreq-set!" more
+   fi
+   exit
+elif cat /sys/devices/system/cpu/cpu0/cpufreq/scaling_available_governors 2>/dev/null | grep -w "$Hcg" >/dev/null; then
+   # case 3
+   # our native way
+   i=0
+   j=`/root/mode/cpucores`
+   while [ $i -lt $j ];do
+      echo $Hcg > /sys/devices/system/cpu/cpu$i/cpufreq/scaling_governor
+      i=$[$i+1]
+   done
+   if [ "$1" = "-l" ]; then
+      /root/mode/modemsg cpufreq "Set to '$Hcg' cpu policy natively!" more
+   fi
+   exit 
+else
+   # say sorry 
+   if [ "$1" = "-l" ]; then
+      /root/mode/modemsg cpufreq "No cpufreq tools at this machine!" more
+   fi
+fi
+
+# end
+

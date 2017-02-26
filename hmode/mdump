@@ -1,0 +1,299 @@
+#!/bin/bash
+# ------------------------------------------------------------------
+# function:
+#           dump mysql database
+# usage   :
+#           ./mdump [<mysql-server-ip>] <database> <userfile.sql>
+#           ./mdump [<mysql-server-ip>] <database>
+# defaults:
+#           default database name is portal
+# e.g.    :
+#           ./mdump         
+#           ./mdump portal        
+#           ./mdump portal /tmp.sql       
+#           ./mdump 6.13        
+#           ./mdump 6.13 portal        
+#           ./mdump 6.13 portal /portal613.sql       
+# ------------------------------------------------------------------
+
+# get mysql server ip
+
+. /root/mode/mysqldip
+
+# Default database to dump is portal or portal_f
+
+if [ -z "$1" ]; then
+   HDBNAME=portal
+   if [ -z `/root/mode/seecfg -s $HMYSQLDIP "show databases like '$HDBNAME'"|grep -i "^$HDBNAME"` ]; then
+      HDBNAME=portal_f
+      if [ -z `/root/mode/seecfg -s $HMYSQLDIP "show databases like '$HDBNAME'"|grep -i "^$HDBNAME"` ]; then
+         echo "Neither Database portal nor database portal_f exists at $HMYSQLDIP2!" && exit 1
+      fi
+   fi
+else
+   HDBNAME="$1"
+   if [ -z `/root/mode/seecfg -s $HMYSQLDIP "show databases like '$HDBNAME'"|grep -i "^$HDBNAME"` ]; then
+       echo "Database $HDBNAME doesn't exist at $HMYSQLDIP2!" && exit 1
+   fi
+fi
+
+# dump name
+
+HCDATE=`date +%Y-%m-%d`
+
+if [ "$2" = "" ]; then
+
+   # generate dumpname
+
+   while [ 1 ]; do
+      HDUMPNAME=`/root/mode/dumpnamepv $HDBNAME $HCDATE`
+      if [ -n "$HDUMPNAME" ]; then
+         break
+      fi
+      sleep 0.$[$RANDOM%100]
+   done
+elif echo "$2" | grep "\.sql$" >/dev/null; then
+   HDUMPNAME="$2"
+else
+   echo "User designated dump name must end with \".sql\"" && exit 1
+fi
+
+# clear linux caches before dump process
+
+/root/mode/clrcache 1
+
+# remove history standard dumps 
+
+/root/mode/rmdump $HMYSQLDIP "$HDBNAME" "$HCDATE"
+
+# set a limit for dump times
+
+Hdodumptimes=0
+Hdodumplimit=2
+Hwaitlength=30
+
+# dump process
+
+trap "" INT
+sleep $[$RANDOM%3].$[$RANDOM%10]
+{
+echo
+echo "############# mdump $HMYSQLDIP2 $* #############"
+echo
+# The following start time will be writen to dumpload.log 
+Hdumpstarttime=`/root/mode/seecfg -s $HMYSQLDIP "select now()"`
+echo "Dump database $HDBNAME at $HMYSQLDIP2 to '$HDUMPNAME' began at MySQL server time $Hdumpstarttime"
+# dump body 
+while [ $Hdodumptimes -lt $Hdodumplimit ]; do
+   
+   Hdodumptimes=$[$Hdodumptimes+1]
+
+   # ----------------------------------------------------------------------------------------------------
+   # Do the following first.
+   # For big dumps,it will spend a lot of time
+   # ----------------------------------------------------------------------------------------------------
+   > "$HDUMPNAME" 
+
+   # ----------------------------------------------------------------------------------------------------
+   # dump start time(using MySQL server time)
+   # The following start time,which varies with $Hdodumptimes,will be recorded at the mode generated header
+   # ----------------------------------------------------------------------------------------------------
+   Hdumpstarttime=`/root/mode/seecfg -s $HMYSQLDIP "select now()"`
+
+cat > "$HDUMPNAME" << EOF
+--
+-- mode generated header
+-- 
+-- [mode] MySQL server time      : $Hdumpstarttime
+-- [mode] MySQL client time      : `LANG=en_US;date`
+-- [mode] MySQL Server addr      : $HMYSQLDIP2
+-- [mode] Database dumped        : $HDBNAME
+-- [mode] binlog to be rotated   : `/root/mode/seecfg -s $HMYSQLDIP "show master status"`
+-- [mode] binlog used to recover : next binlog and on 
+--
+EOF
+
+   if [ "$Hstruconly" = "YeS" ]; then
+      mysqldump -uroot $Hmodepass -h$HMYSQLDIP --opt --single-transaction --master-data=2 -F -R -d $HDBNAME >> "$HDUMPNAME" &
+      Hlprocess=$!
+   else
+      mysqldump -uroot $Hmodepass -h$HMYSQLDIP --opt --single-transaction --master-data=2 -F -R $HDBNAME >> "$HDUMPNAME" &
+      Hlprocess=$!
+   fi
+
+   # test dump mark  
+   
+   echo
+   echo -n "Probing deadlock ......"
+   Hwloop=0
+   Hrandoffset=$[$RANDOM%30+1]
+   Hwsecs=$[2**$[$Hdodumptimes-1]*$Hwaitlength+$Hrandoffset]
+   Hflushtested=
+   Hkilledbyoth=
+   Hwaitedsmark=
+   while [ $Hwloop -lt $Hwsecs ]; do
+      #sync 
+      if ! head -n 30 "$HDUMPNAME" 2>/dev/null | grep -E "Position to start replication" >/dev/null; then
+         if [ -z "$Hflushtested" ]; then
+            /root/mode/kdthread $HMYSQLDIP && Hflushtested=YeS
+         fi 
+         if [ $Hwloop -ge 25 ]; then
+            if [ $[$Hwloop/5*5] -eq $Hwloop ]; then
+               if [ -z "$Hflushtested" ]; then
+                  # probably killed by others
+                  Hkilledbyoth=YeS
+                  break
+               else
+                  if ! /root/mode/kdthread $HMYSQLDIP; then
+                     # -------------------------------------------------------------------------------------
+                     # case 1:dump is just beginning,but 'Position to start replication' has not been found
+                     # case 2:dump thread was killed by others
+                     # -------------------------------------------------------------------------------------
+                     # We waited 5 seconds for clearer situation
+                     # -------------------------------------------------------------------------------------
+                     if [ -z "$Hwaitedsmark" ]; then
+                        # Give chances to case 1 
+                        # we expect that 'Position to start replication' be found
+                        Hwaitedsmark=YeS
+                     else
+                        # probably not case 1
+                        Hkilledbyoth=YeS
+                        break
+                     fi 
+                  fi
+               fi
+            fi
+         fi
+      else
+         break
+      fi
+      sleep 1
+      echo -n " $[$Hwloop%10]" 
+      Hwloop=$[$Hwloop+1]
+   done
+   echo 
+
+   #
+
+   if ! head -n 30 "$HDUMPNAME" 2>/dev/null | grep -E "Position to start replication" >/dev/null; then
+      # ------------------------------------------------------------
+      # In rare cases,dump may be beginning just at this moment
+      # ------------------------------------------------------------
+      # We will kill this kind of dump process at the step 3 
+      # ------------------------------------------------------------
+      echo
+      if [ "$Hkilledbyoth" = "YeS" ]; then
+         # may be already killed by other process
+         /root/mode/modemsg mdump "It seems that this dump thread was killed by other process ......"
+      else
+         # possible deadlock occurred
+         echo "Possible deadlock detected!Kill signal will be sent to the dump thread after neccessary logging!"
+      fi
+
+      # ------------------------------------------------------------------------------------------
+      # step 1:record the current MySQL full processlist,including the dump thread.
+      # ------------------------------------------------------------------------------------------
+
+      echo 
+      echo "Logging the current SQL threads to /root/mode/logs/processlist.log ......" 
+      {
+      echo 
+      echo "#####################################################################################"
+      echo "# OS datetime: `date '+%Y-%m-%d %H:%M:%S'`"
+      echo "# mode script: /root/mode/seecfg $HMYSQLDIP 'show processlist'"
+      echo "# mode script: /root/mode/seecfg $HMYSQLDIP 'show full processlist'"
+      echo "#####################################################################################"
+      echo 
+      /root/mode/seecfg $HMYSQLDIP "show processlist"
+      /root/mode/seecfg $HMYSQLDIP "show full processlist"
+      } >>/root/mode/logs/processlist.log 2>&1
+
+      # ------------------------------------------------------------------------------------------
+      # step 2:kill the dump threads
+      # ------------------------------------------------------------------------------------------
+      # kill all dump threads which are in the forms like 'FLUSH ......' 
+      # do kill again even if they were already killed by other process
+      # ------------------------------------------------------------------------------------------
+
+      /root/mode/kdthread $HMYSQLDIP kill
+
+      # ------------------------------------------------------------------------------------------
+      # step 3:kill our own mysqldump process even if it is normal dump
+      # ------------------------------------------------------------------------------------------
+      # 1.In normal cases,when the mysqldump thread is killed,the mysqldump process will disappear.
+      #   So we need to test if the mysqldump process exists before we kill it.
+      # 2.When the dump thread passed 'FLUSH ...' stages,it is in the form of 'show table status 
+      #   like ......' or 'SELECT /*!40001 SQL_NO_CACHE */ * FROM ......'.We will not kill such 
+      #   threads.Instead we kill our own mysqldump process.
+      # ------------------------------------------------------------------------------------------
+          
+      sleep 2
+      if ps -ef | grep -P "^[^ ]+[ \t]+$Hlprocess[ \t]+.* mysqldump .*$HDBNAME" >/dev/null; then
+         /root/mode/modemsg mdump "mysqldump process $Hlprocess will be killed" more
+         kill -9 $Hlprocess 
+         sleep 1
+      fi
+
+      # ------------------------------------------------------------------------------------------
+      # step 4:continue to dump or not
+      # ------------------------------------------------------------------------------------------
+
+      echo
+      if [ $Hdodumptimes -lt $Hdodumplimit ]; then
+         echo "Mode will redo dump in $Hwsecs seconds ......"
+         sleep $Hwsecs
+         continue 
+      else
+         echo "Mode will not redo dump any more!"
+         break
+      fi
+   fi
+
+   # dump process is at our controll 
+
+   echo
+   if [ $Hdodumptimes -eq 1 ]; then
+      echo "Everything seems OK!"
+   else
+      echo "Everything seems OK now!"
+   fi
+   /usr/bin/renice -2 $Hlprocess &>/dev/null 
+     
+   # dump has been in progress,so go on to monitor dump process
+   
+   trap "kill -9 $Hlprocess" INT
+   echo
+   echo -n "^-^"
+   while [ 1 ]; do
+      /root/mode/mondump $Hlprocess $HMYSQLDIP $HDBNAME || break
+      sleep 5
+   done
+   echo -n "^-^"
+   echo
+
+   # dump has ended,check the completeness of dump file
+
+   trap "" INT
+   if /root/mode/comdump "$HDUMPNAME"; then
+      # remove history dumps,do as usual even when parameter $2 is given,e.g ./mdump portal /portal613.sql
+      /root/mode/rmdump $HMYSQLDIP "$HDBNAME" "$HCDATE"
+   else
+      # incomplete dump
+      echo
+      echo "Error occured during dump process"
+   fi
+
+   # end of dump
+   break
+
+done
+echo
+echo "Dump database $HDBNAME at $HMYSQLDIP2 to '$HDUMPNAME' ended at MySQL server time `/root/mode/seecfg -s $HMYSQLDIP \"select now()\"`"
+echo
+} 2>&1 | tee -a /root/mode/logs/dumpload.log
+
+# clear linux caches after dump process
+
+/root/mode/clrcache 1
+
+#

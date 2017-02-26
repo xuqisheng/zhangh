@@ -1,0 +1,204 @@
+#!/bin/sh
+# -------------------------------------------------------------------------------------
+# function:
+#          compare table differences of multiple databases
+# -------------------------------------------------------------------------------------
+# ./dbcmp [<mysql-server-ip>] <dbname1> <dbname2> ... 
+# e.g.:
+#       ./dbcmp 6.13 db1 db2 db3 db4
+# -------------------------------------------------------------------------------------
+
+# check reentrance
+
+if [ -x /etc/ifconfig ]; then
+   HSHTMP=""
+else
+   HSHTMP="sh.*"
+fi
+MYFILE="/root/mode/tmp/hrydbcmp$$.tmp"
+ps -ef > $MYFILE
+if [ `grep -E "${HSHTMP}dbcmp" $MYFILE | grep -v "exectask dbcmp" | wc -l` -gt 1 ]; then
+   rm -f $MYFILE 
+   echo "Another dbcmp task is running!" && exit 1
+fi
+rm -f $MYFILE 
+
+# get options
+
+HOPTIONS=""
+while (echo "'$1'"  | grep -E  -e "^'-" > /dev/null)
+do
+   HOPTIONS="$HOPTIONS$1"
+   shift 
+done
+
+# get mysql server ip 
+
+. /root/mode/mysqldip
+
+# check if databases are provided to compare
+
+HDBCNT=$#
+
+if [ "$HDBCNT" -eq 0 ]; then
+   echo "Databases should be provided for dbcmp to compare!!" && exit 1
+fi
+
+# check if duplicate dbnames exist
+
+HDBS="$*"
+
+if [ `echo $HDBS | tr " " "\n" | wc -l` -ne `echo $HDBS | tr " " "\n" | sort | uniq -u | wc -l` ]; then
+   echo "Duplicate databases are not allowed!!" && exit 1
+fi 
+
+# 2 or more databases are required
+
+if [ $HDBCNT -lt 2 ]; then
+   echo "Two or more databases are required for dbcmp to compare!" && exit 1
+fi
+
+# check if each database is appropriate 
+
+for i in `echo $HDBS`;do
+   /root/mode/testdb $HMYSQLDIP $i || exit 1
+done
+
+# begin compare  
+
+HTBLIST="/root/mode/tmp/htblist$$.tmp"
+HTBLISTA="/root/mode/tmp/htblista$$.tmp"
+HTBDES="/root/mode/tmp/htbdes$$.tmp"
+HTBDESA="/root/mode/tmp/htbdesa$$.tmp"
+HTBDESB="/root/mode/tmp/htbdesb$$.tmp"
+HDBA="/root/mode/tmp/hdba$$.tmp"
+HDBB="/root/mode/tmp/hdbb$$.tmp"
+> $HTBLISTA
+for i in `echo $HDBS`; do
+   /root/mode/seecfg -s $HMYSQLDIP "select table_name from tables where table_schema ='$i'" information_schema >> $HTBLISTA
+done
+cat $HTBLISTA | sort | uniq > $HTBLIST
+{
+echo "############# dbcmp $HMYSQLDIP2 $* #############"
+echo 
+echo "dbcmp began at `LANG=en_US;date`"
+for i in `cat $HTBLIST`;do
+     > $HDBA
+     > $HDBB
+    for j in `echo $HDBS`;do
+        HNULLTEST=`/root/mode/seecfg -s $HMYSQLDIP "select table_name from tables where table_schema ='$j' and table_name='$i'" information_schema`
+        if [ -z "$HNULLTEST" ]; then
+           echo "$j" >> $HDBA
+        else
+           echo "$j" >> $HDBB
+        fi
+    done
+    if [ `cat $HDBB | wc -l` -gt 1 ]; then
+       HTAG=0
+       HDESNO=0
+       HDIFF=0
+       > $HTBDES
+       for k in `cat $HDBB`;do
+           HDESNO=$[$HDESNO+1]
+           if [ $HTAG -eq 0 ]; then
+              /root/mode/seecfg -s $HMYSQLDIP "describe \`$i\`" $k > $HTBDESA
+              HTAG=1
+            else
+              /root/mode/seecfg -s $HMYSQLDIP "describe \`$i\`" $k > $HTBDESB
+              HTAG=0
+            fi
+            if [ $HDESNO -gt 1 ]; then
+               if cmp -s $HTBDESA $HTBDESB; then
+                  :
+               elif [ `cat $HTBDESA | wc -c` -eq `cat $HTBDESB | wc -c` ]; then
+                  HDIFFCHARCNT=`cmp -l $HTBDESA $HTBDESB | wc -l`
+                  if [ $HDIFFCHARCNT -lt 20 ]; then
+                     # minor differences 
+                     [ $HDIFF -lt 1 ] && HDIFF=1
+                  else
+                     # slightly more differences 
+                     [ $HDIFF -lt 2 ] && HDIFF=2
+                  fi
+               else
+                  HDIFF=3
+               fi
+            fi
+           /root/mode/seecfg -s $HMYSQLDIP "describe \`$i\`" $k >> $HTBDES
+       done
+       if [ `cat $HDBA | wc -l` -gt 0 -o $HDIFF -gt 0 ]; then
+          echo 
+          echo table "<< $i >>"
+          echo 
+       fi
+       if [ `cat $HDBA | wc -l` -gt 0 ]; then
+          echo "---- Not present in ----"
+          cat $HDBA
+       fi
+       HTTLDBB=`cat $HDBB | wc -l`
+       if [ $HTTLDBB -gt 0 ]; then
+          if [ $HDIFF -gt 0 ]; then
+              if [ $HDIFF -eq 1 ]; then
+                 echo "---- Different structures(minor differences) found in ----"
+              elif [ $HDIFF -eq 2 ]; then
+                 echo "---- Different structures(field order difference?) found in ----"
+              else
+                 echo "---- Different structures found in ----"
+              fi
+              # field comparison inserted here 
+              cat $HTBDES | sort   > $HTBDESA
+              cp -f $HTBDESA $HTBDES
+              for kk in `cat $HDBB`; do
+                 echo $kk
+                 /root/mode/seecfg -s $HMYSQLDIP "describe \`$i\`" $kk > $HTBDESA
+                 cat $HTBDESA |
+                 while read -r ll;do
+                    HFLD=`echo "$ll" | sed -re "s/^([^\t]*)\t.*/\1/"`
+                    HFLDACNT=`cat $HTBDES | grep "^$ll	*$" | wc -l`
+                    if [ $HFLDACNT -eq 1 ]; then
+                       HFLDCNT=`cat $HTBDES | grep "^$HFLD	" | wc -l`
+                       if [ $HFLDCNT -eq 1 ]; then
+                          echo "  [Unique defination] " "$ll"
+                       else
+                          echo "  [Varied attributes] " "$ll"
+                       fi
+                    elif [ $HFLDACNT -eq $HTTLDBB ]; then
+                       :
+                    else
+                       echo "  [Partially common] " "$ll"
+                    fi
+                 done  
+              done
+          elif [ `cat $HDBA | wc -l` -ne 0 ]; then
+              echo "---- With same structures in ----"
+              cat $HDBB
+          fi
+       fi
+    else
+       echo 
+       echo table "<< $i >>"
+       echo 
+       if [ `cat $HDBA | wc -l` -gt 0 ]; then
+          echo "---- Not present in ----"
+          cat $HDBA
+       fi
+       if [ `cat $HDBB | wc -l` -gt 0 ]; then
+          echo "---- Uniquely present in ----"
+          cat $HDBB
+       fi 
+    fi
+done
+
+echo 
+echo "dbcmp completed at `LANG=en_US;date`"
+echo
+} | tee -a /root/mode/logs/dbcmp.log
+
+# 
+
+rm -f $HTBLIST
+rm -f $HTBLISTA
+rm -f $HTBDES
+rm -f $HTBDESA
+rm -f $HTBDESB
+rm -f $HDBA
+rm -f $HDBB

@@ -1,0 +1,170 @@
+#!/bin/bash
+# ---------------------------------------------------------------------------------------------------------------------
+# function:
+#          1.maintain MySQL server keymarks
+#          2.display server status,a combination of keymarks
+# usage   :
+#          ./tcmysql [<dispmode>]
+# e.g.    :
+#          ./tcmysql       # display current complete status information
+#          ./tcmysql f     # display only the first word of current complete status information
+#          ./tcmysql n     # display only the No. of current complete status information
+#          ./tcmysql all   # display current status No. along with complete status information
+#                                                                                                     ------ hry ------
+# ---------------------------------------------------------------------------------------------------------------------
+
+# no MySQL server at this machine
+
+if [ ! -x /usr/sbin/mysqld ]; then
+   /root/mode/ltcmysql 0 $1
+   exit
+fi
+
+# no MySQL server data directory(generally offline node at clustered mode)
+ 
+if [ ! -f /var/lib/mysql/mysql-bin.index ]; then
+   Hcmdline=`ps -ef | grep -E ".*( /usr/bin/mysqld_safe | /usr/sbin/mysqld ).*" | grep -v grep`
+   Htprocess=`echo "$Hcmdline" | sed -re "s/^[^ ]+ +([0-9]+).*/\1/"`
+   if [ "$Htprocess" != "" ]; then
+      # kill -9 or kill ?
+      /root/mode/modelog "$0 kill $Htprocess 2>/dev/null"
+      kill $Htprocess 2>/dev/null
+   fi
+fi
+
+# collect neccessary information,MySQL server keymarks  
+
+# port 3306 information 
+
+Hmport=`netstat -ntlp | grep -E "^tcp.*:3306.*LISTEN +[0-9]+/mysqld *$"`
+Hmportp=`echo "$Hmport" | sed -re "s/.* +([0-9]+)\/mysqld *$/\1/"`
+
+# processes mysqld_safe mysqld information
+
+Hmysqld_safe=$(ps -ef | grep -E " /usr/bin/mysqld_safe " | grep -v grep | sed -n "$ p")
+Hmysqld_safep=`echo "$Hmysqld_safe" | awk '{print $2}'`
+Hmysqld_safepp=`echo "$Hmysqld_safe" | awk '{print $3}'`
+
+Hmysqld=$(ps -ef | grep -E " /usr/sbin/mysqld " | grep -v grep | sed -n "$ p")
+Hmysqldp=`echo "$Hmysqld" | awk '{print $2}'`
+Hmysqldpp=`echo "$Hmysqld" | awk '{print $3}'`
+                
+# /var/lib/mysql/`hostname`.pid information
+
+Hpidfile=`ls -1 /var/lib/mysql/$(hostname).pid 2>/dev/null`
+
+# /var/lock/subsys/mysql information
+
+Hlockfile=`ls -1 /var/lock/subsys/mysql 2>/dev/null`
+
+# ------------------------------------------------------
+# fix inconsistent marks
+# ------------------------------------------------------
+
+# Inconsistent pidfile 
+
+if [ -n "$Hpidfile" ]; then
+   Hpid=`cat "$Hpidfile" 2>/dev/null`
+   if echo "$Hpid" | grep -E "^[0-9]+$" >/dev/null; then
+      if ! ps -ef | grep -E "^[^ ]+ +$Hpid +.* /usr/sbin/mysqld .*" | grep -v grep >/dev/null; then
+         /root/mode/modelog "$0 rm -f $Hpidfile"
+         rm -f $Hpidfile
+         Hpidfile=
+      fi
+   else
+      # invalid contents in pidfile
+      /root/mode/modelog "$0 rm -f $Hpidfile"
+      rm -f $Hpidfile
+      Hpidfile=
+   fi
+fi
+
+# Missing pidfile.MySQL server is still working and client can connect to it
+
+if [ -n "$Hmportp" ]; then
+   if [ -z "$Hpidfile" ]; then
+      echo "$Hmportp" > /var/lib/mysql/$(hostname).pid
+      chown mysql:mysql /var/lib/mysql/$(hostname).pid
+      /root/mode/modelog "$0  echo $Hmportp > /var/lib/mysql/$(hostname).pid"
+      Hpidfile="/var/lib/mysql/$(hostname).pid"
+   fi
+fi
+
+#
+
+if [ -n "$Hpidfile" ]; then
+   Hpid=`cat $Hpidfile`
+   if [ `cat /var/lib/mysql/*.pid 2>/dev/null | grep -E "^$Hpid$" | wc -l` -gt 1 ]; then
+      touch /var/lib/mysql/.modedpid
+   else
+      rm -f /var/lib/mysql/.modedpid
+   fi
+else
+   rm -f /var/lib/mysql/.modedpid
+fi
+
+# Inconsistent lockfile
+
+if [ -z "$Hmysqld_safep" ]; then
+   # DON'T test $Hmysqldp !!!
+   if [ -n "$Hlockfile" ]; then
+      /root/mode/modelog "$0 rm -f $Hlockfile"
+      rm -f "$Hlockfile"
+      Hlockfile=
+   fi
+fi
+
+# fix done,now go on to return MySQL server status 
+
+if [ -z "$Hlockfile" ]; then
+   if [ -z "$Hmysqld_safep" ]; then
+      # mysqld_safe process doesn't exist
+      /root/mode/ltcmysql 1 $1
+   else
+      # mysqld_safe process does exist
+      if [ -z "$Hmysqldp" ]; then
+         # mysqld process does exist
+         # just starting
+         /root/mode/ltcmysql 2 $1
+      else
+         # both mysqld_safe and mysqld processes exist 
+         if [ -z "$Hmportp" -a -z "$Hpidfile" ]; then
+            # 3306 port is not listening and pid file has not been created
+            /root/mode/ltcmysql 3 $1
+            echo "starting -- second stage -- both mysqld_safe process and mysqld process exist"
+         else
+            # 3306 port is opened and pidfile should be created almost the same time 
+            if [ "$Hmysqld_safepp" != "1" -o -z "$Hlockfile" ]; then
+               # mysqld_safe's parent pid has not been changed to 1 or lock file has not been created    
+               /root/mode/ltcmysql 4 $1
+               echo "starting -- third stage -- port has been opened for use and the pidfile is created"
+            else
+               echo "up"
+            fi
+         fi
+      fi
+   fi
+else
+   if [ -n "$Hmportp" ]; then
+      # processes and pidfile should be normal
+      /root/mode/ltcmysql 5 $1
+   else
+      # 3306 port has been closed for use
+      if [ -n "$Hpidfile" ]; then
+         # pidfile still exists
+         /root/mode/ltcmysql 6 $1
+      else
+         # pidfile has been deleted
+         if [ -n "$Hmysqld_safep" -o -n "$Hmysqldp" ]; then
+            # processes still exist
+            /root/mode/ltcmysql 7 $1
+         else 
+            # processes don't exist
+            /root/mode/ltcmysql 8 $1
+         fi
+      fi
+   fi
+fi
+
+#
+

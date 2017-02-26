@@ -1,0 +1,5 @@
+#!/bin/bash
+
+/usr/bin/top -b -n 1 -p `/root/mode/jvstat | sed -re "s/^([0-9]+).*/\1,/" | sed -re "$ s/,//"` 2>&1
+
+

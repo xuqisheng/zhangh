@@ -1,0 +1,76 @@
+#!/bin/bash
+# ----------------------------------------------------------------------------------------------------
+# ./testobjects <objects> [<dbname>]
+# Test if all the given objects exist
+# ----------------------------------------------------------------------------------------------------
+# <objects> ::= <object>|<objects><object>
+# <object>  ::= "["[#]tablename[.fieldname|:indexexpression]"]"
+# e.g:[resrv_base][#resrv_base]
+#     [resrv_base.id][#resrv_base.id]
+#     [master_snapshot:id][#master_snapshot:id]
+#     [master_snapshot:hotel_group_id,hotel_id,master_type,master_id,biz_date_begin,biz_date_end]
+#     [#master_snapshot:hotel_group_id,hotel_id,master_type,master_id,biz_date_begin,biz_date_end]
+# ----------------------------------------------------------------------------------------------------
+
+# get mysql server ip
+
+. /root/mode/mysqldip
+
+#
+
+HOBJECTS=`echo "$1" | tr -d "\r\n"`
+HDBNAME=${2:-foxhis}
+
+# strip off first possible 'o'
+
+if echo "$HOBJECTS" | grep -Pi '^o\[' > /dev/null; then
+   HOBJECTS=`echo "$HOBJECTS" | sed -re "s/^.(.*)/\1/"`
+fi
+
+Hneedandtest=1
+Hsyncheckonly=0
+
+while [ -n "$HOBJECTS" ]
+do
+   HOBJECT=`echo  "$HOBJECTS" | sed -re  "s/^([oO]?\[(#*([fFpP]@)?[_0-9a-zA-Z-]+)((\:[_0-9a-zA-Z\,\(\)-=]+)|(\.[_0-9a-zA-Z-]+(\[null\]|\[(type|nullable)=[^][]+\]|\[default='[^%]*%'\])*))?\])(.*)/\1/"`
+   HOBJECTS1=`echo  "$HOBJECTS" | sed -re  "s/^([oO]?\[(#*([fFpP]@)?[_0-9a-zA-Z-]+)((\:[_0-9a-zA-Z\,\(\)-=]+)|(\.[_0-9a-zA-Z-]+(\[null\]|\[(type|nullable)=[^][]+\]|\[default='[^%]*%'\])*))?\])(.*)/\9/"`
+  
+   if [ "$HOBJECTS" = "$HOBJECTS1" ]; then
+      # syntax error 
+      /root/mode/modemsg testobjects "Invalid precheck item(s) $HOBJECTS"
+      exit 2
+   elif [ $Hsyncheckonly -eq 1 ]; then
+      # syntax pass and no need to do semantic check 
+      HOBJECTS="$HOBJECTS1"
+      continue 
+   fi
+
+   # when 'o' is met
+
+   if echo "$HOBJECT" | grep -i '^o' > /dev/null; then
+      if [ $Hneedandtest -eq 1 ]; then
+         Hsyncheckonly=1
+         HOBJECTS="$HOBJECTS1"
+         continue 
+      fi
+      Hneedandtest=1
+      HOBJECT=`echo "$HOBJECT" | sed -re "s/^.(.*)/\1/"`
+   fi
+
+   # 'and' check 
+
+   if [ $Hneedandtest -eq 1 ]; then
+      # need further check of 'and'
+      if ! /root/mode/testobject $HMYSQLDIP "$HOBJECT" "$HDBNAME" ; then
+         # No need of further check of 'and'
+         Hneedandtest=0
+     fi
+   fi
+   HOBJECTS="$HOBJECTS1"
+done
+if [ $Hneedandtest -eq 1 ]; then
+   exit 0
+else
+   exit 1
+fi
+

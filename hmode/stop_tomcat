@@ -1,0 +1,243 @@
+#!/bin/bash
+# --------------------------------------------------------------------
+# function:
+#          stop a tomcat 
+# usage:
+#          ./stop_tomcat <tomcat_directory>
+# example:
+#          /root/mode/stop_tomcat tomcat6  
+#          (stop tomcat under /usr/local/tomcat6)
+# --------------------------------------------------------------------
+
+
+#
+
+/root/mode/modelog "$0 $* --prepare"
+
+#
+
+trap "" INT
+export Htompno=$$
+Hhrytomcat=$1
+
+# check tomcat installation 
+
+/root/mode/check_tomcat $Hhrytomcat || exit 1 
+
+#
+
+Hhrytomdirs=`/root/mode/.tomdirs $Hhrytomcat`
+
+# check exclusiveness 
+
+while [ 1 ]; do
+   /root/mode/tompv stop_tomcat $Hhrytomcat
+   Hrsta=$?
+   if [ $Hrsta -eq 0 ]; then
+      break
+   elif [ $Hrsta -eq 1 ]; then
+      sleep 5
+      continue
+   elif [ $Hrsta -eq 11 ]; then
+      sleep 0.$[$RANDOM%10]
+      continue
+   else
+      exit 1
+   fi
+done
+
+# check tomcat status 
+
+Hhloop=0
+while [ $Hhloop -lt 600 ];do
+   Htsta=`/root/mode/tctomcat $Hhrytomcat kill`
+   if echo "$Htsta" | grep -E '^at unknown' >/dev/null; then
+      /root/mode/modemsg "stop_tomcat $Hhrytomcat" "Wow!No authority to do it!!!"
+      exit 1
+   elif [ "$Htsta" = "down" ]; then
+      # set stop status 
+      /root/mode/setwsta $Hhrytomcat 2 >/dev/null 2>&1
+      #
+      echo "$Hhrytomcat has already been stopped!!" && exit 0
+   elif echo "$Htsta" | grep -E '^up' >/dev/null; then
+      break
+   fi
+   sleep 1
+   Hhloop=$[$Hhloop+1]
+   if [ $[$Hhloop/6*6] -eq $Hhloop ]; then 
+      if [ "$Htsta" = "starting" ]; then
+         /root/mode/modemsg "stop_tomcat $Hhrytomcat" "Wow!A process is starting $Hhrytomcat.Waited $Hhloop seconds ......" 2>&1
+      elif [ "$Htsta" = "stopping" ]; then
+         /root/mode/modemsg "stop_tomcat $Hhrytomcat" "Wow!A process is stopping $Hhrytomcat.Waited $Hhloop seconds ......" 2>&1
+      fi
+   fi
+done
+
+#
+
+/root/mode/modelog "$0 $Hhrytomcat"
+
+# --------------------------------------------------------------------
+# maintain /etc/hosts to ensure tomcat SHUTDOWN port can be connected 
+# --------------------------------------------------------------------
+
+/root/mode/mnthosts
+
+# stop process
+
+if [ -f /root/mode/impfile/java/javaenv ]; then
+   . /root/mode/impfile/java/javaenv
+fi
+
+#
+
+echo
+echo "Stopping $Hhrytomcat"
+
+#
+
+/root/mode/setwsta $Hhrytomcat 2 >/dev/null 2>&1
+sleep 2
+
+#
+
+mkdir -p /usr/local/$Hhrytomcat/logs
+echo "Mode stop mark `LANG=en_US;date`"  >> /usr/local/$Hhrytomcat/logs/catalina.out
+
+if /usr/local/$Hhrytomcat/bin/shutdown.sh 2>&1 1>/dev/null | grep -E  "Connection refused" >/dev/null; then
+   Hdirectkill="2"
+fi
+
+#
+
+Hstring1="`tail /usr/local/$Hhrytomcat/logs/catalina.out`"
+Hhryloop=0
+while [ $Hhryloop -lt 100 ]; do
+   # case 1 : can connect,but can't stop,always 'pause',caused by incorrect hostname or /etc/hosts  
+   # case 2 : connection refused,this is caused by case 1 or successful stop
+   if [ "$Hdirectkill" = "2" ]; then
+      break
+   fi
+   # case 3 : normal stop
+   if tail -n 15 /usr/local/$Hhrytomcat/logs/catalina.out | grep -E "(Stopping Coyote|Destroying ProtocolHandler)" >/dev/null; then
+      # Stopping Coyote -- Apache Tomcat Version 6 mark
+      # Destroying ProtocolHandler -- Apache Tomcat Version 7 mark
+      Hstopdone="1"
+      break
+   fi
+   # -----------------------------------------------------------------------------------
+   # case 4 : confirmed stopped through process port status
+   # -----------------------------------------------------------------------------------
+   # edit catalina.out is dangerous,tomcat outputs to catalina.out by file inode
+   # "vi save" changed the inode of file catalina.out unless catalina.out has hard
+   # links.So changes in the inode will not be reflected in the new file catalina.out.
+   # -----------------------------------------------------------------------------------
+   if [ "`/root/mode/tctomcat $Hhrytomcat 2>/dev/null`" = "down" ]; then
+      # check process port status
+      Hstopdone="1"
+      echo "Mode stop mark(stopped by process check) `LANG=en_US;date`"  >> /usr/local/$Hhrytomcat/logs/catalina.out
+      break
+   fi
+   # case 5 : other factors  
+   sleep 1
+   Hhryloop=$[$Hhryloop+1]
+   if [ $[$Hhryloop/20*20] -eq $Hhryloop ]; then
+      # check file every 20 iterations
+      Hstring2="`tail /usr/local/$Hhrytomcat/logs/catalina.out`"
+      if [ "$Hstring1" = "$Hstring2" ]; then
+         break
+      fi
+      Hstring1="$Hstring2"
+      if [ $Hhryloop -ge 40 ]; then
+         if echo "$Hstring2" | grep -Pi "^(test size:|sync|cmd sync|.*hessianservice.*isalive)" >/dev/null; then
+            Hdirectkill="2"
+            /root/mode/modemsg "stop_tomcat $Hhrytomcat" "Wow!blocked by internal crontab or hessianservice task" 2>&1
+            /root/mode/modemsg "stop_tomcat $Hhrytomcat" "kill signal will be sent" 2>&1
+            break
+         fi
+      fi
+   fi
+done
+
+# time length to wait 
+if [ "$Hstopdone" = "1" ]; then
+   # longer for safety
+   Hloopno=40
+else
+   # shorter for probably abnormal tomcat
+   Hloopno=30
+fi
+
+# test process 
+
+Hloop=0
+while [ 1 ]; do
+   Hcmdline=`ps -ef | grep -E "\-Djava\.io\.tmpdir=$Hhrytomdirs/temp org\.apache\.catalina\.startup\.Bootstrap start$" | grep -v grep`
+   #
+   while read -r Hacmdline;do
+      Htcmdline="$Hacmdline"
+      break
+   done <<< "$Hcmdline"
+
+   # case 1: process doesn't exist
+
+   if [ -z "$Htcmdline" ]; then
+      if [ -n "$HHRYDEBUG" ]; then
+         /root/mode/modemsg "stop_tomcat $Hhrytomcat" "Completely stopped tomcat" 2>&1
+      fi
+      break
+   fi
+ 
+   # case 2: process exists and no ports open.zombie tomcat 
+
+   Htprocess=`echo "$Htcmdline" | sed -re "s/^[^ ]+ +([0-9]+).*/\1/" | sed -n '1 p'`
+
+   Hpcnt_1=`netstat -ntlp 2>/dev/null | grep -E " $Htprocess/java" | wc -l`
+   Hpcnt_2=`netstat -ntlp 2>/dev/null | grep -E " $Htprocess/java" | grep -E ":[0-9]{5}" | wc -l`
+   if [ $Hpcnt_1 -eq 0 ]; then
+      # zombie tomcat
+      if [ -n "$HHRYDEBUG" ]; then
+         /root/mode/modemsg "stop_tomcat $Hhrytomcat" "Zombie tomcat!!!Kill signal is sent" 2>&1
+      fi
+      kill -9 $Htprocess 2>/dev/null
+      sleep 3
+      continue
+   elif [ $Hpcnt_1 -gt 0 -a $Hpcnt_1 -eq $Hpcnt_2 ]; then
+      # almost zombie tomcat
+      Htom_ver=`cat /usr/local/$Hhrytomcat/RELEASE-NOTES 2>/dev/null | grep 'Apache Tomcat Version' | tr -d '\r' | sed -re "s/.*(Version.*)/\1/"`
+      if [ $Hpcnt_1 -ge 3 ]; then
+         /root/mode/modemsg "stop_tomcat $Hhrytomcat" "$Htom_ver tomcat with configurations dangerously violating mode standard!!!Kill signal is sent" 2>&1
+      elif [ $Hpcnt_1 -ge 2 ]; then
+         /root/mode/modemsg "stop_tomcat $Hhrytomcat" "$Htom_ver tomcat with configurations severely violating mode standard!!!Kill signal is sent" 2>&1
+      else
+         /root/mode/modemsg "stop_tomcat $Hhrytomcat" "$Htom_ver tomcat with configurations violating mode standard!!!Kill signal is sent" 2>&1
+      fi
+      kill -9 $Htprocess 2>/dev/null
+      sleep 3
+      continue
+   fi
+
+   # case 3: direct kill process
+
+   if [ -n "$Hdirectkill" ]; then
+      kill -9 $Htprocess 2>/dev/null
+      sleep 3
+      continue
+   fi
+
+   # case 4:
+
+   if [ $Hloop -ge $Hloopno ]; then
+      /root/mode/modemsg "stop_tomcat $Hhrytomcat" "Failed to stop $Hhrytomcat normally.Kill signal is sent." 2>&1
+      kill -9 $Htprocess 2>/dev/null
+   else
+      Hloop=$[$Hloop+1]
+      /root/mode/modemsg "stop_tomcat $Hhrytomcat" "Waited $[$Hloop*3] seconds ......" 2>&1
+   fi
+   sleep 3
+done
+echo
+echo "$Hhrytomcat stopped successfully!!" && exit 0
+
+# end
+

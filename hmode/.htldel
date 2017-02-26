@@ -1,0 +1,161 @@
+#!/bin/sh
+# -------------------------------------------------------------------------------------
+# function:
+# -------------------------------------------------------------------------------------
+# usages  :
+#          ./.htldel [<mysql-server-ip>] <dbname> <hotelid> [<groupid>]
+# e.g.    :
+#          ./.htldel portal 20
+#          ./.htldel 6.13 portal 20
+#          ./.htldel 6.13 portal 20 2
+# -------------------------------------------------------------------------------------
+
+# check reentrance
+
+if [ -x /etc/ifconfig ]; then
+   HSHTMP=""
+else
+   HSHTMP="sh.*"
+fi
+MYFILE="/root/mode/tmp/hryhtldel$$.tmp"
+ps -ef > $MYFILE
+if [ `grep -E "${HSHTMP}htldel" $MYFILE | grep -v "exectask htldel" | wc -l` -gt 1 ]; then
+   rm -f $MYFILE 
+   echo "Another htldel task is running!" && exit 1
+fi
+rm -f $MYFILE 
+
+# get options
+
+HOPTIONS=""
+while (echo "'$1'"  | grep -E  -e "^'-" > /dev/null)
+do
+   HOPTIONS="$HOPTIONS$1"
+   shift 
+done
+
+# get mysql server ip 
+
+. /root/mode/mysqldip
+
+# database name
+
+HDBNAME=$1
+if [ -z "$HDBNAME" ]; then
+   echo "Database name must be provided!" && exit 1
+fi
+
+# $HDBNAME must exist 
+
+if [ -z `/root/mode/seecfg -s $HMYSQLDIP "show databases like '$HDBNAME'"|grep -i "^$HDBNAME"` ]; then
+   echo "Database $HDBNAME doesn't exist!" && exit 1
+fi
+
+# $HDBNAME must be gc ipms 
+
+if [ -z `/root/mode/seecfg -s $HMYSQLDIP "show tables from \\\`$HDBNAME\\\` like 'audit\_flag'"` ]; then
+   echo "Database $HDBNAME IS NOT a gc ipms!!!" && exit 1
+fi
+
+# hotel_id
+
+HHOTELID=$2
+
+if [ -z "$HHOTELID" ]; then
+   echo "Hotel id must be provided!" && exit 1
+fi
+
+if (echo "$HHOTELID"  | grep -E  "^[0-9]+$" > /dev/null); then
+   if [ "$HHOTELID" -le 0 ]; then
+      echo "Hotel id must be greater than 0" && exit 1
+   fi
+else
+   echo "Hotel id must be positive integer" && exit 1
+fi
+
+HHOTEL_ID=`/root/mode/seecfg -s $HMYSQLDIP "select id from \\\`$HDBNAME\\\`.hotel where id=$HHOTELID"`
+HHOTELDES=`/root/mode/seecfg -s $HMYSQLDIP "select descript from \\\`$HDBNAME\\\`.hotel where id=$HHOTELID"`
+HGROUP_ID=`/root/mode/seecfg -s $HMYSQLDIP "select hotel_group_id from \\\`$HDBNAME\\\`.hotel where id='$HHOTEL_ID'"`
+
+if [ -z "$HHOTEL_ID" ]; then
+   if [ -n "$3" ]; then
+      HGROUP_ID=$3
+      if (echo "$HGROUP_ID"  | grep -E  "^[0-9]+$" > /dev/null); then
+         if [ "$HGROUP_ID" -le 0 ]; then
+             echo "Hotel group id must be greater than 0" && exit 1
+         fi
+      else
+         echo "Hotel group id must be positive integer" && exit 1
+     fi
+   else
+      echo "Hotel id $HHOTELID doesn't exist in table hotel!You must also provide its group_id to continue" && exit 1
+   fi
+   HHOTEL_ID=$HHOTELID
+else
+   # more check
+   HDAYBEFORE=`/root/mode/seecfg -s $HMYSQLDIP "select timestampdiff(day,biz_date,now()) from audit_flag where hotel_id = $HHOTEL_ID" $HDBNAME`
+   if [ -z "$HDAYBEFORE" ]; then
+      :
+   elif [ $HDAYBEFORE -le 5 ]; then
+      /root/mode/modemsg "" "Danger!!!Hotel id $HHOTEL_ID seems in use.Nothing will be done" more
+      exit 1
+   fi
+fi
+
+HGROUPDES=`/root/mode/seecfg -s $HMYSQLDIP "select descript from \\\`$HDBNAME\\\`.hotel_group where id='$HGROUP_ID'"`
+if [ -z "$HGROUPDES" ]; then
+   echo "Hotel group id $HGROUP_ID doesn't exist in table hotel_group!" && exit 1
+fi
+
+#
+
+if [ "$HNCONFIRM_MODE" = 'y' ]; then
+   :
+else
+   /root/mode/confirm "Are you sure to delete hotel $HHOTELDES(id=$HHOTEL_ID) in group $HGROUPDES(groupid=$HGROUP_ID) at $HMYSQLDIP " more || exit 1 
+fi 
+
+# body
+
+Hhtldelsql=/root/mode/tmp/hhtldel$$.sql
+Hhtldelout=/root/mode/tmp/hhtldel$$.out
+
+
+/root/mode/find_tables $HMYSQLDIP $HDBNAME 11 |
+if [ "$HOPTIONS" = "-dall" ]; then
+   grep -v -E -i "^(audit_flag)$" 
+else
+   grep -v -E -i "^(audit_flag|member.*|card.*)$" 
+fi | 
+sed -re "s/^/delete from /" |
+sed -re "s/$/ where hotel_group_id=$HGROUP_ID and hotel_id=$HHOTEL_ID;/" > $Hhtldelsql
+
+# delete data
+{
+echo
+echo "############# htldel $HOPTIONS $HMYSQLDIP $* #############"
+echo
+echo "Delete hotel $HHOTEL_ID from database $HDBNAME at $HMYSQLDIP began at `LANG=en_US;date`"
+echo
+/root/mode/seecfg $HMYSQLDIP $Hhtldelsql $HDBNAME
+Hemark=$?
+if [ $Hemark -gt 0 ]; then
+   echo "Delete hotel $HHOTEL_ID from database $HDBNAME at $HMYSQLDIP aborted at `LANG=en_US;date`"
+   echo
+else
+   if [ "$HOPTIONS" = "-dall" ]; then
+      /root/mode/seecfg $HMYSQLDIP "delete from audit_flag where hotel_id = $HHOTEL_ID" $HDBNAME
+      /root/mode/seecfg $HMYSQLDIP "delete from hotel where id = $HHOTEL_ID" $HDBNAME
+   fi
+   echo "Delete hotel $HHOTEL_ID from database $HDBNAME at $HMYSQLDIP ended at `LANG=en_US;date`"
+   echo
+fi
+} 2>&1 | tee -a /root/mode/logs/htl.log
+
+# rm tmp
+
+rm -f $Hhtldelsql 
+
+# end
+
+

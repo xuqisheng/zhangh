@@ -1,0 +1,29 @@
+#!/bin/bash 
+
+# sshd 
+
+if [ -f /etc/init.d/sshd ]; then
+   # restart it if it's down
+   if ! /etc/init.d/sshd status &>/dev/null; then
+      /etc/init.d/sshd restart &>/dev/null
+   fi
+   # 
+   if cat /etc/redhat-release 2>/dev/null | grep -E " release (5\.|6\.[012])" >/dev/null; then
+      Hsshd=`ps -ef | grep -E "^root +[0-9]+ +1 .* /usr/sb($RANDOM){0}in/sshd$" | tail -n 1 | awk '{print $2}'`
+      if echo $Hsshd | grep -E "^[0-9]+$" >/dev/null; then
+         echo -17 >/proc/$Hsshd/oom_adj
+      fi
+   fi
+fi
+
+# mysqld
+
+if [ -f /usr/sbin/mysqld ]; then
+   Hmysqldp=`ps -ef | grep -E "mysql +[0-9]+ .* /usr/sb($RANDOM){0}in/mysqld "  | tail -n 1 | awk '{print $2}'`
+   if echo $Hmysqldp | grep -E "^[0-9]+$" >/dev/null; then
+      echo -17 >/proc/$Hmysqldp/oom_adj
+   fi
+fi
+
+# end
+

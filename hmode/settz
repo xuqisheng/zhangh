@@ -1,0 +1,91 @@
+#!/bin/bash
+# -------------------------------------------------
+# set timezone to Asia/Shanghai
+# -------------------------------------------------
+
+# exclusive execution with wait mode
+
+/root/mode/modepv settz $$ " /bin/bash .*/settz"
+
+#
+
+if [ "$HOME" != "/root" -a "$HOME" != "/" ]; then
+   echo "You must login as root" && exit 1
+fi
+
+# do nothing with sco unix
+[ -x /etc/ifconfig ] && exit 1
+
+# redhat,cs or suse 
+
+HZONE1="Asia"
+HZONE2="Shanghai"
+TMPFILE="/root/mode/tmp/hrysettz$$.tmp"
+cp /etc/sysconfig/clock $TMPFILE
+if [ -f /etc/sysconfig/suseconfig ]; then
+   HCDATE=`date +%m%d%H%M.%S`
+   cat $TMPFILE | 
+   sed -e "s/^HWCLOCK=.*/HWCLOCK=\"--localtime\"/" | 
+   sed -e "s/^SYSTOHC=.*/SYSTOHC=\"no\"/" | 
+   sed -e "s/^TIMEZONE=.*/TIMEZONE=\"$HZONE1\/$HZONE2\"/"  > /etc/sysconfig/clock
+   rm -f /etc/localtime
+   cp /usr/share/zoneinfo/$HZONE1/$HZONE2 /etc/localtime
+   date $HCDATE >/dev/null
+   /sbin/hwclock -w
+else
+   # save the current system time because setting time zone will change system time
+   HS_DATE=`date +%m%d%H%M%Y.%S`
+   # set time zone,and set UTC=false if the UTC item exists
+   cat $TMPFILE | sed -e "s/^ZONE=.*/ZONE=\"$HZONE1\/$HZONE2\"/" | sed -e "s/^UTC=.*/UTC=false/" | sed -e "s/^ARC=.*/ARC=false/" > /etc/sysconfig/clock
+   rm -f /etc/localtime;cp -f /usr/share/zoneinfo/$HZONE1/$HZONE2 /etc/localtime
+   # set system time from $HS_DATE
+   date $HS_DATE &>/dev/null
+   # set hardware time.As a result,we also get a default value LOCAL or UTC in /etc/adjtime
+   if cat /etc/sysconfig/clock | grep -E "^UTC=" >/dev/null; then
+      # UTC already set to false
+      /sbin/hwclock --systohc --localtime
+      # Fix tencent time problem 
+      if hostname | grep -E '^VM_' >/dev/null && uname -a | grep -E " 2\.6\.18-" >/dev/null; then
+         if [ -x /etc/rc.d/rc.sysinit ]; then
+            if ! cat /etc/rc.d/rc.sysinit | grep -E '/root/mode/\.adjdate' >/dev/null; then
+               if [ `cat /etc/rc.d/rc.sysinit | grep 'hwclock' | wc -l` -eq 1 ]; then
+                  cat /etc/rc.d/rc.sysinit | sed -re "/hwclock/ a /root/mode/.adjdate 28800" > $TMPFILE
+                  cp -f $TMPFILE /etc/rc.d/rc.sysinit
+                  chmod 755 /etc/rc.d/rc.sysinit
+               fi
+            fi
+         fi
+      fi
+   else
+      # same effect as UTC=true
+      /sbin/hwclock --systohc --utc
+   fi
+fi
+
+# synchronize system time with cmos time 
+
+if [ -e /etc/crontab ]; then
+   if hostname | grep -E '^VM_' >/dev/null >/dev/null; then
+      if cat /etc/crontab | grep "hwclock" >/dev/null; then
+         cat /etc/crontab | sed -re "s/^(#*)(.*hwclock.*)/#\2/" > $TMPFILE
+         if ! cmp $TMPFILE /etc/crontab &>/dev/null; then
+            cp -f $TMPFILE /etc/crontab
+         fi
+      fi
+   else
+      if ! cat /etc/crontab | grep "root hwclock -s" >/dev/null; then
+         echo "*/5 * * * * root hwclock -s" >> /etc/crontab
+      fi
+   fi
+fi
+
+#
+
+/etc/init.d/crond restart >/dev/null
+
+# remove tmp file
+
+rm -f $TMPFILE
+
+# end
+

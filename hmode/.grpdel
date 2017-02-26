@@ -1,0 +1,132 @@
+#!/bin/sh
+# -------------------------------------------------------------------------------------
+# function:
+# -------------------------------------------------------------------------------------
+# usages  :
+#          ./.grpdel [<mysql-server-ip>] <dbname> <groupid>
+# e.g.    :
+#          ./.grpdel      portal 20
+#          ./.grpdel 6.13 portal 20
+# -------------------------------------------------------------------------------------
+
+# check reentrance
+
+if [ -x /etc/ifconfig ]; then
+   HSHTMP=""
+else
+   HSHTMP="sh.*"
+fi
+MYFILE="/root/mode/tmp/hrygrpdel$$.tmp"
+ps -ef > $MYFILE
+if [ `grep -E "${HSHTMP}grpdel" $MYFILE | grep -v "exectask grpdel" | wc -l` -gt 1 ]; then
+   rm -f $MYFILE 
+   echo "Another grpdel task is running!" && exit 1
+fi
+rm -f $MYFILE 
+
+# get options
+
+HOPTIONS=""
+while (echo "'$1'"  | grep -E  -e "^'-" > /dev/null)
+do
+   HOPTIONS="$HOPTIONS$1"
+   shift 
+done
+
+# get mysql server ip 
+
+. /root/mode/mysqldip
+
+# database name
+
+HDBNAME=$1
+if [ -z "$HDBNAME" ]; then
+   echo "Database name must be provided!" && exit 1
+fi
+
+# $HDBNAME must exist 
+
+if [ -z `/root/mode/seecfg -s $HMYSQLDIP "show databases like '$HDBNAME'"|grep -i "^$HDBNAME"` ]; then
+   echo "Database $HDBNAME doesn't exist!" && exit 1
+fi
+
+# $HDBNAME must be gc ipms 
+
+if [ -z `/root/mode/seecfg -s $HMYSQLDIP "show tables from \\\`$HDBNAME\\\` like 'audit\_flag'"` ]; then
+   echo "Database $HDBNAME IS NOT a gc ipms!!!" && exit 1
+fi
+
+# group_id
+
+HGRPID=$2
+
+if [ -z "$HGRPID" ]; then
+   echo "Group id must be provided!" && exit 1
+fi
+
+if (echo "$HGRPID"  | grep -E  "^[0-9]+$" > /dev/null); then
+   if [ $HGRPID -le 0 ]; then
+      echo "Group id must be greater than 0" && exit 1
+   fi
+else
+   echo "Group id must be positive integer" && exit 1
+fi
+
+HGRP_ID=`/root/mode/seecfg -s $HMYSQLDIP "select id from \\\`$HDBNAME\\\`.hotel_group where id=$HGRPID"`
+HGRPDES=`/root/mode/seecfg -s $HMYSQLDIP "select descript from \\\`$HDBNAME\\\`.hotel_group where id=$HGRPID"`
+
+if [ -z "$HGRP_ID" ]; then
+   /root/mode/modemsg "" "Group id $HGRPID doesn't exist in table hotel_group!" && exit 1
+else
+   # more check
+   HWITHHTL=`/root/mode/seecfg -s $HMYSQLDIP "select id from hotel where hotel_group_id = $HGRP_ID" $HDBNAME`
+   if [ -n "$HWITHHTL" ]; then
+      /root/mode/modemsg "" "You must delete all hotels of group $HGRP_ID first" more
+      exit 1
+   fi
+fi
+
+#
+
+if [ "$HNCONFIRM_MODE" = 'y' ]; then
+   :
+else
+   /root/mode/confirm "Are you sure to delete group $HGRPDES(id=$HGRP_ID) at $HMYSQLDIP " more || exit 1 
+fi 
+
+# body
+
+Hgrpdelsql=/root/mode/tmp/hgrpdel$$.sql
+Hgrpdelout=/root/mode/tmp/hgrpdel$$.out
+
+
+(/root/mode/find_tables $HMYSQLDIP $HDBNAME 11;/root/mode/find_tables $HMYSQLDIP $HDBNAME 10) |
+sed -re "s/^/delete from /" |
+sed -re "s/$/ where hotel_group_id=$HGRP_ID;/" > $Hgrpdelsql
+
+# delete data
+{
+echo
+echo "############# grpdel $HOPTIONS $HMYSQLDIP $* #############"
+echo
+echo "Delete group $HGRP_ID from database $HDBNAME at $HMYSQLDIP began at `LANG=en_US;date`"
+echo
+/root/mode/seecfg $HMYSQLDIP $Hgrpdelsql $HDBNAME
+Hemark=$?
+if [ $Hemark -gt 0 ]; then
+   echo "Delete group $HGRP_ID from database $HDBNAME at $HMYSQLDIP aborted at `LANG=en_US;date`"
+   echo
+else
+   /root/mode/seecfg $HMYSQLDIP "delete from hotel_group where id = $HGRP_ID" $HDBNAME
+   echo "Delete group $HGRP_ID from database $HDBNAME at $HMYSQLDIP ended at `LANG=en_US;date`"
+   echo
+fi
+} 2>&1 | tee -a /root/mode/logs/grp.log
+
+# rm tmp
+
+rm -f $Hgrpdelsql 
+
+# end
+
+

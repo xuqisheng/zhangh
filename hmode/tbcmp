@@ -1,0 +1,198 @@
+#!/bin/sh
+# -------------------------------------------------------------------------------------
+# function:
+#          compare related table differences of a database
+# -------------------------------------------------------------------------------------
+# ./tbcmp [<mysql-server-ip>] <dbname>  
+# e.g.:
+#       ./tbcmp 6.13 portal
+# -------------------------------------------------------------------------------------
+
+#
+
+/root/mode/modelog "$0 $*"
+
+# check reentrance
+
+if [ -x /etc/ifconfig ]; then
+   HSHTMP=""
+else
+   HSHTMP="sh.*"
+fi
+MYFILE="/root/mode/tmp/hrytbcmp$$.tmp"
+ps -ef > $MYFILE
+if [ `grep -E "${HSHTMP}tbcmp" $MYFILE | grep -v "exectask tbcmp" | wc -l` -gt 1 ]; then
+   rm -f $MYFILE 
+   echo "Another tbcmp task is running!" && exit 1
+fi
+rm -f $MYFILE 
+
+# get options
+
+HOPTIONS=""
+while (echo "'$1'"  | grep -E  -e "^'-" > /dev/null)
+do
+   HOPTIONS="$HOPTIONS$1"
+   shift 
+done
+
+# get mysql server ip 
+
+. /root/mode/mysqldip
+
+# default database is portal
+
+HDBNAME=${1:-portal}
+
+# testdb 
+
+/root/mode/testdb $HMYSQLDIP $HDBNAME || exit 1
+
+# begin compare  
+
+HTBLIST="/root/mode/tmp/htblist$$.tmp"
+HTBLISTSUB="/root/mode/tmp/htblistsub$$.tmp"
+HCLLIST="/root/mode/tmp/hcllist$$.tmp"
+HRESULTA="/root/mode/tmp/hresulta$$.tmp"
+HRESULTT="/root/mode/tmp/hresultt$$.tmp"
+HTAG0=/root/mode/tmp/htbdes0$$.tmp
+HTAG1=/root/mode/tmp/htbdes1$$.tmp
+HALLCOLDEF=/root/mode/tmp/hallcoldef$$.tmp
+
+> $HTBLIST
+/root/mode/seecfg -s $HMYSQLDIP "select table_name from tables where table_schema ='$HDBNAME'" information_schema > $HTBLIST
+if [ `cat $HTBLIST | wc -l` -gt 0 ];then
+   HMAXLLEN=`cat $HTBLIST | wc -L`
+   HMAXLLEN=$[$HMAXLLEN+5]
+   HMSPACES="                                                    "
+   HMSPACES="${HMSPACES:0:$HMAXLLEN}"
+else
+   exit
+fi
+
+trap "" INT
+
+{
+echo "############# tbcmp $HMYSQLDIP2 $HDBNAME #############"
+echo 
+echo "tbcmp began at `LANG=en_US;date`"
+for i in `cat $HTBLIST`;do
+
+    # check if related tables exist
+
+    if grep -Pi "^${i}_(log|last|till|history)$" $HTBLIST >/dev/null; then
+       :
+    else
+       continue
+    fi
+
+    # save related tables to $HTBLISTSUB
+
+    echo $i > $HTBLISTSUB
+    grep -Pi "^${i}_(log|last|till|history)$" $HTBLIST >> $HTBLISTSUB
+
+    # table cmp first 
+
+    HTAG=0
+    HDESCNT=0
+    HDIFF=0
+    for k in `cat $HTBLISTSUB`;do
+      HDESCNT=$[$HDESCNT+1]
+       if [ $HTAG -eq 0 ]; then
+          /root/mode/seecfg -s $HMYSQLDIP "desc \`$k\`" $HDBNAME > $HTAG0
+          HTAG=1
+       else
+          /root/mode/seecfg -s $HMYSQLDIP "desc \`$k\`" $HDBNAME > $HTAG1
+          HTAG=0
+       fi
+       if [ $HDESCNT -gt 1 ]; then
+          if cmp -s $HTAG0 $HTAG1; then
+             continue
+          else
+             HDIFF=1
+             break
+          fi
+       fi
+    done
+
+    if [ $HDIFF -eq 0 ]; then
+       continue
+    fi
+
+    # column cmp needed
+
+    # get columns's main definations
+
+    /root/mode/seecfg -s $HMYSQLDIP "select table_name,
+                                 concat('[',column_name,
+                                        '[type=',column_type,']',
+                                        '[nullable=',is_nullable,']',
+                                        '[',ifnull(concat('default=''',
+                                                          replace(column_default,'''',''''''),''''),'null'),']]')
+                                  from information_schema.columns
+                          where table_schema='$HDBNAME'
+                                and table_name in (`cat $HTBLISTSUB | sed -re \"s/^/'/\" | 
+                                                    sed -re \"s/$/',/\" | sed -re \"$ s/,$//\"`)" |
+    tr "A-Z" "a-z" |
+    sed -re "s/(.*\[nullable=no\])(\[null\])\]$/\1\]/" > $HALLCOLDEF
+
+    # get all columns.Some columns may not be defined in some tables
+
+    /root/mode/seecfg -s $HMYSQLDIP "select distinct column_name from information_schema.columns
+                          where table_schema='$HDBNAME'
+                                and table_name in (`cat $HTBLISTSUB | sed -re \"s/^/'/\" | 
+                                                    sed -re \"s/$/',/\" | sed -re \"$ s/,$//\"`)" |
+    tr "A-Z" "a-z" > $HCLLIST
+
+    # get definations of certain column in table order 
+
+    > $HRESULTT
+    for j in `cat $HCLLIST`;do
+       > $HRESULTA
+       HTBCNT=0
+       for k in `cat $HTBLISTSUB`;do
+          HTBCNT=$[$HTBCNT+1]
+          kk="$k$HMSPACES"
+          if cat $HALLCOLDEF | grep -P "^$k\t\[$j\[" >/dev/null; then
+             cat $HALLCOLDEF | grep -P "^$k\t\[$j\[" |
+             sed -re "s/^([^\t]+\t)(.*)/${kk:0:$HMAXLLEN}\2/" >> $HRESULTA
+          else
+             echo "${kk:0:$HMAXLLEN}" >> $HRESULTA
+          fi
+       done
+       if [ `sed -re "s/^.{$HMAXLLEN}(.*)/\1/" $HRESULTA | sort | uniq | wc -l` -gt 1 ]; then
+          echo >> $HRESULTT
+          echo "-----------------------------------------------------------------------------" >> $HRESULTT
+          echo "${HMSPACES}<$j> definations" >> $HRESULTT
+          echo "-----------------------------------------------------------------------------" >> $HRESULTT
+          echo >> $HRESULTT
+          cat $HRESULTA >> $HRESULTT
+       fi
+    done 
+    
+    if [ `cat $HRESULTT |wc -l` -gt 0 ]; then
+       echo 
+       echo 
+       echo "===== Table series <<" `cat $HTBLISTSUB` ">> differences report ====="
+       echo 
+       cat  $HRESULTT
+    fi
+
+done
+
+echo 
+echo "tbcmp completed at `LANG=en_US;date`"
+echo
+} | tee -a /root/mode/logs/tbcmp.log
+
+# 
+
+rm -f $HTBLIST
+rm -f $HTBLISTSUB
+rm -f $HCLLIST
+rm -f $HRESULTA
+rm -f $HRESULTT
+rm -f $HTAG0
+rm -f $HTAG1
+rm -f $HALLCOLDEF
+

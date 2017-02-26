@@ -1,0 +1,14 @@
+#!/bin/bash
+# ------------------------------------------------------------------------------
+# function:
+#           Install jdk6 or jdk7 to directory /usr/local/jdk6
+# ------------------------------------------------------------------------------
+# remarks :
+#           jdk7.tar.gz is compressed from jdk7 installation at /usr/local/jdk6
+# ------------------------------------------------------------------------------           
+
+[ -d /usr/local/jdk6 ] ||
+{
+cd /
+tar xzvf `ls -1 /root/packages/jdk?.tar.gz | sed -n "$ p"`
+}

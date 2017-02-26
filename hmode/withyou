@@ -1,0 +1,20 @@
+#!/bin/bash
+
+Hpps=$1
+Hextra=$(ps -e -o pid,ppid,cmd | 
+         grep -E    "^ *[0-9]+ +[0-9]+ +/bin/bash +[^ ]*/$2( |$)" |  
+         grep -E -v "^ *($Hpps +[0-9]+|[0-9]+ +$Hpps) +/bin/bash +[^ ]*/$2( |$)" | wc -l)
+if [ $Hextra -gt 0 ]; then
+   if [ -n "$3" ]; then 
+      if [ `/root/mode/traceps "crond"` != 'suc' ]; then
+         /root/mode/modemsg "$2" "Another $2 task is running!" more
+      fi
+      # No wait.All $2 processes may abort almost simultaneously
+   fi
+   exit 0
+fi
+exit 1
+
+#
+
+

@@ -1,0 +1,50 @@
+#!/bin/bash
+# -------------------------------------------------------
+# function:
+#           reconfig /etc/my.cnf
+# -------------------------------------------------------
+
+[ -x /usr/sbin/mysqld ] ||
+{
+echo "MySQL server has not been installed!" && exit 
+} 
+
+/root/mode/testmysql || exit
+
+# 
+
+if [ "$HNCONFIRM_MODE" = 'y' ]; then
+   :
+else
+   /root/mode/confirm "Are you sure to reconfigure mysql server at this machine" || exit 1 
+fi 
+
+# 
+
+export HNCONFIRM_MODE='y'
+
+echo
+echo "reconfig_cnf began at `LANG=en_US;date`"
+
+#
+
+/root/mode/mysql stop
+while ps -ef | grep mysqld | grep -v grep >/dev/null;do
+  sleep 1
+done
+
+rm -f /etc/my.cnf
+rm -f /var/lib/mysql/ib_logfile*
+
+#
+
+/root/mode/config_mem max
+
+#
+
+/root/mode/mysql start
+
+#
+
+echo "reconfig_cnf ended at `LANG=en_US;date`"
+echo

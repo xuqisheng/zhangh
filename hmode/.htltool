@@ -1,0 +1,165 @@
+#!/bin/bash 
+# -----------------------------------------------------------------------------
+# function:
+#          dump or remove the data of a hotel
+# usages:
+#          ./.htltool <action> <mysqld-ip> <dbname> <hotel_id> [<dumpname.sql>]
+# remarks:
+#          At present,only two actions are available,"--dump" and "--remove" 
+# --------------------------------------------------------------------------
+# e.g.  :  
+#          ./.htltool --dump   6.15 portal_f 6 /h6.sql
+#          ./.htltool --remove 6.15 portal_f 6
+# -----------------------------------------------------------------------------
+
+# get options
+
+HOPTIONS=""
+while (echo "'$1'"  | grep -E  -e "^'-" > /dev/null)
+do
+   HOPTIONS="$HOPTIONS$1"
+   shift 
+done
+
+#
+
+if [ "$HOPTIONS" = "--dump" -o "$HOPTIONS" = "--remove" ]; then
+   :
+else
+   /root/mode/modemsg htltool "Invalid option!" more
+   exit 1
+fi
+
+# get mysql server ip 
+
+. /root/mode/mysqldip
+
+# database name
+
+HDBNAME="$1"
+if [ -z "$HDBNAME" ]; then
+   /root/mode/modemsg htltool "Database name must be provided!" more
+   exit 1
+fi
+
+# $HDBNAME must exist 
+
+if [ -z `/root/mode/seecfg -s $HMYSQLDIP "show databases like '$HDBNAME'"|grep -i "^$HDBNAME"` ]; then
+   /root/mode/modemsg htltool "Database '$HDBNAME' doesn't exist in MySQL server at $HMYSQLDIP" more
+   exit 1
+fi
+
+# $HDBNAME must be gc ipms 
+
+if [ -z `/root/mode/seecfg -s $HMYSQLDIP "show tables from \\\`$HDBNAME\\\` like 'audit\_flag'"` ]; then
+   /root/mode/modemsg htltool "Database '$HDBNAME' IS NOT a gc ipms!" more
+   exit 1
+fi
+
+# hotel_id
+
+HHOTELID="$2"
+
+if [ -z "$HHOTELID" ]; then
+   /root/mode/modemsg htltool "Hotel id must be provided!" more
+   exit 1
+fi
+
+if (echo "$HHOTELID"  | grep -E  "^[0-9]+$" > /dev/null); then
+   if [ "$HHOTELID" -le 0 ]; then
+      /root/mode/modemsg htltool "Hotel id must be greater than 0" more
+      exit 1
+   fi
+else
+   /root/mode/modemsg htltool "Hotel id must be a positive integer!" more
+   exit 1
+fi
+
+HHOTEL_ID=`/root/mode/seecfg -s $HMYSQLDIP "select id from \\\`$HDBNAME\\\`.hotel where id=$HHOTELID"`
+HHOTELDES=`/root/mode/seecfg -s $HMYSQLDIP "select descript from \\\`$HDBNAME\\\`.hotel where id=$HHOTELID"`
+
+if [ -z "$HHOTEL_ID" ]; then
+   /root/mode/modemsg htltool "Hotel id '$HHOTELID' doesn't exist in table hotel!" more
+   exit 1
+fi
+
+HGROUP_ID=`/root/mode/seecfg -s $HMYSQLDIP "select hotel_group_id from \\\`$HDBNAME\\\`.hotel where id='$HHOTEL_ID'"`
+HGROUPDES=`/root/mode/seecfg -s $HMYSQLDIP "select descript from \\\`$HDBNAME\\\`.hotel_group where id='$HGROUP_ID'"`
+if [ -z "$HGROUPDES" ]; then
+   /root/mode/modemsg htltool "The group id '$HGROUP_ID' of hotel id '$HHOTEL_ID' doesn't exist in table hotel_group!" more
+   exit 1
+fi
+
+if [ "$HOPTIONS" = "--dump" ]; then
+   # dump name
+   if [ -z "$3" ]; then
+      /root/mode/modemsg htltool "Please provide a dump name ending with \".sql\""  more
+      exit 1
+   elif echo "$3" | grep "\.sql$" >/dev/null; then
+      HDUMPNAME="$3"
+   else
+      /root/mode/modemsg htltool "User designated dump name must end with \".sql\""  more
+      exit 1
+   fi
+fi
+
+# confirmation 
+
+/root/mode/modemsg htltool "$HOPTIONS a hotel data--" 
+/root/mode/modemsg htltool "MySQL server ip   : $HMYSQLDIP" less
+/root/mode/modemsg htltool "Database          : $HDBNAME"   less
+/root/mode/modemsg htltool "Hotel id          : $HHOTEL_ID" less
+/root/mode/modemsg htltool "Hotel description : $HHOTELDES" less
+/root/mode/modemsg htltool "group id          : $HGROUP_ID" less
+/root/mode/modemsg htltool "group description : $HGROUPDES" less
+if [ "$HOPTIONS" = "--dump" ]; then
+   /root/mode/modemsg htltool "dump name         : $HDUMPNAME" less
+fi
+
+/root/mode/confirm "Are you sure that the information above is completely right" more || exit 1 
+
+# --------------------------------------------
+# Here is the body,very short in fact 
+# --------------------------------------------
+
+Hhtltoolsql=/root/mode/tmp/hhtltool$$.sql
+
+#
+
+{
+echo
+echo "############# htltool $HOPTIONS $HMYSQLDIP $* #############"
+echo
+
+
+if [ "$HOPTIONS" = "--dump" ]; then
+   echo "dump hotel data of hotel id $HHOTEL_ID from database $HDBNAME at $HMYSQLDIP began at `LANG=en_US;date`"
+   echo
+   mysqldump -uroot $Hmodepass -h$HMYSQLDIP --opt --single-transaction -t -y --skip-add-drop-table --skip-triggers -w "hotel_group_id=$HGROUP_ID and hotel_id=$HHOTEL_ID" $HDBNAME `/root/mode/find_tables $HMYSQLDIP $HDBNAME 11` > "$HDUMPNAME"
+   echo
+   echo "dump hotel data of hotel id $HHOTEL_ID from database $HDBNAME at $HMYSQLDIP ended at `LANG=en_US;date`"
+   echo
+elif [ "$HOPTIONS" = "--remove" ]; then
+   # prepare sql
+   /root/mode/find_tables $HMYSQLDIP $HDBNAME 11 |
+   sed -re "s/^/delete from /" |
+   sed -re "s/$/ where hotel_group_id=$HGROUP_ID and hotel_id=$HHOTEL_ID;/" > $Hhtltoolsql
+   echo "Remove hotel data of hotel id $HHOTEL_ID from database $HDBNAME at $HMYSQLDIP began at `LANG=en_US;date`"
+   echo
+   /root/mode/seecfg $HMYSQLDIP $Hhtltoolsql $HDBNAME
+   echo
+   echo "Remove hotel data of hotel id $HHOTEL_ID from database $HDBNAME at $HMYSQLDIP ended at `LANG=en_US;date`"
+   echo
+fi
+} 2>&1 | tee -a /root/mode/logs/htltool.log
+
+
+# rm tmp
+
+rm -f $Hhtltoolsql 
+
+# end
+
+
+
+

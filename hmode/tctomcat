@@ -1,0 +1,192 @@
+#!/bin/bash
+# ---------------------------------------------------------------------------------------------------------------------
+# function:
+#          display tomcat status for further operation
+# usages  :
+#          ./tctomcat <tomcat_directory> <killmark>
+# e.g.    :
+#          ./tctomcat tomcat6         ## display status of tomcat6,including zombie tomcat and abnormal tomcat status
+#          (return status:up,down,zombie,abnormal,starting,stopping) 
+#          ./tctomcat tomcat6 kill    ## display status of tomcat6,zombie tomcat and abnormal tomcat will be killed
+#          (return status:up,down,starting,stopping) 
+# ---------------------------------------------------------------------------------------------------------------------
+
+Hhrytomcat=$1
+Hhrytomdirs=`/root/mode/.tomdirs $Hhrytomcat`
+Hhrykill=$2
+Hzombiewait=0
+Hloop=0
+while [ 1 ]; do
+   Hcmdline=`ps -ef | grep -E "\-Djava\.io\.tmpdir=$Hhrytomdirs/temp org\.apache\.catalina\.startup\.Bootstrap start$" | grep -v grep`
+   #
+   while read -r Hacmdline;do
+      Htcmdline="$Hacmdline"
+      break
+   done <<< "$Hcmdline"
+   #
+   if [ -z "$Htcmdline" ]; then
+      # No process at all
+      echo "down"
+      exit 
+   fi
+
+   # get the process id of tomcat and the user who started this tomcat
+
+   Htprocess=`echo "$Htcmdline" | sed -re "s/^([^ ]+) +([0-9]+).*/\2/"`
+   Htomcat_user=`echo "$Htcmdline" | sed -re "s/^([^ ]+) +([0-9]+).*/\1/"`
+   Hmonitoruser=$USER
+
+   if [ "$HOME" != "/root" -a "$HOME" != "/" ]; then
+      if [ "$Htomcat_user" != "$Hmonitoruser" ]; then
+         /root/mode/modemsg tctomcat "Tomcat '$Hhrytomcat' was started by '$Htomcat_user' and the current user is '$Hmonitoruser'!"
+         /root/mode/modemsg tctomcat "Mode is unable to get the necessary port usage information.Unexpected disaster might happen!!!"
+         Hdiffuser=1
+      fi
+   fi
+
+   # 
+
+   Hsss=`/usr/sbin/ss -s 2>/dev/null | grep -E "^TCP: +[0-9]+" | sed -re "s/^TCP: +([0-9]+).*/\1/"`
+   if [ $Hsss -gt 2000 ]; then
+      Hntlp=`/usr/sbin/ss -ntlp 2>/dev/null`
+      # if [ `echo "$Hntlp" | grep -Ev " users:\(\(" | wc -l` -gt 1 ]; then
+      if [ `echo "$Hntlp" | sed -re '1 d' | grep -Ev "users:\(\(" | grep -E "(:[489][0-9]{3} |:8[0-9] )" | wc -l` -gt 0 ]; then
+         Hntlp=`netstat -ntlp 2>/dev/null`
+      fi
+   else
+      Hntlp=`netstat -ntlp 2>/dev/null`
+   fi
+      
+   #
+
+   Hportcnt=`echo "$Hntlp" | grep -E "( $Htprocess/java|\(\"java\",$Htprocess,[0-9]+\))" | grep -Ev ":[0-9]{5}" | wc -l`
+
+   #
+
+   Hdwnp=$(cat /usr/local/$1/conf/server.xml|grep -E "<Server port=\"([0-9]+)\" shutdown=" | sed -re "s/.*\"([0-9]+)\".*/\1/")
+   Hajpp=$(cat /usr/local/$1/conf/server.xml|grep -E "<Connector port=\"([0-9]+)\" protocol=\"AJP" | sed -re "s/.*\"([0-9]+)\" p.*/\1/")
+
+   # "up" by method 1 --  process with all ports open 
+
+   Hab_wajp=
+   if [ $Hportcnt -eq 4 ]; then
+      if [ `echo "$Hntlp" | grep -E ".*:${Hajpp} +.*( $Htprocess/java|\(\"java\",$Htprocess,[0-9]+\))" | wc -l` -gt 0 ]; then
+         /root/mode/tomupdtl $Hhrytomcat
+         exit
+      else
+         Hab_wajp=y
+      fi
+   elif [ $Hportcnt -eq 3 ]; then
+      if ! /root/mode/isctom $Hhrytomcat; then
+         if [ `echo "$Hntlp" | grep -E ".*:${Hajpp} +.*( $Htprocess/java|\(\"java\",$Htprocess,[0-9]+\))" | wc -l` -gt 0 ]; then
+            /root/mode/tomupdtl $Hhrytomcat
+            exit
+         else
+             Hab_wajp=y
+         fi
+      fi
+   fi
+     
+   #  
+
+   if [ "$Hab_wajp" = "y" ]; then
+      # abnormal with wrong ajp port opened
+      if [ "$Hhrykill" = "kill" ]; then
+         /root/mode/modemsg tctomcat "$Hhrytomcat dectected as abnormal with wrong ajp port opened.Kill signal is sent"
+         kill -9 $Htprocess 2>/dev/null
+         sleep 3
+         continue
+      else
+         /root/mode/modemsg tctomcat "$Hhrytomcat detected as abnormal with wrong ajp port opened"
+         echo "abnormal with wrong ajp port opened" && exit 
+      fi
+   fi 
+
+   #
+
+   if [ $Hportcnt -eq 0 ]; then
+      # process with no ports open
+      # zombie
+      if [ -n "$Hdiffuser" ]; then
+         echo "at unknown port usage status for current user '$Hmonitoruser' authority"
+         exit
+      else
+         if [ "$Hhrykill" = "kill" ]; then
+            # when tomcat is just starting,it seems zombie tomcat.We wait 5 seconds for some ports open
+            # when tomcat is almost stopped,it seems zombie tomcat too.We wait 5 seconds for the process to disappear.
+            if [ $Hzombiewait -eq 0 ]; then
+               sleep 5
+               Hzombiewait=$[$Hzombiewait+1]
+               continue
+            fi
+            # in rare cases tomcat may be killed wrongly
+            /root/mode/modemsg tctomcat "Zombie tomcat $Hhrytomcat!!!Kill signal is sent"
+            kill -9 $Htprocess 2>/dev/null
+            sleep 3
+            continue
+         else
+            /root/mode/modemsg tctomcat "Zombie tomcat $Hhrytomcat!!!"
+            echo "zombie"
+            exit
+         fi
+      fi
+   fi
+
+   # process with some of the ports open
+
+   if [ `echo "$Hntlp" | grep -E ".*:${Hdwnp} +.*( $Htprocess/java|\(\"java\",$Htprocess,[0-9]+\))" | wc -l` -gt 0 ]; then
+      # running 
+      if [ `echo "$Hntlp" | grep -E ".*:${Hajpp} +.*( $Htprocess/java|\(\"java\",$Htprocess,[0-9]+\))" | wc -l` -gt 0 ]; then
+         # "up" by method 2
+         # running normally
+         /root/mode/tomupdtl $Hhrytomcat
+         exit
+      else
+         # running abnormally
+         if [ "$Hhrykill" = "kill" ]; then
+            /root/mode/modemsg tctomcat "$Hhrytomcat dectected as abnormal.Kill signal is sent"
+            kill -9 $Htprocess 2>/dev/null
+            sleep 3
+            continue
+         else
+            /root/mode/modemsg tctomcat "$Hhrytomcat detected as abnormal"
+            echo "abnormal"
+            exit
+         fi
+      fi
+   else
+      # starting or stopping 
+      if cat /usr/local/$Hhrytomcat/RELEASE-NOTES 2>/dev/null | grep 'Apache Tomcat Version 6' >/dev/null; then
+         # Apache Tomcat Version 6
+         if [ `echo "$Hntlp" | grep -E ".*:${Hajpp} +.*( $Htprocess/java|\(\"java\",$Htprocess,[0-9]+\))" | wc -l` -eq 0 ]; then
+            # ajp is not up,but http (and cluster 400x ) is up
+            echo "starting"
+         else
+            # ajp is up.In rare case,this is 'starting' state,down port will opened soon 
+            if tail -n 10000 /usr/local/$Hhrytomcat/logs/catalina.out 2>/dev/null | grep -E "(Mode stop mark |Mode start mark )" | tail -n 1 | grep 'Mode stop mark '>/dev/null; then
+               echo "stopping" 
+            else
+               echo "starting"
+            fi
+         fi
+      else
+         # Apache Tomcat Version 7 and up
+         if [ `echo "$Hntlp" | grep -E ".*:${Hajpp} +.*( $Htprocess/java|\(\"java\",$Htprocess,[0-9]+\))" | wc -l` -eq 0 ]; then
+            continue 
+         else
+            # In starting state,the ajp port is initialized,but has not been started.The period between initialized and started is very long.
+            # In stoping state,the ajp port is paused,but has not been stoped.The period between paused and stoped is very short.
+            # We use catalina.out to get the accurate status
+            if tail -n 10000 /usr/local/$Hhrytomcat/logs/catalina.out 2>/dev/null | grep -E "(Mode stop mark |Mode start mark )" | tail -n 1 | grep 'Mode stop mark '>/dev/null; then
+               echo "stopping" 
+            else
+               echo "starting"
+            fi
+         fi
+      fi
+      exit
+   fi
+done
+
+#
+

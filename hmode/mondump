@@ -1,0 +1,46 @@
+#!/bin/bash
+#-----------------------------------------------------------------------
+# function:
+#           monitor dump process 
+# usage   :
+#           ./mondump <dumpprocessid> <IP> <database>
+# ----------------------------------------------------------------------
+
+# test process
+
+if ! ps -ef | grep -E "^[^ ]+ +$1 +.* mysqldump " >/dev/null; then
+   exit 1
+fi
+
+# local ip addresses 
+
+if [ "$2" = "localhost" ]; then
+   Hlip="($2)"
+elif [ "$2" = "127.0.0.1" ]; then
+   Hlip="($2):[0-9]+"
+else
+   Hlip="$(/root/mode/getstrips):[0-9]+"
+fi
+
+# get status 
+
+Hinsmark="(SELECT +\/\*!40001 SQL_NO_CACHE \*\/ \* FROM)"
+Hmdfile=/root/mode/tmp/hmondump$$.tmp
+/root/mode/seecfg $2 "show processlist" > $Hmdfile
+if cat $Hmdfile | grep -Pi  "^(\|[^\|]*){2}\| *$Hlip *\| *$3 *(\|[^\|]*){3}\| *$Hinsmark \`" > /dev/null; then
+    Hletter=$(
+    LANG=en_US;
+    cat $Hmdfile | 
+    grep -Pi "^(\|[^\|]*){2}\| *$Hlip *\| *$3 *(\|[^\|]*){3}\| *$Hinsmark \`" |
+    sed -nre "1 p" |
+    sed -re "s/^(\|[^\|]*){2}\| *$Hlip *\| *$3 *(\|[^\|]*){3}\| *$Hinsmark \`(.).*/\5/" |
+    tr "A-Z" "a-z")
+    echo -n $Hletter
+fi
+
+#
+
+rm -f $Hmdfile
+
+# end 
+

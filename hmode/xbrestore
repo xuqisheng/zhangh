@@ -1,0 +1,168 @@
+#!/bin/bash 
+# -------------------------------------------------------------------------------------------------------------------------------
+# function:
+#           restore xbback dumps into local datbase 
+# usages  :
+#           ./xbrestore <xbdump-directory> <restore-till-sub>
+# e.g.    :
+#           ./xbrestore /DISK2/xbdumps/dumptest   base       # restore only the base of xbback dump 
+#           ./xbrestore /DISK2/xbdumps/dumptest   inc003     # restore the base,and the incremental dump inc001,inc002 and inc003
+# -------------------------------------------------------------------------------------------------------------------------------
+
+# get options
+
+HOPTIONS=""
+while (echo "'$1'"  | grep -E  -e "^'-" > /dev/null)
+do
+   HOPTIONS="$HOPTIONS$1"
+   shift
+done
+
+# check if MySQL server exists
+
+if [ ! -x /usr/sbin/mysqld ]; then
+   /root/mode/modemsg xbrestore "MySQL server is not installed" more
+   exit 1
+fi
+
+# xtrabackup utilities
+
+if [ ! -d /usr/local/xtrabackup ]; then
+   /root/mode/modemsg xbrestore "No mode configured xtrabackup utilities exist at this machine!" more
+   exit 1
+fi
+
+# xtrabackup version check
+
+if ! /usr/local/xtrabackup/bin/xtrabackup -v 2>&1 | grep -E '/xtrabackup version 2\.3\.6 ' >/dev/null; then
+   /root/mode/modemsg xbrestore "Only xtrabackup version tested and modified by blackbox2 is allowed!" more
+   exit 1
+fi
+
+# if called from crond
+
+if [ `/root/mode/traceps "crond"` = 'suc' ]; then
+   . /root/.bashrc 2>/dev/null
+   export HBLACKBOX2=1
+fi
+
+# get parameters
+
+if [ -d /var/lib/mysql ]; then
+   if [ -h /var/lib/mysql ]; then
+      Hmysql_data_dir=`readlink /var/lib/mysql`
+   else
+      Hmysql_data_dir=/var/lib/mysql
+   fi
+else
+   /root/mode/modemsg xbrestore "MySQL directory /var/lib/mysql doesn't exist!" more
+   exit 1
+fi
+   
+# check xbback dump directory
+
+Hxbdmp_dir="$1"
+if [ -z "$Hxbdmp_dir" ]; then
+   /root/mode/modemsg xbrestore "xbback dump directory must be provided as the first parm!" more
+   exit 1
+elif [ ! -d "$Hxbdmp_dir" ]; then
+   /root/mode/modemsg xbrestore "xbback dump directory '$Hxbdmp_dir' doesn't exist!" more
+   exit 1
+fi
+
+# check xbback dump sub
+
+Hxbdmp_till="$2"
+if [ -z "$Hxbdmp_till" ]; then
+   /root/mode/modemsg xbrestore "Please privide the xbback dump sub directory to which the restoration will use dump(s) from 'base'" more
+   exit 1
+elif ! echo $Hxbdmp_till | grep -E "^(base|inc[0-9]{3})$" >/dev/null; then
+   /root/mode/modemsg xbrestore "xbback dump sub directory must be 'base' or 'inc001','inc002' ..." more
+   exit 1
+elif [ "$Hxbdmp_till" = "inc000" ]; then
+   /root/mode/modemsg xbrestore "xbback incremental sub directory must be 'inc001' and on!" more
+   exit 1
+fi
+
+# check if all subdirectory exists 
+
+if [ "$Hxbdmp_till" = "base" ]; then
+   Hsublist=base
+else
+   Hxbdmp_till_cntchar=${Hxbdmp_till:3}
+   Hxbdmp_till_cntnumb=$[10#$Hxbdmp_till_cntchar]
+   Hsublist=`seq $Hxbdmp_till_cntnumb | sed -re 's/^/000/' -e 's/.*(.{3})/inc\1/' | sed -re '1 i base'`
+fi
+for Hsubloop in `echo $Hsublist`;do
+   if [ ! -d "$Hxbdmp_dir/$Hsubloop" ]; then
+      /root/mode/modemsg xbrestore "xbback dump sub directory '$Hxbdmp_dir/$Hsubloop' doesn't exist!" more
+      exit 1
+   elif [ ! -f "$Hxbdmp_dir/$Hsubloop/backup-my.cnf" ]; then
+      /root/mode/modemsg xbrestore "'Hxbdmp_dir/$Hsubloop' doesn't contain xbback dump!!!" more
+      exit 1
+   fi
+done
+Hsublist2=`echo $Hsublist | sed -re "s/ /,/g" -e "s/(.*),/\1 and /"`
+
+# ---------------------------------------------------------------------
+# data restoration is very dangerous !!!
+# ---------------------------------------------------------------------
+# confirmation 
+
+/root/mode/confirm "Are you sure to restore MySQL database from dump(s) \"`echo $Hsublist2`\" in $Hxbdmp_dir" more || exit 1
+
+# ------------------------------------
+# apply-log preparation 
+# ------------------------------------
+
+if [ "$Hxbdmp_till" = "base" ]; then
+   #
+   /usr/local/xtrabackup/bin/innobackupex --apply-log --user=root --password=deviskaifa "$Hxbdmp_dir/base"
+else
+   Hxbdmp_till_cntchar=${Hxbdmp_till:3}
+   Hxbdmp_till_cntnumb=$[10#$Hxbdmp_till_cntchar]
+   /usr/local/xtrabackup/bin/innobackupex --apply-log --redo-only --user=root --password=deviskaifa "$Hxbdmp_dir/base"
+   for Hcnt_loop in `seq $Hxbdmp_till_cntnumb`;do
+       Hcnt_loop_char=$[1000+$Hcnt_loop]
+       Hcnt_loop_char=${Hcnt_loop_char:(-3)}
+       if [ $Hcnt_loop -lt $Hxbdmp_till_cntnumb ]; then
+          Hredo="--redo-only" 
+       else
+          Hredo="" 
+       fi
+       /usr/local/xtrabackup/bin/innobackupex --apply-log $Hredo --user=root --password=deviskaifa "$Hxbdmp_dir/base" --incremental-dir="$Hxbdmp_dir/inc$Hcnt_loop_char"
+   done 
+   /usr/local/xtrabackup/bin/innobackupex --apply-log --user=root --password=deviskaifa "$Hxbdmp_dir/base"
+fi
+
+# stop mysql
+
+/root/mode/mysql stop
+
+# remove old mysql data directory 
+
+rm -fR "$Hmysql_data_dir"
+
+# create mysql data directory
+
+mkdir "$Hmysql_data_dir"
+
+# restore to mysql data direcxtory 
+
+/usr/local/xtrabackup/bin/innobackupex --copy-back --user=root --password=deviskaifa "$Hxbdmp_dir/base"
+
+# change owner
+
+chown -R mysql:mysql "$Hmysql_data_dir"
+
+# do fix
+
+/root/mode/fix_cnf
+
+# mysql start
+
+/root/mode/mysql start
+
+# end of restore
+
+

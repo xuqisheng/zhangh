@@ -1,0 +1,30 @@
+#!/bin/bash 
+# ------------------------------------------------
+# function:
+#          add a shell to pt-online-schema-change
+# ------------------------------------------------
+
+# check pt installation
+
+if ! /root/mode/.pt_stat | grep 'installed-ok' >/dev/null; then
+   /root/mode/modemsg ptmode "The pt has not been installed!!" more
+   exit 1
+fi
+
+#
+
+export Hmysql_force=No
+. /root/mode/mysqldip 
+
+#
+
+Hpre_default="--charset=utf8 --set-vars innodb_lock_wait_timeout=80 --recursion-method=none --chunk-time=0.2 --max-load=Threads_running:9 --critical-load=Threads_running:400"
+if [ -x /usr/bin/pt-online-schema-change ]; then 
+   /usr/bin/pt-online-schema-change -uroot $Hmodepass -h$HMYSQLDIP $Hpre_default "$@"
+elif [ -x /usr/local/bin/pt-online-schema-change ]; then 
+   /usr/local/bin/pt-online-schema-change -uroot $Hmodepass -h$HMYSQLDIP $Hpre_default "$@"
+fi
+
+# end
+
+

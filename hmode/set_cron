@@ -1,0 +1,58 @@
+#!/bin/bash 
+# ------------------------------------------------------
+# function:
+#          do some routine job to increase performance
+# -----------------------------------------------------
+
+# exclusive execution with wait mode
+
+/root/mode/modepv set_cron $$ " /bin/bash .*/set_cron"
+
+#
+
+[ -e /etc/crontab ] || exit 1
+
+# clrcache
+
+if cat /etc/crontab | grep "root /root/mode/clrcache" >/dev/null; then
+   cat /etc/crontab |
+   sed -re "s/.*root \/root\/mode\/clrcache.*/\*\/1 \* \* \* \* root \/root\/mode\/clrcache/" > /root/mode/tmp/hcron$$.tmp
+   cp -f /root/mode/tmp/hcron$$.tmp /etc/crontab
+   rm -f /root/mode/tmp/hcron$$.tmp
+else
+   echo "*/1 * * * * root /root/mode/clrcache" >> /etc/crontab
+fi
+
+# tune_mysql
+
+if ! cat /etc/crontab | grep "root /root/mode/tune_mysql" >/dev/null; then
+   echo "*/2 * * * * root /root/mode/tune_mysql" >> /etc/crontab
+elif cat /etc/crontab | grep -P "^\*/15 \* \* \* \* root /root/mode/tune_mysql$" >/dev/null; then
+   cat /etc/crontab 2>/dev/null | sed -re "s/.*\/root\/mode\/tune_mysql.*/\*\/2 \* \* \* \* root \/root\/mode\/tune_mysql/" > /root/mode/tmp/set_cron$$.tmp
+   cp -f /root/mode/tmp/set_cron$$.tmp /etc/crontab
+   rm -f /root/mode/tmp/set_cron$$.tmp
+fi
+
+# clrlogs
+
+if ! cat /etc/crontab | grep -E "root +/root/mode/clrlogs" >/dev/null; then
+   echo "0 5   * * * root /root/mode/clrlogs" >> /etc/crontab
+fi
+
+# --------------------------------------------------------------------------
+# fix /etc/cron.daily/tmpwatch for linux versions below CentOS 5.8
+# --------------------------------------------------------------------------
+
+if [ -f /etc/cron.daily/tmpwatch ]; then
+   if cat /etc/re*re* 2>/dev/null | grep -E " 5\.[01234567] " >/dev/null; then
+      if ! cat /etc/cron.daily/tmpwatch | grep -E "\-x /tmp/hsperfdata_root " > /dev/null; then
+         cat /etc/cron.daily/tmpwatch | sed -re 's/("\$flags")/\1 -x \/tmp\/hsperfdata_root/' > /root/mode/tmp/set_cron$$.tmp
+         cp -f /root/mode/tmp/set_cron$$.tmp /etc/cron.daily/tmpwatch
+         rm -f /root/mode/tmp/set_cron$$.tmp
+      fi
+   fi
+fi
+
+#
+
+

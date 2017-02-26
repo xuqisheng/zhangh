@@ -1,0 +1,11 @@
+#!/bin/bash 
+
+#
+
+if [ ! -f /etc/.modesid ]; then
+  uuidgen > /etc/.modesid 
+fi
+echo `cat /etc/.modesid`
+
+#
+

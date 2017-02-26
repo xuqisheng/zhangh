@@ -1,0 +1,45 @@
+#!/bin/bash 
+# ----------------------------------
+# function:
+#           check mysql log 
+# ----------------------------------
+
+#  
+
+[ -d /var/lib/mysql/ ] || exit
+
+# log
+
+# first test
+
+sync
+if [ `ls -l /var/lib/mysql/ib_logfile* 2>/dev/null | wc -l` -eq 0 ]; then
+   Hsize1=0
+else
+   Hsize1=`ls -l /var/lib/mysql/ib_logfile* 2>/dev/null| sed -re "s/^([^ ]+ *){4}([0-9]+).*$/\2#/"|tr -d "\n"`  
+fi
+
+while [ 1 ]; do
+   sleep 0.1
+   # second test
+
+   sync
+   if [ `ls -l /var/lib/mysql/ib_logfile* 2>/dev/null | wc -l` -eq 0 ]; then
+      Hsize2=0
+   else
+      Hsize2=`ls -l /var/lib/mysql/ib_logfile* 2>/dev/null| sed -re "s/^([^ ]+ *){4}([0-9]+).*$/\2#/"|tr -d "\n"`  
+   fi
+
+   # comparison 
+
+   if [ "$Hsize1" = "$Hsize2" ]; then
+      break
+   fi
+
+   Hsize1="$Hsize2"
+
+done
+
+#
+
+

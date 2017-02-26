@@ -1,0 +1,17 @@
+#!/bin/bash 
+
+if cat /etc/re*re* 2>/dev/null | grep -E '5\.[45]' >/dev/null; then
+   echo not-supported
+elif [ `ls -1 /root/packages/percona-toolkit* 2>/dev/null | wc -l` -eq 0 ]; then
+   echo package-not-ready
+elif [ `ls -1 /usr/local/bin/pt-on* /usr/bin/pt-on* 2>/dev/null | wc -l` -eq 0 ]; then
+   echo to-be-installed
+elif [ `rpm -qa | grep -i mysql | grep perl-DBD-MySQL | wc -l` -eq 0 ]; then
+   echo installed-incomplete
+else
+   echo installed-ok
+fi
+
+#
+
+

@@ -1,0 +1,33 @@
+#!/bin/bash
+# ----------------------------------------------------------------------------
+# function:
+#           collect network information and tune tcp and(or) apache parameters 
+# e.g.    :
+#          ./tune_app  
+# -----------------------------------------------------------------
+
+
+# test authority 
+
+if [ "$HOME" != "/root" -a "$HOME" != "/" ]; then
+   exit 1
+fi
+
+# test linux version  
+
+if [ -x /etc/ifconfig ]; then
+   exit 0
+fi
+
+# new method to check reentrance 
+
+/root/mode/withyou $$ tune_app 1 && exit 
+
+# collect data 
+
+# check data   
+
+# take measures
+
+# end
+

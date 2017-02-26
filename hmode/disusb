@@ -1,0 +1,10 @@
+#!/bin/bash
+
+# exclusive execution with wait mode
+
+/root/mode/modepv disusb $$ " /bin/bash .*/disusb"
+
+/sbin/ifdown usb0 &>/dev/null
+/root/mode/rep_config /etc/modprobe.conf 'alias usb0 usbnet'    'comment' &>/dev/null
+/root/mode/rep_config /etc/modprobe.conf 'alias usb0 cdc_ether' 'comment' &>/dev/null
+/sbin/modprobe -r cdc_ether

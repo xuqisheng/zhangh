@@ -1,0 +1,30 @@
+#!/bin/bash
+
+/root/mode/skip_pv "$1" "$2" "$3" && exit 0
+Hwaitforother_limit=100
+Hwaitforother_count=0
+while [ 1 ]; do
+   Hret=`/root/mode/modepv1 "$1" "$2" "$3"`
+   if [ "$Hret" != "success" ]; then
+      if echo "$Hret" | grep -E "^waitforother" >/dev/null; then
+         Hwaitforother_count=$[$Hwaitforother_count+1]
+         if [ $Hwaitforother_count -ge $Hwaitforother_limit ]; then
+            /root/mode/modelog "$0 $1 $2 '$3' [threshold 'Hwaitforother_limit=$Hwaitforother_limit' reached]"
+            echo "blackbox2: mpv $1 " | mail -s "Wait alert(`/root/mode/getpip`)(`/root/mode/getips|head -n 1`)($Hhost)...... `LANG=en_US;date`" 625835738@qq.com
+            exit 0
+         fi
+      fi
+      HMODEPV_WAITBASE=`echo $Hret | sed -re "s/.* +(.*)/\1/"`
+      Hmodepv_sleeptime=$[$RANDOM%$HMODEPV_WAITBASE].$[$RANDOM%100]
+      if [ -n "$HMODEPV_DEBUG" ]; then
+         /root/mode/modemsg "modepv $1 $2" "I will sleep for $Hmodepv_sleeptime seconds." more
+      fi
+      sleep $Hmodepv_sleeptime
+      continue
+   fi
+   exit 0
+done
+
+#
+
+

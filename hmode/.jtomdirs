@@ -1,0 +1,12 @@
+#!/bin/bash 
+
+ps -ef | grep -E "\-Djava\.io\.tmpdir=.*/temp org\.apache\.catalina\.startup\.Bootstrap start$" | grep -v grep | 
+sed -re "s/^.*tmpdir=(.*)\/temp .*/\1/" |
+sed -re "s/$/\|/" -e "$ s/\|$//" | tr -d "\n" |
+sed -re 's/^/\(\\\(\|\\\|\)\(/' -e 's/$/\)\(\\\|\|\\\)\)/'
+
+#
+
+
+
+

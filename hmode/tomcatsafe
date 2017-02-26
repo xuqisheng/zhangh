@@ -1,0 +1,66 @@
+#!/bin/bash
+# ------------------------------------------------------------------
+# function:
+#          do something to ensure tomcat cluster starts successfully
+#
+# ------------------------------------------------------------------
+
+# 
+
+if ! /root/mode/isctom $1; then
+   exit
+fi
+
+#
+
+/root/mode/getadr >/dev/null || exit 1
+
+#
+
+. /root/mode/getmcast $1
+
+# -------------------------------------------------------------
+# commented by hry
+# -------------------------------------------------------------
+# if /sbin/route -n | grep "UG" >/dev/null; then
+#    # gateway exists
+#    :
+# elif /sbin/route -n | grep -E "^$HHRYMCAST1 .*UH" >/dev/null; then
+# -------------------------------------------------------------
+
+# bind it by myself
+
+Htheeth=`/root/mode/getadr 2`
+Hmcastadded=0
+Hmcastwaitl=0
+Hmcastwaitt=5
+while ! /sbin/route -n | grep -E "^$HHRYMCAST1 .*UH" >/dev/null; do
+   if [ $Hmcastadded -eq 0 ]; then
+      /sbin/route add -host $HHRYMCAST dev $Htheeth
+      Hmcastadded=1
+   fi
+   sleep 1
+   Hmcastwaitl=$[$Hmcastwaitl+1]
+   if [ $Hmcastwaitl -ge $Hmcastwaitt ]; then
+      break
+   fi
+done
+
+# put to static-routes
+
+if ! cat /etc/sysconfig/static-routes 2>/dev/null | grep -E "^any[ 	]+host[ 	]+$HHRYMCAST1[ 	]+dev[ 	]+$Htheeth[ 	]*$" >/dev/null; then
+   echo "any host $HHRYMCAST dev $Htheeth" >> /etc/sysconfig/static-routes
+fi
+
+# Fix mcast for clone machines
+# Limitations:all tomcats of a cluster should be in the same machine
+
+if [ `cat /etc/sysconfig/static-routes 2>/dev/null | grep -E 'host +228' | wc -l` -gt 1 ]; then
+   /root/mode/.modmcast
+elif [ "$HHRYMCAST" != "228.0.0.`/root/mode/getadr`" ]; then
+   /root/mode/.modmcast
+fi
+
+# end 
+
+

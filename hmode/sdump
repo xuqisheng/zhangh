@@ -1,0 +1,285 @@
+#!/bin/bash
+# ----------------------------------------------------------------------------------------------------------------------------
+# function:
+#           dump mysql database in table mode
+# usages  :
+#           ./sdump [options] [localhost] <database> <to-dir>
+#           ./sdump [options] [localhost] <database> <to-dir> [--include-tables [table1 table2 ...]]
+#           ./sdump [options] [localhost] <database> <to-dir> [--exclude-tables [table1 table2 ...]]
+# defaults:
+#           No default database
+# e.g.    :
+#           ./sdump portal /mydump      
+#           ./sdump portal /mydump1 --include-tables card_base master_base    
+#           ./sdump portal /mydump1 --exclude-tables log_info    
+# remarks : 
+#           You can use this script to get a separate table dump of database at local MySQL server in a consistent state.
+# ----------------------------------------------------------------------------------------------------------------------------
+
+# get options
+
+HOPTIONS=""
+while (echo "'$1'"  | grep -E  -e "^'-" > /dev/null)
+do
+   HOPTIONS="$HOPTIONS$1"
+   shift
+done
+
+# get mysql server ip
+
+. /root/mode/mysqldip
+
+# check $HMYSQLDIP
+
+if [ "$HMYSQLDIP" = "localhost" -o "$HMYSQLDIP" = "127.0.0.1" ]; then
+   :
+elif /root/mode/getips | grep -E "^$HMYSQLDIP$" >/dev/null; then
+   :
+else
+   if echo "$HOPTIONS" | grep -E -e "(-u)(-|$)" >/dev/null; then
+      Hunsafe_and_slow_sdump=1
+      /root/mode/modemsg sdump "You seleted unsafe mode of sdump.The dump will not be guaranteed to be in a consistent state!"
+   elif [ "$Hi_will_take_the_risk_of_unsafe_dump" = "SuRe" ]; then
+      Hunsafe_and_slow_sdump=1
+      /root/mode/modemsg sdump "You seleted unsafe mode of sdump.The dump will not be guaranteed to be in a consistent state!"
+   else
+      /root/mode/modemsg sdump "To get a separate table dump in a consistent state,you must use sdump to dump database at local MySQL server!" 
+      /root/mode/modemsg sdump "Use -u option to unsafely dump database at remote MySQL server."
+      /root/mode/modemsg sdump "Or use mdump to safely dump database at remote MySQL server,but the mload process will be much slower than sload." more
+      exit 1
+   fi
+fi
+
+#
+
+if [ -z "$Hunsafe_and_slow_sdump" ]; then
+
+   # check /usr/sbin/mysqld
+
+   if [ ! -x /usr/sbin/mysqld ]; then
+      /root/mode/modemsg sdump "MySQL server has not been installed at this machine!" more && exit 1
+   fi
+   
+   # check MySQL server status
+
+   if ! /root/mode/mysql status &>/dev/null ; then
+      /root/mode/modemsg sdump "MySQL server is not running at this machine!" more && exit 1
+   fi
+else
+   # check MySQL server connectivity
+   if ! /root/mode/seecfg $HMYSQLDIP "" mysql &>/dev/null; then
+      /root/mode/seecfg $HMYSQLDIP "" mysql
+      exit 
+   fi
+fi
+
+# database name to dump
+
+if [ -z "$1" ]; then
+   /root/mode/modemsg sdump "You must privide database name to dump!" && exit 1
+fi
+HDBNAME="$1"
+if [ -z `/root/mode/seecfg -s $HMYSQLDIP "show databases like '$HDBNAME'"|grep -i "^$HDBNAME"` ]; then
+   /root/mode/modemsg sdump "Database $HDBNAME doesn't exist at $HMYSQLDIP2!" more && exit 1
+fi
+
+# target directory for dumps
+
+if [ -z "$2" ]; then
+   /root/mode/modemsg sdump "You must privide a directory name for dumps!" && exit 1
+fi
+Hdumpdir="$2"
+if [ ! -d "$Hdumpdir" ]; then
+   /root/mode/modemsg sdump "'$Hdumpdir' is not a directory!" more && exit 1
+elif [ `ls -ld "$Hdumpdir/"* 2>/dev/null | wc -l` -gt 0 ]; then
+   if [ ! -f "$Hdumpdir/.sdump" ]; then
+      /root/mode/modemsg sdump "'$Hdumpdir' must be an empty directory for the first time dump!" && exit 1
+   fi
+else
+   if [ -z "$Hunsafe_and_slow_sdump" ]; then
+      chown mysql:mysql "$Hdumpdir"
+   fi
+fi
+
+# --------------------------------------------------------------------------------------
+# table limitations
+# --------------------------------------------------------------------------------------
+# dump only 'include-tables'
+# dump tables except 'exclude-tables'
+# --------------------------------------------------------------------------------------
+
+Hrestparms="$*"
+shift;shift
+# conditions under which only table structures will be dumped
+if echo "$HOPTIONS" | grep -E -e "(-S)(-|$)" >/dev/null; then
+   Hstruonly="-d"
+fi
+# conditions under which procedures and functions will be dumped
+if echo "$HOPTIONS" | grep -E -e "(-R)(-|$)" >/dev/null; then
+   Hdproc="-R"
+elif [ -z "$*" ]; then
+   Hdproc="-R"
+fi
+if [ "$1" = "--include-tables" ]; then
+   shift
+   Htabmode=1
+   Htables=`echo $*`
+elif [ "$1" = "--exclude-tables" ]; then
+   shift
+   Htabmode=2
+   Htables=`echo $*`
+else
+   if [ -n "$1" ]; then
+      /root/mode/modemsg sdump "Invalid parm(s) '$*'! sdump will not continue!" more 
+      exit 1
+   fi
+   Htabmode=0
+   Htables= 
+fi
+if [ -z "$Htables" ]; then
+   Htabmode=0
+fi
+
+# if called from crond
+
+if [ `/root/mode/traceps "crond"` = 'suc' ]; then
+   . /root/.bashrc 2>/dev/null
+   export HBLACKBOX2=1
+fi
+
+#
+
+/root/mode/confirm "Are you sure to dump database $HDBNAME at $HMYSQLDIP2 to directory '$Hdumpdir'" more || exit 1
+
+#
+
+{
+echo "Mode generated sdump mark at `LANG=en_US;date`" 
+echo "sdump $HOPTIONS $HMYSQLDIP2 $Hrestparms"
+if [  -z "$Hunsafe_and_slow_sdump" ]; then
+   echo "binlog to be rotated: `/root/mode/seecfg -s $HMYSQLDIP 'show master status'`"
+else
+   echo "This is an unsafe dump"
+fi
+} >> "$Hdumpdir"/.sdump
+
+# preparation
+
+# all base tables (without views)
+Hallbasetables=`/root/mode/find_tables $HMYSQLDIP $HDBNAME`
+# all tables,with views included
+Halltables=`/root/mode/seecfg -s $HMYSQLDIP "show tables" $HDBNAME`
+
+#
+if [ $Htabmode -eq 0 ]; then
+   Hselected_tables=$Halltables
+elif [ $Htabmode -eq 1 ]; then
+   Hselected_tables=`(echo "$Halltables";echo $Htables | tr ' ' '\n' | sort | uniq) | sort | uniq -d`
+elif [ $Htabmode -eq 2 ]; then
+   Hselected_tables=`((echo "$Halltables";echo $Htables | tr ' ' '\n'| sort | uniq) | sort | uniq -d;echo "$Halltables") | sort | uniq -u`
+fi 
+
+#
+
+if [ -z "$Hselected_tables" ]; then
+   if [ -z "$Hdproc" ]; then
+      /root/mode/modemsg sdump "Neither tables nor procedures/functions were selected to dump!" more
+      exit 
+   else
+      /root/mode/modemsg sdump "No tables were selected to dump!dump procedures and functions only!" more
+      Hdump_pf_only=1
+   fi
+else
+   Htables_to_dump="$Hselected_tables"
+fi 
+
+# clear linux caches before dump process
+
+/root/mode/clrcache 1
+
+#
+
+{
+   #
+
+   for Httg in `echo $Htables_to_dump`;do
+       touch "$Hdumpdir/$Httg.ttg"
+   done
+
+   #
+
+   echo
+   echo "############# sdump $HOPTIONS $HMYSQLDIP2 $Hrestparms #############"
+   echo
+
+   Hdumpstarttime=`/root/mode/seecfg -s $HMYSQLDIP "select now()"`
+   echo "Dump database $HDBNAME at $HMYSQLDIP2 to directory '$Hdumpdir' began at MySQL server time $Hdumpstarttime"
+
+
+   if [ -z "$Hunsafe_and_slow_sdump" -a -z "$Hdump_pf_only" ]; then
+      # do safe sdump using mysqldump
+      mysqldump -uroot $Hmodepass -h$HMYSQLDIP --opt --single-transaction --master-data=2 -F $Hdproc $Hstruonly -T "$Hdumpdir" $HDBNAME $Htables_to_dump > "$Hdumpdir/.pf.sql"
+   else
+      # do unsafe sdump using seecfg
+      echo
+      for Hi in `echo $Htables_to_dump`;do
+          if [ -z "$Hstruonly" ]; then
+             # structure and data
+             Hmsg="dumping table structure and contents of '$Hi' ............................................................."
+             Hmsg="${Hmsg:0:80} `LANG=en_US;date`"
+             /root/mode/modemsg "unsafe mode of sdump" "$Hmsg" less
+             mysqldump -uroot $Hmodepass -h$HMYSQLDIP --opt -d --single-transaction $HDBNAME $Hi > "$Hdumpdir/$Hi.sql"
+             if echo "$Hallbasetables" | grep -E "^$Hi$" >/dev/null; then
+                # base table
+                Hfields=`/root/mode/tabprop $HMYSQLDIP $HDBNAME $Hi null`
+                HstrSTR="HrYhScQhF$RANDOM"
+                Hfields=`echo $Hfields | sed -re "s/##/$HstrSTR/g"`
+                /root/mode/seecfg -s $HMYSQLDIP "select /*!40001 SQL_NO_CACHE */ $Hfields from \`$Hi\`" $HDBNAME | sed -re "s/$HstrSTR/\\\\N/g" > "$Hdumpdir/$Hi.txt"
+             else
+                # view 
+                :
+             fi
+          else
+             # structure only
+             Hmsg="dumping table structure of '$Hi' ............................................................."
+             Hmsg="${Hmsg:0:80} `LANG=en_US;date`"
+             /root/mode/modemsg "unsafe mode of sdump" "$Hmsg" less
+             mysqldump -uroot $Hmodepass -h$HMYSQLDIP --opt -d --single-transaction $HDBNAME $Hi > "$Hdumpdir/$Hi.sql"
+             rm -f "$Hdumpdir/$Hi.txt"
+          fi
+      done
+      if [ -n "$Hdproc" ]; then
+         # procedures and functions 
+         Hmsg="dumping procedures and functions .................................................................................................."
+         Hmsg="${Hmsg:0:80} `LANG=en_US;date`"
+         /root/mode/modemsg "unsafe mode of sdump" "$Hmsg" less
+         if [ -z "$Hallbasetables" ]; then
+            # no tables 
+            mysqldump -uroot $Hmodepass -h$HMYSQLDIP --opt -d -R --single-transaction $HDBNAME > "$Hdumpdir/.pf.sql"
+         else
+            # with tables
+            mysqldump -uroot $Hmodepass -h$HMYSQLDIP --opt -d -R --single-transaction $HDBNAME `echo "$Hallbasetables" | tail -n 1` > /root/mode/dump/Hsdump_tmp_$$.dmp
+            Htab_pos=`sed -nre "/Table structure for table/ ="      /root/mode/dump/Hsdump_tmp_$$.dmp` 
+            Htab_pos=$[Htab_pos-2]
+            if [ $Htab_pos -eq -2 ]; then
+               mv -f /root/mode/dump/Hsdump_tmp_$$.dmp "$Hdumpdir/.pf.sql"
+            else 
+               Hpro_pos=`sed -nre "/Dumping routines for database/ =" /root/mode/dump/Hsdump_tmp_$$.dmp` 
+               Hpro_pos=$[$Hpro_pos-1]
+               head -n $Htab_pos        /root/mode/dump/Hsdump_tmp_$$.dmp >  "$Hdumpdir/.pf.sql" 
+               sed -nre "$Hpro_pos,$ p" /root/mode/dump/Hsdump_tmp_$$.dmp >> "$Hdumpdir/.pf.sql"
+               rm -f /root/mode/dump/Hsdump_tmp_$$.dmp
+            fi
+         fi
+      fi
+   fi
+   echo
+   echo "Dump database $HDBNAME at $HMYSQLDIP2 to directory '$Hdumpdir' ended at MySQL server time `/root/mode/seecfg -s $HMYSQLDIP \"select now()\"`"
+   echo
+}  2>&1 | tee -a /root/mode/logs/sdumpload.log
+
+# clear linux caches after dump process
+
+/root/mode/clrcache 1
+
+#

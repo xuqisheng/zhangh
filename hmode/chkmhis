@@ -1,0 +1,12 @@
+#!/bin/bash 
+
+#
+
+if [ "$1" = "-l" ]; then
+   echo $(cat /var/lib/mysql/RPM_UPGRADE_HISTORY 2>/dev/null | grep -E "MySQL RPM (installation of|upgrade to) version" | sed -re "s/.* version (...).*/\1/" | sort | tail -n 1)
+else
+   echo $(cat /var/lib/mysql/RPM_UPGRADE_HISTORY 2>/dev/null | grep -E "MySQL RPM (installation of|upgrade to) version" | sed -re "s/.* version (...).*/\1/" | sort | uniq) | sed -re "s/ /->/g"
+fi
+
+#
+

@@ -1,0 +1,74 @@
+#!/bin/bash 
+# -----------------------------------------------------------------
+# functions:
+#            export the starting binlog of a mode generated dump.
+#            export the incremental sql to stdout 
+# usages   :
+#            ./dumpattr -b <dump.sql>
+#            ./dumpattr -i <starting-binlog>
+# e.g.     :
+#            ./dumpattr -b /root/mode/dump/Hportal.sql  # to stdout
+#            ./dumpattr -i mysql-bin.000012             # to stdout
+# -----------------------------------------------------------------
+
+# get options
+
+HOPTIONS=""
+while (echo "'$1'"  | grep -E  -e "^'-" > /dev/null)
+do
+   HOPTIONS="$HOPTIONS$1"
+   shift
+done
+
+# 
+
+if [ "$HOPTIONS" = '-b' ]; then
+   Hdumpfile="$1"
+   if [ -z "$Hdumpfile" ]; then
+      /root/mode/modemsg dumpattr "Please provide dump file as the parameter!" more
+      exit 1
+   elif [ ! -f "$Hdumpfile" ]; then
+      /root/mode/modemsg dumpattr "File '$Hdumpfile' doesn't exist!" more
+      exit 1
+   elif ! echo "$Hdumpfile" | grep "\.sql$" >/dev/null; then
+      /root/mode/modemsg dumpattr "Dump file name must end with \".sql\"" more
+      exit 1
+   elif ! /root/mode/comdump "$Hdumpfile"; then
+      /root/mode/modemsg dumpattr "Not complete dump!" more
+      exit 1
+   else
+      if ! head -n 40 "$Hdumpfile" | grep -i 'mode generated header' >/dev/null; then
+         /root/mode/modemsg dumpattr "Not mode generated dump!"
+         exit 1
+      elif ! head -n 40 "$Hdumpfile" | grep -E 'CHANGE MASTER TO MASTER_LOG_FILE' >/dev/null; then
+         /root/mode/modemsg dumpattr "This dump didn't conduct binlog rotation!"
+         exit 1
+      else
+         head -n 40 "$Hdumpfile" | grep -E 'CHANGE MASTER TO MASTER_LOG_FILE' | sed -re "s/.*(mysql-bin\.[0-9]+).*/\1/"
+      fi
+   fi
+   exit
+fi
+if [ "$HOPTIONS" = '-i' ]; then
+   Hbinfile="$1"
+   if ! echo "$Hbinfile" | grep -E '^mysql-bin\.[0-9]{6}' >/dev/null; then
+      /root/mode/modemsg dumpattr "Parameter must be binlog file name!" more
+      exit 1
+   fi
+   if ! /root/mode/testmysql; then
+      exit 1
+   elif [ `ls -1d /var/lib/mysql/$Hbinfile 2>/dev/null | wc -l` -eq 0 ]; then
+      /root/mode/modemsg dumpattr "There is no binlog file '$Hbinfile' at directory '/var/lib/mysql'!" more
+      exit 1
+   else
+      ls -1d /var/lib/mysql/mysql-bin.* | grep -v index | sed -nre "/$Hbinfile/,$ p" |
+      xargs /usr/bin/mysqlbinlog 
+   fi
+   exit 
+fi
+
+# end 
+
+
+
+   

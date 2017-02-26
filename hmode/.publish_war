@@ -1,0 +1,320 @@
+#!/bin/bash
+# -----------------------------------------------------------------------------------
+# function:
+#          This is a release script for xxx.war especially used in distributed system
+# usages  :
+#          ./.publish_war [<tomcat>|<apache>] <XXX.war>
+# e.g.    :
+#          ./.publish_war tomcat1 /ipmsthef.war
+#          ./.publish_war tomcat2 /ipmsmember.war
+#          ./.publish_war tomcat3 /ipmsgroup.war
+#          ./.publish_war tomcat4 /ipmssync.war
+#          ./.publish_war apache  /ipmsthef.war
+# -----------------------------------------------------------------------------------
+
+#
+
+export LANG=zh_CN.UTF-8
+
+# get tomcat name or apache name 
+
+Htomapache=$1
+if [ -z "$Htomapache" ]; then
+   /root/mode/modemsg publish_war "Please designate an existing apache or a noncluster tomcat" more
+   exit 1
+elif echo $Htomapache | grep -E "^tomcat" >/dev/null; then
+   # check if valid tomcat
+   /root/mode/check_tomcat $Htomapache || exit 1
+   # check if cluster tomcat
+   if /root/mode/isctom $Htomapache; then
+      /root/mode/modemsg publish_war "You must designate a noncluster tomcat" more
+      exit 1
+   fi
+   Htamode='t'
+elif echo $Htomapache | grep -E "^apache[1-7]?$" >/dev/null; then
+   Hapachemode=$1
+   Hapachetail=`echo $Htomapache | sed -re "s/apache(.*)/\1/"`
+   if [ ! -d /usr/local/$Hapachemode/conf ]; then
+      /root/mode/modemsg publish_war "You must designate an existing apache" more
+      exit 1
+   fi
+   Htamode='a'
+else
+   /root/mode/modemsg publish_war "Neither apache nor tomcat of our standard is provided" more
+   exit 1
+fi
+
+# get war package 
+
+Hwarname="$2"
+if [ -z "$Hwarname" ]; then
+   /root/mode/modemsg publish_war "Please designate a war file" more
+   exit 1
+elif echo "$Hwarname" | grep "\.war$" >/dev/null; then
+   if [ ! -f "$Hwarname" ]; then
+      /root/mode/modemsg publish_war "File $Hwarname doesn't exist!" more && exit 1
+   fi
+else
+   /root/mode/modemsg publish_war "Please provide a war file ended with '.war'" more
+   exit 1
+fi
+
+# get warnames
+
+Hwarname1=`echo $Hwarname  | sed -r -e "s/^.*\///"  -e "s/(.*)\.war/\1/"`
+Hwarname2=`echo $Hwarname1 | sed -r -e "s/^ipms(.*)/\1/"`
+
+# 
+
+if [ "$Hwarname1" = "update" ]; then
+   /root/mode/modemsg publish_war "You can't use 'update' as war name" more
+   exit 1 
+fi
+
+# confirmation
+
+if ! /root/mode/confirm "Are you sure to release '$Hwarname' to '$Htomapache'" more; then
+   exit 1
+fi
+
+# properties file
+
+if [ "$Htamode" = "t" ];  then
+   Hpropfile="/root/antDep/$Htomapache.properties"
+elif [ "$Htamode" = "a" ];  then
+   Hpropfile="/root/antDep/build$Hapachetail.properties"
+else
+   exit 1
+fi
+
+if ! echo "$Hwarname1" | grep -Pi "(sync|mobilepms)" >/dev/null; then
+   if [ ! -f "$Hpropfile" ]; then
+      /root/mode/modemsg publish_war "File $Hpropfile doesn't exist" more
+      exit 1
+   fi
+   Hdbroot=`/root/mode/mod_config   $Hpropfile "db.root" "#Get#"` 
+   Hdbport=`/root/mode/mod_config   $Hpropfile "db.port" "#Get#"` 
+   Hurl=$Hdbroot:$Hdbport
+   Hdb=`/root/mode/mod_config       $Hpropfile "db.name" "#Get#"` 
+   Husr=`/root/mode/mod_config      $Hpropfile "db.usr"  "#Get#"`
+   Hpwd=`/root/mode/mod_config      $Hpropfile "db.pwd"  "#Get#"`
+fi
+
+# check thekmark only for ipmsthef and ipmsthek apps
+
+if [ "$Hwarname1" = "ipmsthek" -o "$Hwarname1" = "ipmsthef" ]; then
+   Hthekmark=`/root/mode/mod_config $Hpropfile "thekmark" "#Get#"`
+   if [ "$Hwarname1" = "ipmsthef" ]; then
+      if echo "$Hthekmark" | grep -E "^[yYtT]" >/dev/null; then
+         /root/mode/modemsg publish_war "You can't deploy ipmsthef.war to ipmsthek application!!!" more
+         exit 1
+      fi
+   else
+      if ! echo "$Hthekmark" | grep -E "^[yYtT]" >/dev/null; then
+         /root/mode/modemsg publish_war "You must set 'thekmark=yes' at $Hpropfile before deploying ipmsthek.war!!!" more
+         exit 1
+      fi
+   fi
+   Hwarname1=ipmsthef
+   Hwarname2=thef
+fi
+
+#  unzip the war
+
+mkdir -p /root/mode/tmp/hwar$$
+rm -fR   /root/mode/tmp/hwar$$/*
+unzip -o $Hwarname -d /root/mode/tmp/hwar$$ &>/dev/null
+
+# look for *.air files from directories /root/mode/tmp/hwar$$/update and /root/mode/tmp/hwar$$
+
+if [ `ls -1 /root/mode/tmp/hwar$$/update/*.air 2>/dev/null | wc -l` -gt 0 ]; then
+   # /root/mode/tmp/hwar$$/update has higher priority than /root/mode/tmp/hwar$$
+   Hcl_mode=u
+   Hwarname2=update
+elif [ `ls -1 /root/mode/tmp/hwar$$/*/*.air 2>/dev/null | wc -l` -gt 0 ]; then
+   #
+   Hcl_mode=o
+   Hwarname2=
+elif [ `ls -1 /root/mode/tmp/hwar$$/*.air 2>/dev/null | wc -l` -gt 0 ]; then
+   Hcl_mode=c
+   if [ "$Hwarname2" = "" ]; then
+      Hwarname2=update
+   elif [ "$Hwarname1" = "$Hwarname2" ]; then
+      Hwarname2=update
+   fi
+else
+   # no client
+   Hcl_mode=
+fi
+
+#
+
+if [ "$Htamode" = "a" ]; then
+
+    # java 
+   /root/mode/modemsg publish_war "Deploying Java ......" more
+
+   cd /usr/local
+   for i in `ls -d tomcat*/ 2>/dev/null | sed -re "s/\/$//" `;do
+      /root/mode/check_tomcat $i || continue
+      if ! /root/mode/isatom $i $Hapachemode; then
+         continue
+      fi
+      /root/mode/stop_tomcat $i
+      if /root/mode/tctomcat $i 2>/dev/null | grep -E '^at unknown' >/dev/null; then
+         /root/mode/modemsg publish_war "Current user '$USER' has no authoriry to stop $i!"
+         /root/mode/modemsg publish_war "Aborting ..." more
+         exit
+      fi
+
+
+      Hipmstail=
+      HURL=$Hurl
+      HDB=$Hdb
+      HUSR=$Husr
+      HPWD=$Hpwd
+
+      rm -fR  /usr/local/$i/webapps/ipms*
+      rm -fR  /usr/local/$i/webapps/$Hwarname1
+      rm -f   /usr/local/$i/webapps/$Hwarname1.war
+      mkdir -p /usr/local/$i/webapps/$Hwarname1
+
+      if [ -n "$Hcl_mode" ]; then
+         cp -fR /root/mode/tmp/hwar$$/WEB-INF /usr/local/$i/webapps/$Hwarname1
+      else
+         cp -fR /root/mode/tmp/hwar$$/* /usr/local/$i/webapps/$Hwarname1
+      fi
+
+      if [ -f /usr/local/$i/webapps/$Hwarname1/WEB-INF/classes/config/jdbc.mysql.properties ]; then
+         cat /usr/local/$i/webapps/$Hwarname1/WEB-INF/classes/config/jdbc.mysql.properties |
+         sed -re "s/^(jdbc\.url.*\/\/)(.*)(\/)(.*)/\1$HURL\3$HDB/" | 
+         sed -re "s/^(jdbc\.username=)(.*)/\1$HUSR/" |
+         sed -re "s/^(jdbc\.password=)(.*)/\1$HPWD/" |
+         tr -d "\r" > /root/mode/tmp/f$$.tmp
+         cp -f  /root/mode/tmp/f$$.tmp /usr/local/$i/webapps/$Hwarname1/WEB-INF/classes/config/jdbc.mysql.properties
+      fi
+      if [ -f /usr/local/$i/webapps/$Hwarname1/WEB-INF/classes/config/remoteip.properties ]; then
+         Hserveradd=/root/antDep/server.add
+         if [ -f /root/antDep/server.add.$Hapachemode ]; then
+            Hserveradd=/root/antDep/server.add.$Hapachemode
+         fi
+         cat $Hserveradd 2>/dev/null | grep "=" | sed -re "s/^([ \t]+)//" | sed -re "s/([ \t]+)$//" |
+         while read -r Hipport; do
+            Hlpart=`echo $Hipport | sed -re "s/(.*)=(.*)/\1/"`
+            Hrpart=`echo $Hipport | sed -re "s/(.*)=(.*)/\2/"`
+            cat /usr/local/$i/webapps/$Hwarname1/WEB-INF/classes/config/remoteip.properties |
+            sed -re "s/^($Hlpart.*=http:\/\/)(.*)(\/.*)/\1$Hrpart\3/" >/root/mode/tmp/f$$.tmp
+            cp -f /root/mode/tmp/f$$.tmp /usr/local/$i/webapps/$Hwarname1/WEB-INF/classes/config/remoteip.properties
+         done
+      fi
+      /root/mode/start_tomcat $i
+   done
+
+   # flex
+
+   if [ -n "$Hcl_mode" ]; then
+      /root/mode/modemsg publish_war "Deploying htdocs/$Hwarname2 ......" more
+      mkdir -p /usr/local/$Hapachemode/htdocs/$Hwarname2
+      rm -fR /root/mode/tmp/hwar$$/WEB-INF
+      rm -fR /root/mode/tmp/hwar$$/META-INF
+      if [ "$Hcl_mode" = "c" ]; then
+         rm -fR /usr/local/$Hapachemode/htdocs/$Hwarname2/*
+         cp -fR /root/mode/tmp/hwar$$/* /usr/local/$Hapachemode/htdocs/$Hwarname2/
+         # added according to yc
+         if [ -d /usr/local/hotelsrc/ ]; then
+            cp -fR /usr/local/hotelsrc/* /usr/local/$Hapachemode/htdocs/$Hwarname2/
+         fi
+      elif [ "$Hcl_mode" = "u" ]; then
+         cp -fR /root/mode/tmp/hwar$$/update/* /usr/local/$Hapachemode/htdocs/$Hwarname2/
+      elif [ "$Hcl_mode" = "o" ]; then
+         cp -fR /root/mode/tmp/hwar$$/* /usr/local/$Hapachemode/htdocs/
+      fi
+   fi
+
+   rm -f /root/mode/tmp/f$$.tmp
+   /root/mode/gcserver$Hapachetail apache
+    
+else
+
+   /root/mode/stop_tomcat $Htomapache
+   if /root/mode/tctomcat $Htomapache 2>/dev/null | grep -E '^at unknown' >/dev/null; then
+      /root/mode/modemsg publish_war "Current user '$USER' has no authoriry to stop $Htomapache!"
+      /root/mode/modemsg publish_war "Aborting ..." more
+      exit
+   fi
+
+
+   # java 
+
+   /root/mode/modemsg publish_war "Deploying Java ......" more
+   Hipmstail=
+   HURL=$Hurl
+   HDB=$Hdb
+   HUSR=$Husr
+   HPWD=$Hpwd
+
+   rm -fR  /usr/local/$Htomapache/webapps/ipms*
+   rm -fR  /usr/local/$Htomapache/webapps/update
+   rm -fR  /usr/local/$Htomapache/webapps/$Hwarname1
+   rm -f   /usr/local/$Htomapache/webapps/$Hwarname1.war
+   mkdir -p /usr/local/$Htomapache/webapps/$Hwarname1
+   if [ -n "$Hcl_mode" ]; then
+      cp -fR /root/mode/tmp/hwar$$/WEB-INF  /usr/local/$Htomapache/webapps/$Hwarname1
+   else
+      cp -fR /root/mode/tmp/hwar$$/*       /usr/local/$Htomapache/webapps/$Hwarname1
+   fi
+   if [ -f  /usr/local/$Htomapache/webapps/$Hwarname1/WEB-INF/classes/config/jdbc.mysql.properties ]; then 
+      cat /usr/local/$Htomapache/webapps/$Hwarname1/WEB-INF/classes/config/jdbc.mysql.properties |
+      sed -re "s/^(jdbc\.url.*\/\/)(.*)(\/)(.*)/\1$HURL\3$HDB/" |
+      sed -re "s/^(jdbc\.username=)(.*)/\1$HUSR/" |
+      sed -re "s/^(jdbc\.password=)(.*)/\1$HPWD/" |
+      tr -d "\r" > /root/mode/tmp/f$$.tmp
+      cp -f  /root/mode/tmp/f$$.tmp /usr/local/$Htomapache/webapps/$Hwarname1/WEB-INF/classes/config/jdbc.mysql.properties
+   fi
+   if [ -f /usr/local/$Htomapache/webapps/$Hwarname1/WEB-INF/classes/config/remoteip.properties ]; then
+      Hserveradd=/root/antDep/server.add
+      if [ -f /root/antDep/server.add.$Htomapache ]; then
+         Hserveradd=/root/antDep/server.add.$Htomapache
+      fi
+      cat $Hserveradd 2>/dev/null | grep "=" | sed -re "s/^([ \t]+)//" | sed -re "s/([ \t]+)$//" |
+      while read -r Hipport; do
+         Hlpart=`echo $Hipport | sed -re "s/(.*)=(.*)/\1/"`
+         Hrpart=`echo $Hipport | sed -re "s/(.*)=(.*)/\2/"`
+         cat /usr/local/$Htomapache/webapps/$Hwarname1/WEB-INF/classes/config/remoteip.properties |
+         sed -re "s/^($Hlpart.*=http:\/\/)(.*)(\/.*)/\1$Hrpart\3/" >/root/mode/tmp/f$$.tmp
+         cp -f /root/mode/tmp/f$$.tmp /usr/local/$Htomapache/webapps/$Hwarname1/WEB-INF/classes/config/remoteip.properties
+      done
+   fi
+   
+   # flex
+
+   if [ -n "$Hcl_mode" ]; then
+      /root/mode/modemsg publish_war "Deploying webapps/$Hwarname2 ......" more
+      mkdir -p /usr/local/$Htomapache/webapps/$Hwarname2
+      rm -fR /root/mode/tmp/hwar$$/WEB-INF
+      rm -fR /root/mode/tmp/hwar$$/META-INF
+      if [ "$Hcl_mode" = "c" ]; then
+         cp -fR /root/mode/tmp/hwar$$/* /usr/local/$Htomapache/webapps/$Hwarname2
+         # added according to yc
+         if [ -d /usr/local/hotelsrc/ ]; then
+            cp -fR /usr/local/hotelsrc/* /usr/local/$Htomapache/webapps/$Hwarname2/
+         fi
+      elif [ "$Hcl_mode" = "u" ]; then
+         cp -fR /root/mode/tmp/hwar$$/update/* /usr/local/$Htomapache/webapps/$Hwarname2
+      elif [ "$Hcl_mode" = "o" ]; then
+         cp -fR /root/mode/tmp/hwar$$/* /usr/local/$Htomapache/webapps/
+      fi
+   fi
+
+   #
+
+   rm -f /root/mode/tmp/f$$.tmp
+   /root/mode/start_tomcat $Htomapache
+fi
+
+#
+
+rm -fR /root/mode/tmp/hwar$$
+
+# end
+

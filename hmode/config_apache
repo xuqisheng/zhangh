@@ -1,0 +1,177 @@
+#!/bin/bash
+# ------------------------------------------------------------------------------
+# configure 
+#   1.mod_jk.conf
+#   2.workers.properties
+#   3.httpd.conf
+#   4.tomcat's server.xml
+# ------------------------------------------------------------------------------
+
+# exclusive execution with wait mode
+
+/root/mode/modepv config_apache $$ " /bin/bash .*/config_apache"
+
+# 
+
+. /root/mode/apachemode
+
+#
+
+[ -d /usr/local/$Hapachemode/conf ] || exit 1
+
+#
+
+. /root/mode/impfile/jktomcat/parms
+
+# get cluster tomcats
+
+Hctomstmp="/root/mode/tmp/hctoms$$.tmp"
+> $Hctomstmp
+cd /usr/local
+for i in `ls -d tomcat*/ 2>/dev/null | sed -re "s/\/$//" `;do
+   /root/mode/check_tomcat $i || continue
+   if /root/mode/isatom $i $Hapachemode; then
+      echo $i >> $Hctomstmp
+   fi
+done
+if [ `cat $Hctomstmp | wc -l` -eq 0 ]; then
+   > /usr/local/$Hapachemode/conf/mod_jk.conf
+   > /usr/local/$Hapachemode/conf/workers.properties
+   rm -f $Hctomstmp
+   exit 1
+fi   
+
+HSCTOMS=`cat $Hctomstmp`
+if [ "$Hapachemode" = "apache" ]; then
+   HSCTOMS=`echo "$HSCTOMS" | sed -r -e "s/^(.*)$/\1,\1/" -e "s/,tomcat6$/,tomcat601/" -e "s/(,tomcat)60*(.*)$/\1\2/"`
+else
+   HSCTOMS=`echo "$HSCTOMS" | grep -n "" | sed -re "s/(.*):(.*)/\2,tomcat\1/"`
+fi
+Hhrytomsc=`echo "$HSCTOMS" | sed -re "s/.*,(.*)/\1/"`
+Hhrytomsc=`echo $Hhrytomsc | sed -re "s/ /,/g"`
+
+# tmp file
+
+Hhryjvmf="/root/mode/tmp/hhryjvm$$.tmp"
+
+# mod_jk.conf
+
+cd /usr/local/$Hapachemode/conf
+
+# save extra 'JkMount' setup
+
+cat mod_jk.conf 2>/dev/null | grep -E '^JkMount ' | grep -Ev "^(JkMount /wflhry12700l mode1|JkMount /hrywfll27001 mode2)$" > /root/mode/tmp/Hmod_jk$$.tmp
+if ! cat /root/mode/tmp/Hmod_jk$$.tmp | grep -E '^JkMount /ipms\* controller$' >/dev/null; then
+   echo 'JkMount /ipms* controller' >>/root/mode/tmp/Hmod_jk$$.tmp
+fi
+
+#
+
+> mod_jk.conf
+cat > mod_jk.conf <<EOF
+LoadModule jk_module modules/mod_jk.so
+JkWorkersFile conf/workers.properties
+JkOptions +DisableReuse
+`cat /root/mode/tmp/Hmod_jk$$.tmp 2>/dev/null`
+JkMount /wflhry12700l mode1
+JkMount /hrywfll27001 mode2
+EOF
+# rm tmp
+rm -f /root/mode/tmp/Hmod_jk$$.tmp
+
+# workers.properties
+
+cd /usr/local/$Hapachemode/conf
+> workers.properties
+cat > workers.properties <<EOF
+worker.list=controller
+worker.maintain=$Hmaintain
+EOF
+
+
+for i in `echo $HSCTOMS` ; do
+   Hptom=`echo $i | sed -re "s/(.*),(.*)/\1/"`
+   Hltom=`echo $i | sed -re "s/(.*),(.*)/\2/"`
+
+cat >> workers.properties <<EOF
+worker.$Hltom.port=`cat /usr/local/$Hptom/conf/server.xml | grep -E "Connector port.*AJP" | sed -re "s/.*port=\"([0-9]*)\".*/\1/"`
+worker.$Hltom.host=localhost
+worker.$Hltom.type=ajp13
+worker.$Hltom.lbfactor=1 
+worker.$Hltom.connection_pool_timeout=$Hctmout_jkpool
+worker.$Hltom.max_packet_size=$Hpacketsize
+worker.$Hltom.retries=1
+worker.$Hltom.recovery_options=3
+
+EOF
+
+# maintain jvmroute
+
+cat /usr/local/$Hptom/conf/server.xml |
+sed -re "s/<(Engine name=\"Catalina\" defaultHost=\"localhost\" jvmRoute=\")(tomcat).*(\")>/<\1$Hltom\3>/" |
+sed -re "s/(<Valve.*JvmRouteBinderValve\")\//\1 enabled=\"true\" sessionIdAttribute=\"takeoverSessionid\"\//" |  
+sed -re "s/(protocol=\"AJP\/1.3\").*(redi)/\1 \2/g"  > $Hhryjvmf
+cat $Hhryjvmf > /usr/local/$Hptom/conf/server.xml 
+
+done
+
+cat >> workers.properties <<EOF
+worker.controller.type=lb
+worker.controller.balance_workers=$Hhrytomsc
+worker.controller.sticky_session=1
+worker.controller.sticky_session_force=0
+worker.controller.method=`/root/mode/apache_mtd`
+worker.controller.recover_time=$Hmaintain
+worker.controller.error_escalation_time=0
+worker.controller.retries=1
+worker.controller.lock=Omygod
+
+worker.list=mode1
+worker.mode1.type=status
+worker.mode1.read_only=true
+worker.list=mode2
+worker.mode2.type=status
+worker.mode2.read_only=false
+
+EOF
+
+# httpd.conf
+
+cd /usr/local/$Hapachemode/conf
+if cat httpd.conf | grep "^ServerName " >/dev/null; then
+   :
+elif  cat httpd.conf | grep "^#ServerName " >/dev/null; then
+   HAPACHETMP="/root/mode/tmp/hhryapache$$.tmp"
+   cp httpd.conf $HAPACHETMP
+   cat $HAPACHETMP | sed -re "/^#ServerName /a \ServerName hrymode$Hapachemode" > httpd.conf
+   rm -f $HAPACHETMP
+else
+   echo 'ServerName hrymode' >> httpd.conf
+fi
+cat httpd.conf | grep -E "mod_jk.conf" > /dev/null  || echo "Include /usr/local/$Hapachemode/conf/mod_jk.conf" >> httpd.conf
+cat httpd.conf | grep -E "^BandWidthModule " > /dev/null  ||
+{
+cat >> httpd.conf << EOF
+
+BandWidthModule On
+ForceBandWidthModule On
+MinBandWidth all 20480
+LargeFileLimit .air 1 204800
+LargeFileLimit .exe 1 204800
+EOF
+}
+
+# config some more parameters
+
+/root/mode/config_apache_more $Hapachemode
+
+#
+
+[ -f /usr/local/$Hapachemode/htdocs/robots.txt ] || cp -f /root/mode/impfile/apache/robots.txt /usr/local/$Hapachemode/htdocs/
+
+# rm tmp file
+
+rm -f $Hhryjvmf
+rm -f $Hctomstmp
+
+

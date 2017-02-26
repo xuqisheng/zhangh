@@ -1,0 +1,21 @@
+#!/bin/bash 
+# ------------------------------------------------------------------------------------------
+# function:
+#          adjust system date with $1 seconds,and syncronize hardware clock from system date
+# usages  :
+#          /root/mode/.adjdate <seconds>
+# e.g.    :
+#          /root/mode/.adjdate +28800    # add  8 hours to system date
+#          /root/mode/.adjdate  28800    # add  8 hours to system date
+#          /root/mode/.adjdate -28800    # add -8 hours to system date
+# ------------------------------------------------------------------------------------------
+
+if echo $1 | grep -E  "^(\+|-)?[0-9]+$" >/dev/null; then
+   # adjust system time
+   date `date -d "$1 seconds" +%m%d%H%M%Y.%S` &>/dev/null
+   # use default value in /etc/adjtime to set hardware time
+   /sbin/hwclock -w 
+else
+   exit 1
+fi
+

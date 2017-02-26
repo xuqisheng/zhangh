@@ -1,0 +1,106 @@
+#!/bin/bash 
+# --------------------------------------------------------------
+# function:
+#          install percona-toolkit
+# --------------------------------------------------------------
+
+# 
+
+if cat /etc/redhat-release | grep -E " release 5\.[01234567] " > /dev/null; then
+   /root/mode/modemsg inst_pt "Not supported for `cat /etc/redhat-release | grep -E ' release 5\.[01234567] '`" more
+   exit 1
+fi
+
+if [ -f /root/packages/percona-toolkit_2.2.17-1.tar.gz ]; then
+   if uname -a | grep "_64 " >/dev/null; then
+      if ! [ -f /root/packages/MySQL-shared-compat-5.5.50-1.linux2.6.x86_64.rpm -o -f /root/packages/MySQL-shared-compat-5.6.35-1.linux_glibc2.5.x86_64.rpm ]; then
+         /root/mode/modemsg inst_pt "No package 'MySQL-shared-compat-5.5.50-1.linux2.6.x86_64.rpm' or 'MySQL-shared-compat-5.6.35-1.linux_glibc2.5.x86_64.rpm' in directory /root/packages" more
+         exit 1
+      fi
+   else
+      if ! [ -f /root/packages/MySQL-shared-compat-5.5.50-1.linux2.6.i386.rpm -o -f /root/packages/MySQL-shared-compat-5.6.35-1.linux_glibc2.5.i386.rpm ]; then
+         /root/mode/modemsg inst_pt "No package 'MySQL-shared-compat-5.5.50-1.linux2.6.i386.rpm' or 'MySQL-shared-compat-5.6.35-1.linux_glibc2.5.i386.rpm' in directory /root/packages" more
+         exit 1
+      fi
+   fi
+else
+   /root/mode/modemsg inst_pt "No package 'percona-toolkit_2.2.17-1.tar.gz' in directory /root/packages" more
+   exit 1
+fi
+
+#  
+
+if /root/mode/.pt_stat | grep -E 'installed-ok' >/dev/null && [ "$1" != "force-reinstall" ]; then
+   exit 
+fi
+      
+# check internet connectivity and DNS correctness
+
+if ! /root/mode/.netok; then
+   if ! /root/mode/.pt_stat | grep -E 'installed-ok' >/dev/null; then
+      # pt is not installed or not installed completely
+      /root/mode/modemsg inst_pt "Internet connectivity or DNS correctness is not ok!Installation of the mode pt utilities will be aborted."
+      /root/mode/modemsg inst_pt "Mode pt utilities are a set of tools which will automatically monitor,optimize and repair database tables." less
+   else
+      # pt is installed ok and force-reinstall is set
+      /root/mode/modemsg inst_pt "Internet connectivity or DNS correctness is not ok!Reinstallation of the mode pt utilities will be aborted."
+   fi
+   /root/mode/modewait 60
+   exit 1
+fi
+
+# install MySQL-shared-compat-5.6.35 or MySQL-shared-compat-5.5.50
+
+if uname -a | grep "_64 " >/dev/null; then
+   if [ -f /root/packages/MySQL-shared-compat-5.6.35-1.linux_glibc2.5.x86_64.rpm ]; then
+      rpm -ivh /root/packages/MySQL-shared-compat-5.6.35-1.linux_glibc2.5.x86_64.rpm
+   else
+      rpm -ivh /root/packages/MySQL-shared-compat-5.5.50-1.linux2.6.x86_64.rpm
+   fi
+else
+   if [ -f /root/packages/MySQL-shared-compat-5.6.35-1.linux_glibc2.5.i386.rpm ]; then
+      rpm -ivh /root/packages/MySQL-shared-compat-5.6.35-1.linux_glibc2.5.i386.rpm
+   else
+      rpm -ivh /root/packages/MySQL-shared-compat-5.5.50-1.linux2.6.i386.rpm
+   fi
+fi
+
+# install perl-ExtUtils-CBuilder perl-ExtUtils-MakeMaker perl-Time-HiRes for CentOs 6.x
+
+if cat /etc/redhat-release | grep -E " release 6\..*" > /dev/null; then
+   yum -y install perl-ExtUtils-CBuilder perl-ExtUtils-MakeMaker perl-Time-HiRes
+   yum -y install perl-IO-Socket-SSL perl-TermReadKey libssl.so.6
+   if uname -a | grep "_64 " >/dev/null; then
+      ln -sf /usr/lib64/libssl.so.10 /usr/lib64/libssl.so.6
+      ln -sf /usr/lib64/libcrypto.so.10 /usr/lib64/libcrypto.so.6
+   else
+      ln -sf /usr/lib/libssl.so.10 /usr/lib/libssl.so.6
+      ln -sf /usr/lib/libcrypto.so.10 /usr/lib/libcrypto.so.6
+   fi
+fi
+
+#
+
+yum -y install perl-DBI
+yum -y install perl-DBD-MySQL
+
+# pt part
+
+Hptmpdir="/root/mode/hhrytmpdir$$"
+mkdir $Hptmpdir
+cd $Hptmpdir
+tar xzvf /root/packages/percona-toolkit_2.2.17-1.tar.gz
+mv per* pt
+cd pt
+perl Makefile.PL
+make
+make test
+make install
+
+# rm tmp 
+
+cd /root/mode
+rm -fR $Hptmpdir
+
+#
+

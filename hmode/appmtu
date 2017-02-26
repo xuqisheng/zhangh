@@ -1,0 +1,54 @@
+#!/bin/bash
+# ------------------------------------------------------------------
+# function:
+#           get mtu through another method
+# usages  : 
+#           ./appmtu [<apachemode>] [<ip-or-hotelname>] [more|MORE]
+# ------------------------------------------------------------------
+
+#
+
+. /root/mode/apachemode
+
+#
+
+[ -f /usr/local/$Hapachemode/conf/httpd.conf ] || exit 1
+
+#
+
+if [ "$1" = "more" -o "$1" = "MORE" ]; then
+   Hmore="$1"
+   Hip="$2"
+else
+   Hmore="$2"
+   Hip="$1"
+fi  
+if [ "$Hmore" = "more" -o "$Hmore" = "MORE" ]; then
+   :
+else
+   Hmore=
+fi
+
+#
+
+Hpspaces="   "
+HTnameold=""
+
+#
+export HTname
+/root/mode/appips $Hapachemode "$Hip" | 
+while read -r HTname HTIP; do
+   if [ "$HTname" != "$HTnameold" ]; then
+      echo 
+      echo "<< $HTname >>" 
+      HTnameold="$HTname"
+   fi
+   echo 
+   echo "${Hpspaces}---- $HTIP ----"
+   echo 
+   /root/mode/getmtu $Hapachemode $HTIP $Hmore | sed -re "s/(.*)/$Hpspaces\1/"
+done
+
+# end
+
+

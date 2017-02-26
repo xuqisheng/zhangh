@@ -1,0 +1,36 @@
+#!/bin/bash 
+
+#
+
+Hhrytomcat="$1"
+Hmytom=/usr/local/"$Hhrytomcat"
+if [ ! -d "$Hmytom" ]; then
+   exit 
+fi
+
+#
+
+{
+echo "$Hmytom"
+while [ -h "$Hmytom" ]; do
+   ls=`ls -ld "$Hmytom"`
+   link=`expr "$ls" : '.*-> \(.*\)$'`
+   if expr "$link" : '/.*' > /dev/null; then
+      Hmytom="$link"
+   else
+      Hmytom=`dirname "$Hmytom"`/"$link"
+   fi
+   Hmytom=`/root/mode/netpath $Hmytom`
+   echo "$Hmytom"
+done
+} | 
+if [ -z "$2" ]; then
+   sed -re "s/$/\|/" -e "$ s/\|$//" | tr -d "\n" | sed -re "s/^/\(/" -e "s/$/\)/"
+else
+   cat 
+fi
+
+#
+
+
+

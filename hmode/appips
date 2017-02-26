@@ -1,0 +1,54 @@
+#!/bin/bash
+# ---------------------------------------------------------
+# function:
+#           get ips of hotels
+# usages  : 
+#           ./appips <apachemode> <ip-or-hotelname>
+# --------------------------------------------------------- 
+
+#
+
+. /root/mode/apachemode
+
+#
+
+[ -f /usr/local/$Hapachemode/conf/httpd.conf ] || exit 1
+
+#
+
+if echo "$1" | grep -E "^([0-9]{1,3}\.){3}[0-9]{1,3}$" >/dev/null; then
+   Hipfilter=" a.wlanip='$1' and"
+elif [ -n "$1" ]; then
+   Hipfilter=" c.descript like '%$1%' and"
+else
+   Hipfilter=""
+fi
+
+
+#
+
+{
+/root/mode/seecfg -s $HdbR "select distinct c.descript,a.wlanip
+                      from work_station_status a,user b,hotel c
+                      where a.status='R' and $Hipfilter
+                            (a.work_user <> 'admin' and a.login_date > date_add(now(),interval -1 day) or a.work_user = 'admin' and a.login_date > date_add(now(),interval -5 hour)) and
+                            a.hotel_group_id=b.hotel_group_id and
+                            a.hotel_id=b.hotel_id and
+                            a.work_user=b.code and
+                            a.hotel_group_id=c.hotel_group_id and
+                            a.hotel_id=c.id
+                            order by c.descript,a.wlanip" $HdbN 2>/dev/null 
+/root/mode/seecfg -s $HdbRtr "select distinct c.descript,a.wlanip
+                      from work_station_status a,user b,hotel c
+                      where a.status='R' and $Hipfilter
+                            (a.work_user <> 'admin' and a.login_date > date_add(now(),interval -1 day) or a.work_user = 'admin' and a.login_date > date_add(now(),interval -5 hour)) and 
+                            a.hotel_group_id=b.hotel_group_id and
+                            a.hotel_id=b.hotel_id and
+                            a.work_user=b.code and
+                            a.hotel_group_id=c.hotel_group_id and
+                            a.hotel_id=c.id
+                            order by c.descript,a.wlanip" $HdbNtr 2>/dev/null 
+} | sort | uniq 
+# end
+
+

@@ -1,0 +1,165 @@
+#!/bin/bash
+# --------------------------------------------------------------
+# function:
+#          tune mysql parameters according to time period
+# --------------------------------------------------------------
+
+#
+
+/root/mode/withyou $$ tune_mysql 1 && exit 
+
+#
+
+[ -x /usr/sbin/mysqld ] || exit 1
+
+#
+
+/root/mode/seecfg localhost "" mysql 2>/dev/null || exit 1
+
+# business hours
+
+Htime=`date +%H:%M`
+
+# logical CPUs
+
+Hcore=`/root/mode/cpucores`
+
+# adjust factor 
+
+Hfactor=10
+Hcfactor=1
+
+if [ `ls -1 /usr/local/apache*/bin/apachectl 2>/dev/null | wc -l` -gt 0 ]; then
+   Hcore=$[$Hcore*3/4]
+   Hfactor=6
+else
+   Hts=`ls -1 /usr/local/tomcat*/conf/server.xml 2>/dev/null | wc -l`
+   if [ $Hts -ge 3 ]; then
+      Hcore=$[$Hcore/2]
+      Hfactor=5
+   elif [ $Hts -ge 1 ]; then
+      Hcore=$[$Hcore*3/4]
+      Hfactor=6
+   else
+      Hcfactor=2
+   fi
+fi
+if [ $Hcore -eq 0 ]; then
+   Hcore=1
+fi
+
+# adjust parms 
+
+if [ "$Htime" \> "06:29" -a "$Htime" \< "08:30" ]; then
+
+   # morning checkout time
+
+   Hmsg="Morning checkout time"
+   Hticket=500
+
+elif [ "$Htime" \> "09:59" -a "$Htime" \< "13:00" ]; then
+
+   # noon checkout time
+
+   Hmsg="Noon checkout peak time"
+   Hticket=500
+
+elif [ "$Htime" \> "18:29" -a "$Htime" \< "20:30" ]; then
+
+   # evening check in period 
+
+   Hmsg="Evening check in peak period"
+   Hticket=500
+
+elif [ "$Htime" \> "22:29" -o "$Htime" \< "06:30" ]; then
+
+   # night audit period
+
+   Hmsg="Night audit period"
+   Hcfactor=$[$Hcfactor*2]
+   Hticket=2000
+
+elif [ "$Htime" \> "08:29" -a "$Htime" \< "10:00" ]; then
+
+   # probably report printing period
+
+   Hmsg="Report printing period"
+   Hticket=1000
+
+else
+   
+   # other time
+
+   Hmsg="leisure period"
+   Hticket=500
+
+fi
+if [ $Hcfactor -gt 2 ]; then
+   Hcfactor=2
+fi
+
+#
+
+Hthread=$[$Hcore*$Hcfactor]
+Hticket=$[$Hticket*$Hfactor]
+if [ "`/root/mode/seecfg -s localhost 'show variables' | grep -P '^version\t' | sed -re 's/.*\t(.*)/\1/'`" \> "5.4" ]; then
+   # MySQL server 5.5 and later 
+   /root/mode/seecfg localhost "set global innodb_thread_concurrency=0"
+else
+   /root/mode/seecfg localhost "set global innodb_thread_concurrency=$Hthread"
+fi
+/root/mode/seecfg localhost "set global innodb_concurrency_tickets=$Hticket"
+[ "$1" = "-l" ] && /root/mode/modemsg tune_mysql "$Hmsg" more
+
+#
+
+Htune_mysql_max_load=$[$Hthread*3/4]
+if [ $Htune_mysql_max_load -le 1 ]; then
+   Htune_mysql_max_load=2
+fi
+   
+# optimize tables with 'Got error -1 ' in MySQL server error log
+
+Hmerrlog=`ls -1t /var/lib/mysql/*.err 2>/dev/null | sed -n '1 p'`
+[ -z "$Hmerrlog" ] && exit 
+
+# mark '[to be fixed by mode]' and save the marked file to /root/mode/tmp/Hoptimize$$.tmp
+cat $Hmerrlog 2>/dev/null | sed -re "s/(.*Got error -1 when reading table .*')$/\1 [to be fixed by mode]/" > /root/mode/tmp/Hoptimize$$.tmp
+
+if [ -f "$Hmerrlog" ]; then 
+   if ! cmp /root/mode/tmp/Hoptimize$$.tmp  $Hmerrlog &>/dev/null; then
+      # save back to original file 
+      cp -f /root/mode/tmp/Hoptimize$$.tmp  $Hmerrlog
+      # log optimize_table event  
+      {
+         echo 
+         echo 
+         echo "#################################################################################################################"
+         echo "###################### tune_mysql -> optimize_table began at `LANG=en_US;date` #######################"
+         echo "#################################################################################################################"
+      } | tee -a /root/mode/logs/tune_mysql_optimize_table.log
+      # fix the marked tables
+      cat $Hmerrlog 2>/dev/null | grep -E '\[to be fixed by mode\]$' | sed -re "s/.*Got error -1 when reading table '\.\/([^\\\\]+)\/([^']+)'.*/\1 \2/" |
+      sort | uniq | 
+      while read -r Hop_db Hop_tb;do
+         # Use /root/mode/optimize_table to do optimization.
+         # Very large tables might not be optimized 
+         /root/mode/optimize_table localhost "$Hop_db" "$Hop_tb" 2>&1 | tee -a /root/mode/logs/tune_mysql_optimize_table.log
+         # we simply ignore the exit status 
+      done
+      # mark '[has been fixed by mode]' and save the marked file to /root/mode/tmp/Hoptimize$$.tmp
+      cat $Hmerrlog 2>/dev/null | sed -re "s/to be fixed by mode/has been fixed by mode/" > /root/mode/tmp/Hoptimize$$.tmp
+      # save back to original file 
+      cp -f /root/mode/tmp/Hoptimize$$.tmp  $Hmerrlog
+      {
+         echo "###################### tune_mysql -> optimize_table ended at `LANG=en_US;date` #######################"
+      } | tee -a /root/mode/logs/tune_mysql_optimize_table.log
+   fi
+fi
+
+# rm tmp file 
+rm -f /root/mode/tmp/Hoptimize$$.tmp
+
+# end
+
+ 

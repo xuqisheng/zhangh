@@ -1,0 +1,38 @@
+#!/bin/bash 
+# -------------------------------------------------------------
+# function:
+#          mode suggested gc collector for this machine
+# -------------------------------------------------------------
+# options:
+#          1.Serial Collector
+#            -XX:+UseSerialGC
+#          2.Parallel Collector/Throughput Collector
+#            -XX:+UseParallelGC
+#          3.Parallel Compacting Collector
+#            -XX:+UseParallelOldGC
+#            -XX:ParallelGCThreads=n
+#          4.Concurrent Mark Sweep Collector (CMS)
+#            -XX:+UseConcMarkSweepGC 
+#            -XX:+CMSIncrementalMode 
+# -------------------------------------------------------------
+
+Hcores=`/root/mode/cpucores`
+Hgcmode=
+if [ -f /etc/nocgc ]; then
+   :
+elif [ `cat /etc/modemem 2>/dev/null | wc -l` -gt 0 ]; then
+   if [ ! -x /usr/sbin/mysqld ]; then
+      if [ $Hcores -ge 8 ]; then
+         Hgcmode='-XX:+UseParallelOldGC'
+      fi
+   else
+      if [ $Hcores -ge 16 ]; then
+         Hgcmode='-XX:+UseParallelOldGC'
+      fi
+   fi
+fi
+echo $Hgcmode
+
+#
+
+

@@ -1,0 +1,9 @@
+Hmaintain=30
+Hthread=600
+Husetomajpcout=0
+Hctmout_jkpool=120
+Hctmout=30000
+Hdroptime=12000
+Hcsendopt=6
+Hmthread=12
+Hpacketsize=65536

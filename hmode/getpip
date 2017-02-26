@@ -1,0 +1,10 @@
+#!/bin/bash 
+
+{
+echo curl --connect-timeout 2 members.3322.org/dyndns/getip
+#echo curl --connect-timeout 2 icanhazip.com
+#echo curl --connect-timeout 2 ipinfo.io/ip
+#echo 'curl --connect-timeout 2 ipecho.net/plain;echo'
+#echo dig +short myip.opendns.com @resolver1.opendns.com
+} | bash 2>/dev/null | head -n 1 
+

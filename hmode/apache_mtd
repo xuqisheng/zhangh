@@ -1,0 +1,15 @@
+#!/bin/bash 
+# ----------------------------------------------------------------------
+# function:
+#          return loadbalancer's method
+#
+# ----------------------------------------------------------------------
+
+if [ ! -f /etc/modegate ]; then
+   echo T
+elif ! cat /etc/modegate | grep -E "^apachemethod=" >/dev/null; then
+   echo T
+else
+   echo `cat /etc/modegate | sed -re "s/^(apachemethod=)(.*)/\2/" | sed -n "$ p"`
+fi
+

@@ -1,0 +1,36 @@
+#!/bin/bash
+
+#
+
+. /root/mode/mysqldip 
+
+#
+
+if [ "$1" = "" ]; then
+   HDUMPNAME=/root/mode/dump/Hzlf.sql
+elif echo "$1" | grep "\.sql$" >/dev/null; then
+   HDUMPNAME="$1"
+else
+   echo "User designated dump name must end with \".sql\"" && exit 1
+fi
+
+#
+
+Hzlftables=
+if /root/mode/seecfg -s $HMYSQLDIP "show tables like 'edm_config'" mysql | grep -i edm_config >/dev/null; then
+   Hzlftables="$Hzlftables edm_config"
+fi
+if /root/mode/seecfg -s $HMYSQLDIP "show tables like 'edm_sms_pay'" mysql | grep -i edm_sms_pay >/dev/null; then
+   Hzlftables="$Hzlftables edm_sms_pay"
+fi
+if /root/mode/seecfg -s $HMYSQLDIP "show tables like 'edm_static'" mysql | grep -i edm_static >/dev/null; then
+   Hzlftables="$Hzlftables edm_static"
+fi
+if [ -z "$Hzlftables" ]; then
+   >"$HDUMPNAME"
+else
+   mysqldump -uroot $Hmodepass -h$HMYSQLDIP --opt --single-transaction --master-data=2 -F mysql $Hzlftables >"$HDUMPNAME"
+fi
+
+# end
+

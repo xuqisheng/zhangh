@@ -1,0 +1,34 @@
+#!/bin/bash
+# ------------------------------------------------------------------------------------------
+#!/bin/sh
+# -------------------------------------------------------------------------------------
+# function:
+#          test database
+# -------------------------------------------------------------------------------------
+# ./testdb [<mysql-server-ip>] <dbname>> 
+# e.g.:
+#       ./testdb portal
+# -------------------------------------------------------------------------------------
+
+. /root/mode/mysqldip
+
+# database name
+
+HDBNAME="$1"
+if [ -z "$HDBNAME" ]; then
+   echo "database name must be provided!" && exit 1
+fi
+
+# $HDBNAME must exist 
+
+if [ -z `/root/mode/seecfg -s $HMYSQLDIP "show databases like '$HDBNAME'"|grep -i "^$HDBNAME"` ]; then
+   echo "Database $HDBNAME doesn't exist!" && exit 1
+fi
+
+# $HDBNAME must be gc ipms 
+
+[ "$HDEBUG_MODE" = "y" ] && exit
+if [ -z `/root/mode/seecfg -s $HMYSQLDIP "show tables from \\\`$HDBNAME\\\` like 'audit\_flag'"` ]; then
+   echo "Database $HDBNAME IS NOT a gc ipms!!!" && exit 1
+fi
+

@@ -1,0 +1,396 @@
+#!/bin/bash 
+
+#
+
+. /root/mode/apachemode
+
+# test if apache exists
+
+if [ ! -d /usr/local/$Hapachemode ]; then
+   /root/mode/modemsg update_apache "/usr/local/$Hapachemode doesn't exist!"
+   exit 1
+fi
+
+# get basic information 
+
+Hori_apache=`/usr/local/$Hapachemode/bin/apachectl -v | grep -E "Apache" | sed -re "s/.*Apache\/([^ ]+).*/\1/"`
+Hnew_apache=`ls -1 /root/packages/httpd-2* 2>/dev/null | sed -nre "$ p" | sed -re "s/.*httpd-(.*)\.tar\.bz2/\1/"`
+Hori_mod_jk=`strings /usr/local/$Hapachemode/modules/mod_jk.so 2>/dev/null | grep 'mod_jk/' | sed -re "s/mod_jk\/(.*)/\1/"`
+Hnew_mod_jk=`ls -1 /root/packages/tomcat-connectors-* | sed -re "s/.*connectors-(.*)-src.*/\1/"`
+
+# check new apache packages
+
+if [ -z "$Hnew_apache" -o -z "$Hnew_mod_jk" ]; then
+   /root/mode/modemsg update_apache "No required apache package or mod_jk package!!!" more
+   exit 1
+fi
+
+# check old apache installation
+
+if [ -z "$Hori_apache" -o -z "$Hori_mod_jk" ]; then
+   /root/mode/modemsg update_apache "The original apache is incomplete or non-standard!!!" more
+   exit 1
+fi
+
+# check upgrade neccessity
+
+if [ "$Hori_apache" = "$Hnew_apache" -a "$Hori_mod_jk" = "$Hnew_mod_jk" ]; then
+   /root/mode/modemsg update_apache "No need to update apache!!!" more
+   exit 1
+fi
+
+# check apache major version number
+
+if [ "$Hori_apache" != "$Hnew_apache" ]; then
+   if [ "${Hori_apache:0:3}" != "${Hnew_apache:0:3}" ]; then
+      # need compelte new upgrade
+      Hwholenewup=1
+   fi
+fi
+
+# check apache installation directory
+
+Hapachedio=/usr/local/$Hapachemode
+if [ -h "$Hapachedio" ]; then
+   ls=`ls -ld "$Hapachedio"`
+   link=`expr "$ls" : '.*-> \(.*\)$'`
+   if expr "$link" : '/.*' > /dev/null; then
+      Hapachetgt="$link"
+   else
+      Hapachetgt=`dirname "$Hapachedio"`/"$link"
+   fi
+fi
+Hapachetgt=`/root/mode/netpath $Hapachetgt`
+if [ -n "$Hapachetgt" ]; then
+   if [ -h "$Hapachetgt" ]; then
+      /root/mode/modemsg update_apache "Too deep apache link!!!" more
+      exit 1
+   elif [ ! -d "$Hapachetgt" ]; then
+      /root/mode/modemsg update_apache "apache link target must be a directory!!!" more
+      exit 1
+   fi
+fi
+
+# check htdocs installation directory
+
+Hhtdocsdio=/usr/local/$Hapachemode/htdocs
+if [ -h "$Hhtdocsdio" ]; then
+   ls=`ls -ld "$Hhtdocsdio"`
+   link=`expr "$ls" : '.*-> \(.*\)$'`
+   if expr "$link" : '/.*' > /dev/null; then
+      Hhtdocstgt="$link"
+   else
+      Hhtdocstgt=`dirname "$Hhtdocsdio"`/"$link"
+   fi
+fi
+Hhtdocstgt=`/root/mode/netpath $Hhtdocstgt`
+if [ -n "$Hhtdocstgt" ]; then
+   if [ -h "$Hhtdocstgt" ]; then
+      /root/mode/modemsg update_apache "Too deep htdocs link!!!" more
+      exit 1
+   elif [ ! -d "$Hhtdocstgt" ]; then
+      /root/mode/modemsg update_apache "htdocs link target must be a directory!!!" more
+      exit 1
+   fi
+fi
+
+# preview upgrade information
+
+{
+   echo
+   echo "##### update_apache preview ####"
+   echo
+   echo "`LANG=en_US;date`"
+   echo
+   echo "Hori_apache: $Hori_apache"
+   echo "Hnew_apache: $Hnew_apache"
+   echo "Hori_mod_jk: $Hori_mod_jk"
+   echo "Hnew_mod_jk: $Hnew_mod_jk"
+   echo
+   echo "Hlistenport: $Hlistenport"
+   echo
+   echo "apache  dio: $Hapachedio"
+   echo "apache  tgt: $Hapachetgt"
+   echo "htdocs  dio: $Hhtdocsdio"
+   echo "htdocs  tgt: $Hhtdocstgt"
+}
+
+# confirmation
+
+/root/mode/confirm "Are you sure to upgrade '$Hapachemode' from 'Apache$Hori_apache/mod_jk$Hori_mod_jk' to 'Apache$Hnew_apache/mod_jk$Hnew_mod_jk'?" || exit 1
+
+# truncate logs to save backup space
+
+/root/mode/clrlogs 2
+
+# save Listen port
+
+if [ `cat /usr/local/$Hapachemode/conf/httpd.conf | grep "^Listen" | wc -l` -eq 1 ]; then
+   Hlistenport=`cat /usr/local/$Hapachemode/conf/httpd.conf | grep "^Listen"`
+   echo $Hlistenport >> /etc/modeupdateapache2
+else
+   /root/mode/modemsg update_apache "abnormal 'Listen port' defination"
+   exit 1
+fi
+ 
+# log upgrade information
+
+{
+   echo
+   echo
+   echo "##################################################################################################"
+   echo "#  update apache                                                                                 #"
+   echo "##################################################################################################"
+   echo
+   echo "`LANG=en_US;date`"
+   echo
+   echo "Hori_apache: $Hori_apache"
+   echo "Hnew_apache: $Hnew_apache"
+   echo "Hori_mod_jk: $Hori_mod_jk"
+   echo "Hnew_mod_jk: $Hnew_mod_jk"
+   echo
+   echo "Hlistenport: $Hlistenport"
+   echo
+   echo "apache  dio: $Hapachedio"
+   echo "apache  tgt: $Hapachetgt"
+   echo "htdocs  dio: $Hhtdocsdio"
+   echo "htdocs  tgt: $Hhtdocstgt"
+} | tee -a /root/mode/logs/update_apache.log
+
+#  do apache backup if neccessary
+
+{
+echo 
+echo "########## Step 1: do backup ##########"
+echo 
+echo "checking if apache backup is needed ......"
+echo
+} | tee -a /root/mode/logs/update_apache.log
+if [ -z "$Hapachetgt" ]; then
+   # the old apache is not a symbololic link
+   # do whole backup
+   {
+      echo "no apache link -----> do whole backup of the current directory '$Hapachedio'"
+      echo "command: tar czvf /l$Hapachemode.tar.gz $Hapachedio"
+      echo
+   } | tee -a /root/mode/logs/update_apache.log
+   tar czvf /l$Hapachemode.tar.gz $Hapachedio
+   Hexitstat=$?
+   [ $Hexitstat -ne 0 ] && exit 1
+elif [ -z "$Hwholenewup" ]; then
+   # the old apache is a symbololic link
+   # override upgade 
+   {
+      echo "with apache link && override upgrade ------> do whole backup of link-target directory '$Hapachetgt'"
+      echo "command: tar czvf /l$Hapachemode.tar.gz $Hapachetgt"
+      echo
+   } | tee -a /root/mode/logs/update_apache.log
+   tar czvf /l$Hapachemode.tar.gz $Hapachetgt
+   Hexitstat=$?
+   [ $Hexitstat -ne 0 ] && exit 1
+else
+   # the old apache is a symbololic link
+   # wholy new upgade 
+   {
+   echo "with apache link && wholy new upgrade ------> apache backup of '$Hapachetgt' is not needed"
+   echo "but we still do backup for safety"
+   echo "command: tar czvf /l$Hapachemode.tar.gz $Hapachetgt"
+   echo 
+   } | tee -a /root/mode/logs/update_apache.log
+   tar czvf /l$Hapachemode.tar.gz $Hapachetgt
+fi
+
+# do htdocs backup
+
+{
+echo 
+echo "htdocs backup is always needed ......"
+echo
+} | tee -a /root/mode/logs/update_apache.log
+if [ -z "$Hhtdocstgt" ]; then
+   # the old htdocs is not a symbololic link
+   # do whole backup of htdocs 
+   {
+      echo "no htdocs link -----> do whole backup of the current directory '$Hhtdocsdio'"
+      echo "command: tar czvf /lhtdocs$Hapachetail.tar.gz $Hhtdocsdio"
+      echo
+   } | tee -a /root/mode/logs/update_apache.log
+   tar czvf /lhtdocs$Hapachetail.tar.gz $Hhtdocsdio 
+   Hexitstat=$?
+   [ $Hexitstat -ne 0 ] && exit 1
+else
+   # the old htdocs is a symbololic link
+   # do whole backup 
+   {
+      echo "with htdocs link -----> do whole backup of link-target directory '$Hhtdocstgt'"
+      echo "command: tar czvf /lhtdocs$Hapachetail.tar.gz $Hhtdocstgt"
+      echo
+   } | tee -a /root/mode/logs/update_apache.log
+   tar czvf /lhtdocs$Hapachetail.tar.gz $Hhtdocstgt 
+   Hexitstat=$?
+   [ $Hexitstat -ne 0 ] && exit 1
+fi
+
+# begin to upgrade  
+
+/root/mode/apachectl $Hapachemode -k stop
+
+#
+
+{
+echo 
+echo "########## Step 2: do update ##########"
+echo 
+} | tee -a /root/mode/logs/update_apache.log
+
+# 
+
+if [ -n "$Hwholenewup" ]; then
+   {
+      echo "wholy new upgrade will begin"
+      if [ -z "$Hapachetgt" ]; then
+         echo "remove current apache"
+      else
+         echo "remove current apache link(apache target is not affected)"
+      fi
+      echo "command: rm -fR $Hapachedio"
+   }  | tee -a /root/mode/logs/update_apache.log
+   rm -fR $Hapachedio
+else
+   echo "override upgrade" | tee -a /root/mode/logs/update_apache.log
+   export HAPACHE_OVERRIDE=1
+fi
+{
+   echo 
+   echo "Upgrading ......" 
+   echo
+}  | tee -a /root/mode/logs/update_apache.log
+
+# reinstall
+
+if ! /root/mode/install.sh $Hapachetail; then
+   # failed 
+   {
+   echo 
+   echo "########## Step 2: do rollback ##########"
+   echo 
+   } | tee -a /root/mode/logs/update_apache.log
+   # restore will begin
+   {
+      echo
+      echo "Upgrading is aborted"
+      echo "remove new installtion no matter it is link or not"
+      echo "command: rm -fR $Hapachedio"
+      echo 
+   } | tee -a /root/mode/logs/update_apache.log
+   rm -fR $Hapachedio
+   cd /
+   if [ -z "$Hapachetgt" ]; then
+      # no link
+      {
+         echo "no link --> restore entire backup"
+         echo "command: cd /;tar xzvf /l$Hapachemode.tar.gz"
+      } | tee -a /root/mode/logs/update_apache.log
+      tar xzvf /l$Hapachemode.tar.gz
+   elif [ -z "$Hwholenewup" ]; then
+      # with link
+      # override upgrade  
+
+      echo "remove link-target apache '$Hapachetgt'"  | tee -a /root/mode/logs/update_apache.log
+      echo "command: rm -fR $Hapachetgt" | tee -a /root/mode/logs/update_apache.log
+      rm -fR $Hapachetgt
+
+      echo "restore link-target backup to '$Hapachetgt'"  | tee -a /root/mode/logs/update_apache.log
+      echo "command: cd /;tar xzvf /l$Hapachemode.tar.gz"  | tee -a /root/mode/logs/update_apache.log
+      tar xzvf /l$Hapachemode.tar.gz
+
+      echo "relink to $Hapachetgt"  | tee -a /root/mode/logs/update_apache.log
+      echo "command: ln -s $Hapachetgt $Hapachedio"  | tee -a /root/mode/logs/update_apache.log
+      ln -s $Hapachetgt $Hapachedio
+
+   else
+      # with link
+      # complete new upgrade ,link-target is not overriden
+      echo "relink to $Hapachetgt"  | tee -a /root/mode/logs/update_apache.log
+      echo "command: ln -s $Hapachetgt $Hapachedio"  | tee -a /root/mode/logs/update_apache.log
+      ln -s $Hapachetgt $Hapachedio
+   fi
+   echo "start apache"  | tee -a /root/mode/logs/update_apache.log
+   /root/mode/apachectl $Hapachemode -k start
+   echo "restore cpmplete ......"  | tee -a /root/mode/logs/update_apache.log
+   exit
+fi
+
+#
+
+{
+echo 
+echo "########## Step 3: do aftwork after upgrade ##########"
+echo 
+} | tee -a /root/mode/logs/update_apache.log
+
+# completed ok
+
+if [ -z "$Hwholenewup" ]; then
+   echo "override installation --> keep the new target(including htdocs)"  | tee -a /root/mode/logs/update_apache.log
+else
+   if [ -n "$Hapachetgt" ]; then
+      # link case 
+      # complete new upgrade 
+      Hupdir=`dirname $Hapachetgt`
+      echo "complete new installtion --> remove original target apache '$Hapachetgt'"  | tee -a /root/mode/logs/update_apache.log
+      echo "command: rm -fR $Hapachetgt"  | tee -a /root/mode/logs/update_apache.log
+      rm -fR $Hapachetgt
+
+      echo "move the new installed apache to target position $Hupdir"  | tee -a /root/mode/logs/update_apache.log
+      echo "command: mv -f  $Hapachedio $Hupdir"  | tee -a /root/mode/logs/update_apache.log
+      mv -f  "$Hapachedio" "$Hupdir"
+
+      echo "do link again"  | tee -a /root/mode/logs/update_apache.log
+      echo "command: ln -s $Hapachetgt $Hapachedio" | tee -a /root/mode/logs/update_apache.log
+      ln -s $Hapachetgt $Hapachedio
+   fi
+   # extract old htdocs
+   if [ -n "$Hhtdocstgt" ]; then
+      # the htdocs is a symbololic link
+
+      echo "complete new installation -> original htdocs is a link -> remove the just installed htdocs" | tee -a /root/mode/logs/update_apache.log
+      echo "command: rm -fR $Hhtdocsdio" | tee -a /root/mode/logs/update_apache.log
+      rm -fR "$Hhtdocsdio"
+
+      echo "restore htdocs backup to htdocs target '$Hhtdocstgt'"  | tee -a /root/mode/logs/update_apache.log
+      echo "command: cd /;tar xzvf /lhtdocs$Hapachetail.tar.gz"  | tee -a /root/mode/logs/update_apache.log
+      cd /;tar xzvf /lhtdocs$Hapachetail.tar.gz
+
+      echo "do link again"  | tee -a /root/mode/logs/update_apache.log
+      echo "command: ln -s $Hhtdocstgt $Hhtdocsdio" | tee -a /root/mode/logs/update_apache.log
+      ln -s $Hhtdocstgt $Hhtdocsdio
+
+   else
+      # the htdocs is not a symbololic link
+      echo "restore htdocs backup to $Hhtdocsdio"  | tee -a /root/mode/logs/update_apache.log
+      echo "command: cd /;tar xzvf /lhtdocs$Hapachetail.tar.gz" | tee -a /root/mode/logs/update_apache.log
+      cd /;tar xzvf /lhtdocs$Hapachetail.tar.gz
+   fi
+fi
+
+echo "End of log ......"  | tee -a /root/mode/logs/update_apache.log
+
+# replace apache listen port
+
+/root/mode/mod_config /usr/local/$Hapachemode/conf/httpd.conf "$Hlistenport"
+
+# reconfigure
+
+/root/mode/config_apache $Hapachemode
+
+# start apache
+
+/root/mode/apachectl $Hapachemode -k start
+
+# congratulations
+
+/root/mode/modemsg update_apache "update $Hapachemode complete"
+
+# end
+

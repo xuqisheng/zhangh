@@ -1,0 +1,15 @@
+#!/bin/bash
+# ------------------------------------------------------------------
+# function:
+#          provide some utilities for type conversion in dbsync
+#
+# ------------------------------------------------------------------
+
+cd /root/mode/impfile/mysql/types
+for i in `ls -1`;do
+    if cat $i | sed -re "/^[ \t]* $/ d" | grep -E "^$1$" >/dev/null; then
+       echo $i`cat $i | sed -re "/^[ \t]*$/ d" | sed -nre "/^$1$/ ="`
+       exit
+    fi
+done
+echo ""

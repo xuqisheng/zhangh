@@ -1,0 +1,16 @@
+#!/bin/bash
+
+Hcps=$$
+Hrexp="$1"
+while [ 1 ];do
+   Hpps=`ps -ef | sed -nre "s/^[^ ]+ +$Hcps +([0-9]+) +.*/\1/ p"`
+   if ps -ef | grep -E "^[^ ]+ +$Hpps +.*$Hrexp.*" | grep -v "grep -E" >/dev/null; then
+      echo suc
+      exit 0
+   elif [ $Hpps -eq 1 ]; then
+      echo fail
+      exit 0
+   fi
+   Hcps=$Hpps
+done
+

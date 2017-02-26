@@ -1,0 +1,76 @@
+#!/bin/bash
+
+# exclusive execution with wait mode
+
+/root/mode/modepv mod_tthread $$ " /bin/bash .*/mod_tthread"
+
+#
+
+if [ -z "$1" ]; then
+   Hmytom="tomcat*"
+else
+   Hmytom="$1"
+fi
+
+#
+
+. /root/mode/impfile/jktomcat/parms
+
+#
+
+[ `ls -1d /usr/local/$Hmytom/ 2>/dev/null | wc -l` -eq 0 ] && exit
+
+#
+
+Hhrymodtthread=/root/mode/tmp/hmodtthread$$.tmp
+
+#
+
+ls -1d /usr/local/$Hmytom/ 2>/dev/null |
+while read -r i; do
+   cd ${i}conf
+   cat server.xml | tr -d '\r' | 
+   sed -re "s/^( *<Connector port=\"[0-9]+\" protocol=\"HTTP\/1\.1\"[ ]*)$/\1 maxThreads=\"300\"/" |
+   sed -re "s/^( *<Connector port=\"[0-9]+\" protocol=\"AJP\/1\.3\" redirectPort=\"8443\")( *\/>)/\1 maxThreads=\"300\"\2/"|
+   sed -re "s/(Connector.*(HTTP|AJP).*maxThreads=\"[0-9]+\") *((\/>)?) *$/\1 enableLookups=\"false\" \3/" | 
+   sed -re "s/(Connector.*AJP.* enableLookups=\"false\")( *\/>)/\1 packetSize=\"$Hpacketsize\"\2/" | 
+   if [ $Husetomajpcout -eq 1 ]; then
+      sed -re "s/(Connector.*AJP.* packetSize=\"[0-9]+\")( *\/>)/\1 connectionTimeout=\"30000\"\2/"  
+   else
+      sed -re "s/(Connector.*AJP.* packetSize=\"[0-9]+\")( +connectionTimeout=\"[0-9]+\")/\1/"  
+   fi | 
+   sed -re "s/(Connector.*(HTTP|AJP).*maxThreads=\"[0-9]+\") +(enableLookups=.*)/\1 backlog=\"300\" \3/" | 
+   sed -re "s/(packetSize=\")[0-9]+(\")/\1$Hpacketsize\2/" | 
+   sed -re "s/(NioReceiver\"[ \t]*)$/\1 timeout=\"$Hdroptime\"/" |
+   sed -re "s/(NioReceiver\"[ \t]*timeout=\")[0-9]+(\")/\1$Hdroptime\2/" |
+   sed -re "s/(PooledParallelSender\")(\/>)/\1 timeout=\"$Hdroptime\"\2/" | 
+   sed -re "s/(PooledParallelSender\"[ \t]*timeout=\")[0-9]+(\")/\1$Hdroptime\2/" | 
+   sed -re "s/(protocol=\"HTTP\/1\.1\" *maxThreads=\")[0-9]+(\")/\1${Hthread}\2/" | 
+   sed -re "s/(redirectPort=\"[0-9]+\" *maxThreads=\")[0-9]+(\")/\1${Hthread}\2/" |
+   sed -re "s/( *backlog=\")([0-9]+)(\")/\1$Hthread\3/"         |
+   if [ -f /etc/nsbacklog ]; then
+      sed -re "s/(( *backlog=\")([0-9]+)(\" *))/ /"               
+   else
+      sed -re "s/(( *backlog=\")([0-9]+)(\" *))/\1/"               
+   fi |
+   sed -re "s/(connectionTimeout=\")[0-9]+(\")/\1${Hctmout}\2/" |
+   sed -re "s/(.*AJP.*connectionTimeout=\")[0-9]+(\")/\1$[$Hctmout_jkpool*1000]\2/" |
+   sed -re "s/(channelSendOptions=\")[0-9](\")/\1$Hcsendopt\2/" |
+   sed -re "s/^( *maxThreads=\")([0-9]+)(\"\/>)/\1$Hmthread\3/" |
+   sed -re "s/(dropTime=\")[0-9]+(\")/\1$Hdroptime\2/" > $Hhrymodtthread
+   cat $Hhrymodtthread > server.xml
+
+   # add some more adjustment -- 2012-11-30 --
+   if ! cat server.xml | grep -E "<Interceptor className=\"org\.apache\.catalina\.tribes\.group\.interceptors\.ThroughputInterceptor\"/>" >/dev/null; then
+      cat server.xml | sed -re "/<Interceptor className=\"org\.apache\.catalina\.tribes\.group\.interceptors\.MessageDispatch15Interceptor\"\/>/ a\            <Interceptor className=\"org\.apache\.catalina\.tribes\.group\.interceptors\.ThroughputInterceptor\"/>" > $Hhrymodtthread
+      cat $Hhrymodtthread > server.xml
+   fi
+done
+
+#
+
+rm -f $Hhrymodtthread
+
+# end
+
+

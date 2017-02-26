@@ -1,0 +1,302 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Sample build file used to retrieve svnant's sources -->
+<project name="gcipms_deploy" basedir="." default="deployAir">
+
+	<!--  all properties are in build.properties -->
+	<property file="build.properties" />
+
+
+
+	<!-- load the svn task -->
+	<typedef resource="org/tigris/subversion/svnant/svnantlib.xml" />
+
+
+
+	<target name="clean">
+		<delete dir="${javalib}" />
+		<delete dir="${build.dir}" />
+		<delete dir="${output.dir}" />
+		<delete dir="${airbuild.dir}" />
+		<delete dir="${restemp.dir}" />
+	</target>
+
+	<target name="cleansvn">
+		<delete dir="${airbuild.dir}" />
+		<delete dir="${release.dir}" />
+		<delete dir="${restemp.dir}" />
+		<delete dir="${temp}" />
+	</target>
+
+	<target name="checkout" depends="cleansvn">
+
+		<svn username="${svn.repository.user}" password="${svn.repository.passwd}">
+			<checkout url="${svn.url}${svn.java}trunk/${javalib}" revision="HEAD" destPath="${javalib}" />
+			<checkout url="${svn.url}${svn.java}trunk/${htdocs}" revision="HEAD" destPath="${htdocs}" />
+			<checkout url="${svn.url}${dbsql}/trunk" revision="HEAD" destPath="${dbsql}"/>
+			<checkout url="${svn.url}release/${build.dir}/${fullversion}" revision="${svn.reversion}" destPath="${temp}" />
+			<export srcPath="${temp}/${airbuild.dir}" revision="HEAD" destPath="${airbuild.dir}" force="true" />
+			<export srcPath="${temp}/${res.dir}" revision="HEAD" destPath="${restemp.dir}" force="true" />
+			<export srcPath="${temp}/${centerserver}" revision="HEAD" destPath="${release.dir}/${centerserver}" force="true" />
+
+
+		</svn>
+	</target>
+
+
+
+
+	<target name="packageAir" depends="packageJava">
+		<mkdir dir="${release.dir}" />
+		<copy todir="${release.dir}" overwrite="true">
+			<fileset dir="${temp}" includes="*.xml,*.sql" />
+			<fileset file="${temp}/update.properties" />
+		</copy>
+		<property file="${release.dir}/update.properties" />
+		<echo message="build on ${build.time}" />
+
+
+
+
+		<replace encoding="utf-8" file="${airbuild.dir}/Update.xml" propertyfile="${release.dir}/update.properties">
+			<replacefilter token="@mainversion@" property="main.version" />
+
+
+		</replace>
+
+		<replace encoding="utf-8" file="${airbuild.dir}/${app.name}-app.xml" propertyfile="${release.dir}/update.properties">
+			<replacefilter token="@airversion@" property="air.version" />
+
+
+		</replace>
+
+		<replace encoding="utf-8" file="${airbuild.dir}/${app.name}-app.xml" propertyfile="${release.dir}/update.properties">
+			<replacefilter token="0.99" property="air.version" />
+		</replace>
+
+
+		<replace encoding="utf-8" file="${restemp.dir}/Update.xml" propertyfile="${release.dir}/update.properties">
+
+			<replacefilter token="@resourceversion@" property="resource.version" />
+
+		</replace>
+
+		<zip destfile="${release.dir}/resource.zip">
+			<zipfileset dir="${restemp.dir}" excludes="**/.svn" />
+		</zip>
+
+		<zip destfile="${release.dir}/resourcefull.zip">
+			<zipfileset dir="${restemp.dir}" excludes="**/.svn" />
+		</zip>
+
+		<replace encoding="utf-8" file="${airbuild.dir}/config.xml">
+			<replacefilter token="debug" value="${update.path}" />
+			<replacefilter token="localhost:8080" value="${centerserver.root}" />
+
+		</replace>
+
+		<java jar="${FLEX_HOME}/lib/adt.jar" fork="true" failonerror="true" maxmemory="512m">
+			<arg value="-package" />
+			<arg value="-storetype" />
+			<arg value="pkcs12" />
+			<arg value="-keystore" />
+			<arg value="${temp}/gc.p12" />
+			<arg value="-storepass" />
+			<arg value="${p12.pwd}" />
+			<arg value="${release.dir}/${app.name}.air" />
+			<arg value="${airbuild.dir}/${app.name}-app.xml" />
+			<arg value="-C" />
+			<arg value="${airbuild.dir}" />
+			<arg value="." />
+		</java>
+
+
+		<!--<property file="${temp}/update.properties" />-->
+
+
+		<replace encoding="utf-8" file="${release.dir}/update.xml" propertyfile="${release.dir}/update.properties">
+			<replacefilter token="@mainversion@" property="main.version" />
+			<replacefilter token="@airversion@" property="air.version" />
+			<replacefilter token="@forceversion@" property="force.version" />
+			<replacefilter token="@resourceversion@" property="resource.version" />
+			<replacefilter token="@updateserver@" value="${update.server}" />
+			<replacefilter token="@resforceversion@" property="resforce.version" />
+		</replace>
+
+		<replace encoding="utf-8" file="${release.dir}/update_air.xml" propertyfile="${release.dir}/update.properties">
+
+			<replacefilter token="@airversion@" property="air.version" />
+
+			<replacefilter token="@updateserver@" value="${update.server}" />
+
+		</replace>
+
+
+	</target>
+
+	<target name="backup" depends="packageAir">
+		<property file="${release.dir}/update.properties" />
+		<zip destfile="${backup.dir}/${build.time}.zip">
+			<zipfileset dir="${release.dir}" />
+		</zip>
+	</target>
+
+	<target name="deployAir" depends="deployJava">
+		<property file="${release.dir}/update.properties" />
+
+		<copy todir="${apache.htdocs}" overwrite="true">
+			<fileset dir="${htdocs}" excludes="**/.svn"/>
+		</copy>
+
+		<copy todir="${apache.htdocs}/update" overwrite="true">
+			<fileset dir="${release.dir}" includes="*.xml" />
+
+			<fileset file="${release.dir}/${app.name}.air" />
+			<fileset file="${release.dir}/*.zip" />
+		</copy>
+
+
+		<copy overwrite="true" tofile="${apache.htdocs}/update/${app.name}${air.version}.air">
+			<fileset file="${release.dir}/${app.name}.air" />
+		</copy>
+	</target>
+
+
+	<target name="packageJava" depends="checkout">
+		<delete dir="${warlib.dir}" />
+		<copy overwrite="true" todir="${warlib.dir}">
+			<fileset dir="${javalib}/blazeds">
+				<include name="**/*.jar" />
+			</fileset>
+			<fileset dir="${javalib}/jdbc">
+				<include name="**/*.jar" />
+			</fileset>
+			<fileset dir="${javalib}/spring">
+				<include name="**/*.jar" />
+			</fileset>
+			<fileset dir="${javalib}/springFlex">
+				<include name="**/*.jar" />
+			</fileset>
+			<fileset dir="${javalib}/third">
+				<include name="**/*.jar" />
+			</fileset>
+
+		</copy>
+		<jar destfile="${jar.dist}" basedir="${javabuild.dir}">
+
+		</jar>
+
+	</target>
+	<target name="deployJava" depends="backup">
+		<exec executable="${tomcat.stop}">
+			<arg line="${tomcat1}" />
+		</exec>
+		<delete dir="${tomcat1.wap}/${centerserver}" />
+		<delete dir="${tomcat1.wap}/${centerserver}1" />
+		<delete dir="${tomcat1.wap}/${loginserver}" />
+		<delete dir="${tomcat1.wap}/${loginserver}1" />
+		<copy todir="${tomcat1.wap}/${centerserver}">
+			<fileset dir="${release.dir}/${centerserver}/WebRoot" />
+		</copy>
+		<copy todir="${tomcat1.wap}/${centerserver}/WEB-INF/lib">
+			<fileset dir="${warlib.dir}" />
+		</copy>
+		<copy todir="${tomcat1.wap}/${centerserver}/WEB-INF/classes">
+			<fileset dir="${release.dir}/${centerserver}/src/config" />
+		</copy>
+		<replace encoding="utf-8" file="${tomcat1.wap}/${centerserver}/${db.file}">
+			<replacefilter token="jdbc:mysql://192.168.6.13:3306/portal" value="${db.url}" />
+			<replacefilter token="root" value="${db.usr}" />
+			<replacefilter token="deviskaifa" value="${db.pwd}" />
+		</replace>
+		<copy todir="${tomcat1.wap}/${centerserver}1">
+			<fileset dir="${release.dir}/${centerserver}/WebRoot" />
+
+		</copy>
+		<copy todir="${tomcat1.wap}/${centerserver}1/WEB-INF/lib">
+			<fileset dir="${warlib.dir}" />
+		</copy>
+		<copy todir="${tomcat1.wap}/${centerserver}1/WEB-INF/classes">
+			<fileset dir="${release.dir}/${centerserver}/src/config" />
+		</copy>
+		<replace encoding="utf-8" file="${tomcat1.wap}/${centerserver}1/${db.file}">
+			<replacefilter token="jdbc:mysql://192.168.6.13:3306/portal" value="${dbtr.url}" />
+			<replacefilter token="root" value="${dbtr.usr}" />
+			<replacefilter token="deviskaifa" value="${dbtr.pwd}" />
+		</replace>
+	
+		
+		<exec executable="${tomcat.start}">
+			<arg line="${tomcat1}" />
+		</exec>
+
+
+
+
+		<exec executable="${tomcat.stop}">
+			<arg line="${tomcat2}" />
+		</exec>
+		<delete dir="${tomcat2.wap}/${centerserver}" />
+		<delete dir="${tomcat2.wap}/${centerserver}1" />
+		<delete dir="${tomcat2.wap}/${loginserver}" />
+		<delete dir="${tomcat2.wap}/${loginserver}1" />
+		<copy todir="${tomcat2.wap}/${centerserver}">
+			<fileset dir="${release.dir}/${centerserver}/WebRoot" />
+		</copy>
+		<copy todir="${tomcat2.wap}/${centerserver}/WEB-INF/lib">
+			<fileset dir="${warlib.dir}" />
+		</copy>
+		<copy todir="${tomcat2.wap}/${centerserver}/WEB-INF/classes">
+			<fileset dir="${release.dir}/${centerserver}/src/config" />
+		</copy>
+		<replace encoding="utf-8" file="${tomcat2.wap}/${centerserver}/${db.file}">
+			<replacefilter token="jdbc:mysql://192.168.6.13:3306/portal" value="${db.url}" />
+			<replacefilter token="root" value="${db.usr}" />
+			<replacefilter token="deviskaifa" value="${db.pwd}" />
+		</replace>
+		<copy todir="${tomcat2.wap}/${centerserver}1">
+			<fileset dir="${release.dir}/${centerserver}/WebRoot" />
+
+		</copy>
+		<copy todir="${tomcat2.wap}/${centerserver}1/WEB-INF/lib">
+			<fileset dir="${warlib.dir}" />
+		</copy>
+		<copy todir="${tomcat2.wap}/${centerserver}1/WEB-INF/classes">
+			<fileset dir="${release.dir}/${centerserver}/src/config" />
+		</copy>
+		<replace encoding="utf-8" file="${tomcat2.wap}/${centerserver}1/${db.file}">
+			<replacefilter token="jdbc:mysql://192.168.6.13:3306/portal" value="${dbtr.url}" />
+			<replacefilter token="root" value="${dbtr.usr}" />
+			<replacefilter token="deviskaifa" value="${dbtr.pwd}" />
+		</replace>
+
+		
+		
+		<exec executable="${tomcat.start}">
+			<arg line="${tomcat2}" />
+		</exec>
+
+	</target>
+
+
+
+	<target name="rollback">
+		<delete dir="${release.dir}" />
+		<unzip dest="${release.dir}" src="${backup.dir}/${zipfile}" />
+	</target>
+	
+	<target name="updatedb">
+		<exec executable="/root/mode/updatedb.sh">
+			<arg line="/root/antDep/${dbsql}/updatestructsql" />
+			<arg line="${db.name}"/>
+		</exec>
+	</target>
+	
+	<target name="defaultoption">
+			<exec executable="/root/mode/updatedb.sh">
+				<arg line="/root/antDep/${dbsql}/updatedatasql" />
+				<arg line="${db.name}"/>
+			</exec>
+		</target>
+
+
+</project>

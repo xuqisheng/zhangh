@@ -1,0 +1,127 @@
+#!/bin/bash 
+# --------------------------------------------------------------------------------------------
+# function:
+#           add a shell to /usr/local/$Hapachemode/bin/apachectl which,already a shell of httpd,has
+#           some drawbacks
+# --------------------------------------------------------------------------------------------
+
+# exclusive execution with wait mode
+
+/root/mode/modepv apachectl $$ " /bin/bash .*/apachectl"
+
+#
+
+. /root/mode/apachemode
+
+#
+
+[ -e /usr/local/$Hapachemode/bin/apachectl ] || exit 
+
+# ---------------------------------------------------------
+# prework about httpd.pid etc.
+# ---------------------------------------------------------
+# beginning of fix
+# Non-root user might not do the fix successfully!
+# ---------------------------------------------------------
+
+if [ -f /usr/local/$Hapachemode/logs/httpd.pid ]; then
+   # ------------------------------------------------------------------
+   # check the consistency of /usr/local/$Hapachemode/logs/httpd.pid
+   # ------------------------------------------------------------------
+   if [ `cat /usr/local/$Hapachemode/logs/httpd.pid | wc -l` -ne 1 ]; then
+      /root/mode/modelog "$0 [modefix] file httpd.pid was corrupted or destroyed!original file lines `cat /usr/local/$Hapachemode/logs/httpd.pid | wc -l`"
+      /root/mode/modelog "$0 [modefix] rm -f /usr/local/$Hapachemode/logs/httpd.pid;rm -f /usr/local/$Hapachemode/logs/jk*"
+      rm -f /usr/local/$Hapachemode/logs/httpd.pid;rm -f /usr/local/$Hapachemode/logs/jk*
+   elif ! cat /usr/local/$Hapachemode/logs/httpd.pid | grep -E '^[0-9]+$' > /dev/null; then
+      /root/mode/modelog "$0 [modefix] file httpd.pid was corrupted or destroyed!original contents are `cat /usr/local/$Hapachemode/logs/httpd.pid`"
+      /root/mode/modelog "$0 [modefix] rm -f /usr/local/$Hapachemode/logs/httpd.pid;rm -f /usr/local/$Hapachemode/logs/jk*"
+      rm -f /usr/local/$Hapachemode/logs/httpd.pid;rm -f /usr/local/$Hapachemode/logs/jk*
+   else
+      Hpid=`cat /usr/local/$Hapachemode/logs/httpd.pid 2>/dev/null`
+      if echo "$Hpid" | grep -E "^[0-9]+$" >/dev/null; then
+         if ! ps -ef | grep -E "^[^ ]+ +$Hpid +1 +.*/usr/local/$Hapachemode/bin/httpd -k (graceful|(re)?start)" | grep -v grep >/dev/null; then
+            /root/mode/modelog "$0 [modefix] wrong pid record `cat /usr/local/$Hapachemode/logs/httpd.pid` in file httpd.pid!Power failure might have happened."
+            /root/mode/modelog "$0 [modefix] rm -f /usr/local/$Hapachemode/logs/httpd.pid;rm -f /usr/local/$Hapachemode/logs/jk*"
+            rm -f /usr/local/$Hapachemode/logs/httpd.pid;rm -f /usr/local/$Hapachemode/logs/jk*
+         fi
+      fi
+   fi
+fi
+if [ ! -f /usr/local/$Hapachemode/logs/httpd.pid ]; then
+   # ------------------------------------------------------------------
+   # check if /usr/local/$Hapachemode/logs/httpd.pid was missing 
+   # ------------------------------------------------------------------
+   Hapfile=/root/mode/tmp/hapache_$$.tmp
+   ps -ef > $Hapfile
+   if cat $Hapfile | grep -E "^[^ ]+ +[0-9]+ +1 +.*/usr/local/$Hapachemode/bin/httpd -k (graceful|(re)?start)$" >/dev/null; then
+      Hpid=`cat $Hapfile |  grep -E "^[^ ]+ +[0-9]+ +1 +.*/usr/local/$Hapachemode/bin/httpd -k (graceful|(re)?start)$" | sed -re "s/^[^ ]+ +([0-9]+).*/\1/" |
+            sed -n "1 p"`
+      if [ ! -d /usr/local/$Hapachemode/logs ]; then
+         mkdir -p /usr/local/$Hapachemode/logs
+      fi
+      /root/mode/modelog "$0 [modefix] missing file httpd.pid!"
+      /root/mode/modelog "$0 [modefix] echo $Hpid > /usr/local/$Hapachemode/logs/httpd.pid"
+      echo $Hpid > /usr/local/$Hapachemode/logs/httpd.pid
+   fi
+   rm -f $Hapfile
+fi
+# ---------------------------------------------------------
+# end of fix 
+# Non-root user might not do the fix successfully!
+# ---------------------------------------------------------
+
+# Call the original shell /usr/local/$Hapachemode/bin/apachectl of /usr/local/$Hapachemode/bin/httpd
+
+Hsaveparm="$@"
+/usr/local/$Hapachemode/bin/apachectl "$@" 2>&1 | tee /root/mode/tmp/hapache$$.tmp
+Hapacheerr=$?
+if [ $Hapacheerr -gt 0 ]; then
+    if [ "$HOME" = "/root" -o "$HOME" = "/" ]; then
+       if cat /root/mode/tmp/hapache$$.tmp | grep -E 'could not bind to address' > /dev/null; then
+          Hapacheport=`cat /root/mode/tmp/hapache$$.tmp | grep -E 'could not bind to address' | head -n 1 | sed -re "s/.*:([0-9]+)$/\1/"`
+          /root/mode/modemsg apachectl "Execution of '/usr/local/$Hapachemode/bin/apachectl $Hsaveparm' failed.Please check if port $Hapacheport is used by other process!"
+       else
+          /root/mode/modemsg apachectl "Execution of '/usr/local/$Hapachemode/bin/apachectl $Hsaveparm' failed!"
+       fi
+    else
+       /root/mode/modemsg apachectl "Execution of '/usr/local/$Hapachemode/bin/apachectl $Hsaveparm' failed!Please retry your mode script using root privilege"
+    fi
+else
+   # even apachectl returns with exit status 0,non-root user may still report misleading 'httpd (pid xxxxx) not running' message when stopping apache"
+   if [ "$HOME" = "/root" -o "$HOME" = "/" ]; then
+      :
+   else
+      if cat /root/mode/tmp/hapache$$.tmp | grep -E 'httpd .* not running' >/dev/null; then
+         Hmisleading_msg=`cat /root/mode/tmp/hapache$$.tmp | grep -E 'httpd .* not running'`
+         Hapc_process_owner=`ps -ef | grep -E "^([^ ]+) +[0-9]+ +1 +.*/usr/local/$Hapachemode/bin/httpd -k (graceful|(re)?start)" | sed -re "s/^([^ ]+).*/\1/"`
+         Hapc_pidfile_owner=`ls -l /usr/local/$Hapachemode/logs/httpd.pid 2>/dev/null | sed -re "s/^([^ ]+ +){2}([^ ]+).*/\2/"`
+         #
+         if [ -n "$Hapc_process_owner" ]; then
+            if [ -n "$Hapc_pidfile_owner" ]; then
+               if [ "$Hapc_process_owner" = "root" ]; then
+                  /root/mode/modemsg apachectl "Execution of '/usr/local/$Hapachemode/bin/apachectl $Hsaveparm' by user '$USER' has reported message '$Hmisleading_msg' which seems misleading!"
+                  if [ "$Hapc_process_owner" != "$Hapc_pidfile_owner" ]; then
+                     /root/mode/modemsg apachectl "The apache is probably running well with process owner '$Hapc_process_owner' and pidfile owner '$Hapc_pidfile_owner'!"
+                  else
+                     /root/mode/modemsg apachectl "The apache is probably running well with both process owner and pidfile owner being $Hapc_process_owner!"
+                  fi
+                  /root/mode/modemsg apachectl "Please retry your mode script using root privilege to get thing to work as you wish!"
+               else
+                  if [ "$Hapc_process_owner" = "$Hapc_pidfile_owner" ]; then
+                     /root/mode/modemsg apachectl "Execution of '/usr/local/$Hapachemode/bin/apachectl $Hsaveparm' by user '$USER' has reported message '$Hmisleading_msg' which seems misleading!"
+                     /root/mode/modemsg apachectl "The apache is probably running well with both process owner and pidfile owner being $Hapc_process_owner!"
+                     /root/mode/modemsg apachectl "Please retry your mode script using root privilege to get thing to work as you wish!"
+                  fi
+               fi
+            fi
+         fi
+      fi
+   fi
+fi
+
+# rm tmp file
+
+rm -f /root/mode/tmp/hapache$$.tmp
+
+# end
+

@@ -1,0 +1,169 @@
+#!/bin/bash
+# -------------------------------------------------------------------------------------------
+# function: 
+#          calculate memory allocation for tomcat and mysql server
+#          in minimal or maximal mode depending on the global variable HMEMMODE 
+#          
+#          HMEMMODE=max          maximal mode
+#          HMEMMODE=min          minimal mode
+# -------------------------------------------------------------------------------------------
+
+# memory allocation mode 
+
+if [ -z "$HMEMMODE" ]; then
+   if [ -f /etc/modemem ]; then
+      . /etc/modemem
+   fi
+fi
+
+# total memory in Kbytes
+
+if [ -x /etc/ifconfig ]; then
+   HTTLMEM=`expr \`/etc/memsize\` / 1024` 
+else
+   HTTLMEM=`cat /proc/meminfo |grep MemTotal | sed -e 's/MemTotal://' -e 's/\( \|kB\)//g'`
+fi
+
+# total memory in Mbytes
+
+HTTLMEM=$[$HTTLMEM/1024]
+
+# various tomcat counts
+
+HTOMNUMc=`/root/mode/ctomno -c`
+HTOMNUMn=`/root/mode/ctomno -n`
+HTOMNUMN=`/root/mode/ctomno -N`
+
+# tomcat heap limit 
+
+. /root/mode/tomhl
+
+# memory allocation
+
+# -------------------------------------------------------------------------------------------
+# Notes:
+# -------------------------------------------------------------------------------------------
+# HPERMMAX  is used to configure cluster tomcat to avoid perm generation overflow
+# HPERMSIZE is used to calculate memory allocation
+# -------------------------------------------------------------------------------------------
+HPERMMAX=800
+# -------------------------------------------------------------------------------------------
+# change HPERMSIZE from 256M to 200M
+# -------------------------------------------------------------------------------------------
+HPERMSIZE=200
+# -------------------------------------------------------------------------------------------
+# HAPCSIZE is reserved for apache connections
+#          300M is former value
+#          100M is current value,saving more memory for cluster tomcats in poor machine
+# -------------------------------------------------------------------------------------------
+# How does the value 100M come?
+#          Turning off the apache keepalive setting remarkably decreases apache connections
+#          (40 max practical connections * 2.3M each connection = 92M --> 100M)
+# -------------------------------------------------------------------------------------------
+HAPCCNT=`ls -1d /usr/local/apache*/ 2>/dev/null | wc -l`
+HAPCSIZE=$[100*$HAPCCNT]
+[ -f /etc/modememp ] ||
+{
+echo "HTOMPERCNT=50" >  /etc/modememp
+echo "HSQLPERCNT=30" >> /etc/modememp
+}
+. /etc/modememp
+HPTOMMEM=$[$HTTLMEM*$HTOMPERCNT/100]
+HPSQLMEM=$[$HTTLMEM*$HSQLPERCNT/100]
+HADJMEM=0
+if [ "$HMEMMODE" = "max" ]; then
+   if [ -x /usr/sbin/mysqld ] ; then
+      if [ $[$HTOMNUMc+$HTOMNUMn+$HTOMNUMN] -eq 0 ]; then
+         # no tomcats installed
+         HADJMEM=$HPTOMMEM
+      elif [ $HTTLMEM -ge 4000 -a $[$HTOMNUMc+$HTOMNUMn+$HTOMNUMN] -le 10 ]; then
+         if [ $[$HTOMNUMc+$HTOMNUMN] -gt 0 ]; then
+            HCMAXMEM=$[$HTOMHLIMIT+$HPERMSIZE]
+            if [ $HTOMNUMc -gt 0 ]; then
+               HTOMMAXUSABLE=$[$HCMAXMEM*($HTOMNUMc+$HTOMNUMN)+$HAPCSIZE+464*$HTOMNUMn]
+            else
+               HTOMMAXUSABLE=$[$HCMAXMEM*($HTOMNUMc+$HTOMNUMN)+464*$HTOMNUMn]
+            fi
+         else
+            HTOMMAXUSABLE=$[464*$HTOMNUMn]
+         fi
+         if [ $HPTOMMEM -gt $HTOMMAXUSABLE ]; then
+            HADJMEM=$[$HPTOMMEM-$HTOMMAXUSABLE]
+         fi
+      fi
+   elif [ $[$HTOMNUMc+$HTOMNUMN+$HTOMNUMn] -gt 0 ]; then
+      HADJMEM=$[-$HPSQLMEM]
+   else
+      # Neither tomcats nor MySQL server has been installed
+      # assume to install MySQL server
+      HADJMEM=$HPTOMMEM
+   fi
+fi
+if [ $HADJMEM -gt 0 ]; then
+   HTOMMEM=$[$HPTOMMEM-$HADJMEM]
+   HSQLMEM=$[$HPSQLMEM+$HADJMEM]
+elif [ $HADJMEM -lt 0 ]; then
+   HTOMMEM=$[$HPTOMMEM-$HADJMEM]
+   HSQLMEM=$HPSQLMEM
+else
+   HTOMMEM=$HPTOMMEM
+   HSQLMEM=$HPSQLMEM
+fi
+
+export HTTLMEM HTOMMEM HSQLMEM
+if [ "$1" = "-l" ]; then
+   echo
+   if [ "$HMEMMODE" = "max" ]; then
+      echo "maximal memory allocation:" 
+   else
+      echo "minimal memory allocation:" 
+   fi
+   echo
+   echo "HTTLMEM ${HTTLMEM} Mbytes"
+   echo -n "HTOMMEM ${HTOMMEM} Mbytes"
+   if [ $HTOMNUMc -gt 0 ]; then
+      Hhashave=has
+      HTOMDES="Tomcat cluster with $HTOMNUMc tomcats"
+      if [ $[$HTOMNUMN+$HTOMNUMn] -gt 0 ]; then
+         Hhashave=have
+         HTOMDES="${HTOMDES},and $[$HTOMNUMN+$HTOMNUMn] nonclustered tomcat"
+         if [ $[$HTOMNUMN+$HTOMNUMn] -gt 1 ]; then
+            HTOMDES="${HTOMDES}s"
+         fi
+      fi
+   elif [ $[$HTOMNUMN+$HTOMNUMn] -gt 0 ]; then
+      if [ $[$HTOMNUMN+$HTOMNUMn] -gt 1 ]; then
+         Hhashave=have
+         HTOMDES="$[$HTOMNUMN+$HTOMNUMn] nonclustered tomcats"
+      else
+         Hhashave=has
+         HTOMDES="$[$HTOMNUMN+$HTOMNUMn] nonclustered tomcat"
+      fi
+   else
+      Hhashave=has
+      HTOMDES="No tomcat"
+   fi
+   echo "($HTOMDES $Hhashave been installed)"
+   if [ $HADJMEM -lt 0 ]; then
+      echo -n "HSQLMEM 0 Mbytes"
+   else
+      echo -n "HSQLMEM ${HSQLMEM} Mbytes"
+   fi
+   if [ -x /usr/sbin/mysqld ]; then
+      echo "(mysql server has been installed)"
+   else
+      echo "(mysql server has not been installed)"
+   fi
+
+   #
+
+   if [ $HADJMEM -ne 0 ]; then
+      echo 
+      echo "minimal memory allocation before optimization:"
+      echo 
+      echo "HTOMMEM ${HPTOMMEM} Mbytes"
+      echo "HSQLMEM ${HPSQLMEM} Mbytes"
+   fi
+
+   echo
+fi

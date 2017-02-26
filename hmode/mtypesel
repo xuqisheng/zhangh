@@ -1,0 +1,19 @@
+#!/bin/bash
+# ------------------------------------------------------
+
+H1=`/root/mode/mtypeno "$1"`
+H2=`/root/mode/mtypeno "$2"`
+if [ "$H1" = "" -o "$H2" = "" ]; then
+   echo 0
+elif [ `expr substr $H1 1 1` !=  `expr substr $H2 1 1` ]; then
+   echo 0
+else
+   if [ `expr substr $H1 2 1` -gt `expr substr $H2 2 1` ]; then
+      echo 1
+   elif [ `expr substr $H1 2 1` -lt `expr substr $H2 2 1` ]; then
+      echo 2
+   else
+      echo 3
+   fi
+fi
+

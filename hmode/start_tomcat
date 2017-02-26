@@ -1,0 +1,78 @@
+#!/bin/bash
+# ----------------------------------------------------------
+# function:
+#          start a tomcat 
+# usage:
+#          ./start_tomcat <tomcat_directory>
+# example:
+#          /root/mode/start_tomcat tomcat6  
+#          (start tomcat under /usr/local/tomcat6)
+# ----------------------------------------------------------
+
+
+#  
+
+/root/mode/modelog "$0 $* --prepare"
+
+#
+
+trap "" INT
+export Htompno=$$
+Hhrytomcat=$1
+
+# check tomcat installation 
+
+/root/mode/check_tomcat $Hhrytomcat || exit 1
+
+# check exclusiveness
+
+while [ 1 ]; do
+   /root/mode/tompv start_tomcat $Hhrytomcat
+   Hrsta=$?
+   if [ $Hrsta -eq 0 ]; then
+      break
+   elif [ $Hrsta -eq 1 ]; then
+      sleep 5
+      continue
+   elif [ $Hrsta -eq 11 ]; then
+      sleep 0.$[$RANDOM%10]
+      continue
+   else
+      exit 1
+   fi
+done
+
+# check tomcat status 
+
+Hhloop=0
+while [ $Hhloop -lt 600 ];do
+   Htsta=`/root/mode/tctomcat $Hhrytomcat kill`
+   if echo "$Htsta" | grep -E '^at unknown' >/dev/null; then
+      /root/mode/modemsg "start_tomcat $Hhrytomcat" "Wow!No authority to do it!!!"
+      exit 1
+   elif [ "$Htsta" = "down" ]; then
+      break
+   elif [ "$Htsta" = "up" ]; then
+      echo "$Hhrytomcat has already been running fine!!" && exit 0
+   elif echo "$Htsta" | grep -E '^up ' >/dev/null; then
+      echo "$Hhrytomcat is $Htsta!!" && exit 1
+   fi
+   sleep 1
+   Hhloop=$[$Hhloop+1]
+   if [ $[$Hhloop/6*6] -eq $Hhloop ]; then 
+      if [ "$Htsta" = "starting" ]; then
+         /root/mode/modemsg "start_tomcat $Hhrytomcat" "Wow!A process is starting $Hhrytomcat.Waited $Hhloop seconds ......" 2>&1
+      elif [ "$Htsta" = "stopping" ]; then
+         /root/mode/modemsg "start_tomcat $Hhrytomcat" "Wow!A process is stopping $Hhrytomcat.Waited $Hhloop seconds ......" 2>&1
+      fi
+   fi
+done
+
+#  
+
+/root/mode/modelog "$0 $Hhrytomcat"
+setsid /root/mode/.stt_tom $Hhrytomcat
+
+# end
+
+

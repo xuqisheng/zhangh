@@ -1,0 +1,131 @@
+#!/bin/bash
+# -------------------------------------------------------------------------------------------------
+# function:
+#           copy latest standard dump from remote server to local directory /root/mode/dump
+#           or
+#           copy latest standard dump from remote server to local designated directory
+#           or 
+#           copy latest standard dump from remote server to local designated sql file
+# -------------------------------------------------------------------------------------------------
+#           or 
+#           copy sql files to local directory /root/mode/dump or to local designated directory
+# -------------------------------------------------------------------------------------------------
+# usage   :
+#           ./mdscp <remote-server-name> <dbname> [<dump-dir>|<user-named-file.sql>]
+# -------------------------------------------------------------------------------------------------
+# e.g.    :
+#           # latest standard dump of portal
+#           ./mdscp smarthotels portal
+#           ./mdscp smarthotels portal /root/mode/dump
+#           ./mdscp smarthotels portal /mydumpdir
+#           ./mdscp smarthotels portal /portal_morning.sql
+#           # sql files 
+#           ./mdscp smarthotels "/root/mode/dump/H*.sql"
+#           ./mdscp smarthotels "/root/mode/dump/H*.sql" /root/mode/dump
+#           ./mdscp smarthotels "/root/mode/dump/H*.sql" /mydumpdir
+# -------------------------------------------------------------------------------------------------
+
+# check remote server name
+
+if [ -z "$1" ]; then
+   /root/mode/modemsg mdscp "Remote server name must be provided!" more
+   exit 
+fi
+if ! cat /root/servers.txt 2>/dev/null | grep -E "^$1$" >/dev/null; then
+   /root/mode/modemsg mdscp "Remote server name must be registered first!" more
+   exit 
+fi 
+
+# check database name
+
+if [ -z "$2" ]; then
+   /root/mode/modemsg mdscp "Database name or sql file(s) must be provided!" more
+   exit 
+fi
+if echo "$2" | grep "\.sql$" >/dev/null; then
+   #sql files
+   Hsqlparm=1
+   Hdname="$2"
+else
+   # database name
+   Hsqlparm=0
+   Hdname=`ssh $1 "ls -1 /root/mode/dump/$2-[0-9][0-9][0-9][0-9]-[0-9][0-9]-[0-9][0-9]_[0-9][0-9][0-9].sql 2>/dev/null | sed -n '$ p'"`
+   if [ -z "$Hdname" ]; then
+      /root/mode/modemsg mdscp "No standard dump of '$2' exists in remote server '$1'!" more
+      exit 
+   fi
+fi
+
+# dump directory or dump name which ends with '.sql'
+
+Hisdir=
+if [ -z "$3" ]; then
+   Hdfname=/root/mode/dump
+   Hisdir=yes
+elif [ -d "$3" ]; then
+   Hdfname="$3"
+   Hisdir=yes
+else
+   if [ "$Hsqlparm" = "1" ]; then
+      echo "Sql files must be copied to directiory!"
+      exit
+   elif echo "$3" | grep "\.sql$" >/dev/null; then
+      Hdfname="$3"
+   else
+      echo "User designated dump name must end with \".sql\""
+      exit 1
+   fi
+fi
+
+# remove history standard dumps first
+
+if [ "$Hisdir" = "yes" ]; then
+   if [ "$Hsqlparm" = "0" ]; then
+      # remove history dumps
+      /root/mode/rmdump "$2" "`date +%Y-%m-%d`" "$Hdfname"
+   fi
+fi
+
+# do scp
+
+
+if [ `/root/mode/traceps "crond"` = 'suc' ]; then
+   {
+      echo 
+      if [ "$Hsqlparm" = "1" ]; then
+         echo "################ mdscp $1 \"$2\" $3 ####################################"
+      else
+         echo "################ mdscp $1 $2 $3 ####################################"
+      fi
+      echo 
+      echo "began at `LANG=en_US;date`"
+      echo 
+   } | tee -a /root/mode/logs/mdscp.log >> /root/mode/logs/mdscp_raw.log
+   script -q -f -c "scp -Cp $1:$Hdname '$Hdfname'" /dev/null 2>&1 | tee -a /root/mode/logs/mdscp_raw.log | tr '\r' '\n' >>/root/mode/logs/mdscp.log
+else
+   {
+      echo 
+      if [ "$Hsqlparm" = "1" ]; then
+         echo "################ mdscp $1 \"$2\" $3 ####################################"
+      else
+         echo "################ mdscp $1 $2 $3 ####################################"
+      fi
+      echo 
+      echo "began at `LANG=en_US;date`"
+      echo  
+   } | tee -a /root/mode/logs/mdscp.log
+   script -q -f -c "scp -Cp $1:$Hdname '$Hdfname'" /root/mode/tmp/Hscp$$.tmp
+   cat /root/mode/tmp/Hscp$$.tmp | tr '\r' '\n' | sed -re "/^Script started/,+1 d" >>/root/mode/logs/mdscp.log 
+   rm -f /root/mode/tmp/Hscp$$.tmp
+   {
+      echo  
+      echo "ended at `LANG=en_US;date`"
+   }  | tee -a /root/mode/logs/mdscp.log
+
+   # clear caches
+   /root/mode/clrcache 1
+fi
+
+#
+
+

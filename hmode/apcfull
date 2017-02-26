@@ -1,0 +1,59 @@
+#!/bin/bash
+# -----------------------------------------------------------
+# function: ...
+# -----------------------------------------------------------
+
+#
+
+. /root/mode/apachemode
+
+#
+
+[ -d /usr/local/$Hapachemode/conf ] || exit 1
+
+#
+
+Hmpm=`/root/mode/apachectl $Hapachemode -M | grep mpm_ | sed -re "s/.*mpm_(.*)_module.*/\1/"`
+
+#
+
+Hapccnt=`/root/mode/seeapc $Hapachemode | wc -l`
+
+#
+
+if [ "$Hmpm" = "prefork" ]; then
+   if /root/mode/apachectl $Hapachemode -v | grep -E 'Apache/2.2' >/dev/null; then
+      Hapcmax=`cat /usr/local/$Hapachemode/conf/extra/httpd-mpm.conf 2>/dev/null | grep 'MaxClients ' | sed -n "1 p" | sed -re "s/.*MaxClients[ \t]+(0*)([0-9]+).*/\2/"`
+   else
+      Hapcmax=`cat /usr/local/$Hapachemode/conf/extra/httpd-mpm.conf 2>/dev/null | grep 'MaxRequestWorkers ' | sed -n "1 p" | sed -re "s/.*MaxRequestWorkers[ \t]+(0*)([0-9]+).*/\2/"`
+   fi
+elif [ "$Hmpm" = "worker" -o "$Hmpm" = "event" ]; then
+   if [ "$Hmpm" = "worker" ]; then
+      H_line=2
+      H_line1=1
+   else
+      H_line=3
+      H_line1=2
+   fi
+   if /root/mode/apachectl $Hapachemode -v | grep -E 'Apache/2.2' >/dev/null; then
+      Hapcmax=`cat /usr/local/$Hapachemode/conf/extra/httpd-mpm.conf 2>/dev/null | grep 'MaxClients ' | sed -n "$H_line p" | sed -re "s/.*MaxClients[ \t]+(0*)([0-9]+).*/\2/"`
+   else
+      Hapcmax=`cat /usr/local/$Hapachemode/conf/extra/httpd-mpm.conf 2>/dev/null | grep 'MaxRequestWorkers ' | sed -n "$H_line p" | sed -re "s/.*MaxRequestWorkers[ \t]+(0*)([0-9]+).*/\2/"`
+   fi
+   Hthreads_per_child=`cat /usr/local/$Hapachemode/conf/extra/httpd-mpm.conf 2>/dev/null | grep 'ThreadsPerChild ' | sed -n "$H_line1 p" | sed -re "s/.*ThreadsPerChild[ \t]+(0*)([0-9]+).*/\2/"`
+   Hapccnt=$[$Hapccnt*10#$Hthreads_per_child]
+else
+   exit 1
+fi
+Hapcmax=$[10#$Hapcmax]
+
+#
+
+if [ $Hapccnt -ge $[$Hapcmax*7/10] ]; then
+   exit 0
+fi
+exit 1
+
+#
+
+

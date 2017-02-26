@@ -1,0 +1,64 @@
+#!/bin/bash
+# -------------------------------------------------------------------------------------------------
+# functions:
+#           find tables with(without) hotel_group_id and/or hotel_id
+# usages:
+#           ./find_tables [<mysql-server-ip>] <dbname> 00|01|10|11|all
+# e.g.:
+#           ./find_tables 6.15 portal_whyj 00    # tables without both hotel_group_id and hotel_id 
+#           ./find_tables 6.15 portal_whyj 01    # tables without hotel_group_id but with hotel_id 
+#           ./find_tables 6.15 portal_whyj 10    # tables with hotel_group_id but without hotel_id 
+#           ./find_tables 6.15 portal_whyj 11    # tables with both hotel_group_id and hotel_id 
+#           ./find_tables 6.15 portal_whyj all   # all tables  
+#           ./find_tables 6.15 portal_whyj       # all tables  
+# ------------------------------------------------------------------------------------------------
+
+# get mysql server ip
+
+. /root/mode/mysqldip
+
+# 
+
+HDBNAME="$1"
+HMODE=$2
+if [ "$HMODE" = "1" ]; then
+   HMODE="11"
+fi
+
+# tmp files
+
+Hfall=/root/mode/tmp/hfall$$.tmp
+Hfgid=/root/mode/tmp/hfgid$$.tmp
+Hfhid=/root/mode/tmp/hfhid$$.tmp
+
+# get basic data
+
+/root/mode/seecfg -s $HMYSQLDIP "SELECT a.table_name FROM TABLES a WHERE a.table_type='BASE TABLE' and a.table_schema='$HDBNAME'" information_schema    > $Hfall 
+/root/mode/seecfg -s $HMYSQLDIP "SELECT a.table_name FROM TABLES a,COLUMNS b
+                                                     WHERE a.table_type='BASE TABLE' and a.table_schema='$HDBNAME' AND b.table_schema='$HDBNAME' 
+                                                                  AND a.table_name=b.table_name  AND b.column_name='hotel_group_id'" information_schema > $Hfgid
+/root/mode/seecfg -s $HMYSQLDIP "SELECT a.table_name FROM TABLES a,COLUMNS b
+                                                     WHERE a.table_type='BASE TABLE' and a.table_schema='$HDBNAME' AND b.table_schema='$HDBNAME' 
+                                                                   AND a.table_name=b.table_name  AND b.column_name='hotel_id'" information_schema      > $Hfhid
+
+# use basic data to generate desired result
+
+if [ "$HMODE" = "11" ] ; then
+   cat $Hfgid $Hfhid | sort | uniq -d
+elif [ "$HMODE" = "10" ] ; then
+   (cat $Hfall $Hfhid | sort | uniq -u;cat $Hfgid) | sort | uniq -d
+elif [ "$HMODE" = "01" ]; then
+   (cat $Hfall $Hfgid | sort | uniq -u;cat $Hfhid) | sort | uniq -d
+elif [ "$HMODE" = "00" ]; then
+   cat $Hfall $Hfgid $Hfhid | sort | uniq -u
+else
+   # all 
+   cat $Hfall
+fi
+
+# rm tmp file
+
+rm -f $Hfall $Hfgid $Hfhid
+
+# end
+

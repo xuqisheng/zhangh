@@ -1,0 +1,185 @@
+#!/bin/bash 
+# ---------------------------------------------------------------------------------------------------------------------------------------------------------------
+# function:
+#           deploy products to all or some of the tomcats/apaches which are not empty.
+# usages  :
+#           ./.autopub [options] [<tomcat-or-apache-or-appname> ...]
+# e.g.    :
+#
+#           ./.autopub                                                                 # preview mode,no execution will be made
+#           ./.autopub -e                                                              # execution mode,sql will be executed unless there exists file /etc/.autopub.nosql 
+#
+#           ./.autopub       tomcat1 tomcat2 tomcat3 apache apache1                    # limited to ... 
+#           ./.autopub       ipms ipmsthef ipmsthek ipmsgroup ipmsmember ipmssync      # limited to ...
+#           ./.autopub       tomcat1 ipmsgroup                                         # limited to ... 
+#
+#           ./.autopub -j                                                              # DO NOT deploy java/air 
+#           ./.autopub -s                                                              # DO NOT execute update sql 
+#           ./.autopub -S                                                              # Force to execute update sql.
+#                                                                                      # The option '-S' has higher priority than /etc/.autopub.nosql 
+# ----------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+# get options
+
+HOPTIONS=""
+while (echo "'$1'"  | grep -E  -e "^'-" > /dev/null)
+do
+   HOPTIONS="$HOPTIONS$1"
+   shift
+done
+
+# 
+
+if ! cd /fenku 2>/dev/null; then
+   /root/mode/modemsg autopub "Product directory /fenku must exist!" more
+   exit 1
+fi
+
+# filter parms
+
+Hfilter_strings=$*
+Hfilter_tolines=`echo $Hfilter_strings | tr ' ' '\n' | sed -re "/^$/ d"`
+
+#
+
+Hsapache=
+Hseetoms=`/root/mode/seetom`
+(echo "$Hseetoms" | grep ' H 9999 ';echo "$Hseetoms" | grep -v ' H 9999 ') | 
+while read -r Hc1 Hc2 Hcother;do
+   # -------------------------------------------------------------------------------------------
+   # war information (installed products information)
+   # -------------------------------------------------------------------------------------------
+   if   echo "$Hcother" | grep -E "[\( ]ipmsgroup[\) ].* H [0-9]" >/dev/null; then
+      Hwar1=ipmsgroup
+   elif echo "$Hcother" | grep -E "[\( ]ipmsmember[\) ].* H [0-9]" >/dev/null; then
+      Hwar1=ipmsmember
+   elif echo "$Hcother" | grep -E "[\( ]ipms[\) ].* H [0-9]" >/dev/null; then
+      if ! echo "$Hcother" | grep -E "[\( ]ipms1[\) ].* H [0-9]" >/dev/null; then
+         Hwar1=ipms
+      else
+         Hwar1=
+      fi
+   elif echo "$Hcother" | grep -E "[\( ]ipmsthef[\) ].* H [0-9]" >/dev/null; then
+      Hwar1=ipmsthef
+   elif echo "$Hcother" | grep -E "[\( ]ipmsthek[\) ].* H [0-9]" >/dev/null; then
+      Hwar1=ipmsthek
+   elif echo "$Hcother" | grep -E "[\( ]ipmssync[\) ].* H [0-9]" >/dev/null; then
+      Hwar1=ipmssync
+   elif echo "$Hcother" | grep -E "[\( ]mobilepms[\) ].* H [0-9]" >/dev/null; then
+      Hwar1=mobilepms
+   elif echo "$Hcother" | grep -E "[\( ]pos[\) ].* H [0-9]" >/dev/null; then
+      Hwar1=pos
+   else
+      # Other apps will not be deployed for the present
+      Hwar1=
+   fi
+   if [ -z "$Hwar1" ]; then
+      continue
+   fi
+   # -------------------------------------------------------------------------------------------
+   # inst_at information 
+   # -------------------------------------------------------------------------------------------
+   if echo $Hc1 | grep -E "^[sS]ingle$" >/dev/null; then
+      Hat=$Hc2
+      Hsapache=
+   else
+      if [ "$Hsapache" = "$Hc1" ]; then
+          continue
+      fi
+      Hsapache=$Hc1
+      Hat=$Hc1
+   fi
+   if echo "$Hat" | grep -E "^apache" >/dev/null; then
+      Hat1=`echo $Hat | sed -re "s/^apache(.*)/build\1.properties/"`
+   else
+      Hat1="$Hat.properties"
+   fi
+   Hdbip=`/root/mode/mod_config /root/antDep/$Hat1 'db.root' '#Get#' 2>/dev/null`
+   Hdbname=`/root/mode/mod_config /root/antDep/$Hat1 'db.name' '#Get#' 2>/dev/null`
+
+   #
+
+   Hwar=$Hwar1.war
+   # -------------------------------------------------------------------------------------------
+   # limit apps to $Hfilter_strings if $Hfilter_strings is not empty
+   # -------------------------------------------------------------------------------------------
+
+   if [ -n "$Hfilter_strings" ]; then
+      if echo "$Hfilter_tolines" | grep -E "^$Hwar1$" >/dev/null; then
+         :
+      elif echo "$Hfilter_tolines" | grep -E "^$Hat$" >/dev/null; then
+         :
+      else
+         continue
+      fi
+   fi
+   
+   # -------------------------------------------------------------------------------------------
+   # generate deployment scripts
+   # -------------------------------------------------------------------------------------------
+   
+   # to deloy java/air?
+
+   Hj=1
+   if echo "$HOPTIONS" | grep -E -e "(-j)(-|$)" >/dev/null; then
+      Hj=
+   fi
+   if [ -n "$Hj" ]; then
+      echo "#"
+      echo "echo "
+      echo "echo '-----------------------------------------------------------------------------------------------------'"
+      echo "echo Executing \'/root/mode/.publish_war $Hat /fenku/$Hwar\' at \`LANG=en_US;date\`"
+      echo "echo '-----------------------------------------------------------------------------------------------------'"
+      echo "echo "
+      echo "/root/mode/.publish_war $Hat /fenku/$Hwar"
+   fi
+
+   # to execute sql?
+
+   Hs=1
+   if echo "$HOPTIONS" | grep -E -e "(-S)(-|$)" >/dev/null; then
+      Hs=1
+   elif echo "$HOPTIONS" | grep -E -e "(-s)(-|$)" >/dev/null; then
+      Hs=
+   elif [ -f /etc/.autopub.nosql ]; then
+      Hs=
+   fi
+   if [ -n "$Hs" ]; then
+      echo "#"
+      echo "echo "
+      echo "echo '-----------------------------------------------------------------------------------------------------'"
+      echo "echo Executing \'*.sql for $Hwar1\' at \`LANG=en_US;date\`"
+      echo "echo '-----------------------------------------------------------------------------------------------------'"
+      echo "echo "
+
+      if echo "$Hwar" | grep -E 'sync' >/dev/null; then
+         :
+      elif echo "$Hwar" | grep -E 'group' >/dev/null; then
+         echo "/root/mode/updatedb.sh $Hdbip /fenku/updatestructsql/public/ $Hdbname"
+         echo "/root/mode/updatedb.sh $Hdbip /fenku/updatestructsql/group/ $Hdbname"
+         echo "/root/mode/updatedb.sh $Hdbip /fenku/updatedatasql/public/ $Hdbname"
+         echo "/root/mode/updatedb.sh $Hdbip /fenku/updatedatasql/group/ $Hdbname"
+      elif echo "$Hwar" | grep -E 'member' >/dev/null; then
+         echo "/root/mode/updatedb.sh $Hdbip /fenku/updatestructsql/public/ $Hdbname"
+         echo "/root/mode/updatedb.sh $Hdbip /fenku/updatestructsql/member/ $Hdbname"
+         echo "/root/mode/updatedb.sh $Hdbip /fenku/updatedatasql/public/ $Hdbname"
+         echo "/root/mode/updatedb.sh $Hdbip /fenku/updatedatasql/member/ $Hdbname"
+      elif [ "$Hwar" = "ipms.war" -o "$Hwar" = "ipmsthef.war" -o "$Hwar" = "ipmsthek.war" ]; then
+         echo "/root/mode/updatedb.sh $Hdbip /fenku/updatestructsql/public/ $Hdbname"
+         echo "/root/mode/updatedb.sh $Hdbip /fenku/updatestructsql/pms/ $Hdbname"
+         echo "/root/mode/updatedb.sh $Hdbip /fenku/updatedatasql/public/ $Hdbname"
+         echo "/root/mode/updatedb.sh $Hdbip /fenku/updatedatasql/pms/ $Hdbname"
+      fi
+   fi
+done |
+if echo "'$HOPTIONS" | grep -E -e "(-e)(-|$)" >/dev/null; then
+   export HBLACKBOX2=1
+   (cat -;echo "echo \"#\"";echo "echo \"# This circle of autopub completed at \`LANG=en_US;date\`\"";echo "echo \"#\"") |
+   bash 2>&1 | tee /root/mode/logs/autopub.log
+else
+   cat -
+fi
+ 
+#
+
+

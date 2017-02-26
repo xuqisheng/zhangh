@@ -1,0 +1,79 @@
+#!/bin/bash 
+# --------------------------------------------------------------------------
+# function:
+#          update network drivers for some network cards
+# --------------------------------------------------------------------------
+
+exit
+# check if gcc is installed 
+
+if [ ! -f /usr/bin/gcc ]; then
+ echo "gcc has not been installed!!" && exit 1
+fi
+
+# Intel Corporation 82574L Gigabit Network Connection
+
+if cat /etc/modprobe.conf | grep "e1000e" >/dev/null; then
+  if cat /etc/sysconfig/network-scripts/ifcfg-eth* | grep "82574L" > /dev/null; then
+     if [ -f /root/packages/e1000e-2.1.4.tar.gz ]; then
+        /root/mode/modemsg netfix "Updating Intel Corporation 82574L Gigabit Network Connection driver ......"
+        Hnetfixdir="/root/mode/tmp/hnetfix$$"
+        mkdir -p $Hnetfixdir
+        cd $Hnetfixdir
+        rm -fR *
+        tar xzvf /root/packages/e1000e-2.1.4.tar.gz >/dev/null
+        cd e1000e-2.1.4/src
+        make install >/dev/null 2>&1
+        rmmod e1000e;modprobe e1000e
+        cd /root/mode
+        rm -fR $Hnetfixdir
+        /root/mode/modemsg netfix "Update completed" more
+     fi
+  fi
+fi
+
+# Broadcom Corporation NetXtreme II BCMxxxx Gigabit Ethernet
+# xxxx is (5706|5708|5709|5716)
+
+if cat /etc/modprobe.conf | grep -E "bnx2$" >/dev/null; then
+  if cat /etc/sysconfig/network-scripts/ifcfg-eth* | grep -E " BCM57(06|08|09|16) " > /dev/null; then
+     if [ -f /root/packages/netxtreme2-7.2.20.tar.gz ]; then
+        /root/mode/modemsg netfix "Updating Broadcom Corporation NetXtreme II BCM57(06|08|09|16) Gigabit Ethernet driver ......"
+        Hnetfixdir="/root/mode/tmp/hnetfix$$"
+        mkdir -p $Hnetfixdir
+        cd $Hnetfixdir
+        rm -fR *
+        tar xzvf /root/packages/netxtreme2-7.2.20.tar.gz >/dev/null
+        cd netxtreme2-7.2.20
+        make 
+        make install
+        rmmod bnx2;modprobe bnx2
+        cd /root/mode
+        rm -fR $Hnetfixdir
+        /root/mode/modemsg netfix "Update completed" more
+     fi
+  fi
+fi
+
+# Broadcom Corporation NetXtreme BCMxxxx Gigabit Ethernet
+# xxxx is (5700|5701|5703|5704|5714|5715|5717|5718|5719|5720|5721|5722|5723|5780)
+
+if cat /etc/modprobe.conf | grep -E "tg3$" >/dev/null; then
+  if cat /etc/sysconfig/network-scripts/ifcfg-eth* | grep -E " BCM57(00|01|03|04|14|15|17|18|19|20|21|22|23|80) " > /dev/null; then
+     if [ -f /root/packages/tg3-3.122n.tar.gz ]; then
+        /root/mode/modemsg netfix "Updating Broadcom Corporation NetXtreme II BCM57(00|01|03|04|14|15|17|18|19|20|21|22|23|80) Gigabit Ethernet driver"
+        Hnetfixdir="/root/mode/tmp/hnetfix$$"
+        mkdir -p $Hnetfixdir
+        cd $Hnetfixdir
+        rm -fR *
+        tar xzvf /root/packages/tg3-3.122n.tar.gz >/dev/null
+        cd tg3-3.122n 
+        make 
+        make install
+        rmmod tg3;modprobe tg3
+        cd /root/mode
+        rm -fR $Hnetfixdir
+        /root/mode/modemsg netfix "Update completed" more
+     fi
+  fi
+fi

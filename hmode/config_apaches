@@ -1,0 +1,13 @@
+#!/bin/bash 
+# -----------------------------------------------------------
+# function:
+#          configure all apaches
+# -----------------------------------------------------------
+
+cd /usr/local
+for i in `ls -d apache*/ 2>/dev/null | sed -re "s/\/$//"`; do 
+    /root/mode/config_apache $i
+done
+
+#
+

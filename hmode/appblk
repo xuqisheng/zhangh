@@ -1,0 +1,32 @@
+#!/bin/bash
+
+#
+
+. /root/mode/apachemode
+
+#
+
+[ -d /usr/local/$Hapachemode/conf ] || exit 1
+
+#
+
+if [ `cat /usr/local/$Hapachemode/conf/httpd.conf | grep "^Listen" | wc -l` -eq 1 ]; then
+   Hport=`cat /usr/local/$Hapachemode/conf/httpd.conf | grep "^Listen" | sed -re "s/Listen *([0-9]+).*/\1/"`
+else
+   /root/mode/modemsg update_apache "abnormal 'Listen port' defination"
+   exit 1
+fi
+
+#
+
+if [ -z "$1" ]; then
+   /usr/sbin/ss -ant | grep -Piv '^listen' | grep -P "^[^ \t]+[ \t]*0[ \t]*[0-9]{2,}" | grep -E ":$Hport  +[^ ]+.*"
+else
+   /usr/sbin/ss -ant | grep -Piv '^listen' | grep -P "^[^ \t]+[ \t]*0[ \t]*[0-9]{2,}" | grep -E ":$Hport  +[^ ]+.*" |
+   sed -re "s/.*:(([0-9]+\.){3}[0-9]+).*/\1/" |
+   sort | uniq |
+   sed -re "s/(.*)/\/root\/mode\/appmtu $Hapachemode \1 $1/" | bash
+fi
+
+# end
+

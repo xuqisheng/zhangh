@@ -1,0 +1,90 @@
+#!/bin/bash 
+# -------------------------------------------------------------------------
+# "On" or "Off" 
+# -------------------------------------------------------------------------
+# "keepAlive Off" seems more effective  -- 2012-12-09 --
+# -------------------------------------------------------------------------
+# "On" or "Off" 
+# -------------------------------------------------------------------------
+# Flex blaseDS httpkeeplive is not implemented yet,so httpkeeplive setting
+# is useless
+#                                       -- 2013-03-26 --
+# -------------------------------------------------------------------------
+
+# exclusive execution with wait mode
+
+/root/mode/modepv config_apache_more $$ " /bin/bash .*/config_apache_more"
+
+#
+
+. /root/mode/apachemode
+
+#
+
+[ -d /usr/local/$Hapachemode/conf ] || exit 1
+
+
+###### httpd-default.conf ######
+
+/root/mode/mod_config "/usr/local/$Hapachemode/conf/extra/httpd-default.conf" "Timeout 40"
+
+if [ -f /etc/modeopts/httpkeepalive ]; then
+   /root/mode/mod_config "/usr/local/$Hapachemode/conf/extra/httpd-default.conf" "KeepAlive On"
+else
+   /root/mode/mod_config "/usr/local/$Hapachemode/conf/extra/httpd-default.conf" "KeepAlive Off"
+fi
+
+/root/mode/mod_config "/usr/local/$Hapachemode/conf/extra/httpd-default.conf" "MaxKeepAliveRequests 100"
+/root/mode/mod_config "/usr/local/$Hapachemode/conf/extra/httpd-default.conf" "KeepAliveTimeout 5"
+/root/mode/mod_config "/usr/local/$Hapachemode/conf/extra/httpd-default.conf" "ServerTokens Prod"
+/root/mode/mod_config "/usr/local/$Hapachemode/conf/extra/httpd-default.conf" "HostnameLookups Off"
+
+
+###### httpd-mpm.conf     ######
+
+/root/mode/rep_config "/usr/local/$Hapachemode/conf/extra/httpd-mpm.conf" "MinSpareServers" "1"
+/root/mode/rep_config "/usr/local/$Hapachemode/conf/extra/httpd-mpm.conf" "MaxSpareServers" "05"
+/root/mode/rep_config "/usr/local/$Hapachemode/conf/extra/httpd-mpm.conf" "MinSpareThreads" "05"
+/root/mode/rep_config "/usr/local/$Hapachemode/conf/extra/httpd-mpm.conf" "MaxSpareThreads" "030"
+/root/mode/rep_config "/usr/local/$Hapachemode/conf/extra/httpd-mpm.conf" "ThreadsPerChild" "25"
+
+if /root/mode/apachectl $Hapachemode -v | grep -E 'Apache/2.2' >/dev/null; then
+   /root/mode/rep_config "/usr/local/$Hapachemode/conf/extra/httpd-mpm.conf" "MaxClients"         "800"
+   /root/mode/rep_config "/usr/local/$Hapachemode/conf/extra/httpd-mpm.conf" "MaxClients"         "256" T1
+   if [ -f /etc/modeopts/httpkeepalive ]; then
+      /root/mode/rep_config "/usr/local/$Hapachemode/conf/extra/httpd-mpm.conf" "MaxRequestsPerChild" "500"
+   else
+      /root/mode/rep_config "/usr/local/$Hapachemode/conf/extra/httpd-mpm.conf" "MaxRequestsPerChild" "10000"
+   fi
+else
+   /root/mode/rep_config "/usr/local/$Hapachemode/conf/extra/httpd-mpm.conf" "MaxRequestWorkers"  "800"
+   /root/mode/rep_config "/usr/local/$Hapachemode/conf/extra/httpd-mpm.conf" "MaxRequestWorkers"  "256" T1
+   if [ -f /etc/modeopts/httpkeepalive ]; then
+      /root/mode/rep_config "/usr/local/$Hapachemode/conf/extra/httpd-mpm.conf" "MaxConnectionsPerChild" "500"
+   else
+      /root/mode/rep_config "/usr/local/$Hapachemode/conf/extra/httpd-mpm.conf" "MaxConnectionsPerChild" "10000"
+   fi
+fi
+
+
+###### httpd-info.conf ######
+
+if /root/mode/apachectl $Hapachemode -v | grep -E 'Apache/2.2' >/dev/null; then
+   /root/mode/rep_config "/usr/local/$Hapachemode/conf/extra/httpd-info.conf" "Allow from" "183.129.215.114 192.168.2.61 127.0.0.1"
+else
+   /root/mode/rep_config "/usr/local/$Hapachemode/conf/extra/httpd-info.conf" "Require host .example.com"  "uncomment"
+   /root/mode/rep_config "/usr/local/$Hapachemode/conf/extra/httpd-info.conf" "Require host"               "localhost"
+   /root/mode/rep_config "/usr/local/$Hapachemode/conf/extra/httpd-info.conf" "Require ip"                 "183.129.215.114 192.168.2.61 127.0.0.1"
+fi
+/root/mode/rep_config "/usr/local/$Hapachemode/conf/extra/httpd-info.conf" "ExtendedStatus On" "uncomment"
+
+# ----------uncomment -----------
+
+/root/mode/rep_config "/usr/local/$Hapachemode/conf/httpd.conf" "Include conf/extra/httpd-mpm.conf"              "uncomment"
+/root/mode/rep_config "/usr/local/$Hapachemode/conf/httpd.conf" "Include conf/extra/httpd-default.conf"          "uncomment"
+/root/mode/rep_config "/usr/local/$Hapachemode/conf/httpd.conf" "Include conf/extra/httpd-info.conf"             "uncomment"
+/root/mode/rep_config "/usr/local/$Hapachemode/conf/httpd.conf" "LoadModule info_module modules/mod_info.so"     "uncomment"
+/root/mode/rep_config "/usr/local/$Hapachemode/conf/httpd.conf" "LoadModule status_module modules/mod_status.so" "uncomment"
+
+#
+

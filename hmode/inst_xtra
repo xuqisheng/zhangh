@@ -1,0 +1,80 @@
+#!/bin/bash
+
+# check if MySQL server exists
+
+if [ ! -x /usr/sbin/mysqld ]; then
+   /root/mode/modemsg inst_xtra "MySQL server is not installed" more
+   exit 1
+fi
+
+Hxtra_cmark=
+# remove other xtrabackup versions except 2.3.6
+
+if [ -d /usr/local/xtrabackup ]; then
+   if ! /usr/local/xtrabackup/bin/xtrabackup -v 2>&1 | grep -E '/xtrabackup version 2\.3\.6 ' >/dev/null; then
+      rm -fR /usr/local/xtrabackup
+      Hxtra_cmark=1
+   fi
+fi
+
+# now /usr/local/xtrabackup is not prent or it's version 2.3.6
+
+if [ ! -d /usr/local/xtrabackup ]; then
+   # /usr/local/xtrabackup is not prent
+   if uname -a | grep "x86_64" >/dev/null; then
+      Hos=x86_64
+   else
+      Hos=i686
+   fi
+   #
+   if [ ! -f /root/packages/xtrabackup-2.3.6.${Hos}.tar.gz ]; then
+      /root/mode/modemsg inst_xtra "No package xtrabackup-2.3.6.${Hos}.tar.gz in directory /root/packages" more
+      [ -n "$Hxtra_cmark" ] && /root/mode/setpath
+      exit 1
+   fi
+   # install  
+   cd /usr/local
+   tar xzvf /root/packages/xtrabackup-2.3.6.${Hos}.tar.gz
+   mv `ls -1d xtrabackup*/ | sed -n "1 p"` xtrabackup
+   Hxtra_cmark=1
+fi
+
+# now /usr/local/xtrabackup is version 2.3.6
+
+# xtrabackup usability check 
+
+if cat /etc/redhat-release | grep -E " release 5\.[01234567] " > /dev/null; then
+   # CentOS 5.4 etc.
+   :
+elif cat /etc/redhat-release | grep -E " release [5]\." > /dev/null; then
+   # CentOS 5.8 and later CentOS 5.x
+   if [ `rpm -qa | grep -E "^(perl-DBI-|perl-DBD-MySQL-)" | wc -l` -lt 2 ]; then
+      /root/mode/.inst_pt force-reinstall 
+      # check again
+      if [ `rpm -qa | grep -E "^(perl-DBI-|perl-DBD-MySQL-)" | wc -l` -lt 2 ]; then
+         # remove the installed xtrabackup version 2.3.6
+         /root/mode/modemsg inst_xtra "The installed xtrabackup version 2.3.6 will be removed." more
+         rm -fR /usr/local/xtrabackup
+         Hxtra_cmark=1
+      fi
+   fi
+elif cat /etc/redhat-release | grep -E " release 6\." > /dev/null; then
+   # CentOS 6.x 
+   if [ `rpm -qa | grep -E "^(perl-DBI-|perl-DBD-MySQL-|perl-IO-Socket-SSL-)" | wc -l` -lt 3 ]; then
+      /root/mode/.inst_pt force-reinstall 
+      # check again
+      if [ `rpm -qa | grep -E "^(perl-DBI-|perl-DBD-MySQL-|perl-IO-Socket-SSL-)" | wc -l` -lt 3 ]; then
+         # remove the installed xtrabackup version 2.3.6
+         /root/mode/modemsg inst_xtra "The installed xtrabackup version 2.3.6 will be removed." more
+         rm -fR /usr/local/xtrabackup
+         Hxtra_cmark=1
+      fi
+   fi
+fi
+
+# set path
+
+[ -n "$Hxtra_cmark" ] && /root/mode/setpath
+
+# end
+

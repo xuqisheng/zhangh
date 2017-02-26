@@ -1,0 +1,27 @@
+#!/bin/bash 
+# -----------------------------------------------------------------------------
+# function:
+#          determine if tcp_tw_recycle can be used safely
+# notes   :
+#          tcp_tw_recycle=1 can effectively decrease tcp TIME_WAIT list,but ...
+# -----------------------------------------------------------------------------
+# 1 or 0
+# -----------------------------------------------------------------------------
+# performance or stability
+# -----------------------------------------------------------------------------
+# 1 or 0 
+# -----------------------------------------------------------------------------
+
+if [ -f /etc/modegate ]; then
+   if cat /etc/modegate | grep -E "^tcp_tw_recycle=" >/dev/null; then
+      Htw=`cat /etc/modegate | sed -re "s/^tcp_tw_recycle=(.*)/\1/" | sed -n "$ p"`
+   fi
+fi
+if [ "$Htw" != "0" -a "$Htw" != "1" ]; then
+   # temporarily set to 0
+   Htw=0
+   # further investigation and study results will be put here   
+fi
+echo $Htw
+
+#

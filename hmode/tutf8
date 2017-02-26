@@ -1,0 +1,99 @@
+#!/bin/bash
+# -------------------------------------------------------
+# function:
+#           convert file <file> to utf8 format
+# usages  :
+#           ./tutf8 <file>
+# e.g.    :
+#           ./tutf8 /unrec.txt
+# -------------------------------------------------------
+
+TMPFILE="$1"
+if [ -z "$TMPFILE" ]; then
+   exit 
+elif [ ! -f "$TMPFILE" ]; then
+   echo "File $1 doesn't exist"
+   exit 
+fi
+Htfileout=`/root/mode/tfile "$TMPFILE"`
+if echo "$Htfileout" | grep -E "ASCII" >/dev/null; then
+   # don't display ascii encoding
+   #[ -n "$HMODEDEBUG" ] && /root/mode/modemsg tutf8 "ASCII encoding detected"
+   exit
+elif echo "$Htfileout" | grep -E "UTF-8" >/dev/null; then
+   if [ -n "$HMODEDEBUG" ]; then
+      if cat "$TMPFILE" | xxd -l 3 | grep -E "^0000000: efbb bf" >/dev/null; then
+         /root/mode/modemsg tutf8 "UTF-8+BOM encoding detected"
+      else
+         /root/mode/modemsg tutf8 "UTF-8 encoding detected"
+      fi
+   fi
+   exit
+elif echo "$Htfileout" | grep -E "ISO-8859" >/dev/null; then
+  if [ -x /usr/local/bin/enca ]; then
+     if /usr/local/bin/enca -L zh_CN "$TMPFILE" | grep -E "GB2312" > /dev/null; then
+        # gb18030
+        [ -n "$HMODEDEBUG" ] && /root/mode/modemsg tutf8 "GB2312 encoding detected"
+        iconv -f gb18030 -t utf-8 "$TMPFILE" > /root/mode/tmp/htutf8_$$.tmp
+        mv -f /root/mode/tmp/htutf8_$$.tmp "$TMPFILE"
+        exit
+     elif /usr/local/bin/enca -L zh_CN "$TMPFILE" | grep -E "Big5" > /dev/null; then
+        # Big5
+        [ -n "$HMODEDEBUG" ] && /root/mode/modemsg tutf8 "Big5 encoding detected"
+        iconv -f Big5 -t utf-8 "$TMPFILE" > /root/mode/tmp/htutf8_$$.tmp
+        mv -f /root/mode/tmp/htutf8_$$.tmp "$TMPFILE"
+        exit
+     elif [ "`/usr/local/bin/enca -L zh_CN \"$TMPFILE\"`" = "Unrecognized encoding" ]; then
+        # assume to be gb2312
+        [ -n "$HMODEDEBUG" ] && /root/mode/modemsg tutf8 "Assume to be GB2312 encoding"
+        iconv -f gb18030 -t utf-8 "$TMPFILE" > /root/mode/tmp/htutf8_$$.tmp
+        mv -f /root/mode/tmp/htutf8_$$.tmp "$TMPFILE"
+        exit
+     else
+        # don't convert at all
+        exit
+     fi
+   else
+      # gb18030
+      [ -n "$HMODEDEBUG" ] && /root/mode/modemsg tutf8 "Assume to be GB2312 encoding"
+      iconv -f gb18030 -t utf-8 "$TMPFILE" > /root/mode/tmp/htutf8_$$.tmp
+      mv -f /root/mode/tmp/htutf8_$$.tmp "$TMPFILE"
+      exit
+   fi
+elif echo "$Htfileout" | grep -E "Big-endian UTF-16" >/dev/null; then
+   # unicode big endian
+   [ -n "$HMODEDEBUG" ] && /root/mode/modemsg tutf8 "Big-endian UTF-16 Unicode encoding detected"
+   iconv -f unicode -t utf-8 "$TMPFILE" > /root/mode/tmp/htutf8_$$.tmp
+   mv -f /root/mode/tmp/htutf8_$$.tmp "$TMPFILE"
+   exit
+elif echo "$Htfileout" | grep -E "Little-endian UTF-16" >/dev/null; then
+   # detected by CentOS 6.x 
+   # unicode (not big endian)
+   [ -n "$HMODEDEBUG" ] && /root/mode/modemsg tutf8 "Little-endian UTF-16 Unicode encoding detected"
+   iconv -f unicode -t utf-8 "$TMPFILE" > /root/mode/tmp/htutf8_$$.tmp
+   mv -f /root/mode/tmp/htutf8_$$.tmp "$TMPFILE"
+   exit
+else
+   if [ -x /usr/local/bin/enca ]; then
+      if /usr/local/bin/enca -L zh_CN "$TMPFILE" | grep -E "UCS-2" >/dev/null; then
+         if /usr/local/bin/enca -L zh_CN "$TMPFILE" | grep -E "Byte order reversed" >/dev/null; then
+            # Little-endian UTF-16 Unicode
+            [ -n "$HMODEDEBUG" ] && /root/mode/modemsg tutf8 "Little-endian UTF-16 Unicode encoding detected using enca"
+         else
+            # Big-endian UTF-16 Unicode
+            [ -n "$HMODEDEBUG" ] && /root/mode/modemsg tutf8 "Big-endian UTF-16 Unicode encoding detected using enca"
+         fi
+         iconv -f unicode -t utf-8 "$TMPFILE" > /root/mode/tmp/htutf8_$$.tmp
+         mv -f /root/mode/tmp/htutf8_$$.tmp "$TMPFILE"
+         exit
+      else
+         exit
+      fi
+   else
+      exit
+   fi
+fi
+
+#
+
+

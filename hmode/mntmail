@@ -1,0 +1,56 @@
+#!/bin/bash
+
+# try to start sendmail if it is installed and not running
+
+if [ -f /etc/init.d/sendmail ]; then
+   if ! /etc/init.d/sendmail status &>/dev/null; then
+      /etc/init.d/sendmail stop
+      /etc/init.d/sendmail start
+   fi
+fi
+
+#
+
+if ! /root/mode/.netok; then
+   exit 1
+fi
+
+# remove postfix
+
+if [ -f /etc/init.d/postfix ]; then
+   chkconfig postfix off
+   /etc/init.d/postfix stop &>/dev/null
+   rpm -e --nodeps postfix
+   rm -f /var/lock/subsys/postfix
+fi
+if ps -ef | grep -E "(postfix|/usr/sbin/exim)" | grep -v grep >/dev/null; then
+   ps -ef | grep -E "(postfix|/usr/sbin/exim)" | grep -v grep | awk '{print $2}' | xargs kill -9 
+fi
+
+# install sendmail
+  
+if [ ! -f /etc/init.d/sendmail ]; then
+   yum -y install sendmail || yum -y install sendmail
+fi
+chkconfig sendmail on
+if ! /etc/init.d/sendmail status &>/dev/null; then
+   /etc/init.d/sendmail stop
+   /etc/init.d/sendmail start
+fi
+
+# remove mysql-libs
+
+if rpm -qa | grep mysql-libs >/dev/null; then
+   rpm -qa | grep mysql-libs | xargs rpm -e --nodeps
+fi
+
+# restore /etc/my.cnf
+
+if rpm -qa | grep "^MySQL-client-" > /dev/null; then
+   if [ ! -f /etc/my.cnf ]; then
+      /root/mode/config_mysql
+   fi
+fi
+
+# end
+

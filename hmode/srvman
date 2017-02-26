@@ -1,0 +1,111 @@
+#!/bin/bash
+# --------------------------------------------------------
+# function:
+#           manage linux services.
+# usages  :
+#           ./srvman
+# --------------------------------------------------------
+
+# exclusive execution with wait mode
+
+/root/mode/modepv srvman $$ " /bin/bash .*/srvman"
+
+# mode mark
+
+if ! cat /etc/sysctl.conf | grep -E "^# mode added option$" >/dev/null; then
+   echo "# mode added option" >> /etc/sysctl.conf
+fi
+
+# /etc/sysconfig/iptables-config
+
+if cat /etc/redhat-release | grep -E " release 5\..*" > /dev/null; then
+   /root/mode/mod_config /etc/sysconfig/iptables-config "IPTABLES_MODULES=\"ip_conntrack_netbios_ns\""
+else
+   /root/mode/mod_config /etc/sysconfig/iptables-config "IPTABLES_MODULES=\"ip_conntrack\""
+fi
+
+# firewall configuration
+
+if /root/mode/modegate noiptables; then
+   # disable firewall explicitly
+   /root/mode/mod_config /etc/sysctl.conf "net.ipv4.ip_forward=0"  "# mode added option"
+   iptables -F
+   iptables -X
+   chkconfig iptables off
+   service iptables stop >/dev/null 2>&1 
+else
+   # enable firewall
+   /root/mode/mod_config /etc/sysctl.conf "net.ipv4.ip_forward=1"  "# mode added option"
+   chkconfig iptables off
+   chkconfig --level 35 iptables on
+   #
+   if /root/mode/modegate iptables; then
+      # we open firewall,and we use iptables
+      touch /etc/sysconfig/iptables
+      touch /etc/sysconfig/ip6tables
+   else
+      # we open firewall,but we don't use iptables
+      >/etc/sysconfig/iptables
+      >/etc/sysconfig/ip6tables
+   fi
+   # our save 
+   cp -f /etc/sysconfig/iptables /etc/sysconfig/iptables$$
+   cp -f /etc/sysconfig/ip6tables /etc/sysconfig/ip6tables$$
+   #
+   /sbin/iptables -L         &>/dev/null
+   /etc/init.d/iptables save &>/dev/null
+   #
+   mv -f /etc/sysconfig/iptables$$  /etc/sysconfig/iptables
+   mv -f /etc/sysconfig/ip6tables$$ /etc/sysconfig/ip6tables
+   # stop first 
+   service iptables stop >/dev/null 2>&1 
+   # start later 
+   service iptables start >/dev/null 2>&1 
+fi
+
+# make effect
+
+/sbin/sysctl -p &>/dev/null
+
+# disable SELINUX
+
+if [ -f /etc/sysconfig/selinux ]; then
+   if grep -E "^SELINUX=" /etc/sysconfig/selinux >/dev/null; then
+      cat /etc/sysconfig/selinux | sed -re "s/^(SELINUX=).*/\1disabled/" > /root/mode/tmp/hsrvman$$.tmp
+      cp -f /root/mode/tmp/hsrvman$$.tmp /etc/sysconfig/selinux
+      rm -f /root/mode/tmp/hsrvman$$.tmp
+   else
+      echo "SELINUX=disabled" >> /etc/sysconfig/selinux
+   fi
+fi
+
+
+# disable avahi-daemon
+
+if [ -f /etc/init.d/avahi-daemon ]; then
+   chkconfig avahi-daemon off
+   /etc/init.d/avahi-daemon stop >/dev/null 2>&1
+fi
+
+# disable yum-updatesd
+
+chkconfig yum-updatesd off    >/dev/null 2>&1
+/etc/init.d/yum-updatesd stop >/dev/null 2>&1
+
+# disable packagekit
+
+if [ -f /etc/yum/pluginconf.d/refresh-packagekit.conf ]; then
+   /root/mode/mod_config /etc/yum/pluginconf.d/refresh-packagekit.conf "enabled=0"
+fi
+
+# disable bad and useless services
+
+for i in `echo abrt-ccpp abrtd abrt-oops`;do
+   if [ -f /etc/init.d/$i ]; then
+      chkconfig $i off    &>/dev/null
+      /etc/init.d/$i stop &>/dev/null
+   fi
+done
+
+#
+

@@ -1,0 +1,121 @@
+#!/bin/bash
+# -----------------------------------------------------------
+# function:
+#          Offline data preparation
+# -----------------------------------------------------------
+# usages:
+#        ./ol_data [<apachemode>] [<sqldir>] [db|dbtr]
+# -----------------------------------------------------------
+# e.g.  :
+#        ./ol_data                          
+#        ./ol_data apache
+#        ./ol_data apache  /ol_sql
+#        ./ol_data apache  /ol_sql db
+#        ./ol_data apache  /ol_sql dbtr
+#        ./ol_data apache  /ol_sql dbtr
+#        ./ol_data apache  ""      dbtr
+#        ./ol_data apache1 /groupa_sql
+#        ./ol_data apache1 /groupa_sql db
+#        ./ol_data apache1 /groupa_sql dbtr
+# -----------------------------------------------------------
+
+
+# re-entrance check
+
+/root/mode/withyou $$ ol_data 1 && exit
+
+#
+
+. /root/mode/apachemode
+
+# apache existence check 
+
+[ -d /usr/local/$Hapachemode/conf ] || exit 1
+
+# default sql file directory
+
+mkdir -p /ol_sql
+
+# sql file directory
+
+Hsqldir=${1:-/ol_sql}
+
+if [ ! -d "$Hsqldir" ]; then
+   /root/mode/modemsg ol_data "sql file directory '$Hsqldir' doesn't exist!" more
+   exit 1
+fi
+
+# ip and database 
+
+if [ "$2" = "" -o "$2" = "db" ]; then
+   HmydbR=$HdbR
+   HmydbN=$HdbN
+   Hmydbmark=db
+elif [ "$2" = "dbtr" ]; then
+   HmydbR=$HdbRtr
+   HmydbN=$HdbNtr
+   Hmydbmark=dbtr
+else
+   /root/mode/modemsg ol_data "db parameter must be 'db','dbtr' or empty!" more
+   exit 1
+fi
+
+# offline data directory
+
+mkdir -p /usr/local/$Hapachemode/htdocs/ol_data
+
+#
+
+Holdir="/root/mode/tmp/Holdir$$"
+Holsql="/root/mode/tmp/Holsql$$.sql"
+mkdir -p $Holdir
+
+# 
+
+/root/mode/updatedb.sh $HmydbR /root/mode/impfile/ol_sql_base $HmydbN &>/dev/null
+
+#
+
+/root/mode/seecfg -s $HmydbR \
+          "select hotel_group_id,(select lower(b.code) from hotel_group b where b.id=hotel.hotel_group_id) as hotel_group_code,
+                  id as hotel_id,lower(code) as hotel_code
+                  from hotel order by hotel_group_id,id" $HmydbN |
+while read -r Hgid Hgcode Hhid Hhcode; do
+   rm -f $Holdir/*
+   find -L "$Hsqldir" -name "*.sql" | sed -re "s/\.sql$//" | sort | sed -re "s/$/.sql/" | 
+   while read -r i;do
+      [ ! -r "$i" ] && continue 
+      j=`echo "$i" | sed -r -e 's/(\/)+/HrYhBy/g' -e 's/^HrYhBy//' -e 's/HrYhBy/_/g'`
+      cat "$i" | 
+      sed -re "s/##gh#/\(hotel_group_id=#group_id# and hotel_id=#hotel_id#\)/g" |
+      sed -re "s/#([a-z])#gh#/\(\1.hotel_group_id=#group_id# and \1.hotel_id=#hotel_id#\)/g" |
+      sed -re "s/#([a-z])([a-z])#gh#/\(\1\.hotel_group_id=\2\.hotel_group_id and \1\.hotel_id=\2\.hotel_id\)/g" |
+      sed -re "s/#group_id#/$Hgid/g"  |
+      sed -re "s/#hotel_id#/$Hhid/g" > $Holsql
+      /root/mode/seecfg -c $HmydbR $Holsql $HmydbN > $Holdir/$j.csv
+   done
+   cd $Holdir
+   mkdir -p /usr/local/$Hapachemode/htdocs/ol_data/$Hmydbmark/$Hgcode
+
+   # --------------------------------------------------------------------------------
+   # tar czvf $Hhcode.tar.gz *.csv >/dev/null
+   # mv -f $Hhcode.tar.gz /usr/local/$Hapachemode/htdocs/ol_data/$Hmydbmark/$Hgcode
+   # --------------------------------------------------------------------------------
+
+   zip $Hhcode.zip *.csv >/dev/null
+   openssl aes-256-cbc -K 4C85783C83096DF861EB6EDDECDBB8AE655A6C58D0C3709B7E8EDE36E25CA709 -iv 5951223EADBAC52706E17210DA5032FE -in $Hhcode.zip -out $Hhcode.hz
+   mv -f $Hhcode.hz /usr/local/$Hapachemode/htdocs/ol_data/$Hmydbmark/$Hgcode
+
+#
+
+#
+
+done
+
+#
+
+rm -fR $Holdir
+rm -f  $Holsql
+
+
+#

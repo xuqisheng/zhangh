@@ -1,0 +1,38 @@
+#!/bin/bash
+# -------------------------------------------------------
+# function:
+#           remove bom of utf8 and/or unicode file
+# usages  :
+#           ./rmbom <file>
+# e.g.    :
+#           ./rmbom /unrec.txt
+# -------------------------------------------------------
+
+# this script is not used now,only as study notes
+
+if [ -z "$1" ]; then
+   echo "usage:"
+   echo "      /root/mode/rmbom <file>"
+   exit 
+elif [ ! -f "$1" ]; then
+   echo "File $1 doesn't exist"
+   exit 
+fi
+
+#
+
+if cat "$1" | xxd -l 3 | grep -E "^0000000: efbb bf" >/dev/null; then
+   # utf8 with bom
+   xxd -s 3 "$1" | xxd -r -s -3 > /root/mode/tmp/hbom$$.tmp 
+   cp -f /root/mode/tmp/hbom$$.tmp "$1"
+   rm -f /root/mode/tmp/hbom$$.tmp
+elif cat "$1" | xxd -l 2 | grep -E "^0000000: fffe" >/dev/null; then
+   # unicode UCS-2 not big endian
+   xxd -s 2 "$1" | xxd -r -s -2 > /root/mode/tmp/hbom$$.tmp 
+   cp -f /root/mode/tmp/hbom$$.tmp "$1"
+   rm -f /root/mode/tmp/hbom$$.tmp
+elif cat "$1" | xxd -l 2 | grep -E "^0000000: feff" >/dev/null; then
+   # unicode UCS-2 big endian
+   # must not remove bom(i.e. efff)
+   :
+fi

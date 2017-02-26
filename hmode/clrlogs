@@ -1,0 +1,130 @@
+#!/bin/bash
+# ------------------------------------------------------------------
+# function:
+#          clear logs some days ago
+# usage   :
+#         ./clrlogs 10
+#         /root/mode/clrlogs         
+# ------------------------------------------------------------------
+
+# exclusive execution with wait mode
+
+/root/mode/modepv clrlogs $$ "/bin/bash .*/clrlogs"
+
+# added by mode
+
+/root/mode/modelog "$0 $*"
+
+#
+
+HDAYS=${1:-5}
+if (echo "$HDAYS"  | grep -E  "^[0-9]+$" > /dev/null); then
+   if [ $HDAYS -lt 2 ]; then
+      echo "Parameter should be integer greater than one!" && exit 
+   fi
+else
+   echo "invalid parameter" && exit 1
+fi
+
+#
+
+HDDATE=`date -d "-$HDAYS days" +%Y-%m-%d`
+
+# root mail 
+
+if [ -f /var/spool/mail/root ]; then
+   /root/mode/trun_log /var/spool/mail/root
+fi
+
+# apache logs
+
+cd /usr/local
+for i in `ls -d apache*/ 2>/dev/null | sed -re "s/\/$//"`; do
+    if [ -f /usr/local/$i/logs/mod_jk.log ]; then
+       cd /usr/local/$i/logs
+       for j in `echo access_log error_log mod_jk.log`;do
+           /root/mode/trun_log $j
+       done
+    fi
+done
+
+# tomcat logs
+
+cd /usr/local
+for i in `ls -d tomcat*/ 2>/dev/null | sed -re "s/\/$//" `;do
+    /root/mode/check_tomcat $i || continue
+    cd /usr/local/$i/logs
+    # 
+    Htestvars=`ls -1|grep -E '[0-9]{4}-[0-9]{2}-[0-9]{2}'|sed -re "s/^/b/" -e "s/$/e/"`
+    while read -r k; do 
+       j=`echo "$k" | sed -re "s/b(.*)e/\1/"`
+       if [ -d "$j" ]; then
+          continue
+       fi
+       Hjdate=`echo "$j" | sed -re "s/.*([0-9]{4}-[0-9]{2}-[0-9]{2}).*/\1/"`
+       if [ "$Hjdate" \< "$HDDATE" -o "$Hjdate" = "$HDDATE" ]; then
+          rm -f "$j"
+       fi
+    done <<<"$Htestvars" 
+    # catalina.out
+    /root/mode/trun_log catalina.out
+    # files_
+    /root/mode/trun_log files_
+    # fileexception_
+    /root/mode/trun_log fileexception_
+    # SystemOut.log
+    /root/mode/trun_log SystemOut.log
+done
+
+# mysql-bin.000000 etc
+
+if /root/mode/testmysql 2>/dev/null; then
+    cd /var/lib/mysql
+    # maintain first 
+    ls -1 mysql-bin.[0-9][0-9][0-9][0-9][0-9][0-9] 2>/dev/null | sed -re "s/^/.\//" > mysql-bin.index
+    #
+    hmysqlbincnt=`ls -1 mysql-bin.[0-9][0-9][0-9][0-9][0-9][0-9] 2>/dev/null | wc -l`
+    Htodelete=$[$hmysqlbincnt-$HDAYS]
+    Hrealtodelete=0
+    if [ $Htodelete -gt 0 ]; then
+       for i in `ls -1 mysql-bin.[0-9][0-9][0-9][0-9][0-9][0-9] 2>/dev/null | head -n $Htodelete`;do
+           if [ `find . -name "$i" -mtime +1 | wc -l` -gt 0 ]; then  
+              Hrealtodelete=$[Hrealtodelete+1]
+           fi
+       done
+    fi
+    if [ $Hrealtodelete -gt 0 ]; then
+       if /root/mode/seecfg -s localhost "show processlist" 2>/dev/null | grep -P "\tBinlog Dump\t" >/dev/null; then
+          Hfstbinlog=`ls -1 mysql-bin.[0-9][0-9][0-9][0-9][0-9][0-9] 2>/dev/null | sed -nre "$[Hrealtodelete+1] p"`
+          /root/mode/seecfg localhost "purge binary logs to '$Hfstbinlog'"
+       else
+          ls -1 mysql-bin.[0-9][0-9][0-9][0-9][0-9][0-9] 2>/dev/null | head -n $Hrealtodelete | xargs rm -f
+          ls -1 mysql-bin.[0-9][0-9][0-9][0-9][0-9][0-9] 2>/dev/null | sed -re "s/^/.\//" > mysql-bin.index
+       fi
+    fi
+
+    # extract badsqls from slow.log before truncation
+ 
+    # rows_sent ranking
+    /root/mode/badsql_rows_sent  20
+    # query_time ranking
+    /root/mode/badsql_query_time 20
+
+    # truncate MySQL slowquery logs
+    for j in `ls *.log 2>/dev/null`;do
+       /root/mode/trun_log "$j"
+    done
+fi
+
+# truncate my own logs 
+
+if [ `du -m -s /root/mode/logs | awk '{print $1}'` -ge 100 ]; then
+   for i in `ls -1 /root/mode/logs/*.log 2>/dev/null`;do
+       /root/mode/trun_log "$i"
+   done 
+fi
+
+# 
+
+/root/mode/clrcache
+

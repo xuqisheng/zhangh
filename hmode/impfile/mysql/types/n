@@ -1,0 +1,7 @@
+tinyint
+smallint
+mediumint
+int
+bigint
+float
+decimal

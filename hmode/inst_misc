@@ -1,0 +1,39 @@
+#!/bin/bash
+
+# exclusive execution with wait mode
+
+/root/mode/modepv inst_misc $$ " /bin/bash .*/inst_misc"
+
+# install convmv
+
+if [ ! -x /usr/bin/convmv ]; then 
+   rpm -ivh /root/mode/package/convmv-1.10-1.el5.noarch.rpm
+fi
+
+# install enca
+# gcc is required 
+
+if [ ! -f /usr/bin/gcc ]; then
+   echo "gcc is required to install enca!!" 
+elif [ ! -x /usr/local/bin/enca ]; then
+   Hencatmpdir=/root/mode/tmp/hhryenca$$
+   mkdir -p $Hencatmpdir
+   rm -fR $Hencatmpdir/*
+   cd $Hencatmpdir
+   tar xzvf /root/mode/package/enca-1.13.tar.gz
+   cd enca*
+   ./configure
+   make
+   make check
+   make install
+   cd /root/mode
+   rm -fR $Hencatmpdir
+fi
+
+# install each sql
+
+if [ -f /root/mode/package/sql.tar.gz ]; then
+   rm -fR /root/mode/sql >/dev/null 2>&1
+   tar xzvf /root/mode/package/sql.tar.gz -C / >/dev/null 2>&1
+fi
+

@@ -1,0 +1,24 @@
+#!/bin/bash
+# -----------------------------------------------------------------------------------
+# function:
+#          modify mysql start/stop script to eanable idcheck
+#
+# -----------------------------------------------------------------------------------
+
+exit
+if [ -x /etc/init.d/mysql ]; then
+   if cat /etc/init.d/mysql | grep "idcheck localhost" > /dev/null; then
+      echo "idcheck has already been added into mysql start/stop script"
+   else
+      HTMPFILE="/root/mode/tmp/hhrymysql$$.tmp"
+      if cat /etc/init.d/mysql | grep "idcheck" > /dev/null; then
+         cat /etc/init.d/mysql | sed -re "s/idcheck fix/idcheck localhost fix/" > $HTMPFILE
+      else
+         cat /etc/init.d/mysql | sed -re "/^ *wait_for_pid created/a \      /root/mode/idcheck localhost fix" > $HTMPFILE
+      fi
+      cp -p $HTMPFILE /etc/init.d/mysql
+      chmod a+x /etc/init.d/mysql
+      rm -f $HTMPFILE
+   fi
+fi
+

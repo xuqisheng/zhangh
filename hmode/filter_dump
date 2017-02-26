@@ -1,0 +1,70 @@
+#!/bin/bash
+# -----------------------------------------------------------------
+# function:
+#          get the resired records according to hotel_id's 
+# usages:
+#          ./filter_dump [-x] <inputfile> <outputfile> <[hotel_ids]>
+# e.g.:
+#          ./filter_dump dump/dump0607.sql dump/hotel2_3  "2|3"
+# -----------------------------------------------------------------
+
+# get options
+
+HOPTIONS=""
+while (echo "'$1'"  | grep -E  -e "^'-" > /dev/null)
+do
+   HOPTIONS="$HOPTIONS$1"
+   shift 
+done
+
+# set option 
+
+if echo "'$HOPTIONS" | grep -E -e "-x" >/dev/null; then
+   HFILTERMODE='x'
+fi
+
+# files
+
+Hinfile="$1"
+Houtfile="$2"
+Hhotelid=$3
+
+# init output file
+
+> "$Houtfile"
+
+# create tmp file
+
+Hdump1="/root/mode/tmp/hdump1$$.sql"
+Hdump2="/root/mode/tmp/hdump2$$.sql"
+Hdump3="/root/mode/tmp/hdump3$$.sql"
+
+cat "$Hinfile" |
+while read -r Hbuffer; do
+   if echo "$Hbuffer" | grep -E "^insert  into \`.*\`hotel_id\`" >/dev/null; then
+      Hnum=$(echo "$Hbuffer" | sed -re "s/^(insert  into \`[^ ]*\`\(.*\`hotel_id\`).*/\1/" | sed -re "s/[^,]//g" | wc -c)
+      Hnum=$[$Hnum-1]
+      echo "$Hbuffer" |
+      sed -re "s/(\) values )(\()/\1\n\2/" | 
+      sed -re "s/(\),)(\()/\1\n\2/g" > $Hdump1       
+      cat $Hdump1 | sed -n "1 p" > $Hdump2
+      cat $Hdump1 | sed -e "1 d" | 
+      if [ "$HFILTERMODE" != "x" ]; then
+         grep  -E "^\(([^,]+,){$Hnum}(${Hhotelid})[,\)]"  
+      else
+         grep  -v -E "^\(([^,]+,){$Hnum}(${Hhotelid})[,\)]"
+      fi |
+      sed -re "$ s/,$/;/"  > $Hdump3
+      if [ `cat $Hdump3 | wc -l` -gt 0 ]; then
+         cat $Hdump2 $Hdump3 >> $Houtfile
+      fi
+   else
+      echo "$Hbuffer" >> "$Houtfile"
+   fi
+done
+
+
+# delete tmp file 
+
+rm -f $Hdump{1..3}
+

@@ -1,0 +1,30 @@
+#!/bin/bash
+# -------------------------------------------
+#
+# -------------------------------------------
+
+H1="$1"
+H2="$2"
+
+H1P=`echo "$H1" | sed -re "s/^([^ \(]+).*/\1/"`
+H2P=`echo "$H2" | sed -re "s/^([^ \(]+).*/\1/"`
+
+HPCMP=`/root/mode/mtypesel "$H1P" "$H2P"`
+if [ "$HPCMP" -lt 3 ]; then
+   echo "$HPCMP"
+else
+   if echo "$H1" | grep -E "\(" >/dev/null; then
+      H1L=`echo "$H1" | sed -re "s/^.*\(([0-9]+).*/\1/"`
+      H2L=`echo "$H2" | sed -re "s/^.*\(([0-9]+).*/\1/"`
+      if [ $H1L -gt $H2L ]; then
+         echo 1
+      elif [ $H1L -lt $H2L ]; then
+         echo 2
+      else
+         echo 3
+      fi
+   else
+      #TODO
+      echo 3
+   fi
+fi

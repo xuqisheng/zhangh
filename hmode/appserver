@@ -1,0 +1,346 @@
+#!/bin/bash
+# chkconfig: 2345 65 35
+# description: iHotel app server management.
+### BEGIN INIT INFO
+# Provides:          gcserver
+# Required-Start:    network
+# Should-Start:      network,mysql
+# Default-Start:     3 5
+# Default-Stop:      0 1 2 4 6
+# Description:       gcserver
+### END INIT INFO
+
+# ---------------------------------------------------------------------------------
+# Notes:
+# ---------------------------------------------------------------------------------
+# Because
+# -------
+# 1.When starting server is in progress,
+#   and the file /var/lock/subsys/gcserver has not been created,
+#   the rcinit gcserver stop will not be called in rc script
+# 2.When stopping server is in progress,
+#   and the /var/lock/subsys/gcserver has not been removed,
+#   the rcinit gcserver start will not be called in rc script
+# -------
+# so
+# -------
+# 3.DON'T start or stop gcserver manually during operating system startup/shutdown
+# ---------------------------------------------------------------------------------
+
+
+tgcserver()
+{
+# rcinit gcserver will wait for other gcservers to complete
+Hdeadloop=0
+while [ 1 ]; do
+   MYFILE="/root/mode/tmp/gcserver$$.tmp"
+   ps -ef > $MYFILE
+   eval HH$1=1
+   Hherereturn=1
+   if [ `grep -E ".*/bin/bash *.*$Hlnserver +($1) *$" $MYFILE | wc -l` -gt `eval echo \\\$HH\$1` ]; then
+      echo "Another '$Hlnserver $1' process already in operation!"
+   elif [ "$1" != "start" -a  `grep -E ".*/bin/bash *.*$Hlnserver +(start) *$" $MYFILE | wc -l` -gt 0 ]; then
+      echo "A '$Hlnserver start' process is in operation!"
+   elif [ "$1" != "stop" -a  `grep -E ".*/bin/bash *.*$Hlnserver +(stop) *$" $MYFILE | wc -l` -gt 0 ]; then
+      echo "A '$Hlnserver stop' process is in operation!"
+   elif [ "$1" != "restart" -a  `grep -E ".*/bin/bash *.*$Hlnserver +(restart) *$" $MYFILE | wc -l` -gt 0 ]; then
+      echo "A '$Hlnserver restart' process is in operation!"
+   elif [ "$1" != "cluster" -a  `grep -E ".*/bin/bash *.*$Hlnserver +(cluster) *$" $MYFILE | wc -l` -gt 0 ]; then
+      echo "A '$Hlnserver cluster' process is in operation!"
+   else
+      Hherereturn=0
+   fi
+   rm -f $MYFILE 
+   if [ $Hherereturn -eq 0 ]; then
+      return 0
+   elif [ "$Hrcinit" = "suc" ]; then
+      sleep 5
+      Hdeadloop=$[$Hdeadloop+1]
+      if [ $Hdeadloop -ge 600 ]; then
+         return 1
+      fi
+      continue
+   else
+      return 1
+   fi
+done
+}
+fixat()
+{
+# The following is for apache+tomcats cluster to work more harmoniously 
+cd /usr/local
+for i in `ls -dr tomcat*/ 2>/dev/null | sed -re "s/\/$//" `;do
+   /root/mode/check_tomcat $i || continue
+   if /root/mode/isatom $i apache$Hservert; then
+      Htcsta=`/root/mode/tctomcat $i`
+      if ! echo "$Htcsta" | grep -E '^at unknown' >/dev/null; then
+         if ! /root/mode/tomtoact $i "$Htcsta"; then
+            /root/mode/setwsta $i 2 >/dev/null 2>&1
+         else
+            /root/mode/setwsta $i a >/dev/null 2>&1
+         fi
+      fi
+   fi
+done
+}
+start()
+{
+cd /usr/local
+for i in `ls -d tomcat*/ 2>/dev/null | sed -re "s/\/$//" `;do
+   /root/mode/check_tomcat $i || continue
+   if [ "$Hlnserver" = "gcserver" ]; then
+      if ! /root/mode/isctom $i; then
+         /root/mode/start_tomcat $i
+      elif /root/mode/isatom $i apache; then
+         /root/mode/start_tomcat $i
+      fi
+   elif /root/mode/isatom $i apache$Hservert; then
+      /root/mode/start_tomcat $i
+   fi
+done
+[ -f /usr/local/apache$Hservert/bin/apachectl ] && /root/mode/apachectl apache$Hservert -k start
+fixat
+if ! touch /var/lock/subsys/$Hlnserver 2>/dev/null; then
+   /root/mode/modemsg $Hlnserver "Wow!No authority to touch file /var/lock/subsys/$Hlnserver"
+   /root/mode/modemsg $Hlnserver "You must give user '$USER' read/write authority for system directory /var/lock/subsys before user '$USER' can execute script 'gcserver' successfully!"
+fi
+}
+stop()
+{
+[ -f /usr/local/apache$Hservert/bin/apachectl ] && /root/mode/apachectl apache$Hservert -k stop
+cd /usr/local
+for i in `ls -d tomcat*/ 2>/dev/null | sed -re "s/\/$//" `;do
+   /root/mode/check_tomcat $i || continue
+   if [ "$Hlnserver" = "gcserver" ]; then
+      if ! /root/mode/isctom $i; then
+         /root/mode/stop_tomcat $i
+      elif /root/mode/isatom $i apache; then
+         /root/mode/stop_tomcat $i
+      fi
+   elif /root/mode/isatom $i apache$Hservert; then
+      /root/mode/stop_tomcat $i
+   fi
+done
+if ! rm -f /var/lock/subsys/$Hlnserver 2>/dev/null; then 
+   /root/mode/modemsg $Hlnserver "Wow!No authority to remove file /var/lock/subsys/$Hlnserver"
+   /root/mode/modemsg $Hlnserver "You must give user '$USER' read/write authority for system directory /var/lock/subsys before user '$USER' can execute script 'gcserver' successfully!"
+fi
+}
+apache()
+{
+if [ -f /usr/local/apache$Hservert/bin/apachectl ]; then
+   if /root/mode/apcfull apache$Hservert; then 
+      /root/mode/apachectl apache$Hservert -k restart
+   else
+      /root/mode/apachectl apache$Hservert -k graceful
+   fi
+fi
+fixat
+}
+apachestart()
+{
+if [ -f /usr/local/apache$Hservert/bin/apachectl ]; then
+   /root/mode/apachectl apache$Hservert -k start
+fi
+fixat
+}
+apachestop()
+{
+if [ -f /usr/local/apache$Hservert/bin/apachectl ]; then
+   /root/mode/apachectl apache$Hservert -k stop
+fi
+}
+apacherestart()
+{
+if [ -f /usr/local/apache$Hservert/bin/apachectl ]; then
+   /root/mode/apachectl apache$Hservert -k restart
+fi
+fixat
+}
+Apacherestart()
+{
+if [ -f /usr/local/apache$Hservert/bin/apachectl ]; then
+   /root/mode/apachectl apache$Hservert -k stop
+   /root/mode/apachectl apache$Hservert -k start
+fi
+fixat
+}
+cluster()
+{
+cd /usr/local
+for i in `ls -d tomcat*/ 2>/dev/null | sed -re "s/\/$//" `;do
+   /root/mode/check_tomcat $i || continue
+   # only restart cluster tomcats for specific apache
+   if /root/mode/isatom $i apache$Hservert; then
+      /root/mode/stop_tomcat $i
+      /root/mode/start_tomcat $i
+   fi
+done
+apache
+}
+show()
+{
+# to mod
+ps -ef | grep -E apache | grep -v grep 
+}
+status()
+{
+Happ=0
+Hctom=0
+Hctom_unkn=0
+Hctom_norm=0
+Hctom_abno=0
+Hctom_down=0
+Hntom=0
+
+# test apache httpd
+
+if [ -f /usr/local/apache$Hservert/bin/apachectl ]; then
+   if [ `ps -ef | grep -E "/usr/local/apache$Hservert/bin/httpd" | grep -v grep | wc -l` -eq 0 ]; then
+      Happ=1
+      /root/mode/modemsg $Hlnserver "Apache$Hservert httpd server is not running"
+   else
+      Happ=2
+      /root/mode/modemsg $Hlnserver "Apache$Hservert httpd server is running"
+   fi
+else
+   Happ=0
+   /root/mode/modemsg $Hlnserver "Apache$Hservert httpd server is not installed"
+fi
+
+# test tomcat and zombie tomcat process will be killed
+
+cd /usr/local
+for i in `ls -d tomcat*/ 2>/dev/null | sed -re "s/\/$//"`; do
+   /root/mode/check_tomcat $i || continue 
+   Hiscluster=0
+   if /root/mode/isctom $i; then
+      if /root/mode/isatom $i apache$Hservert; then
+         Hiscluster=1
+         Htcsta=`/root/mode/tctomcat $i`
+         /root/mode/modemsg $Hlnserver "Cluster$Hservert tomcat($i) is $Htcsta"
+         Hctom=$[$Hctom+1]
+      else
+         continue
+      fi
+   else
+      if [ "$Hlnserver" = "gcserver" ]; then
+         Htcsta=`/root/mode/tctomcat $i`
+         /root/mode/modemsg $Hlnserver "Noncluster tomcat($i) is $Htcsta"
+         Hntom=$[$Hntom+1]
+      else
+         continue
+      fi
+   fi
+   if [ $Hiscluster -eq 1 ]; then
+      if echo "$Htcsta" | grep -E '^at unknown' >/dev/null; then
+         Hctom_unkn=$[$Hctom_unkn+1]
+      elif [ "$Htcsta" = "down" ]; then
+         Hctom_down=$[$Hctom_down+1]
+      elif echo "$Htcsta" | grep -E "^up" >/dev/null; then
+         if /root/mode/tomtoact $i "$Htcsta"; then
+            Hctom_norm=$[$Hctom_norm+1]
+         else
+            Hctom_abno=$[$Hctom_abno+1]
+         fi
+      else
+         Hctom_abno=$[$Hctom_abno+1]
+      fi
+   fi
+done
+
+Hretstat=0
+
+# display installation information
+
+if [ $Hctom -eq 0 ]; then
+   if [ $Happ -eq 0 ]; then
+      /root/mode/modemsg $Hlnserver "$Hlnserver is not installed!"
+   else
+      /root/mode/modemsg $Hlnserver "Tomcat cluster$Hservert is not installed!"
+   fi
+elif [ $Hctom -eq 1 ]; then
+   /root/mode/modemsg $Hlnserver "Tomcat cluster$Hservert is not installed completely!"
+   Hretstat=1
+fi
+
+# display running information
+      
+if [ $Happ -eq 1 ]; then
+   /root/mode/modemsg $Hlnserver "$Hlnserver is not working!!!"
+   Hretstat=1
+elif [ $Happ -eq 2 ]; then
+   if [ $Hctom_norm -gt 0 ]; then
+      if [ $Hctom_down -gt 0 ]; then
+         if [ $Hctom_abno -gt 0 ]; then
+            /root/mode/modemsg $Hlnserver "$Hlnserver is working with $Hctom_down cluster$Hservert tomcat down and $Hctom_abno cluster$Hservert tomcat in middle status!"
+         else
+            /root/mode/modemsg $Hlnserver "$Hlnserver is working with $Hctom_down cluster$Hservert tomcat down!"
+         fi
+      elif [ $Hctom_abno -gt 0 ]; then
+         /root/mode/modemsg $Hlnserver "$Hlnserver is working with $Hctom_abno cluster$Hservert tomcat in middle status!"
+      else
+         /root/mode/modemsg $Hlnserver "$Hlnserver is working!"
+      fi
+      Hretstat=0
+   elif [ $Hctom_unkn -gt 0 ]; then
+      /root/mode/modemsg $Hlnserver "$Hlnserver is at unknown port usage status for current user '$USER' authority!"
+      Hretstat=0
+   else
+      /root/mode/modemsg $Hlnserver "$Hlnserver is not working!"
+      Hretstat=1
+   fi
+fi
+echo
+return $Hretstat
+}
+# 
+trap "" INT
+/root/mode/modelog "$0 $*"
+export Hlnserver=`echo $0 | sed -re "s/.*(gcserver.*)/\1/"`
+export Hservert=`echo $0 | sed -re "s/.*gcserver(.*)/\1/"`
+export Hgcsrvpno=$$
+export Hrcinit=`/root/mode/traceps "/bin/bash /etc/rc\.d/rc"`
+case $1 in
+start)
+tgcserver start && start
+;;
+stop)
+tgcserver stop  && stop
+;;
+restart)
+tgcserver restart &&
+{
+stop
+start
+}
+;;
+cluster)
+tgcserver cluster && cluster
+;;
+apache)
+apache
+;;
+apachestart)
+apachestart
+;;
+apachestop)
+apachestop
+;;
+apacherestart)
+apacherestart
+;;
+Apacherestart)
+Apacherestart
+;;
+show)
+show
+;;
+status)
+status
+;;
+*)
+show
+;;
+esac
+

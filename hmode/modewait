@@ -1,0 +1,36 @@
+#!/bin/bash 
+
+
+#
+
+Hw_minsecs=1
+Hw_maxsecs=120
+Hw_default=30
+
+# get wait seconds from $1
+
+Hw_s=${1:-$Hw_default}
+if (echo "$Hw_s"  | grep -E  "^[0-9]+$" > /dev/null); then
+   if [ $Hw_s -gt $Hw_maxsecs ]; then
+      Hw_s=$Hw_maxsecs
+   elif [ $Hw_s -lt $Hw_minsecs ]; then
+      Hw_s=$Hw_minsecs
+   fi
+else
+   Hw_s=$Hw_default
+fi
+
+# do wait
+
+echo
+while [ $Hw_s -gt 0 ]; do
+   echo -n -e "\rPress any key to continue ... $Hw_s   "
+   Hw_s=$[$Hw_s-1]
+   read -t 1 && break
+done
+if [ $Hw_s -eq 0 ]; then
+   echo
+fi
+echo 
+
+#

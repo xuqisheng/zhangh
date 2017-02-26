@@ -1,0 +1,101 @@
+#!/bin/bash 
+# ---------------------------------------------------
+# function:
+#          add a tomcat to a tomcat cluster 
+# ---------------------------------------------------
+
+# some requirements
+
+. /root/mode/cpumem
+
+Hchkpassed=
+if [ $HTTLMEM -ge 15000 ]; then
+   if [ ! -x /usr/sbin/mysqld ]; then
+      if [ `/root/mode/cpucores` -ge 8 ]; then
+         Hchkpassed=1
+      fi
+   else
+      if [ `/root/mode/cpucores` -ge 16 ]; then
+         Hchkpassed=1
+      fi
+   fi
+fi
+if [ -z "$Hchkpassed" ]; then
+   /root/mode/modemsg addctom "Not good enough configurations" more
+   exit 1
+fi
+
+# apache httpd server check
+
+. /root/mode/apachemode 
+
+#
+
+if [ ! -d /usr/local/$Hapachemode/conf ]; then
+   /root/mode/modemsg addctom "No $Hapachemode httpd server!" more
+   exit 1
+fi
+
+# confirmation
+
+if ! /root/mode/confirm "Are you sure to add a tomcat to $Hapachemode tomcat cluster" more; then
+   exit 1 
+fi
+
+# OK,let's go on
+
+# install tomcat
+
+export HCTOMMORE=yes
+export Hinst_Ctom=1
+if ! /root/mode/inst_tomcat $Hapachemode; then
+   /root/mode/modemsg addctom "You don't need to add tomcat to $Hapachemode tomcat cluster!" more
+   exit 1
+fi
+
+# find a tomcat in $Hapachemode server with ipms
+
+cd /usr/local
+Hftomcat=
+for i in `ls -d tomcat*/ 2>/dev/null | sed -re "s/\/$//" `;do
+    /root/mode/check_tomcat $i || continue
+    if /root/mode/isatom $i $Hapachemode; then
+       if [ `ls -1d /usr/local/$i/webapps/ipms*/ 2>/dev/null | wc -l` -gt 0 ]; then
+          Hftomcat=$i
+          break
+       fi
+    fi
+done
+
+# copy ipms/ipms1 from $Hftomcat to new tomcat
+
+if [ -n "$Hftomcat" ]; then
+   cd /usr/local
+   for i in `ls -d tomcat*/ 2>/dev/null | sed -re "s/\/$//" `;do
+       /root/mode/check_tomcat $i || continue
+       if /root/mode/isatom $i $Hapachemode; then
+          if [ -d /usr/local/$i/webapps ]; then
+             if [ `ls -1d /usr/local/$i/webapps/ipms*/ 2>/dev/null | wc -l` -eq 0 ]; then
+                /root/mode/modemsg addctom "Copying data from $Hftomcat to $i ......" more
+                cp -fR /usr/local/$Hftomcat/webapps/ipms*  /usr/local/$i/webapps
+             fi
+          fi
+       fi
+   done
+fi
+
+# reconfigure
+
+/root/mode/mod_tthread
+/root/mode/config_tomcat
+/root/mode/config_apache $Hapachemode
+
+#
+
+if /root/mode/gcserver$Hapachetail status 2>&1 | grep -E 'httpd server is running' >/dev/null; then
+   /root/mode/gcserver$Hapachetail apache
+   /root/mode/gcserver$Hapachetail start 
+fi
+
+# end
+

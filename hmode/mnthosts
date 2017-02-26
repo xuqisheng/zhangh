@@ -1,0 +1,66 @@
+#!/bin/bash
+# ----------------------------------------------------------------------------
+# function:
+#           maintain hosts for neccessary setting
+# ----------------------------------------------------------------------------
+
+# exclusive execution with wait mode
+
+/root/mode/modepv mnthosts $$ " /bin/bash .*/mnthosts"
+
+#  
+
+/root/mode/fixhosts
+
+# hostname 
+
+Hhostname=`hostname`
+if echo "$Hhostname" | grep -E "^(localhost|localhost\.localdomain|localhost4|localhost4\.localdomain4)$" >/dev/null; then
+   H127host=
+else
+   H127host=" $Hhostname"
+fi
+
+#
+
+{
+  echo "# Do not remove the following line, or various programs"
+  echo "# that require network functionality will fail."
+  echo "127.0.0.1 localhost  localhost.localdomain localhost4 localhost4.localdomain4$H127host"
+  echo "::1       localhost6 localhost6.localdomain6"
+  cat /etc/hosts | grep -Ev "^(# Do not remove the following line, or various programs|# that require network functionality will fail|127\.0\.0\.1|::1)" |
+  while read -r i;do
+     Htodel=0
+     if [ -n "$i" ]; then
+        Hippart=`echo $i | sed -re "s/^([^ \t]+).*/\1/"`
+        Hippart1=`/root/mode/nmlizeip "$Hippart"`
+        if echo "$Hippart" | grep -E "^#" >/dev/null; then
+           # comments
+           # reserve it
+           :
+        elif [ "$Hippart" != "$Hippart1" ]; then
+           # ip not supported by dns now(both local and not local)
+           # mark it to be deleted
+           Htodel=1
+        fi
+     fi
+     if [ $Htodel -eq 0 ]; then
+        echo "$i"
+     else
+        echo "# The following line was commented by mode at `LANG=en_US;date`"
+        echo "# $i"
+     fi
+  done
+} >/root/mode/tmp/htmphosts$$.tmp
+
+if ! cmp /root/mode/tmp/htmphosts$$.tmp /etc/hosts &>/dev/null; then
+   cp -f /root/mode/tmp/htmphosts$$.tmp /etc/hosts
+fi
+rm -f /root/mode/tmp/htmphosts$$.tmp
+
+# 
+
+/root/mode/.modesid &>/dev/null
+
+#
+

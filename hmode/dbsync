@@ -1,0 +1,360 @@
+#!/bin/sh
+# -------------------------------------------------------------------------------------
+# function:
+#          synchronize table structures of two databases
+# -------------------------------------------------------------------------------------
+# usages  :
+#          ./dbsync [<mysql-server-ip>] <dbname1> <dbname2> 
+# e.g.    :
+#          ./dbsync 6.13 db1 db2
+# -------------------------------------------------------------------------------------
+
+# check reentrance
+
+if [ -x /etc/ifconfig ]; then
+   HSHTMP=""
+else
+   HSHTMP="sh.*"
+fi
+MYFILE="/root/mode/tmp/hrydbsync$$.tmp"
+ps -ef > $MYFILE
+if [ `grep -E "${HSHTMP}dbsync" $MYFILE | grep -v "exectask dbsync" | wc -l` -gt 1 ]; then
+   rm -f $MYFILE 
+   echo "Another dbsync task is running!" && exit 1
+fi
+rm -f $MYFILE 
+
+# get options
+
+HOPTIONS=""
+while (echo "'$1'"  | grep -E  -e "^'-" > /dev/null)
+do
+   HOPTIONS="$HOPTIONS$1"
+   shift 
+done
+
+# get mysql server ip 
+
+. /root/mode/mysqldip
+
+# check if databases are provided to synchronize
+
+HDBCNT=$#
+
+if [ "$HDBCNT" -eq 0 ]; then
+   echo "Databases should be provided for dbsync to synchronize!!" && exit 1
+fi
+
+# check if duplicate dbnames exist
+
+HDBS="$*"
+
+if [ `echo $HDBS | tr " " "\n" | wc -l` -ne `echo $HDBS | tr " " "\n" | sort | uniq -u | wc -l` ]; then
+   echo "Duplicate databases are not allowed!!" && exit 1
+fi 
+
+# 2 and only 2 databases are required
+
+if [ $HDBCNT -lt 2 ]; then
+   echo "Two databases are required for dbsync to synchronize!" && exit 1
+elif [ $HDBCNT -gt 2 ]; then
+   echo "Only two databases are allowed for dbsync to synchronize!" && exit 1
+fi
+
+# check if each database is appropriate 
+
+for i in `echo $HDBS`;do
+   /root/mode/testdb $HMYSQLDIP $i || exit 1
+done
+
+# confirm 
+
+if [ "$HNCONFIRM_MODE" = 'y' ]; then
+   :
+else
+   /root/mode/confirm "Are you sure to synchronize $HDBS at $HMYSQLDIP2" || exit 1 
+fi 
+
+# begin to synchronize  
+
+HDBCNT=0
+for i in `echo $HDBS`; do
+   HDBCNT=$[$HDBCNT+1]
+   eval HDB$HDBCNT=$i
+done
+HTBLIST="/root/mode/tmp/htblist$$.tmp"
+HTBLIST1="/root/mode/tmp/htblist1$$.tmp"
+HTBLIST2="/root/mode/tmp/htblist2$$.tmp"
+HTBLISTA="/root/mode/tmp/htblista$$.tmp"
+HTBLISTB="/root/mode/tmp/htblistb$$.tmp"
+HTBDES1="/root/mode/tmp/htbdes1$$.tmp"
+HTBDES2="/root/mode/tmp/htbdes2$$.tmp"
+HCRETAB="/root/mode/tmp/hcretab$$.sql"
+
+/root/mode/seecfg -s $HMYSQLDIP "select table_name from tables where table_schema ='$HDB1'" information_schema > $HTBLIST1
+/root/mode/seecfg -s $HMYSQLDIP "select table_name from tables where table_schema ='$HDB2'" information_schema > $HTBLIST2
+
+cat $HTBLIST1 $HTBLIST2 | sort | uniq -d | uniq > $HTBLIST
+cat $HTBLIST  $HTBLIST1 | sort | uniq -u > $HTBLISTA
+cat $HTBLIST  $HTBLIST2 | sort | uniq -u > $HTBLISTB
+
+{
+echo "############# dbsync $HMYSQLDIP2 $* #############"
+echo 
+echo "dbsync began at `LANG=en_US;date`"
+
+for i in `cat $HTBLISTA`;do
+   # tables only in $HDB1
+   if [ "$HSYNCTAB" = 'yes' ]; then
+      echo "create table $i in database << $HDB2 >>"
+      /root/mode/seecfg -s $HMYSQLDIP "show create table \`$i\`\G" $HDB1 | sed -nre "3,$ p" > $HCRETAB
+      /root/mode/seecfg $HMYSQLDIP $HCRETAB $HDB2
+   fi
+done
+for i in `cat $HTBLISTB`;do
+   # tables only in $HDB2
+   if [ "$HSYNCTAB" = 'yes' ]; then
+      echo "create table $i in database << $HDB1 >>"
+      /root/mode/seecfg -s $HMYSQLDIP "show create table \`$i\`\G" $HDB2 | sed -nre "3,$ p" > $HCRETAB
+      /root/mode/seecfg $HMYSQLDIP $HCRETAB $HDB1
+   fi
+done
+for i in `cat $HTBLIST`;do
+   # tables in both $HDB1 and $HDB2
+   /root/mode/seecfg -s $HMYSQLDIP "describe \`$i\`" $HDB1 | sed -re "s/^(.*)$/HrYhBy\1HrYhBy/" > $HTBDES1
+   /root/mode/seecfg -s $HMYSQLDIP "describe \`$i\`" $HDB2 | sed -re "s/^(.*)$/HrYhBy\1HrYhBy/" > $HTBDES2
+
+   if cmp -s $HTBDES1 $HTBDES2; then
+      continue
+   fi
+   HDLOOP=0
+   while [ $HDLOOP -lt 2 ];do
+      HDLOOP=$[$HDLOOP+1]
+      if [ $HDLOOP -eq 1 ]; then
+         HNLOOP=2
+      else
+         HNLOOP=1
+         /root/mode/seecfg -s $HMYSQLDIP "describe \`$i\`" $HDB1 | sed -re "s/^(.*)$/HrYhBy\1HrYhBy/" > $HTBDES1
+         /root/mode/seecfg -s $HMYSQLDIP "describe \`$i\`" $HDB2 | sed -re "s/^(.*)$/HrYhBy\1HrYhBy/" > $HTBDES2
+      fi 
+      cat `eval echo \\\$HTBDES$HDLOOP` |
+      while read -r j;do
+         # get line from dynamically  first column file
+
+         H1LINE=`echo "$j" | sed -re "s/^HrYhBy(.*)HrYhBy/\1/"`
+         H1COL=`echo "$H1LINE" | sed -re "s/^([^\t]*).*/\1/"`
+         H1COLL=`echo "$H1COL" | tr "A-Z" "a-z"`
+         H1TYPE=`echo "$H1LINE" | sed -re "s/^([^\t]*\t){1}([^\t]*)\t.*/\2/"`
+         H1NULL=`echo "$H1LINE" | sed -re "s/^([^\t]*\t){2}([^\t]*)\t.*/\2/"`
+         H1KEY=`echo "$H1LINE" | sed -re "s/^([^\t]*\t){3}([^\t]*)\t.*/\2/"`
+         H1DEFAULT=`echo "$H1LINE" | sed -re "s/^([^\t]*\t){4}([^\t]*)\t.*/\2/"`
+         H1EXTRA=`echo "$H1LINE" | sed -re "s/^([^\t]*\t){5}(.*)$/\2/"`
+
+         # check if this field is in dynamically second column file
+
+         HINDES2=
+         if cat `eval echo \\\$HTBDES\$HNLOOP` | grep -i "^HrYhBy$H1COLL	" >/dev/null; then
+            HINDES2=y
+            k=$(cat `eval echo \\\$HTBDES$HNLOOP` | grep -i "^HrYhBy$H1COLL	")
+            H2LINE=`echo "$k" | sed -re "s/^HrYhBy(.*)HrYhBy/\1/"`
+            if [ "$H1LINE" = "$H2LINE" ]; then
+               continue
+            fi
+            H2COL=`echo "$H2LINE" | sed -re "s/^([^\t]*).*/\1/"`
+            H2COLL=`echo "$H2COL" | tr "A-Z" "a-z"`
+            H2TYPE=`echo "$H2LINE" | sed -re "s/^([^\t]*\t){1}([^\t]*)\t.*/\2/"`
+            H2NULL=`echo "$H2LINE" | sed -re "s/^([^\t]*\t){2}([^\t]*)\t.*/\2/"`
+            H2KEY=`echo "$H2LINE" | sed -re "s/^([^\t]*\t){3}([^\t]*)\t.*/\2/"`
+            H2DEFAULT=`echo "$H2LINE" | sed -re "s/^([^\t]*\t){4}([^\t]*)\t.*/\2/"`
+            H2EXTRA=`echo "$H2LINE" | sed -re "s/^([^\t]*\t){5}(.*)$/\2/"`
+         fi
+         if [ -z "$HINDES2" ]; then
+            if [ "$H1NULL" = "YES" ]; then
+               H1NULL="NULL"
+            else
+               H1NULL="NOT NULL"
+            fi
+
+            if [ "$H1DEFAULT" = "NULL" ]; then
+               if [ "$H1NULL" = "NOT NULL" ];then
+                  #echo "warning: database $HDB1 table $i column $H1COLL default value is null with 'not null' constraint"
+                  H1DEFAULT=""
+               else
+                  if echo "$H1TYPE" | grep "char" > /dev/null; then
+                     HRNULL=$(/root/mode/seecfg -s $HMYSQLDIP \
+                              "select 1 from columns \
+                                        where table_schema='`eval echo \\\$HDB$HDLOOP`' \
+                                              and table_name='$i' \
+                                              and column_name='$H1COL' \
+                                              and column_default='NULL'" information_schema)
+                     if [ -z "$HRNULL" ];then
+                        H1DEFAULT="DEFAULT NULL"
+                     else
+                        H1DEFAULT="DEFAULT 'NULL'"
+                     fi
+                  else
+                     H1DEFAULT="DEFAULT NULL"
+                  fi
+               fi
+            elif echo "$H1TYPE" | grep -E "(blob|text)" >/dev/null; then
+               #default not allowed
+               H1DEFAULT=""
+            else
+               # ' doubled 
+               H1DEFAULT="`echo \"$H1DEFAULT\" | sed -re \"s/'/''/g\"`"
+               H1DEFAULT="DEFAULT '$H1DEFAULT'"
+            fi
+
+            # extra (auto_increment)
+
+            # added 2013-06-28 
+
+            if [ "$H1EXTRA" = "auto_increment" ]; then
+               H1DEFAULT=
+            fi
+
+            # PRI key
+
+            if [ "$H1KEY" = "PRI" ]; then
+               H1NKEY=",add primary key($H1COLL)"
+            else
+               H1NKEY=""
+            fi
+
+            echo
+            echo "Database <<`eval echo \\\$HDB$HNLOOP`>>"
+            echo "           alter table $i add $H1COLL $H1TYPE $H1NULL $H1DEFAULT $H1EXTRA $H1NKEY"
+            /root/mode/seecfg $HMYSQLDIP "alter table \`$i\` add \`$H1COLL\` $H1TYPE $H1NULL $H1DEFAULT $H1EXTRA $H1NKEY" `eval echo \\\$HDB$HNLOOP`
+            continue
+         fi
+
+         HTYPECMP=3
+         if [ "$H1TYPE" != "$H2TYPE" ]; then
+            HTYPECMP=`/root/mode/mtypesel0 "$H1TYPE" "$H2TYPE"`
+         fi
+         if [ "$HTYPECMP" -eq 0 ]; then
+            continue
+         elif [ "$HTYPECMP" -eq 1 ]; then
+            HNTYPE="$H1TYPE"
+         elif [ "$HTYPECMP" -eq 2 ]; then
+            HNTYPE="$H2TYPE"
+         else
+            HNTYPE="$H1TYPE"
+         fi
+
+         # NULL constraint
+
+         if echo "$H1NULL$H2NULL" | grep "YES" >/dev/null; then
+            HNNULL="NULL"
+         else
+            HNNULL="NOT NULL"
+         fi
+
+         # default
+
+         if [ "$H1DEFAULT" = "NULL" -a "$H2DEFAULT" = "NULL" ]; then
+            if [ "$HNNULL" = "NOT NULL" ];then
+               HNDEFAULT=""
+            else
+               if echo "$H1TYPE" | grep "char" > /dev/null; then
+                  HRNULL1=$(/root/mode/seecfg -s $HMYSQLDIP \
+                          "select 1 from columns \
+                                    where table_schema='`eval echo \\\$HDB$HDLOOP`' \
+                                          and table_name='$i' \
+                                          and column_name='$H1COL' \
+                                          and column_default='NULL'" information_schema)
+                  HRNULL2=$(/root/mode/seecfg -s $HMYSQLDIP \
+                          "select 1 from columns \
+                                    where table_schema='`eval echo \\\$HDB$HNLOOP`' \
+                                          and table_name='$i' \
+                                          and column_name='$H2COL' \
+                                          and column_default='NULL'" information_schema)
+                  if [ -z "$HRNULL1" -a -z "$HRNULL2" ]; then
+                     HNDEFAULT="DEFAULT NULL"
+                  else
+                     HNDEFAULT="DEFAULT 'NULL'"
+                  fi
+               else
+                  HNDEFAULT="DEFAULT NULL"
+               fi
+            fi
+         elif echo "$H1TYPE" | grep -E "(blob|text)" >/dev/null; then
+            #default not allowed
+            HNDEFAULT=""
+         else
+            if [ "$H1DEFAULT" = "NULL" -a "$H2DEFAULT" != "NULL" ]; then
+               HNDEFAULT="$H2DEFAULT"
+            elif [ "$H1DEFAULT" != "NULL" -a "$H2DEFAULT" = "NULL" ]; then
+               HNDEFAULT="$H1DEFAULT"
+            else
+               if [ $HTYPECMP -eq 1 ]; then
+                  HNDEFAULT="$H1DEFAULT"
+               elif [ $HTYPECMP -eq 2 ]; then
+                  HNDEFAULT="$H2DEFAULT"
+               else
+                  HNDEFAULT="$H1DEFAULT"
+               fi
+            fi
+            # ' doubled 
+            HNDEFAULT="`echo \"$HNDEFAULT\" | sed -re \"s/'/''/g\"`"
+            HNDEFAULT="DEFAULT '$HNDEFAULT'"
+         fi
+
+         # extra (auto_increment)
+
+         if [ -n "$H1EXTRA" ]; then
+            HNEXTRA="$H1EXTRA"
+         elif [ -n "$H2EXTRA" ]; then
+            HNEXTRA="$H2EXTRA"
+         else
+            HNEXTRA=""
+         fi
+
+         # added 2013-06-28 
+
+         if [ "$HNEXTRA" = "auto_increment" ]; then
+            HNDEFAULT=
+         fi
+
+         # PRI key
+
+         if [ "$H1KEY" = "PRI" ]; then
+            if [ "$H2KEY" != "PRI" ]; then
+               H2NKEY=",add primary key($H2COLL)"
+            else
+               H2NKEY=""
+            fi
+         else
+            if [ "$H2KEY" = "PRI" ]; then
+               H1NKEY=",add primary key($H1COLL)"
+            else
+               H1NKEY=""
+            fi
+         fi
+
+         echo
+         echo "Database <<`eval echo \\\$HDB$HDLOOP`>>"
+         echo "           alter table $i change $H1COL $H1COLL $HNTYPE $HNNULL $HNDEFAULT $HNEXTRA $H1NKEY"
+         echo "Database <<`eval echo \\\$HDB$HNLOOP`>>"
+         echo "           alter table $i change $H2COL $H2COLL $HNTYPE $HNNULL $HNDEFAULT $HNEXTRA $H2NKEY"
+         /root/mode/seecfg $HMYSQLDIP "alter table \`$i\` change \`$H1COL\` \`$H1COLL\` $HNTYPE $HNNULL $HNDEFAULT $HNEXTRA $H1NKEY" `eval echo \\\$HDB$HDLOOP`
+         /root/mode/seecfg $HMYSQLDIP "alter table \`$i\` change \`$H2COL\` \`$H2COLL\` $HNTYPE $HNNULL $HNDEFAULT $HNEXTRA $H2NKEY" `eval echo \\\$HDB$HNLOOP`
+      done
+   done
+done
+echo 
+echo "dbsync completed at `LANG=en_US;date`"
+echo
+} | tee -a /root/mode/logs/dbsync.log
+#
+
+rm -f $HTBLIST
+rm -f $HTBLIST1
+rm -f $HTBLIST2
+rm -f $HTBLISTA
+rm -f $HTBLISTB
+rm -f $HTBDES1
+rm -f $HTBDES2
+rm -f $HCRETAB
+
+

@@ -1,0 +1,8 @@
+#!/bin/bash 
+
+if ping -A -c 2 -W 2 183.129.215.114 2>&1 | grep -E '(100% packet loss|Network is unreachable)' >/dev/null; then
+   exit 1
+elif ping -A -c 4 -W 5 www.baidu.com 2>&1 | grep -E "(100% packet loss|unknown host www\.baidu\.com)" >/dev/null; then
+   exit 1
+fi
+exit 0

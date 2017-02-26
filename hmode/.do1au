@@ -1,0 +1,30 @@
+#!/bin/bash
+# ---------------------------------------------------
+# function:
+# ---------------------------------------------------
+
+. /root/mode/mysqldip
+
+#
+
+H1="$1"
+H2=${2:-deviskaifa}
+
+# display
+
+/root/mode/modemsg "***" "$HMYSQLDIP2" more
+/root/mode/seecfg $HMYSQLDIP "select user,host,password from user order by host desc,user desc"
+
+# display only
+
+[ -z "$H1" ] && exit 1
+
+# set and display again 
+
+/root/mode/seecfg $HMYSQLDIP "grant all on *.* to $H1 identified by '$H2' with grant option;flush privileges" 
+/root/mode/modemsg "***" "$HMYSQLDIP2" more
+/root/mode/seecfg $HMYSQLDIP "select user,host,password from user order by host desc,user desc"
+
+# end
+
+

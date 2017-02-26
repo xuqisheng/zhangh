@@ -1,0 +1,23 @@
+#!/bin/bash 
+# ----------------------------------------------------
+# function: do memory related check
+# usages  :
+#          ./health_check_memory
+#          /root/mode/health_check_memory
+# ----------------------------------------------------
+
+#
+
+Hclrcache=`/root/mode/clrcache 2>&1`
+
+#
+
+if echo "$Hclrcache" | grep -E "Please add system memory as soon as possible" >/dev/null; then
+   echo "memory#ModeD#memory stress - severe - No sufficient memory for the workload"
+elif echo "$Hclrcache" | grep -E "No sufficient memory for the workload" >/dev/null; then
+   echo "memory#ModeD#memory stress - No sufficient memory for the workload"
+fi
+
+# end of memory checks
+
+

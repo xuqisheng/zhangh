@@ -1,0 +1,24 @@
+#!/bin/bash
+
+. /root/mode/mysqldip 
+
+if [ -n "$1" ]; then
+   HDBNAME="$1"
+else
+   HDBNAME=`cat /root/antDep/build.properties 2>/dev/null | tr -d "\r" | grep -E "^db\.name=" | sed -re "s/.*=(.*)/\1/"`
+   [ -z "$HDBNAME" ] && exit 1
+fi
+
+#
+
+echo
+echo "============ group code information of $HDBNAME at $HMYSQLDIP2 ==========="
+echo
+
+#
+
+/root/mode/seecfg $HMYSQLDIP "select id,code,descript from hotel_group order by id" $HDBNAME
+
+# end
+
+

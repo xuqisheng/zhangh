@@ -1,0 +1,52 @@
+#!/bin/bash
+# ---------------------------------------------
+# function:
+#          return installed tomcat no 
+# usages  :
+#          ./ctomno -c               # cluster tomcat no of all apaches
+#          ./ctomno -c <apachemode>  # cluster tomcat no of apachemode
+#          ./ctomno -n               # noncluster tomcat no
+#          ./ctomno -N               # Noncluster tomcat no
+#          ./ctomno -a               # all tomcat no
+#          ./ctomno <othervalue>     # all tomcat no
+# ---------------------------------------------
+
+# 
+
+HCTOMNOc=0
+HCTOMNOca=0
+HCTOMNOn=0
+HCTOMNON=0
+cd /usr/local
+for i in `ls -d tomcat*/ 2>/dev/null | sed -re "s/\/$//" `;do
+   /root/mode/check_tomcat $i || continue
+   if /root/mode/isctom $i; then
+      HCTOMNOc=$[$HCTOMNOc+1]
+      if /root/mode/isatom $i $2; then
+         HCTOMNOca=$[$HCTOMNOca+1]
+      fi 
+   elif /root/mode/isNtom $i; then
+      HCTOMNON=$[$HCTOMNON+1]
+   else
+      HCTOMNOn=$[$HCTOMNOn+1]
+   fi
+done
+
+#
+
+if [ "$1" = "-c" ]; then
+   if [ "$2" = "" ]; then
+      echo $HCTOMNOc
+   else
+      echo $HCTOMNOca
+   fi
+elif [ "$1" = "-n" ]; then
+   echo $HCTOMNOn
+elif [ "$1" = "-N" ]; then
+   echo $HCTOMNON
+else
+   echo $[$HCTOMNOc+$HCTOMNOn+$HCTOMNON]
+fi
+
+#
+

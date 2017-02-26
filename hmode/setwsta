@@ -1,0 +1,44 @@
+#!/bin/bash
+# -----------------------------------------------------------
+# function: ...
+# -----------------------------------------------------------
+
+#
+
+Htomcat=$1
+if ! /root/mode/isctom $Htomcat; then
+   exit 1
+else
+   if echo $2 | grep -E -e "^[02aAsS]" >/dev/null; then
+      Hcmode=set
+      Hsetsta=$2
+   fi
+   if cat /usr/local/$Htomcat/conf/server.xml | grep -E "<!-- apache[1-7]? -->" >/dev/null; then
+      Hapachemode=`cat /usr/local/$Htomcat/conf/server.xml | grep -E "<!-- apache[1-7]? -->" | sed -re "s/.*<!-- (apache[1-7]?) -->.*/\1/" | sed -n "1 p"`
+   else
+      Hapachemode=apache
+   fi
+fi
+Hline=`cat /usr/local/$Htomcat/conf/server.xml | grep "jvmRoute" | sed -n "$ p"`
+Hworker=`echo "$Hline" | sed -re "s/.*jvmRoute=\"(.*)\">.*/\1/"`
+Hhport=`cat /usr/local/$Hapachemode/conf/httpd.conf 2>/dev/null | grep -E "^Listen" | sed -n "$ p" | awk '{print $2}'`
+#  
+if [ -z "$HNoAPCfullCHK" ]; then
+   if /root/mode/apcfull $Hapachemode; then
+      export HNoAPCfullCHK=yES
+      Hapachetail=`echo $Hapachemode | sed -re "s/apache(.*)/\1/"`
+      /root/mode/gcserver$Hapachetail apacherestart &>/dev/null
+   fi
+fi
+#  
+if [ `/root/mode/seeapc $Hapachemode | wc -l` -gt 0 ]; then
+   if [ "$Hcmode" = "set" ]; then
+      # set 
+      curl --connect-timeout 2 --max-time 2 "http://localhost:$Hhport/hrywfll27001?cmd=update&mime=prop&w=controller&sw=${Hworker}&vwa=${Hsetsta}" &>/dev/null
+   fi
+   # show 
+   curl --connect-timeout 2 --max-time 2 "http://localhost:$Hhport/hrywfll27001?cmd=show&mime=prop&w=controller&sw=${Hworker}" 2>/dev/null| grep -E "^worker\.${Hworker}\.activation" | sed -re "s/.*=(.*)/\1/"
+fi
+
+#
+

@@ -1,0 +1,30 @@
+#!/bin/bash
+# ---------------------------------------------------------------------------------------------------------------------
+# function: 
+#           display MySQL server status description of designated status no
+# usages  :
+#           ./ltcmysql <status no> [<dispmode>]
+# e.g.    :
+#           ./ltcmysql 2      # display the whole status description of 2
+#           ./ltcmysql 2 f    # display the first word of status description of 2
+#           ./ltcmysql 2 n    # display the status No. of 2
+#           ./ltcmysql 2 all  # display the status No. along with its whole description of 2
+# ---------------------------------------------------------------------------------------------------------------------
+
+#
+
+Hino=$1
+Himode=$2
+
+if [ "$Himode" = "n" ]; then
+   cat /root/mode/impfile/mysql/mysqlsta | grep -E "${Hino}:.*" | sed -re "s/^([0-9]+):(([^ ]+).*)/\1/"
+elif [ "$Himode" = "f" ]; then
+   cat /root/mode/impfile/mysql/mysqlsta | grep -E "${Hino}:.*" | sed -re "s/^([0-9]+):(([^ ]+).*)/\3/"
+elif [ "$Himode" = "all" ]; then
+   cat /root/mode/impfile/mysql/mysqlsta | grep -E "${Hino}:.*"
+else
+   cat /root/mode/impfile/mysql/mysqlsta | grep -E "${Hino}:.*" | sed -re "s/^([0-9]+):(([^ ]+).*)/\2/"
+fi
+
+#
+

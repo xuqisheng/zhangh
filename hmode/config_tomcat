@@ -1,0 +1,142 @@
+#!/bin/bash
+# -------------------------------------------------------------------------------------------
+# function:
+#           configure tomcat memory for each tomcat 
+#
+# -------------------------------------------------------------------------------------------
+
+# exclusive execution with wait mode
+
+/root/mode/modepv config_tomcat $$ " /bin/bash .*/config_tomcat"
+
+. /root/mode/cpumem
+
+# tmp file
+
+Hhrytmpfile="/root/mode/tmp/hhrytommem$$.tmp"
+
+# tomcat memory allocation
+
+# ---------------------------------------------------------------------------------------------------------------
+# For noncluster tomcats such as web tomcats,we use fixed memory allocation mode "-Xmx1000m -XX:MaxPermSize=200m",
+# but calculate memory usage with Heapsize=400M and permsize=64M.
+# So comes 464M
+# ---------------------------------------------------------------------------------------------------------------
+HNTOMMEM=$[$HTOMNUMn*464]
+
+if [ $[$HTOMNUMc+$HTOMNUMN] -gt 0 ]; then
+   if [ $HTOMNUMc -gt 0 ]; then
+      HCTOMMEM=$[($HTOMMEM-$HNTOMMEM-$HAPCSIZE)/$[$HTOMNUMc+$HTOMNUMN]]
+   else
+      HCTOMMEM=$[($HTOMMEM-$HNTOMMEM)/($HTOMNUMc+$HTOMNUMN)]
+   fi
+else
+   HCTOMMEM=1000
+fi
+HCTOMMEM=$[$HCTOMMEM-$HPERMSIZE]
+
+# -------------------------------------------------------------------------------------------------
+# decrease HCTOMMEM for cluster and Noncluster tomcats at high memory servers 
+#                                                                                  -- 2015-08-21 -- 
+# -------------------------------------------------------------------------------------------------
+
+if [ $HCTOMMEM -gt $HTOMHLIMIT ]; then
+   HCTOMMEM=$HTOMHLIMIT
+fi
+
+# -------------------------------------------------------------------------------------------------
+# increase HCTOMMEM for cluster and Noncluster tomcats at low memory servers 
+#                                                                                  -- 2015-08-21 -- 
+# -------------------------------------------------------------------------------------------------
+
+if /root/mode/modegate tomcat_elasticmem_max; then
+   # elatic memory allocaltion
+   if [ $HCTOMMEM -lt 1600 ]; then
+      HCTOMMEM=1600
+   fi
+   HTOMMIXMODE=yES
+   HTOMXmsMODE=no
+else
+   # normal allocation 
+   if [ $HCTOMMEM -ge 1500 ]; then
+      if /root/mode/modegate force_tomcat_mixmode; then
+         HTOMMIXMODE=yES
+         if [ "$Hjvcvm" != "yes" ]; then
+            # -Xms mode is triggered
+            HTOMXmsMODE=yES
+         fi
+      fi
+   else 
+      HTOMMIXMODE=yES
+      if [ $HCTOMMEM -ge 1000 ]; then
+         # keep HCTOMMEM
+         if [ "$Hjvcvm" != "yes" ]; then
+            # -Xms mode is triggered
+            HTOMXmsMODE=yES
+         fi
+      else
+         # set memory at least 1000M 
+         HCTOMMEM=1000
+      fi
+   fi
+fi
+
+#
+
+cd /usr/local
+for i in `ls -d tomcat*/ 2>/dev/null | sed -re "s/\/$//" `;do
+    /root/mode/check_tomcat $i || continue
+    if /root/mode/isctom $i || /root/mode/isNtom $i; then
+       if [ "$HTOMMIXMODE" = "yES" ]; then
+          Htconfig="-Xmx${HCTOMMEM}m -XX:MaxPermSize=${HPERMMAX}m"
+          if [ "$HTOMXmsMODE" = "yES" ]; then
+             Htconfig="-Xms${HCTOMMEM}m $Htconfig"
+          fi
+       else
+          HMAXNEW=1000
+          Hnewsize=$[($HCTOMMEM-1000)*($HMAXNEW-500)/1500+500]
+          Htconfig="-Xms${HCTOMMEM}m -Xmx${HCTOMMEM}m -Xmn${Hnewsize}m -XX:MaxPermSize=${HPERMMAX}m"
+       fi
+    else
+       Htconfig="-Xmx1000m -XX:MaxPermSize=200m"
+    fi
+
+    # --------------------------------------------------------------------------
+    # added on 2012-11-16,but commented on 2012-11-24 
+    # Htconfig="$Htconfig -XX:+UseConcMarkSweepGC -XX:+CMSClassUnloadingEnabled"
+    # --------------------------------------------------------------------------
+
+    # --------------------------------------------------------------------------
+    # added on 2013-01-12
+    # --------------------------------------------------------------------------
+    
+    Hgcmode=`/root/mode/gcmode`
+    if [ -n "$Hgcmode" ]; then
+       Htconfig="$Htconfig $Hgcmode"
+    fi
+
+    # add -XX:ReservedCodeCacheSize=64m to Htconfig 
+    #                            ------  2015-06-22
+
+    # add -Duser.timezone=GMT+08
+    #                            ------ 2015-08-05 
+
+    #Htconfig="$Htconfig -Duser.timezone=GMT+08 -XX:ReservedCodeCacheSize=64m -XX:+UseCodeCacheFlushing"
+    Htconfig="$Htconfig -Duser.timezone=GMT+08 -XX:ReservedCodeCacheSize=128m -XX:+UseCodeCacheFlushing"
+
+    #
+
+    if cat /usr/local/$i/bin/catalina.sh | grep -E "^JAVA_OPTS" > /dev/null; then
+       cat /usr/local/$i/bin/catalina.sh |
+       sed -re "s/^JAVA_OPTS=.*(MaxPermSize=[0-9]+m)( +-XX:\+UseParallelOldGC)?( +-Duser\.timezone=GMT\+08)?( +-XX:ReservedCodeCacheSize=[0-9]+m)?( +-XX:\+UseCodeCacheFlushing)?(.*)\"/JAVA_OPTS=\"-server $Htconfig\6\"/" > $Hhrytmpfile
+    else
+       cat /usr/local/$i/bin/catalina.sh | 
+       sed -re "/cygwin=false/ iJAVA_OPTS=\"-server $Htconfig\"" > $Hhrytmpfile
+    fi
+    cp -f $Hhrytmpfile /usr/local/$i/bin/catalina.sh 
+done
+
+# delete tmp file
+
+rm -f  $Hhrytmpfile
+

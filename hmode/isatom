@@ -1,0 +1,31 @@
+#!/bin/bash
+# ------------------------------------------------------------------
+# function:
+#          test if this is a cluster tomcat for an apache
+# usages  :
+#          ./isatom <tomcat> <HAPACHEMODE>
+# ------------------------------------------------------------------
+
+
+cd /usr/local/$1/conf
+if /root/mode/isctom $1; then
+   if [ "$2" = "" -o "$2" = "apache" ]; then
+      if ! cat server.xml | grep -E "<!-- apache[1-7] -->" >/dev/null; then
+         exit 0
+      else
+         exit 1
+      fi
+   else
+      if cat server.xml | grep -E "<!-- $2 -->" >/dev/null; then
+         exit 0
+      else
+         exit 1
+      fi
+   fi
+else
+   exit 1
+fi
+
+#
+
+

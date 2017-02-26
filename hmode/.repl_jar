@@ -1,0 +1,39 @@
+#!/bin/bash 
+
+# get options
+
+HOPTIONS=""
+while (echo "'$1'"  | grep -E  -e "^'-" > /dev/null)
+do
+   HOPTIONS="$HOPTIONS$1"
+   shift
+done
+
+# get the jar file
+
+Hjar="$1"
+if [ -z "$Hjar" ]; then
+   /root/mode/modemsg repl_jar "Please designate a jar file" more
+   exit 1
+elif echo "$Hjar" | grep -E "\.jar$" >/dev/null; then
+   if [ ! -f "$Hjar" ]; then
+      /root/mode/modemsg repl_jar "File $Hjar doesn't exist!" more && exit 1
+   fi
+else
+   /root/mode/modemsg repl_jar "Please provide a jar file ended with '.jar'" more
+   exit 1
+fi
+Hjar_tail=`echo "$Hjar"  | sed -r -e "s/^.*\///"`
+
+# do replacement
+
+find -L /usr/local -name "$Hjar_tail" |
+while read -r Hjar2;do
+   echo "$Hjar2"
+   if [ "$HOPTIONS" = "-e" ] ; then
+       cp -f "$Hjar" "$Hjar2"
+   fi
+done
+
+#
+

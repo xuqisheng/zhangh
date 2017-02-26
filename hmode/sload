@@ -1,0 +1,272 @@
+#!/bin/bash
+# -------------------------------------------------------------------------------
+# function:
+#           load database from directory with separate table dumps in it 
+# usages  :
+#           ./sload [options] [<mysql-server-ip>] <database> <from-dir>
+#           ./sload [options] [<mysql-server-ip>] <database> <from-dir> [--include-tables [table1 table2 ...]]
+#           ./sload [options] [<mysql-server-ip>] <database> <from-dir> [--exclude-tables [table1 table2 ...]]
+# defaults:
+#           No default database
+# e.g.    :
+#           ./sload portal /mydump      
+# -------------------------------------------------------------------------------
+
+# get options
+
+HOPTIONS=""
+while (echo "'$1'"  | grep -E  -e "^'-" > /dev/null)
+do
+   HOPTIONS="$HOPTIONS$1"
+   shift
+done
+
+# get mysql server ip
+
+. /root/mode/mysqldip
+
+# database name to load
+
+if [ -z "$1" ]; then
+   /root/mode/modemsg sload "You must privide database name to dump!" && exit 1
+fi
+HDBNAME="$1"
+if [ -z `/root/mode/seecfg -s $HMYSQLDIP "show databases like '$HDBNAME'"|grep -i "^$HDBNAME"` ]; then
+   /root/mode/modemsg sload "Database $HDBNAME doesn't exist at $HMYSQLDIP2!" more && exit 1
+fi
+
+# target directory for loads
+
+if [ -z "$2" ]; then
+   /root/mode/modemsg sload "You must privide a directory name for dumps!" && exit 1
+fi
+Hdumpdir="$2"
+if [ ! -d "$Hdumpdir" ]; then
+   /root/mode/modemsg sload "'$Hdumpdir' is not a directory!" more && exit 1
+elif [ ! -f "$Hdumpdir/.sdump" ]; then
+   /root/mode/modemsg sload "There is no valid table dumps in directory '$Hdumpdir'!" && exit 1
+fi
+
+# --------------------------------------------------------------------------------------
+# table limitations
+# --------------------------------------------------------------------------------------
+# load only 'include-tables'
+# load tables except 'exclude-tables'
+# --------------------------------------------------------------------------------------
+
+Hrestparms="$*"
+shift;shift
+# conditions,under which only table structures will be created,data will not be loaded
+if echo "$HOPTIONS" | grep -E -e "(-S)(-|$)" >/dev/null; then
+   Hstruonly="-d"
+fi
+# conditions under which procedures and functions may be loaded
+if echo "$HOPTIONS" | grep -E -e "(-R)(-|$)" >/dev/null; then
+   Hdproc="-R"
+elif [ -z "$*" ]; then
+   Hdproc="-R"
+fi
+if echo "$HOPTIONS" | grep -E -e "(-I)(-|$)" >/dev/null; then
+   Hindex_adjust_mode=1
+fi
+if [ "$1" = "--include-tables" ]; then
+   shift
+   Htabmode=1
+   Htables=`echo $*`
+elif [ "$1" = "--exclude-tables" ]; then
+   shift
+   Htabmode=2
+   Htables=`echo $*`
+else
+   if [ -n "$1" ]; then
+      /root/mode/modemsg sload "Invalid parm(s) '$*'! sload will not continue!" more
+      exit 1
+   fi
+   Htabmode=0
+   Htables=
+fi
+if [ -z "$Htables" ]; then
+   Htabmode=0
+fi
+
+# if called from crond
+
+if [ `/root/mode/traceps "crond"` = 'suc' ]; then
+   . /root/.bashrc 2>/dev/null
+   export HBLACKBOX2=1
+fi
+
+# abort if ...
+
+if ! echo $HDBNAME | grep -P "_tr$" >/dev/null; then
+   if ! echo "$HOPTIONS" | grep -E -e "(-f)(-|$)" >/dev/null; then
+      # not force mode   
+      if [ `/root/mode/seecfg -s $HMYSQLDIP "show processlist" | grep -Pi "\t$HDBNAME\t" | wc -l` -ge 1 ]; then
+         /root/mode/modemsg sload "Database '$HDBNAME' at $HMYSQLDIP2 seems in use!sload will not continue." more
+         exit 1
+      fi
+   fi
+fi
+
+#
+
+/root/mode/confirm "Are you sure to load database $HDBNAME at $HMYSQLDIP2 from directory '$Hdumpdir'" more || exit 1
+
+#
+
+if echo "$HOPTIONS" | grep -E -e "(-m)(-|$)" >/dev/null; then
+   /root/mode/confirm "Target tables will be myisam type and their indexes will be dropped.Is this right" more || exit 1
+else
+   /root/mode/confirm "Target tables will be innodb type and their indexes will be reserved.Is this right" more || exit 1
+fi
+
+#
+
+{
+echo "Mode generated sload mark at `LANG=en_US;date`"
+echo "sload $HOPTIONS $HMYSQLDIP2 $Hrestparms"
+} >> "$Hdumpdir"/.sload
+
+# clear linux caches before load process
+
+/root/mode/clrcache 1
+
+#
+
+{
+   
+   #
+
+   Hsaveviewfile=/root/mode/tmp/Hview$$.tmp
+   touch $Hsaveviewfile   
+
+   #
+
+   echo
+   echo "############# sload $HOPTIONS $HMYSQLDIP2 $Hrestparms #############"
+   echo
+   echo "Load database $HDBNAME at $HMYSQLDIP2 from directory '$Hdumpdir' began at `LANG=en_US;date`"
+   echo
+
+   ls -1 "$Hdumpdir/"*.sql "$Hdumpdir/"*.ttg 2>/dev/null | sed -re "s/\.(sql|ttg)$//" | sort | uniq | sed -re "s/$/.sql/" |
+   while read -r Hi;do
+
+      #
+
+      Hj=`echo "$Hi"  | sed -r -e "s/^.*\///"  -e "s/(.*)\.sql/\1/"`
+      Hk=`echo "$Hi"  | sed -re "s/\.sql$/.txt/"`
+
+      # filter tables 
+
+      if [ $Htabmode -eq 1 ]; then
+         if ! echo "$Htables" | grep -Pi "(^| )$Hj( |$)" >/dev/null; then
+            continue
+         fi
+      elif [ $Htabmode -eq 2 ]; then
+         if echo "$Htables" | grep -Pi "(^| )$Hj( |$)" >/dev/null; then
+            continue
+         fi
+      fi
+
+      # 
+
+      Hit=`echo "$Hi" | sed -re "s/\.sql$/\.ttg/"`
+      Hmsg_sub=
+      Hctag=
+      if [ ! -f "$Hi" ]; then
+         Hmsg_sub="(dump not generated yet)"
+         Hctag=1
+      else
+         if cat "$Hi" 2>/dev/null | grep -E "(Final view structure|Temporary table structure for view)" >/dev/null; then 
+            echo $Hj >> $Hsaveviewfile
+            continue
+         fi   
+         if [ -f "$Hit" ]; then
+            if ls -1tr "$Hi" "$Hit" 2>/dev/null | tail -n 1 | grep -E "\.ttg$" >/dev/null; then
+               Hmsg_sub="(not latest dump?)"
+            fi  
+         fi
+      fi
+
+      #
+      if [ "$Hstruonly" = "-d" ]; then
+         Hmsg="dropping and creating table $Hj $Hmsg_sub  ............................................................."
+      else
+         Hmsg="dropping,creating and loading table $Hj $Hmsg_sub ............................................................."
+      fi
+      Hmsg="${Hmsg:0:80} `LANG=en_US;date`"
+      /root/mode/modemsg sload "$Hmsg" less
+      if [ -n "$Hctag" ]; then
+         continue
+      fi
+      #
+      if echo "$HOPTIONS" | grep -E -e "(-q)(-|$)" >/dev/null; then
+         export HNoBiNlOg=DaNgEr
+      fi
+      # table structure 
+      if echo "$HOPTIONS" | grep -E -e "(-m)(-|$)" >/dev/null; then
+         # delete keys and constraints
+         cat "$Hi" | sed -re "/^  (KEY|UNIQUE|CONSTRAINT)/ d" | sed -re "s/$/HrYhRy3M/" | tr -d "\n" | sed -re "s/,(HrYhRy3M\) ENGINE)/\1/" | sed -re "s/HrYhRy3M/\n/g" > /root/mode/tmp/Hfkey$$.sql
+         /root/mode/seecfg -s $HMYSQLDIP /root/mode/tmp/Hfkey$$.sql $HDBNAME
+         rm -f /root/mode/tmp/Hfkey$$.sql
+         # drop indexes for myisam
+         /root/mode/seecfg -s $HMYSQLDIP "create table \`${Hj}hryhschbyqhf\` select * from \`$Hj\` where 1=2" $HDBNAME
+         /root/mode/seecfg -s $HMYSQLDIP "alter table \`${Hj}hryhschbyqhf\` char set utf8" $HDBNAME
+         /root/mode/seecfg -s $HMYSQLDIP "drop table \`${Hj}\`" $HDBNAME
+         /root/mode/seecfg -s $HMYSQLDIP "alter table \`${Hj}hryhschbyqhf\` rename to \`${Hj}\`" $HDBNAME
+         /root/mode/seecfg -s $HMYSQLDIP "alter table \`$Hj\` engine=myisam" $HDBNAME
+      else
+         # 
+         if [ -z "$Hindex_adjust_mode" ]; then 
+            /root/mode/seecfg -s $HMYSQLDIP "$Hi" $HDBNAME
+         else
+            # adjust indexes as needed
+            if [ -f "${Hi}.adj" ]; then
+               # replace indexes with those in the file ${Hi}.adj
+               Hmyrand=blackboxhry$RANDOM
+               cat "$Hi" | sed -re "/^  (PRIMARY|KEY|UNIQUE|CONSTRAINT)/ d" | sed -re "/\) ENGINE=/ i $Hmyrand" | sed -re "/$Hmyrand/ r ${Hi}.adj" | sed -re "/$Hmyrand/ d" > /root/mode/tmp/Hfkey$$.sql
+               /root/mode/seecfg -s $HMYSQLDIP /root/mode/tmp/Hfkey$$.sql $HDBNAME
+               rm -f /root/mode/tmp/Hfkey$$.sql
+            else
+               /root/mode/seecfg -s $HMYSQLDIP "$Hi" $HDBNAME
+            fi
+         fi
+      fi
+      # data
+      if [ -f "$Hk" ]; then
+         if [ "$Hstruonly" != "-d" ]; then
+            /root/mode/seecfg -s $HMYSQLDIP "set unique_checks=0;set foreign_key_checks=0;load data local infile '$Hk' into table \`$Hj\`" $HDBNAME
+         fi
+      fi
+   done
+   # views
+   cat $Hsaveviewfile 2>/dev/null | 
+   while read Hj;do
+      Hmsg="dropping and creating view $Hj ............................................................."
+      Hmsg="${Hmsg:0:80} `LANG=en_US;date`"
+      /root/mode/modemsg sload "$Hmsg" less
+      /root/mode/seecfg -s $HMYSQLDIP "$Hdumpdir/$Hj.sql" $HDBNAME
+   done
+   rm -f $Hsaveviewfile
+   # procedures and functions 
+   if ! echo "$HOPTIONS" | grep -E -e "(-m)(-|$)" >/dev/null; then
+      if [ "$Hdproc" = "-R" ]; then
+         if [ -f "$Hdumpdir"/.pf.sql ]; then
+            Hmsg="dropping and creating procedures/functions ............................................................."
+            Hmsg="${Hmsg:0:80} `LANG=en_US;date`"
+            /root/mode/modemsg sload "$Hmsg" less
+            /root/mode/seecfg -s $HMYSQLDIP "$Hdumpdir"/.pf.sql $HDBNAME
+         fi
+      fi
+   fi
+   echo
+   echo "Load database $HDBNAME at $HMYSQLDIP2 from directory '$Hdumpdir' ended at `LANG=en_US;date`"
+   echo
+}  2>&1 | tee -a /root/mode/logs/sdumpload.log
+
+# clear linux caches after load process
+
+/root/mode/clrcache 1
+
+#
+

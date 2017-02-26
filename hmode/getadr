@@ -1,0 +1,36 @@
+#!/bin/bash
+# ---------------------------
+#
+# --------------------------- 
+
+if [ -z "$1" ]; then
+   Hgetadr=`/sbin/ifconfig | sed -n "1 p" | sed -re "s/.*:([^:]*)$/\1/"`
+   if echo $Hgetadr | grep -E "^[0-9A-F]{2}$" >/dev/null; then
+      echo $[0x$Hgetadr]
+      exit 0
+   else
+      echo
+      /root/mode/modemsg "getadr $1" "Network is not ready!"
+      exit 1
+   fi
+elif [ "$1" = "1" ]; then
+   Hgetadr1=`/sbin/ifconfig | sed -n "1 p" | sed -re "s/.*:(.*):([^:]*)$/\1/"`
+   if echo $Hgetadr1 | grep -E "^[0-9A-F]{2}$" >/dev/null; then
+      echo $[0x$Hgetadr1]
+      exit 0
+   else
+      echo
+      /root/mode/modemsg "getadr $1" "Network is not ready!"
+      exit 1
+   fi
+elif [ "$1" = "2" ]; then
+   Hgetadr2=`/sbin/route -n | grep -E "^[0-9]" | grep -Ev "( UH | UG )" | sed -re "s/.* +([^ ]+)$/\1/" | sort | sed -n "1 p"`
+   if [ -n "$Hgetadr2" ]; then
+      echo $Hgetadr2
+      exit 0
+   else
+      echo
+      /root/mode/modemsg "getadr $1" "Network is not ready!"
+      exit 1
+   fi
+fi

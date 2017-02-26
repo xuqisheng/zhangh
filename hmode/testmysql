@@ -1,0 +1,26 @@
+#!/bin/bash
+# ---------------------------------------------------
+# function:
+# ---------------------------------------------------
+
+if [ -f /etc/mfloatip ]; then
+   if [ ! -x /usr/sbin/mysqld ]; then
+      /root/mode/modemsg testmysql "MySQL server is not installed" more
+      exit 1
+   fi
+   if [ ! -f /var/lib/mysql/ibdata1 ]; then
+      /root/mode/modemsg testmysql "Offline MySQL server at clustered mode" more
+      exit 2
+   fi
+   exit 0
+else
+   if [ ! -x /usr/sbin/mysqld ]; then
+      /root/mode/modemsg testmysql "MySQL server is not installed" more
+      exit 1
+   fi
+   if [ ! -d /var/lib/mysql ]; then
+      /root/mode/modemsg testmysql "Directory /var/lib/mysql doesn't exist" more
+      exit 2
+   fi
+   exit 0
+fi

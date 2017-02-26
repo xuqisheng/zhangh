@@ -1,0 +1,124 @@
+#!/bin/bash
+# -----------------------------------------------------------------
+# function:
+#          analyze and evaluate app server     
+# -----------------------------------------------------------------
+# precedence of considerations:
+#          1.MySQL server connectivity
+#          2.Apache subprocess number
+#          3.Latest apache subprocess createtime
+#          4.The createtimes of apache subprocesses
+#          5.Subprocess count comparisons according to time period  
+# -----------------------------------------------------------------
+
+# save data to tmp file
+
+Hevalapptmp=/root/mode/tmp/hevalapp$$.tmp
+
+#
+
+. /root/mode/apachemode
+
+#
+
+/root/mode/seeapc $Hapachemode > $Hevalapptmp
+
+# exit if no data 
+
+Htotal=`cat $Hevalapptmp | wc -l`
+if [ $Htotal -eq 0 ]; then
+   rm -f $Hevalapptmp
+   exit 1
+fi
+
+# get time data
+
+Htime0=`cat $Hevalapptmp | sed -n "1 p"`
+Htime4=`cat $Hevalapptmp | sed -n "$ p"`
+Hsecn=$(/root/mode/seecfg -s "select timestampdiff(second,'$Htime4',now())" 2>/dev/null)
+Hsec4=$(/root/mode/seecfg -s "select timestampdiff(second,'$Htime0','$Htime4')" 2>/dev/null)
+if [ -z "$Hsec4" ]; then
+   Hmysqlservererror=1
+   [ "$1" = "-ll" ] && cat $Hevalapptmp
+elif [ $Hsec4 -eq 0 ]; then
+   [ "$1" = "-ll" ] && cat $Hevalapptmp
+else
+   # for readability
+   Hsec1=$[$Hsec4*1/4]
+   Hsec2=$[$Hsec4*2/4]
+   Hsec3=$[$Hsec4*3/4]
+   Htime1=$(/root/mode/seecfg -s "select timestampadd(second,'$Hsec1','$Htime0')" 2>/dev/null)
+   Htime2=$(/root/mode/seecfg -s "select timestampadd(second,'$Hsec2','$Htime0')" 2>/dev/null)
+   Htime3=$(/root/mode/seecfg -s "select timestampadd(second,'$Hsec3','$Htime0')" 2>/dev/null)
+   Hproc1=0
+   Hproc2=0
+   Hproc3=0
+   Hproc4=0
+   [ "$1" = "-ll" ] && echo
+   for i in `cat $Hevalapptmp | sed -re "s/ /A/g"`; do 
+      i=`echo "$i" | sed -re "s/A/ /g"`
+      # converse order,high index Hproc has precedence
+      if [ "$i"   \> "$Htime3" ]; then
+         Hproc4=$[$Hproc4+1]
+         [ "$1" = "-ll" ] && echo hproc4 "$i"
+      elif [ "$i" \> "$Htime2" ]; then 
+         Hproc3=$[$Hproc3+1]
+         [ "$1" = "-ll" ] && echo hproc3 "$i"
+      elif [ "$i" \> "$Htime1" ]; then 
+         Hproc2=$[$Hproc2+1]
+         [ "$1" = "-ll" ] && echo hproc2 "$i"
+      else 
+         Hproc1=$[$Hproc1+1]
+         [ "$1" = "-ll" ] && echo hproc1 "$i"
+      fi
+   done
+   [ "$1" = "-ll" ] && echo htotal "apache subprocesses" $Htotal
+fi
+
+# time analization report 
+
+if [ -n "$Hmysqlservererror" ]; then
+   /root/mode/modemsg eval_app$Hapachetail "MySQL server in error state!" more
+elif [ $Htotal -eq 1 ]; then
+   /root/mode/modemsg eval_app$Hapachetail "Server$Hapachetail is free!" more
+elif [ $Htotal -le 5 ]; then
+   /root/mode/modemsg eval_app$Hapachetail "Server$Hapachetail is running leisurely!" more
+elif [ $Hsecn -ge $[3600*10] ]; then
+    /root/mode/modemsg eval_app$Hapachetail "Extremely light server load!!!" more
+elif [ $Hsecn -ge $[3600*1] ]; then
+   if [ $Htotal -ge 15 ]; then
+      /root/mode/modemsg eval_app$Hapachetail "There was a peak time!Now server is running smoothly!" more
+   else
+      /root/mode/modemsg eval_app$Hapachetail "Server$Hapachetail is running smoothly!" more
+   fi
+else
+   # using time segment 
+   if [ $Hsec4 -eq 0 ]; then
+      /root/mode/modemsg eval_app$Hapachetail "Server$Hapachetail has sufficient power for current situation!" more
+   elif [ $Hproc4 -gt $[$Hproc1+$Hproc2+$Hproc3] ]; then
+      if [ $Hsecn -le 120 ]; then
+         /root/mode/modemsg eval_app$Hapachetail "Server$Hapachetail is highly active!" more
+      else
+         /root/mode/modemsg eval_app$Hapachetail "Server$Hapachetail is very active!" more
+      fi
+   elif [ $Hproc4 -gt $[$Hproc1+$Hproc2] ]; then
+      if [ $Hsecn -le 120 ]; then
+         /root/mode/modemsg eval_app$Hapachetail "Server$Hapachetail is very active!" more
+      else
+         /root/mode/modemsg eval_app$Hapachetail "Server$Hapachetail is rather active!" more
+      fi
+   elif [ $[$Hproc3+$Hproc4] -gt $[$Hproc1+$Hproc2] ]; then
+      /root/mode/modemsg eval_app$Hapachetail "Server$Hapachetail is actively working!" more
+   elif [ $[$Hproc3+$Hproc4] -eq $[$Hproc1+$Hproc2] ]; then
+      /root/mode/modemsg eval_app$Hapachetail "Server$Hapachetail is running smoothly!" more
+   else
+      /root/mode/modemsg eval_app$Hapachetail "Server$Hapachetail is relatively not busy!" more
+   fi
+fi
+
+# remove tmp files
+
+rm -f $Hevalapptmp
+
+#
+

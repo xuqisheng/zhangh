@@ -1,0 +1,36 @@
+#!/bin/bash
+# -------------------------------------------------------
+# function:
+#           test if it is not required to transfer to utf8 format
+# usages  :
+#           ./kpfile <file>
+# e.g.    :
+#           ./kpfile /unrec.txt
+# -------------------------------------------------------
+
+TMPFILE="$1"
+if [ -z "$TMPFILE" ]; then
+   exit 0 
+elif [ ! -f "$TMPFILE" ]; then
+   echo "File $1 doesn't exist"
+   exit 0
+fi
+if /root/mode/tfile "$TMPFILE" | grep -E "ASCII" >/dev/null; then
+   # don't display ascii encoding
+   #[ -n "$HMODEDEBUG" ] && /root/mode/modemsg tutf8 "ASCII encoding detected"
+   exit 0
+elif /root/mode/tfile "$TMPFILE" | grep -E "UTF-8" >/dev/null; then
+   if [ -n "$HMODEDEBUG" ]; then
+      if cat "$TMPFILE" | xxd -l 3 | grep -E "^0000000: efbb bf" >/dev/null; then
+         /root/mode/modemsg tutf8 "UTF-8+BOM encoding detected"
+      else
+         /root/mode/modemsg tutf8 "UTF-8 encoding detected"
+      fi
+   fi
+   exit 0
+fi
+exit 1
+
+#
+
+

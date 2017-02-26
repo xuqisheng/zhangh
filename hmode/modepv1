@@ -1,0 +1,117 @@
+#!/bin/bash
+
+#
+
+/root/mode/skip_pv "$1" "$2" "$3" && echo "success" && exit 
+
+# get parms
+
+Hmodepv1="$1"
+Hmodepv2="$2"
+Hmodepv3=`echo "$3" | sed -re "s/^ */ \(HrY$RANDOM\)\{0\}/" -e "s/ *$/\( \|\$\)/"`
+
+# PV signal 
+
+MYFILE=/root/mode/tmp/hmodepv$$.tmp
+ps -ef > $MYFILE
+HMODEPV_WAITBASE=`grep -E ".*/bin/bash *.*/modepv1 $Hmodepv1 .*$" $MYFILE | wc -l`
+if [ $HMODEPV_WAITBASE -gt 1 ]; then
+   rm -f $MYFILE 
+   if [ -n "$HMODEPV_DEBUG" ]; then
+      /root/mode/modemsg "modepv1 $1 $2" "Unable to get enter-lock.I'll wait some time and try again." more
+   fi
+   echo "waitforenter $HMODEPV_WAITBASE"
+   exit 
+fi
+rm -f $MYFILE 
+if [ -n "$HMODEPV_DEBUG" ]; then
+   /root/mode/modemsg "modepv1 $1 $2" "I've got enter-lock and try to get execution-lock." more
+fi
+if [ ! -f /root/mode/mproc/"$Hmodepv1" ]; then
+   # -------------------------------------------------------------------------
+   # File /root/mode/mproc/$Hmodepv1 was created the first time.
+   # If you don't delete it,it will be there all the time,so in normal cases,
+   # this branch will take place only once for this server 
+   # -------------------------------------------------------------------------
+   if [ ! -e /root/mode/mproc/"$Hmodepv1" ]; then 
+      echo "$Hmodepv2" > /root/mode/mproc/"$Hmodepv1"
+      if [ -n "$HMODEPV_DEBUG" ]; then
+         /root/mode/modemsg "modepv1 $1 $2" "I've got execution-lock." more
+      fi
+   else
+      # mode was destroyed by someone.We simply echo "success"
+      /root/mode/modemsg "modepv1 $1 $2" "Danger!!!/root/mode/mproc/$Hmodepv1 is NOT a regualar file.Please check if mode was invaded by hackers." more
+      if [ -n "$HMODEPV_DEBUG" ]; then
+         /root/mode/modemsg "modepv1 $1 $2" "I've got execution-lock." more
+      fi
+   fi
+   echo "success"
+   exit
+elif [ -h /root/mode/mproc/"$Hmodepv1" ]; then
+   # symbolic link.We simply echo "success"
+   /root/mode/modemsg "modepv1 $1 $2" "Danger!!!/root/mode/mproc/$Hmodepv1 is a symbolic link.Please check if mode was invaded by hackers." more
+   if [ -n "$HMODEPV_DEBUG" ]; then
+      /root/mode/modemsg "modepv1 $1 $2" "I've got execution-lock." more
+   fi
+   echo "success"
+   exit
+fi
+# recover destroyed regular file 
+Hfsize=`ls -l /root/mode/mproc/"$Hmodepv1" | awk '{print $5}'`
+if [ $Hfsize -gt 10 -o $Hfsize -eq 0 ]; then
+   # invalid file contents
+   /root/mode/modemsg "modepv1 $1 $2" "Type 1 correction was made." more
+   echo "$Hmodepv2" > /root/mode/mproc/"$Hmodepv1"
+elif [ `cat /root/mode/mproc/"$Hmodepv1" | sed -nre "$ ="` -gt 1 ]; then
+   # invalid file contents
+   /root/mode/modemsg "modepv1 $1 $2" "Type 2 correction was made." more
+   echo "$Hmodepv2" > /root/mode/mproc/"$Hmodepv1"
+elif ! cat /root/mode/mproc/"$Hmodepv1" | grep -E "^[1-9][0-9]*$" >/dev/null; then
+   # invalid file contents
+   /root/mode/modemsg "modepv1 $1 $2" "Type 3 correction was made." more
+   echo "$Hmodepv2" > /root/mode/mproc/"$Hmodepv1"
+fi
+# check contents of /root/mode/mproc/$Hmodepv1,which should be normal now 
+if [ `cat /root/mode/mproc/"$Hmodepv1"` -eq $Hmodepv2 ]; then
+   # ---------------------------------------------------------------------------------
+   # rare and interesting case
+   # The $Hmodepv2 is exactly the same as what was saved in /root/mode/mproc/$Hmodepv1
+   # Historically two events happened to use the same PS No.
+   # We touch /root/mode/mproc/$Hmodepv1 to record the latest event time
+   # ---------------------------------------------------------------------------------
+   touch /root/mode/mproc/"$Hmodepv1"
+   if [ -n "$HMODEPV_DEBUG" ]; then
+      /root/mode/modemsg "modepv1 $1 $2" "I've got execution-lock." more
+   fi
+   echo "success"
+elif ps -ef | grep -E "^[^ ]+ +$(cat /root/mode/mproc/"$Hmodepv1") +.*$Hmodepv3" | grep -Ev "/modepv1? " >/dev/null; then
+   # --------------------------------------------------------------------------------------------------------------------------------------
+   # For exclusiveness,we have to wait for `cat /root/mode/mproc/$Hmodepv1` to finish
+   # --------------------------------------------------------------------------------------------------------------------------------------
+   # Two cases,however rare as they are,will lead to endless wait of the current task:
+   # 1.The saved psno belongs to other probably malicious program which has same name as ours and which will never end;
+   # 2.The saved psno is doing the same category of things as we will do,but it is unfortunately dead forever.
+   # --------------------------------------------------------------------------------------------------------------------------------------
+   # We resolve these two cases by setting threshold,logging events and sending mails
+   # --------------------------------------------------------------------------------------------------------------------------------------
+   if [ -n "$HMODEPV_DEBUG" ]; then
+      /root/mode/modemsg "modepv1 $1 $2" "Unable to get execution-lock.I'll wait some time and try from scratch." more
+   fi
+   echo "waitforother $HMODEPV_WAITBASE"
+else
+   # ----------------------------------------------------------------------------------------------------------
+   # The saved process doesn't exist anymore or 
+   # It happened to be PS NO. of other unrelated program,
+   # i.e. `cat /root/mode/mproc/$Hmodepv1` was historical PS NO  
+   # We replace it with our new PS NO
+   # ----------------------------------------------------------------------------------------------------------
+   echo $Hmodepv2 > /root/mode/mproc/"$Hmodepv1"
+   if [ -n "$HMODEPV_DEBUG" ]; then
+      /root/mode/modemsg "modepv1 $1 $2" "I've got execution-lock." more
+   fi
+   echo "success"
+fi
+exit
+
+#
+

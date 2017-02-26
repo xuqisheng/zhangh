@@ -1,0 +1,60 @@
+#!/bin/bash
+# -------------------------------------------------
+# function:
+#           install gcserver start/stop script
+# -------------------------------------------------
+
+# exclusive execution with wait mode
+
+/root/mode/modepv inst_gcserver $$ " /bin/bash .*/inst_gcserver"
+
+#
+
+if [ -f /etc/afloatip ]; then
+   # high availability system 
+   if [ -f /etc/init.d/gcserver ]; then
+      /sbin/chkconfig --del gcserver >/dev/null 2>&1
+      rm -f /etc/init.d/gcserver
+   fi
+else
+   # --------------------------------
+   # normal system 
+   # --------------------------------
+   # remove first
+   # --------------------------------
+   cd /etc/init.d
+   for i in `ls -d gcserver* 2>/dev/null`; do
+      /sbin/chkconfig --del $i >/dev/null 2>&1
+      rm -f /etc/init.d/$i
+   done
+   # --------------------------------
+   # added back
+   # --------------------------------
+   cd /usr/local
+   for i in `ls -d apache*/ 2>/dev/null | sed -re "s/\/$//"`; do
+       Hapachetail=`echo $i | sed -re "s/apache(.*)/\1/"`
+       ln -s /root/mode/gcserver$Hapachetail /etc/init.d/gcserver$Hapachetail
+      /sbin/chkconfig --add gcserver$Hapachetail >/dev/null 2>&1
+      /sbin/chkconfig gcserver$Hapachetail off >/dev/null 2>&1
+      /sbin/chkconfig --level 35 gcserver$Hapachetail on >/dev/null 2>&1
+      if [ "$Hapachetail" = "" ]; then
+         Hnomoretest=1
+      fi
+   done
+   if [ -z "$Hnomoretest" ]; then
+      cd /usr/local
+      for i in `ls -1d tomcat*/ 2>/dev/null | sed -re "s/\/$//"`; do
+          if ! /root/mode/isctom $i; then
+             ln -s /root/mode/gcserver /etc/init.d/gcserver
+             /sbin/chkconfig --add gcserver >/dev/null 2>&1
+             /sbin/chkconfig gcserver off >/dev/null 2>&1
+             /sbin/chkconfig --level 35 gcserver on >/dev/null 2>&1
+             break
+          fi
+      done
+   fi
+fi
+
+# end
+
+

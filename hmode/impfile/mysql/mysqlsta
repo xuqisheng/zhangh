@@ -1,0 +1,9 @@
+0:No MySQL server installed
+1:down
+2:starting -- first stage -- only mysqld_safe process exists
+3:starting -- second stage -- both mysqld_safe process and mysqld process exist
+4:starting -- third stage -- port has been opened for use and the pidfile is created
+5:up
+6:stopping -- first stage -- port has been closed,with others to be released
+7:stopping -- second stage -- port and pidfile have been released,with others to be released
+8:stopping -- third stage -- port,pidfile and processes are released,with lockfile still there

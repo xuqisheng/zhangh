@@ -1,0 +1,96 @@
+#!/bin/bash
+# ---------------------------------------------------------------
+# function:
+#           upgrade mysql server and client from 5.1.57 to 5.5.50
+# ---------------------------------------------------------------
+
+#
+
+if [ ! -x /usr/sbin/mysqld ]; then
+   /root/mode/modemsg upgrade_mysql_to_5.5.50 "MySQL server has not been installed!" 
+   /root/mode/modemsg upgrade_mysql_to_5.5.50 "We demand The original MySQL server be installed and working well before upgrading" reverse
+   exit 1
+fi
+ 
+#
+
+/root/mode/testmysql || exit 1
+
+# check the current gc MySQL Server version 
+
+if rpm -qa | grep -E "^MySQL-server-community-5\.1\.57-1.rhel5" >/dev/null; then
+   Hgc_mysql_ver='5.1.57'
+elif rpm -qa | grep -E "^MySQL-server-5\.5\.50-1\.linux2\.6" >/dev/null; then
+   Hgc_mysql_ver='5.5.50'
+elif rpm -qa | grep -E "^MySQL-server-5\.6\.35-1\.linux_glibc2\.5" >/dev/null; then
+   Hgc_mysql_ver='5.6.35'
+fi
+
+#
+
+if [ "$Hgc_mysql_ver" = "5.1.57" ]; then
+   :
+elif [ "$Hgc_mysql_ver" = "5.5.50" ]; then
+   /root/mode/modemsg upgrade_mysql_to_5.5.50 "The installed MySQL server is already the desired version!!!" more
+   exit 
+elif [ "$Hgc_mysql_ver" = "5.6.35" ]; then
+   /root/mode/modemsg upgrade_mysql_to_5.5.50 "The installed MySQL server is newer than what you want!!!" more
+   exit 
+else
+   /root/mode/modemsg upgrade_mysql_to_5.5.50 "The installed MySQL server is NOT gc designated version!!!" more
+   exit 
+fi
+
+# check the installation package
+
+if uname -a | grep "x86_64" >/dev/null; then
+   if [ ! -f /root/packages/MySQL-server-5.5.50-1.linux2.6.x86_64.rpm ]; then
+      /root/mode/modemsg upgrade_mysql_to_5.5.50 "No MySQL server 5.5.50 64bit RPM package in directory /root/packages" more
+      exit
+   fi
+else
+   if [ ! -f /root/packages/MySQL-server-5.5.50-1.linux2.6.i386.rpm ]; then
+      /root/mode/modemsg upgrade_mysql_to_5.5.50 "No MySQL server 5.5.50 32bit RPM package in directory /root/packages" more
+      exit
+   fi
+fi
+
+#
+
+/root/mode/confirm "Are you sure to upgrade MySQL server version from $Hgc_mysql_ver to 5.5.50(server will stop for a while)" more || exit 
+
+#
+
+export HNCONFIRM_MODE='y'
+echo
+echo "Upgrade began at `LANG=en_US;date`"
+
+#
+
+/root/mode/mysql stop
+rpm -qa | grep -i MySQL | xargs rpm -e --nodeps 
+rm -f /var/lib/mysql/ib_logfile*
+
+#
+
+export HSKIP_IDCHECK=1
+export HkPlGfileSiZe=1
+export HmUpGrAdE=1
+/root/mode/.inst_mysql_55
+/root/mode/config_mem max
+/root/mode/mysql restart
+
+# reinstall mysql service 
+
+/root/mode/inst_mysql_service
+
+# execute mysql_upgrade
+
+. /root/mode/mysqldip localhost
+mysql_upgrade -uroot $Hmodepass -h$HMYSQLDIP
+/root/mode/tune_mysql
+
+#
+
+echo "Upgrade ended at `LANG=en_US;date`"
+echo

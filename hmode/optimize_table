@@ -1,0 +1,173 @@
+#!/bin/bash
+# ---------------------------------------------------------------------------------------------------------------
+# function:
+#          optimize table performance
+# ---------------------------------------------------------------------------------------------------------------
+# usages  :
+#          ./optimize_table [<MySQL-server-ip>] <dbname> <tbname> 
+# ---------------------------------------------------------------------------------------------------------------
+# e.g.    :
+#          ./optimize_table portal_f_pms master_base    
+#          ./optimize_table 192.168.2.230 portal_f_pms master_base    
+#          ./optimize_table localhost     portal_f_pms master_base    
+# ---------------------------------------------------------------------------------------------------------------
+
+# get options
+
+HOPTIONS=""
+while (echo "'$1'"  | grep -E  -e "^'-" > /dev/null)
+do
+   HOPTIONS="$HOPTIONS$1"
+   shift
+done
+
+#
+
+. /root/mode/mysqldip 
+
+#
+
+HDB="$1"
+HTAB="$2"
+
+# database name
+
+if [ -z "$HDB" ]; then
+   /root/mode/modemsg optimize_table "Database name must be provided!" more
+   exit 1
+fi
+# $HDB must exist
+if [ -z `/root/mode/seecfg -s $HMYSQLDIP "show databases like '$HDB'"|grep -i "^$HDB"` ]; then
+   /root/mode/modemsg optimize_table "Database '$HDB' doesn't exist in MySQL server at $HMYSQLDIP" more
+   exit 1
+fi
+# test table name
+if [ -n "$HTAB" ]; then
+   if ! /root/mode/testobjects $HMYSQLDIP "[$HTAB]" "$HDB"; then
+      /root/mode/modemsg optimize_table "Table '$HTAB' doesn't exist!" more
+      exit 1
+   fi
+else
+   /root/mode/modemsg optimize_table "Table name must be provided!" more
+   exit 1
+fi
+
+# check ptmode usability  
+
+Hcanusept=1
+if ! /root/mode/.pt_stat | grep 'installed-ok' >/dev/null; then
+   # pt has not been installed
+   Hcanusept=
+   Hptreason=0
+else
+   # pt has been installed
+   if /root/mode/testobjects $HMYSQLDIP "[#$HTAB:primarykey=][#$HTAB:uniquekey=]" "$HDB"; then
+      # Neither primary key nor unique key exists 
+      Hcanusept=
+      Hptreason=1
+   elif [ `/root/mode/seecfg -s $HMYSQLDIP "select count(1) from information_schema.triggers where event_object_schema='$HDB' and event_object_table='$HTAB'"` -ne 0 ]; then
+      # with triggers
+      Hcanusept=
+      Hptreason=2
+   fi
+fi
+
+# get table rows estimation
+
+Htab_rows=`/root/mode/seecfg -s $HMYSQLDIP "select table_rows from information_schema.tables where table_schema='$HDB' and table_name='$HTAB'"`
+Hrow_mesg="Table '$HTAB' has about $Htab_rows rows"
+
+#
+
+# --------------------------------------------------------------------------
+# Change Hrows_low from 10000 to 0 on 2016-11-22.
+# This means that mode will use ptmode to do optimization when ever possible
+# --------------------------------------------------------------------------
+Hrows_low=0
+Hrows_mid=50000
+Hrows_high=200000
+Hrows_very_high=2000000
+
+#
+
+if [ $Htab_rows -lt $Hrows_low ];then
+   # ---------------------------------------------
+   # $Htab_rows < $Hrows_low 
+   # ---------------------------------------------
+   # use the MySQL native 'alter' statement only
+   # ---------------------------------------------
+   /root/mode/modemsg "optimize_table $HDB $HTAB" "$Hrow_mesg.Mode will use the MySQL native 'alter' statement to do optimization!"
+   /root/mode/seecfg $HMYSQLDIP "alter table \`$HTAB\` engine=innodb" "$HDB"
+   /root/mode/modemsg "optimize_table $HDB $HTAB" "Optimization completed!" more
+elif [ $Htab_rows -ge $Hrows_high ];then
+   # ---------------------------------------------
+   # $Htab_rows >= $Hrows_high 
+   # ---------------------------------------------
+   # use ptmode only
+   # ---------------------------------------------
+   if [ -n "$Hcanusept" ]; then
+      # -----------------------------------------------------------------
+      # if $Htab_rows >= $Hrows_very_high,the option -f must also be used
+      # -----------------------------------------------------------------
+      if echo "'$HOPTIONS" | grep -E -e "(-f)(-|$)" >/dev/null || [ $Htab_rows -lt $Hrows_very_high ]; then
+         # -f or < $Hrows_very_high
+         /root/mode/modemsg "optimize_table $HDB $HTAB" "$Hrow_mesg and the non-blocking ptmode optimization will be used." more
+         /root/mode/ptmode $HMYSQLDIP --e --alter "engine=innodb" D="$HDB",t="$HTAB"
+         /root/mode/modemsg "optimize_table $HDB $HTAB" "Optimization completed!" more
+      else
+         # not -f and >= $Hrows_very_high
+         /root/mode/modemsg "optimize_table $HDB $HTAB" "$Hrow_mesg!It will take long time for ptmode to do optimization.Use -f option to confirm your action." more
+      fi
+   else
+      # say reason for not using ptmode 
+      if [ $Hptreason -eq 0 ]; then
+         /root/mode/modemsg "optimize_table $HDB $HTAB" "$Hrow_mesg!Please install the mode pt utilities before doing table optimization."
+      elif [ $Hptreason -eq 1 ]; then
+         /root/mode/modemsg "optimize_table $HDB $HTAB" "$Hrow_mesg and doesn't have a primary key or a unique key which is required for ptmode to work."
+      elif [ $Hptreason -eq 2 ]; then
+         /root/mode/modemsg "optimize_table $HDB $HTAB" "$Hrow_mesg and has triggers which are not allowed for ptmode to work."
+      fi
+      # say reason for not using native method 
+      /root/mode/modemsg "optimize_table $HDB $HTAB" "For tables with more than $Hrows_high rows,the MySQL native 'alter' statement will not be used to do optimization!" more
+   fi
+else
+   # ----------------------------------------------------------------------------
+   # $Htab_rows >= $Hrows_low and $Htab_rows < $Hrows_high
+   # ----------------------------------------------------------------------------
+   # consider using ptmode first
+   # if ptmode is not available,consider using the MySQL native 'alter' statement  
+   # ----------------------------------------------------------------------------
+   if [ -n "$Hcanusept" ]; then
+      # ptmode is available
+      /root/mode/modemsg "optimize_table $HDB $HTAB" "$Hrow_mesg and the non-blocking ptmode optimization will be used." more
+      /root/mode/ptmode $HMYSQLDIP --e --alter "engine=innodb" D="$HDB",t="$HTAB"
+      /root/mode/modemsg "optimize_table $HDB $HTAB" "Optimization completed!" more
+   else
+      # say reason for not using ptmode 
+      if [ $Hptreason -eq 0 ]; then
+         /root/mode/modemsg "optimize_table $HDB $HTAB" "$Hrow_mesg and the mode pt has not been installed!"
+      elif [ $Hptreason -eq 1 ]; then
+         /root/mode/modemsg "optimize_table $HDB $HTAB" "$Hrow_mesg and doesn't have a primary key or a unique key which is required for ptmode to work."
+      elif [ $Hptreason -eq 2 ]; then
+         /root/mode/modemsg "optimize_table $HDB $HTAB" "$Hrow_mesg and has triggers which are not allowed for ptmode to work."
+      fi
+      # -----------------------------------------------------------------
+      # consider using the MySQL native method now
+      # if $Htab_rows >= $Hrows_mid,the option -f must also be used
+      # -----------------------------------------------------------------
+      if echo "'$HOPTIONS" | grep -E -e "(-f)(-|$)" >/dev/null || [ $Htab_rows -lt $Hrows_mid ] ; then
+         # -f or < $Hrows_mid
+         # use the MySQL native 'alter' statement
+         /root/mode/modemsg "optimize_table $HDB $HTAB" "Mode will use the MySQL native 'alter' statement to do optimization!"
+         /root/mode/seecfg $HMYSQLDIP "alter table \`$HTAB\` engine=innodb" "$HDB"
+         /root/mode/modemsg "optimize_table $HDB $HTAB" "Optimization completed!" more
+      else
+         # say reason for not using native method 
+         /root/mode/modemsg "optimize_table $HDB $HTAB" "For tables with more than $Hrows_mid rows,The -f option is required in order to use the MySQL native 'alter' statement to do optimization!" more
+      fi
+   fi
+fi
+
+# end
+
+

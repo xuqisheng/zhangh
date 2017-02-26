@@ -1,0 +1,27 @@
+#!/bin/bash
+# --------------------------------------------------------
+# funtion:
+#         guess the complete ip by the last parts of an IP
+# --------------------------------------------------------
+
+# normalize ip etc.
+
+Hipend=`/root/mode/nmlizeip "$1"`
+
+# parts count
+
+Hl2=`echo $Hipend | sed -re "s/\./ /g" | wc -w` 
+Hl1=$[4-$Hl2] 
+
+# 
+
+Hgsip=$(/sbin/ifconfig | grep Bcast |
+        sed -re "s/.*inet addr:([^ ]+).*Bcast:([^ ]+).*Mask:(.*)/\1 \2 \3/" |
+        sed -re "s/^(([0-9]+\.){$Hl1})[^ ]+( .*)/\1$Hipend\3/" |
+        sed -re "s/^([^ ]+) ([^ ]+) ([^ ]+)/echo -n \1 \2;ipcalc -b \1 \3/" | bash |
+        grep -E "^([^ ]+) ([^ ]+)B[^0-9]+\2$" | sed -n "1 p" |
+        sed -re "s/^([^ ]+).*/\1/")
+echo "$Hgsip"
+
+#
+

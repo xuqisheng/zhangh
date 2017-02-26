@@ -1,0 +1,4 @@
+if ! echo $PROMPT_COMMAND | grep -E '^history -a' >/dev/null; then
+   PROMPT_COMMAND="history -a;$PROMPT_COMMAND"
+fi
+export PROMPT_COMMAND

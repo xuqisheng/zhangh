@@ -1,0 +1,226 @@
+#!/bin/bash
+# --------------------------------------------------
+# function:
+#          configure system parameters
+# --------------------------------------------------
+
+# exclusive execution with wait mode
+
+/root/mode/modepv msysctl $$ " /bin/bash .*/msysctl"
+
+# mode mark
+
+if ! cat /etc/sysctl.conf | grep -E "^# mode added option$" >/dev/null; then
+   echo "# mode added option" >> /etc/sysctl.conf
+fi
+
+# -------------------------------------------------------------------------------------------------------
+# The parameter tcp_max_tw_buckets has default value 180000.It was modified to 5000 by Ali.
+# We explicitly change it back to 180000
+# -------------------------------------------------------------------------------------------------------
+
+/root/mode/mod_config /etc/sysctl.conf "net.ipv4.tcp_max_tw_buckets=180000"          "# mode added option"
+
+#
+
+if cat /etc/redhat-release | grep -E " release 5\..*" > /dev/null; then
+   /root/mode/mod_config /etc/sysctl.conf "net.ipv4.netfilter.ip_conntrack_tcp_timeout_established=7200"      "# mode added option"
+   /root/mode/mod_config /etc/sysctl.conf "net.ipv4.netfilter.ip_conntrack_tcp_loose=0"                       "# mode added option"
+   /root/mode/mod_config /etc/sysctl.conf "net.ipv4.ip_conntrack_max=25000000"                                "# mode added option"
+   /root/mode/mod_config /etc/sysctl.conf "net.ipv4.netfilter.ip_conntrack_max =25000000"                     "# mode added option"
+elif cat /etc/redhat-release | grep -E " release 6\..*" > /dev/null; then
+   /root/mode/mod_config /etc/sysctl.conf "net.netfilter.nf_conntrack_tcp_timeout_established=7200"           "# mode added option"
+   /root/mode/mod_config /etc/sysctl.conf "net.netfilter.nf_conntrack_tcp_loose=0"                            "# mode added option"
+   /root/mode/mod_config /etc/sysctl.conf "net.nf_conntrack_max=25000000"                                     "# mode added option"
+   /root/mode/mod_config /etc/sysctl.conf "net.netfilter.nf_conntrack_max=25000000"                           "# mode added option"
+fi
+
+# avoid attacks  
+
+/root/mode/mod_config /etc/sysctl.conf "vm.mmap_min_addr=1000"                       "# mode added option"
+/root/mode/mod_config /etc/sysctl.conf "net.ipv4.tcp_syncookies=1"                   "# mode added option"
+/root/mode/mod_config /etc/sysctl.conf "net.ipv4.tcp_synack_retries=2"               "# mode added option"
+/root/mode/mod_config /etc/sysctl.conf "net.ipv4.tcp_syn_retries=2"                  "# mode added option"
+/root/mode/mod_config /etc/sysctl.conf "net.ipv4.tcp_max_syn_backlog=262144"         "# mode added option"
+
+# speed up release of fin_wait1 connections
+
+/root/mode/mod_config /etc/sysctl.conf "net.ipv4.tcp_retrans_collapse=0"             "net.ipv4.tcp_synack_retries"
+/root/mode/mod_config /etc/sysctl.conf "net.ipv4.tcp_orphan_retries=3"               "net.ipv4.tcp_synack_retries" 
+/root/mode/mod_config /etc/sysctl.conf "net.ipv4.tcp_retries1=3"                     "net.ipv4.tcp_synack_retries"
+/root/mode/mod_config /etc/sysctl.conf "net.ipv4.tcp_retries2=5"                     "net.ipv4.tcp_synack_retries"
+
+# add some net parameters
+
+/root/mode/mod_config /etc/sysctl.conf "net.ipv4.tcp_keepalive_intvl=20"             "# mode added option"
+/root/mode/mod_config /etc/sysctl.conf "net.ipv4.tcp_keepalive_probes=4"             "# mode added option"
+/root/mode/mod_config /etc/sysctl.conf "net.ipv4.tcp_keepalive_time=1200"            "# mode added option"
+/root/mode/mod_config /etc/sysctl.conf "net.ipv4.tcp_fin_timeout=10"                 "# mode added option"
+
+# --------------------------------------------------------------------------------------------------------
+# main rfc1323 related settings
+# --------------------------------------------------------------------------------------------------------
+# 1.tcp_timestamp
+# 2.tcp_window_scaling
+# --------------------------------------------------------------------------------------------------------
+# We disable tcp_timestamp setting because of extensive use of NAT
+# We enable tcp_window_scaling 
+# --------------------------------------------------------------------------------------------------------
+
+/root/mode/mod_config /etc/sysctl.conf "net.ipv4.tcp_timestamps=0"                   "# mode added option"
+/root/mode/mod_config /etc/sysctl.conf "net.ipv4.tcp_tw_recycle=0"                   "# mode added option"
+/root/mode/mod_config /etc/sysctl.conf "net.ipv4.tcp_tw_reuse=0"                     "# mode added option"
+/root/mode/mod_config /etc/sysctl.conf "net.ipv4.tcp_window_scaling=1"               "# mode added option"
+
+# --------------------------------------------------------------------------------------------------------
+# rfc2018 etc.
+# --------------------------------------------------------------------------------------------------------
+# We disable tcp_sack,tcp_fack and tcp_dsack   -- 2014-08-08 --
+# --------------------------------------------------------------------------------------------------------
+
+/root/mode/mod_config /etc/sysctl.conf "net.ipv4.tcp_sack=0"                         "# mode added option"
+/root/mode/mod_config /etc/sysctl.conf "net.ipv4.tcp_fack=0"                         "# mode added option"
+/root/mode/mod_config /etc/sysctl.conf "net.ipv4.tcp_dsack=0"                        "# mode added option"
+/root/mode/mod_config /etc/sysctl.conf "net.ipv4.tcp_reordering=5"                   "# mode added option"
+
+# --------------------------------------------------------------------------------------------------------
+# rfc1337 related settings
+# --------------------------------------------------------------------------------------------------------
+# This is TIME_WAIT assassination,in two flavors
+#      1.enable  rfc1337
+#      2.disable rfc1337
+# --------------------------------------------------------------------------------------------------------
+# Linux source code segment is as follows:
+# --------------------------------------------------------------------------------------------------------
+# if (th->rst) {
+#    /* This is TIME_WAIT assassination, in two flavors.
+#     * Oh well... nobody has a sufficient solution to this
+#     * protocol bug yet.
+#   */
+#   if (sysctl_tcp_rfc1337 == 0) {
+#      kill:
+#      inet_twsk_deschedule(tw, &tcp_death_row);
+#      inet_twsk_put(tw);
+#      return TCP_TW_SUCCESS;
+#   }
+# }
+# --------------------------------------------------------------------------------------------------------
+# We enable it
+# --------------------------------------------------------------------------------------------------------
+
+/root/mode/mod_config /etc/sysctl.conf "net.ipv4.tcp_rfc1337=1"                      "# mode added option"
+
+# --------------------------------------------------------------------------------------------------------
+# reno       -> (not used now)
+# bic,cubic  -> tcp_cubic(with bugs in 2.6.18 kernel!!!)
+# highspeed  -> tcp_highspeed
+# htcp       -> tcp_htcp
+# hybla      -> tcp_hybla
+# scalable   -> tcp_scalable
+# vegas      -> tcp_vegas
+# veno       -> tcp_veno
+# westwood   -> tcp_westwood
+# --------------------------------------------------------------------------------------------------------
+/root/mode/mod_config /etc/sysctl.conf "net.ipv4.tcp_congestion_control=htcp"        "# mode added option"
+
+/root/mode/mod_config /etc/sysctl.conf "net.ipv4.tcp_no_metrics_save=1"              "# mode added option"
+/root/mode/mod_config /etc/sysctl.conf "net.ipv4.tcp_low_latency=1"                  "# mode added option"
+/root/mode/mod_config /etc/sysctl.conf "net.ipv4.tcp_slow_start_after_idle=0"        "# mode added option"
+
+# --------------------------------------------------------------------------------------------------------
+# RFC 2884 Explicit Congestion Notification
+# --------------------------------------------------------------------------------------------------------
+# CentOS 5.x          tcp_ecn defaults to 0
+# CentOS 6.x          tcp_ecn defaults to 2
+# --------------------------------------------------------------------------------------------------------
+# We explicitly disable it
+# --------------------------------------------------------------------------------------------------------
+
+/root/mode/mod_config /etc/sysctl.conf "net.ipv4.tcp_ecn=0"                          "net.ipv4.tcp_congestion_control="
+
+# buffers
+
+/root/mode/mod_config /etc/sysctl.conf "net.ipv4.tcp_mem=16777216 16777216 16777216" "# mode added option"
+/root/mode/mod_config /etc/sysctl.conf "net.ipv4.tcp_wmem=4096 524288 16777216"      "# mode added option"
+/root/mode/mod_config /etc/sysctl.conf "net.ipv4.tcp_rmem=4096 524288 16777216"      "# mode added option"
+
+# --------------------------------------------------------------------------------------------------------
+# DON'T modify the following line 
+#                                                                                                -- hry -- 
+# --------------------------------------------------------------------------------------------------------
+
+/root/mode/mod_config /etc/sysctl.conf "net.ipv4.ip_local_port_range=10000 65535"    "# mode added option"
+
+#
+
+/root/mode/mod_config /etc/sysctl.conf "net.core.netdev_max_backlog=262144"          "# mode added option"
+/root/mode/mod_config /etc/sysctl.conf "net.core.somaxconn=262144"                   "# mode added option"
+/root/mode/mod_config /etc/sysctl.conf "net.core.wmem_max=16777216"                  "# mode added option"
+/root/mode/mod_config /etc/sysctl.conf "net.core.rmem_max=16777216"                  "# mode added option"
+/root/mode/mod_config /etc/sysctl.conf "net.core.optmem_max=16777216"                "net.core.wmem_max="
+/root/mode/mod_config /etc/sysctl.conf "net.core.wmem_default=524288"                "# mode added option"
+/root/mode/mod_config /etc/sysctl.conf "net.core.rmem_default=524288"                "# mode added option"
+
+# ip 
+
+/root/mode/mod_config /etc/sysctl.conf "net.ipv4.ipfrag_high_thresh=524288"          "# mode added option"
+
+# --------------------------------------------------------------------------------------------------------
+# arp related 
+# --------------------------------------------------------------------------------------------------------
+# DON'T modify the following lines
+#                                                                                                -- hry -- 
+# --------------------------------------------------------------------------------------------------------
+
+/root/mode/mod_config /etc/sysctl.conf "net.ipv4.conf.default.rp_filter=0"           "# mode added option"
+/root/mode/mod_config /etc/sysctl.conf "net.ipv4.conf.all.rp_filter=0"               "net.ipv4.conf.default.rp_filter="
+
+/root/mode/mod_config /etc/sysctl.conf "net.ipv4.conf.all.arp_ignore=1"              "# mode added option"
+/root/mode/mod_config /etc/sysctl.conf "net.ipv4.conf.all.arp_filter=0"              "# mode added option"
+/root/mode/mod_config /etc/sysctl.conf "net.ipv4.conf.all.arp_announce=2"            "# mode added option"
+
+
+# make effect 
+
+/sbin/sysctl -p &>/dev/null
+
+# arp ralated -- dynamic part 
+
+Hcurvl=`/sbin/sysctl -a | grep -E 'net\.ipv4\.conf\.default\.rp_filter' | sed -re "s/.*= *([0-9]+).*/\1/"`
+if [ "$Hcurvl" = "0" ]; then
+   Hcurvl=0
+else
+   Hcurvl=1
+fi
+/sbin/sysctl -a | grep -E 'rp_filter' | grep -v 'arp_filter' | tr -d ' ' | grep -Ev "=$Hcurvl$" | sed -re "s/(.*)=(.*)/\/sbin\/sysctl -w \1=$Hcurvl/" | bash &>/dev/null
+
+#
+
+/sbin/sysctl -w net.ipv4.route.flush=1 &>/dev/null
+
+# other miscellaneous system setting 
+
+if ! cat /etc/pam.d/login | grep -P "^session[\t ]+required[\t ]+.*pam_limits.so" >/dev/null; then
+   echo "# The following line was added by mode msysctl script" >> /etc/pam.d/login
+   echo "session    required     pam_limits.so" >> /etc/pam.d/login
+fi
+if ! cat /etc/security/limits.conf | grep -P "^root[\t ]+-[\t ]+nofile[\t ]+1006154" > /dev/null; then
+   echo "# The following line was added by mode msysctl script"  >> /etc/security/limits.conf
+   echo "root - nofile 1006154" >> /etc/security/limits.conf
+fi
+if [ -f /etc/security/limits.d/90-nproc.conf ]; then
+  cat /etc/security/limits.d/90-nproc.conf | sed -re "/^([^#]|#[^ ])/ d " > /root/mode/tmp/Hnproc$$.tmp
+  {
+     echo "*          soft    nproc     1024"
+     echo "root       soft    nproc     unlimited"
+     echo "daemon     soft    nproc     10000"
+  }  >>  /root/mode/tmp/Hnproc$$.tmp 
+  if ! cmp /etc/security/limits.d/90-nproc.conf /root/mode/tmp/Hnproc$$.tmp &>/dev/null; then
+     cp -f /root/mode/tmp/Hnproc$$.tmp /etc/security/limits.d/90-nproc.conf
+  fi
+  rm -f /root/mode/tmp/Hnproc$$.tmp
+fi
+
+
+# end 
+

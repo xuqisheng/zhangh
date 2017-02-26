@@ -1,0 +1,48 @@
+#!/bin/bash 
+# ------------------------------------------------------------------------------------------------------------------------------------------------------------
+# function:
+#          remove history xbback backup 
+# usages  :
+#          ./xbrmhis <xbdump-directory> <reserve-days>
+# e.g.    :
+#          ./xbrmhis /DISK2/xbdumps 7  # remove history xbback dumps 7 days ago
+#                                      # if current date is '2017-01-19',directories /DISK2/xbdumps/2017-01-12,/DISK2/xbdumps/2017-01-11,... will be removed
+# ------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+
+# check xbback dump directory
+
+Hxbdmp_dir="$1"
+if [ -z "$Hxbdmp_dir" ]; then
+   /root/mode/modemsg xbrestore "xbback dump directory must be provided as the first parm!" more
+   exit 1
+elif [ ! -d "$Hxbdmp_dir" ]; then
+   /root/mode/modemsg xbrestore "xbback dump directory '$Hxbdmp_dir' doesn't exist!" more
+   exit 1
+fi
+
+# default reserve days is 5 
+# check days 
+
+HDAYS=${2:-5}
+if (echo "$HDAYS"  | grep -E "^[0-9]+$" > /dev/null); then
+   if [ $HDAYS -lt 2 ]; then
+      echo "Reserve-days must be integer greater than one!" && exit 1
+   fi
+else
+   echo "invalid reserve-days parameter" && exit 1
+fi
+HDDATE=`date -d "-$HDAYS days" +%Y-%m-%d`
+
+# do removal task
+
+cd "$Hxbdmp_dir"
+for i in `ls -1d * | grep -E "^[0-9]{4}-[0-9]{2}-[0-9]{2}$"`;do
+   if [ "$i" \< "$HDDATE" -o "$i" = "$HDDATE" ]; then
+      rm -fR "$i"
+   fi
+done
+
+#
+
+

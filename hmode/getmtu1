@@ -1,0 +1,87 @@
+#!/bin/bash 
+# ------------------------------------------------------------------------
+# function:
+#          get mtu of <IP> through tcpdump
+# usages  :
+#          ./getmtu1 <IP>
+# e.g.    :
+#          ./getmtu1 110.189.116.37    # execute this at ms131 app server
+#          
+#          1460                        # return value 
+#                                
+# remarks :
+#          1.we use tcpdump to get mss value of the client computer
+#          2.add 40 to mss,we get mtu of the client computer
+#          2.must be used in app server
+# -----------------------------------------------------------------------
+
+
+#
+
+[ -f /usr/sbin/tcpdump ] || 
+{
+echo "tcpdump has not been installed"
+exit 
+}
+
+# 
+
+. /root/mode/apachemode
+
+#
+
+
+Hip=$1
+
+#
+
+if [ -f /usr/local/$Hapachemode/conf/httpd.conf ]; then
+   Hhttpports=$(cat /usr/local/$Hapachemode/conf/httpd.conf | sed -nre "s/^Listen +([0-9]+).*/\1/p")
+   Hhttpports=$(echo $Hhttpports | sed -r -e "s/ +/|/g" -e "s/(.*)/\(\1\)/")
+else
+   Hhttpports=8090
+fi
+
+
+
+# my tmp file
+
+Htcpdumpfile=/root/mode/tmp/htcpdump$$.tmp
+> $Htcpdumpfile
+
+#
+
+/usr/sbin/tcpdump -i any -l -nn host $Hip 2>/dev/null > $Htcpdumpfile &
+Htcpdumpp=$!
+
+Hloop=0
+Hwaitsecs=10
+while [ 1 ];do
+   sleep 6
+   if cat $Htcpdumpfile | grep -E "> .*\.$Hhttpports: (Flags \[)?S" >/dev/null; then
+      break
+   fi
+   Hloop=$[$Hloop+1]
+   if [ $Hloop -eq $Hwaitsecs ]; then
+      break
+   fi
+done
+kill $Htcpdumpp
+
+# 
+
+if cat $Htcpdumpfile | grep -E "^[^ ]+ IP $Hip[^ ]+ > .*\.$Hhttpports: (Flags \[)?S" >/dev/null; then
+   Hmtu=`cat $Htcpdumpfile | grep -E "^[^ ]+ IP $Hip[^ ]+ > .*\.$Hhttpports: (Flags \[)?S" | sed -re "s/.*mss ([0-9]+),[^,]+,((wscale [0-9]+)?).*/\2 \1/" |
+         sed -re "s/^(.*) ([0-9]+)$/echo -n '\1 ';echo '\2\+40' | bc/" | bash | sed -re "s/(.*) ([0-9]+)/\2 \1;/" -e "$ s/;$//"`          
+else
+   # No packets captured
+   Hmtu="No_samples_available"
+fi
+echo $Hmtu
+
+#
+
+rm -f $Htcpdumpfile
+
+# end
+

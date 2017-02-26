@@ -1,0 +1,62 @@
+#!/bin/bash
+# ------------------------------------------------------------------
+# function:
+#          get the category and various attributes of a tomcat 
+# usages  :
+#          ./gettomp <tomcat>
+# ------------------------------------------------------------------
+
+#
+
+/root/mode/check_tomcat $1 || exit 1
+
+#
+
+cd /usr/local/$1/conf
+Hhtpp=$(cat /usr/local/$1/conf/server.xml|grep -E "<Connector port=\"[0-9]+\" protocol=\"HTTP/1.1\"" | grep -v SSL | sed -re "s/.*\"([0-9]+)\" proto.*/\1/")
+Hhtpp="$Hhtpp     "
+Hhtpp=${Hhtpp:0:5}
+Hajpp=$(cat /usr/local/$1/conf/server.xml|grep -E "<Connector port=\"([0-9]+)\" protocol=\"AJP" | sed -re "s/.*\"([0-9]+)\" p.*/\1/")
+Hdwnp=$(cat /usr/local/$1/conf/server.xml|grep -E "<Server port=\"([0-9]+)\" shutdown=" | sed -re "s/.*\"([0-9]+)\".*/\1/")
+Hports="H ${Hhtpp}A $Hajpp D $Hdwnp"
+if /root/mode/isctom $1; then
+   Hclup=$(cat /usr/local/$1/conf/server.xml|tr -d "\r\n" | sed -re "s/.*port=\"([0-9]+)\"[ \t]*autoB.*/\1/")
+   Hports="$Hports C $Hclup "
+   if ! cat server.xml | grep -E "<!-- apache[1-7] -->" >/dev/null; then
+      Hapctom=apache
+      echo -n "apache "
+   else
+      Hapctom=`cat server.xml | grep -E "<!-- apache[1-7]? -->" | sed -re "s/.*<!-- (apache[1-7]?) -->.*/\1/" | sed -n "1 p"`
+      echo -n $Hapctom
+   fi
+   Hapctom=`echo $Hapctom | sed -re "s/apache/build/"`
+else
+  Hapctom=$1
+  Hports="$Hports ......."
+  if ! /root/mode/isNtom $1; then
+       echo -n "single "
+  else
+      echo -n "Single "
+  fi
+fi
+if [ ${#1} -le 10 ]; then
+   Htom="$1          "
+   Htom=${Htom:0:10}
+else
+   Htom="$1"
+fi
+# get the apps 
+Htomapps=`ls -1d  /usr/local/$1/webapps/*/ 2>/dev/null | grep -Ev "(/ROOT/|/docs/|/examples/|/host-manager/|/manager/)$" | sed -re "s/.*\/(.*)\//\1/"`
+Htomsapps=`echo \($Htomapps\)`
+if echo $Htomsapps | grep -E ipmsthef >/dev/null; then
+   if /root/mode/mod_config /root/antDep/$Hapctom.properties "thekmark" "#Get#" | grep -E "^[yYtT]" >/dev/null; then
+      Htomsapps=`echo $Htomsapps | sed -re "s/thef/thek/g"`
+   fi
+fi
+if [ ${#Htomsapps} -le 27 ]; then
+   Htomsapps="$Htomsapps........................."
+   Htomsapps=${Htomsapps:0:27}
+fi
+#
+echo " $Htom $Htomsapps ${Hports}...... `/root/mode/tctomcat $1 2>/dev/null`"
+

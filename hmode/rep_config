@@ -1,0 +1,92 @@
+#!/bin/bash 
+# ---------------------------------------------------------
+# function:
+#          replace item value with new one
+# ---------------------------------------------------------
+
+#
+
+Hconfigfile="$1"
+Hconfigitem="$2"
+Hconfigvalue="$3"
+Hsedline="$4"
+if echo "$Hsedline" | grep -E "^[tT][0-9]+$" >/dev/null; then
+   Hocc_cnt=1
+   Hsedline=`echo "$Hsedline" | sed -re "s/^.(.*)/\1/"`
+fi
+
+
+# check configuration file
+
+if [ -z "$Hconfigfile" ]; then
+   /root/mode/modemsg rep_config "Configuration file not provided!" more
+   exit 1
+elif [ ! -f "$Hconfigfile" ]; then
+   /root/mode/modemsg rep_config "File $Hconfigfile doesn't exist!" more
+   exit 1
+fi
+
+# check configuration item 
+
+if [ -z "$Hconfigitem" ]; then
+   /root/mode/modemsg rep_config "Configuration item not provided!" more
+   exit 1
+elif echo | grep -E "^$Hconfigitem$" >/dev/null; then
+   /root/mode/modemsg rep_config "Configuration item is too dangerous!" more
+   exit 1
+fi
+
+# check configuration item 
+
+if [ -z "$Hconfigvalue" ]; then
+   /root/mode/modemsg rep_config "Configuration value not provided!" more
+   exit 1
+fi
+
+# replace part
+
+HConfigitem=$(echo "$Hconfigitem" |  sed -re "s/\[/\\\\\[/g" | sed -re "s/\]/\\\\\]/g" | sed -re "s/\//\\\\\//g")
+if [ "$Hconfigvalue" = "uncomment" ]; then
+   if cat "$Hconfigfile" | grep -P "^[ \t]*${HConfigitem}[ \t]*$" > /dev/null; then
+      # already exists
+      :
+   elif  cat "$Hconfigfile" | grep -P "^[ \t]*#+${HConfigitem}[ \t]*$" > /dev/null; then
+      cat "$Hconfigfile" | sed -re "s/^([ \t]*)#+(${HConfigitem})([ \t]*)$/\1\2/"  > /root/mode/tmp/hrep_config$$.tmp
+      if ! cmp -s /root/mode/tmp/hrep_config$$.tmp "$Hconfigfile" 2>/dev/null; then
+         cp -f /root/mode/tmp/hrep_config$$.tmp "$Hconfigfile"
+      fi
+      rm -f /root/mode/tmp/hrep_config$$.tmp
+   fi
+elif [ "$Hconfigvalue" = "comment" ]; then
+   if cat "$Hconfigfile" | grep -P "^[ \t]*${HConfigitem}[ \t]*$" > /dev/null; then
+      cat "$Hconfigfile" | sed -re "s/^([ \t]*)(${HConfigitem})([ \t]*)$/\1#\2/"  > /root/mode/tmp/hrep_config$$.tmp
+      if ! cmp -s /root/mode/tmp/hrep_config$$.tmp "$Hconfigfile" 2>/dev/null; then
+         cp -f /root/mode/tmp/hrep_config$$.tmp "$Hconfigfile"
+      fi
+      rm -f /root/mode/tmp/hrep_config$$.tmp
+   fi
+elif [ "$Hconfigvalue" = "D-commented" ]; then
+   if [ -n "$HConfigitem" ]; then
+      if cat "$Hconfigfile" | grep -P "^[ \t]*#+${HConfigitem}" > /dev/null; then
+         cat "$Hconfigfile" | sed -re "/^[ \t]*#+${HConfigitem}/ d"  > /root/mode/tmp/hrep_config$$.tmp
+         if ! cmp -s /root/mode/tmp/hrep_config$$.tmp "$Hconfigfile" 2>/dev/null; then
+            cp -f /root/mode/tmp/hrep_config$$.tmp "$Hconfigfile"
+         fi
+         rm -f /root/mode/tmp/hrep_config$$.tmp
+      fi
+   fi
+else
+   if [ -n "$Hocc_cnt" ]; then
+      Hsedline=`cat "$Hconfigfile" | sed -nre "/^([ \t]*)(${HConfigitem})([ \t]+)([^0 \t].*|0[^0].*|0$)/ =" | sed -nre "$Hsedline p"`
+   fi
+   cat "$Hconfigfile" |
+   sed -re "$Hsedline s/^([ \t]*)(${HConfigitem})([ \t]+)([^0 \t].*|0[^0].*|0$)/\1\2\3${Hconfigvalue}/"  > /root/mode/tmp/hrep_config$$.tmp 
+   if ! cmp -s /root/mode/tmp/hrep_config$$.tmp "$Hconfigfile" 2>/dev/null; then
+      cp -f /root/mode/tmp/hrep_config$$.tmp "$Hconfigfile"
+   fi
+   rm -f /root/mode/tmp/hrep_config$$.tmp
+fi
+
+#
+
+ 

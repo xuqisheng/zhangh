@@ -1,0 +1,40 @@
+#!/bin/bash 
+
+if find /etc/hosts -type f -links +1 2>/dev/null | grep -E '/etc/hosts' >/dev/null; then
+   # The best case
+   :
+elif find /etc/hosts -type f -links 1 2>/dev/null | grep -E '/etc/hosts' >/dev/null; then
+   # Ali & Tencent
+   # The '/etc/sysconfig/networking/profiles/default/hosts' hard link is missing
+   # We add our own hard link
+   if [ -f /etc/.hrywfl ]; then
+      # backup /etc/.hrywfl
+      cp -f /etc/.hrywfl /etc/.hrywfl${RANDOM}$$
+      # recreate hard link to /etc/hosts
+      rm -f /etc/.hrywfl;ln /etc/hosts /etc/.hrywfl
+   elif [ -f /etc/sysconfig/networking/profiles/default/hosts ]; then
+      # backup /etc/sysconfig/networking/profiles/default/hosts
+      cp -f /etc/sysconfig/networking/profiles/default/hosts /etc/sysconfig/networking/profiles/default/.hosts${RANDOM}$$
+      # recreate hard link to /etc/hosts
+      rm -f /etc/sysconfig/networking/profiles/default/hosts;ln /etc/hosts /etc/sysconfig/networking/profiles/default/hosts
+   else
+      # create a hard link to /etc/hosts
+      ln /etc/hosts /etc/.hrywfl
+   fi
+else
+   # 1./etc/hosts doesn't exist
+   # 2./etc/hosts isn't a regular file
+   if [ -f /etc/.hrywfl ]; then
+      # create hard link to /etc/.hrywfl
+      ln /etc/.hrywfl /etc/hosts
+   elif [ -f /etc/sysconfig/networking/profiles/default/hosts ]; then
+      # create hard link to /etc/sysconfig/networking/profiles/default/hosts
+      ln /etc/sysconfig/networking/profiles/default/hosts /etc/hosts
+   else
+      touch /etc/hosts
+      ln /etc/hosts /etc/.hrywfl
+   fi
+fi
+
+#
+

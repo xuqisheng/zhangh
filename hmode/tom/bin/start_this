@@ -1,0 +1,24 @@
+
+Hhry="$0"
+while [ -h "$Hhry" ]; do
+   Hfil=`ls -l $Hhry 2>/dev/null | sed -re "s/.*-> ([^ ]+) */\1/"`
+   if echo "$Hfil" | grep "^/" >/dev/null; then
+      Hhry="$Hfil"
+   else
+      Hhry=`dirname "$Hhry"`/"$Hfil"
+   fi
+done
+Hdir=`dirname $Hhry`
+Hfil=${Hhry#$Hdir/}
+cd -P $Hdir
+Hdir=`pwd`
+#echo $Hdir/$Hfil
+#echo $Hdir
+
+Htomdir=`dirname $Hdir`
+Hlocdir=`dirname $Htomdir`
+Htomnam=${Htomdir#$Hlocdir/}
+/root/mode/start_tomcat $Htomnam
+
+
+

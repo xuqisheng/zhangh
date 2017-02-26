@@ -1,0 +1,20 @@
+#!/bin/bash
+
+# -------------------------------------------------------------------
+# function:
+#          adjust mysql log size 
+# -------------------------------------------------------------------
+
+# check if mysql server is installed
+
+# edit /etc/my.cnf
+
+# stop mysql server
+
+# rm old log files
+
+# start mysql server
+
+# end
+
+

@@ -1,0 +1,157 @@
+#!/bin/bash 
+# -------------------------------------------------------------------
+# function:
+#           do remote backup of local MySQL using xbstream mode
+# usages  :
+#           ./xbback <ssh-remote-host> <remote-backup-dir> 
+# e.g.    :
+#           ./xbback gc615        /var/myback
+#           ./xbback 192.168.0.15 /var/myback
+# -------------------------------------------------------------------
+
+# get options
+
+HOPTIONS=""
+while (echo "'$1'"  | grep -E  -e "^'-" > /dev/null)
+do
+   HOPTIONS="$HOPTIONS$1"
+   shift
+done
+
+# check if MySQL server exists
+
+if [ ! -x /usr/sbin/mysqld ]; then
+   /root/mode/modemsg xbback "MySQL server is not installed" more
+   exit 1
+fi
+
+# xtrabackup utilities 
+
+if [ ! -d /usr/local/xtrabackup ]; then
+   /root/mode/modemsg xbback "No mode configured xtrabackup utilities exist at this machine!" more 
+   exit 1
+fi
+  
+# xtrabackup version check
+
+if ! /usr/local/xtrabackup/bin/xtrabackup -v 2>&1 | grep -E '/xtrabackup version 2\.3\.6 ' >/dev/null; then 
+   /root/mode/modemsg xbback "Only xtrabackup version tested and modified by blackbox2 is allowed!" more 
+   exit 1
+fi
+
+# if called from crond
+
+if [ `/root/mode/traceps "crond"` = 'suc' ]; then
+   . /root/.bashrc 2>/dev/null
+   export HBLACKBOX2=1
+fi
+
+# get parameters
+
+Hsshrmt="$1"
+Hrmtdir="$2"
+
+# check ssh remote 
+
+if [ -z "$Hsshrmt" ]; then
+   /root/mode/modemsg xbback "ssh remote ip or server name must be provided!" more 
+   exit 1
+elif ! ssh $Hsshrmt "echo ab12345" | grep ab12345 >/dev/null; then
+   /root/mode/modemsg xbback "ssh remote '$Hsshrmt' cannot be connected!" more 
+   exit 1
+elif ! ssh $Hsshrmt "ls -1 /usr/local/xtrabackup/bin/xbstream 2>/dev/null" | grep xbstream >/dev/null; then
+   /root/mode/modemsg xbback "No xtrabackup tested and modified by blackbox2 has been installed" more 
+   exit 1
+fi
+
+# check remote directory
+
+if [ -z "$Hrmtdir" ]; then
+   /root/mode/modemsg xbback "remote directory must be provided as the second parm!" more 
+   exit 1
+elif ! ssh $Hsshrmt "[ -d \"$Hrmtdir\" ] && echo success" | grep success >/dev/null; then
+   /root/mode/modemsg xbback "remote directory '$Hrmtdir' doesn't exist!" more 
+   exit 1
+fi
+
+# mkdir date subdirectory under $Hrmtdir if option '-d' is given
+
+if echo "'$HOPTIONS" | grep -E -e "(-d)(-|$)" >/dev/null; then
+   Hhere_date=`date '+%Y-%m-%d'`
+   ssh $Hsshrmt "mkdir -p \"$Hrmtdir/$Hhere_date\""
+   Hrmtdir="$Hrmtdir/$Hhere_date"
+fi
+
+# backup mode
+
+if [ "$HOPTIONS" = "-b" ]; then
+   Hbackmode=Base
+elif [ "$HOPTIONS" = "-s" ]; then
+   Hbackmode=sql
+elif ! ssh $Hsshrmt "ls -1d \"$Hrmtdir/base/\" 2>/dev/null" | grep -E "/base/$" >/dev/null; then
+   Hbackmode=base
+else
+   Hbackmode=inc
+   Hinclist=`ssh $Hsshrmt "ls -1d \"$Hrmtdir/\"inc[0-9][0-9][0-9]/ 2>/dev/null"`
+   if [ -z "$Hinclist" ]; then
+      Hlastdir=base
+      Hthisdir=inc001
+   else
+      Hlastinc=`echo "$Hinclist" | sort | sed -n -re "$ p" | sed -re "s/.*\/inc([0-9]{3})\/$/\1/"`
+      Hthisinc=$[1001+$[10#$Hlastinc]]
+      Hthisinc=${Hthisinc:(-3)}
+      Hlastdir=inc$Hlastinc
+      Hthisdir=inc$Hthisinc
+   fi
+   # get lsn
+   Hlsn=`ssh $Hsshrmt "cat \"$Hrmtdir/$Hlastdir/xtrabackup_checkpoints\"" | grep last_lsn | sed -re "s/.*= *(.*)/\1/"`
+   if [ -z "$Hlsn" ]; then
+      /root/mode/modemsg xbback "Last backup has not been completed!" more 
+      exit 1
+   fi
+fi
+
+# avoid an innobackupex bug
+
+if [ -d /var/lib/mysql/test ]; then
+   if [ ! -f /var/lib/mysql/test/db.opt ]; then
+      cp -fp /root/mode/impfile/mysql/db.opt /var/lib/mysql/test
+      chown mysql:mysql /var/lib/mysql/test/db.opt
+   fi
+fi
+
+# real work is very short in fact
+
+if [ "$Hbackmode" = "sql" ]; then
+   if ! ssh $Hsshrmt "ls -1d \"$Hrmtdir/base/\" 2>/dev/null" | grep base >/dev/null; then
+      /root/mode/modemsg xbback "Complete backup has not been done!" more 
+      exit 1
+   fi
+   /root/mode/confirm "Are you sure to generate the incremental inc.sql since the complete backup and save it to directory '$Hrmtdir/sql' at remote side '$Hsshrmt'" hellohby || exit 1
+   # get binlog and its postion
+   Hbase_binlog=`ssh $Hsshrmt "cat $Hrmtdir/base/xtrabackup_binlog_info 2>/dev/null"`
+   Hbinfile=`echo $Hbase_binlog | sed -re "s/^([^ \t]+).*/\1/"`
+   Hbinposi=`echo $Hbase_binlog | sed -re "s/^([^ \t]+)[ \t]+(.*)/\2/"`
+   ssh $Hsshrmt "mkdir -p $Hrmtdir/sql" 
+   ls -1d /var/lib/mysql/mysql-bin.* | grep -v index | sed -nre "/$Hbinfile/,$ p" |
+   xargs /usr/bin/mysqlbinlog --start-position=$Hbinposi | ssh $Hsshrmt "cat - >$Hrmtdir/sql/inc.sql"
+elif [ "$Hbackmode" = "inc" ]; then
+   /root/mode/confirm "Are you sure to do incremental MySQL backup and save it to directory '$Hrmtdir/$Hthisdir' at remote side '$Hsshrmt'" hellohby || exit 1
+   ssh $Hsshrmt "mkdir -p $Hrmtdir/$Hthisdir"
+   /usr/local/xtrabackup/bin/innobackupex --incremental --user=root --password=deviskaifa --stream=xbstream ./ --incremental-lsn=$Hlsn | 
+   ssh $Hsshrmt "/usr/local/xtrabackup/bin/xbstream -x -C $Hrmtdir/$Hthisdir"
+else
+   if [ "$Hbackmode" = 'Base' ]; then 
+      /root/mode/confirm "Are you sure to remove old backups and make a new complete MySQL backup and save it to directory '$Hrmtdir/base' at remote side '$Hsshrmt'" hellohby || exit 1
+      ssh $Hsshrmt "rm -fR $Hrmtdir/*"
+   else
+      /root/mode/confirm "Are you sure to do complete MySQL backup and save it to directory '$Hrmtdir/base' at remote side '$Hsshrmt'" hellohby || exit 1
+   fi
+   ssh $Hsshrmt "mkdir -p $Hrmtdir/base"
+   /usr/local/xtrabackup/bin/innobackupex --user=root --password=deviskaifa --stream=xbstream ./ |
+   ssh $Hsshrmt "/usr/local/xtrabackup/bin/xbstream -x -C $Hrmtdir/base"
+fi
+
+# end 
+
+

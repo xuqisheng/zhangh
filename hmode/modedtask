@@ -1,0 +1,73 @@
+#!/bin/bash 
+# --------------------------------------
+# function:
+# --------------------------------------
+
+
+#
+
+/root/mode/withyou $$ modedtask 1 && exit
+
+#
+
+mkdir -p /etc/modetsk/dp
+
+#
+
+Holdsta=`/root/mode/setdsta`
+if echo "$Holdsta"  | grep -E "^send-all-completed#" >/dev/null; then
+   /root/mode/setdsta "downloading" >/dev/null
+fi
+
+#
+
+Holdsta=`/root/mode/setdsta`
+if echo "$Holdsta" | grep -E "^downloading#" >/dev/null; then
+   mkdir -p /fenku
+   cd /fenku
+   Hurl=`/root/mode/mod_config  /etc/modetsk/dp/dp.conf  "url" "#Get#"`
+   >/etc/modetsk/dp/dp.log
+   Herrcnt=0
+   for i in `cat /etc/modetsk/dp/dpfiles 2>/dev/null`;do
+       j=`echo "$i" | sed -re "s/.*\/(.*)/\1/"`
+       rm -f $j
+       wget ${Hurl}$i 2>>/etc/modetsk/dp/dp.log
+       Hret_s=$?
+       if [ $Hret_s -gt 0 ]; then
+          Herrcnt=$[$Herrcnt+1]
+       fi
+   done
+   if [ $Herrcnt -gt 0 ]; then
+      exit 1
+   fi
+   if cat /etc/modetsk/dp/dpfiles 2>/dev/null | grep -E "/sql.war$" >/dev/null; then
+      rm -fR update*
+      unzip -o sql.war -d .
+   fi
+   /root/mode/setdsta "download-completed" >/dev/null
+fi
+
+#
+
+Holdsta=`/root/mode/setdsta`
+if echo "$Holdsta" | grep -E "^download-completed#" >/dev/null; then
+   Hsettime=`/root/mode/mod_config  /etc/modetsk/dp/dp.conf  "time" "#Get#"`
+   Hnow=`date '+%Y-%m-%d %H:%M:%S'`
+   Hold=`date -d '-30 minutes' '+%Y-%m-%d %H:%M:%S'`
+   if [ "$Hnow" \> "$Hsettime" -o "$Hnow" = "$Hsettime" ]; then
+      if [ "$Hsettime" \> "$Hold" ]; then
+         /root/mode/setdsta "deploying" >/dev/null
+      fi
+   fi
+fi
+
+#
+
+Holdsta=`/root/mode/setdsta`
+if echo "$Holdsta" | grep -E "^deploying#" >/dev/null; then
+   /root/mode/.autopub -e `cat /etc/modetsk/dp/dpfiles 2>/dev/null | grep -Ev "/sql.war$" | sed -re "s/.*\/(.*)\.war/\1/"` 
+   /root/mode/setdsta "deploy-completed" >/dev/null
+fi
+
+#
+

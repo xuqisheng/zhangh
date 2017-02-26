@@ -1,0 +1,12 @@
+#!/bin/bash
+# -----------------------------------------
+# function:
+#          test if this is a sql dump
+# -----------------------------------------
+if head -n 20 "$1" | grep "MySQL dump.*Distrib" >/dev/null; then
+   exit 0
+elif head -n 20 "$1" | grep "SQLyog Ultimate" >/dev/null; then
+   exit 0
+fi
+exit 1
+

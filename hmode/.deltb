@@ -1,0 +1,76 @@
+#!/bin/sh
+# -------------------------------------------------------------------------------------
+# function:
+#          delete records in tbname
+# -------------------------------------------------------------------------------------
+# ./.deltb [<mysql-server-ip>] <dbname> <tbname>
+# e.g.:
+#       ./deltb 6.13 portal
+# -------------------------------------------------------------------------------------
+
+#
+
+/root/mode/modelog "$0 $*"
+
+# get options
+
+HOPTIONS=""
+while (echo "'$1'"  | grep -E  -e "^'-" > /dev/null)
+do
+   HOPTIONS="$HOPTIONS$1"
+   shift 
+done
+
+# get mysql server ip 
+
+. /root/mode/mysqldip
+
+# default database is portal
+
+HDBNAME=${1:-portal}
+
+# tbname is temporary log_info only
+
+HTBNAME=log_info
+
+# testdb 
+
+/root/mode/testdb $HMYSQLDIP $HDBNAME || exit 1
+
+#
+
+cat > /root/mode/tmp/${HTBNAME}$$.sql << EOF
+/*
+----each----:[${HTBNAME}.id]
+*/
+delimiter hryhby
+create procedure p_hry_del_${HTBNAME}$$()
+sql security invoker
+begin
+   declare var_maxid bigint(20);
+   declare var_minid bigint(20);
+   select max(id)-1000000 into var_maxid from ${HTBNAME};
+   select min(id)         into var_minid from ${HTBNAME};
+   while var_minid+10000 < var_maxid do
+      begin
+      delete from ${HTBNAME} where id < var_minid+10000;
+      select min(id)  into var_minid from ${HTBNAME};
+      end;
+   end while;
+   delete from ${HTBNAME} where id <= var_maxid;
+endhryhby
+delimiter ;
+call p_hry_del_${HTBNAME}$$();
+drop procedure if exists  p_hry_del_${HTBNAME}$$;
+EOF
+
+#
+
+/root/mode/seecfg $HMYSQLDIP /root/mode/tmp/${HTBNAME}$$.sql $HDBNAME
+
+#
+
+rm -f /root/mode/tmp/${HTBNAME}$$.sql
+
+# end
+

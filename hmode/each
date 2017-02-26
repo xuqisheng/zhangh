@@ -1,0 +1,170 @@
+#!/bin/sh
+# -------------------------------------------------------------------------------------
+# ./each [-c] [<mysql-server-ip>] <dbname> <hotel_code>
+# -------------------------------------------------------------------------------------
+
+# check reentrance
+
+if [ -x /etc/ifconfig ]; then
+   HSHTMP=""
+else
+   HSHTMP="sh.*"
+fi
+MYFILE="/root/mode/tmp/hryeach$$.tmp"
+ps -ef > $MYFILE
+if [ `grep -E "${HSHTMP}each" $MYFILE | grep -v "exectask each" | wc -l` -gt 1 ]; then
+   rm -f $MYFILE 
+   echo "Another each task is running!" && exit 1
+fi
+rm -f $MYFILE 
+
+# get options
+
+HOPTIONS=""
+while (echo "'$1'"  | grep -E  -e "^'-" > /dev/null)
+do
+   HOPTIONS="$HOPTIONS$1"
+   shift 
+done
+
+# get mysql server ip 
+
+. /root/mode/mysqldip
+
+# Default database to check is portal
+
+HDBNAME=${1:-portal}
+
+# $HDBNAME must exist 
+
+if [ -z `/root/mode/seecfg -s $HMYSQLDIP "show databases like '$HDBNAME'"|grep -i "^$HDBNAME"` ]; then
+   echo "Database $HDBNAME doesn't exist!" && exit 1
+fi
+
+# $HDBNAME must be gc ipms 
+
+if [ -z `/root/mode/seecfg -s $HMYSQLDIP "show tables from \\\`$HDBNAME\\\` like 'audit\_flag'"` ]; then
+   echo "Database $HDBNAME IS NOT a gc ipms!!!" && exit 1
+fi
+
+# Default hotel code is xt
+
+HHOTELCODE=${2:-xt}
+HHOTEL_ID=`/root/mode/seecfg -s $HMYSQLDIP "select id from \\\`$HDBNAME\\\`.hotel where code='$HHOTELCODE'"`
+HHOTELDES=`/root/mode/seecfg -s $HMYSQLDIP "select descript from \\\`$HDBNAME\\\`.hotel where code='$HHOTELCODE'"`
+
+if [ -z "$HHOTEL_ID" ]; then
+   echo "Hotel code $HHOTELCODE doesn't exist!" && exit 1
+fi
+
+HGROUP_ID=`/root/mode/seecfg -s $HMYSQLDIP "select hotel_group_id from \\\`$HDBNAME\\\`.hotel where id='$HHOTEL_ID'"`
+HGROUPDES=`/root/mode/seecfg -s $HMYSQLDIP "select descript from \\\`$HDBNAME\\\`.hotel_group where id='$HGROUP_ID'"`
+
+# get audit report bdate
+
+HACCTBDATE=`/root/mode/seecfg -s $HMYSQLDIP "select date(date_add(biz_date,interval -1 day)) from \\\`$HDBNAME\\\`.audit_flag where hotel_id=$HHOTEL_ID and biz_date1 = biz_date"`
+if [ -z "$HACCTBDATE" ]; then
+   echo "Night audit has been in process!!!" && exit 1
+fi
+
+# check if sql directory exists
+
+if [ ! -d /root/mode/sql ]; then
+   echo "Directory /root/mode/sql doesn't exist!" && exit 1
+fi
+
+# delete logs before check
+
+if echo "'$HOPTIONS'" | grep -E -e "-[a-zA-Z]*c" > /dev/null ; then
+   >/root/mode/logs/each.log
+   >/root/mode/logs/each_detail.log
+fi
+
+# Check will begin 
+
+exec 3>&1 1>>/root/mode/logs/each.log
+echo "######## each task ##########" | tee -a /root/mode/logs/each_detail.log
+echo | tee -a /root/mode/logs/each_detail.log
+echo "checking database $HDBNAME for hotel $HHOTELDES from group $HGROUPDES at $HMYSQLDIP2" | tee -a /root/mode/logs/each_detail.log
+echo | tee -a /root/mode/logs/each_detail.log
+echo "audit report bdate $HACCTBDATE" | tee -a /root/mode/logs/each_detail.log
+echo | tee -a /root/mode/logs/each_detail.log
+echo "check began at `LANG=en_US;date`" | tee -a /root/mode/logs/each_detail.log
+echo | tee -a /root/mode/logs/each_detail.log
+MYFILE="/root/mode/tmp/hryeach$$.tmp"
+MYERRFILE="/root/mode/tmp/hryeacherr$$.tmp"
+MYSQLF="/root/mode/tmp/hryeach$$.sql"
+cd /root/mode
+find -L sql -name "*.sql" | sort | 
+while read -r i; do
+    [ ! -r "$i" ] && continue 
+    HSQLFILE="$i"
+
+    # debug mode
+    if [ -n "$HEACHDEBUG" ]; then
+       if cat "$HSQLFILE" | grep -E "^----dbug----" >/dev/null; then
+          :
+       else
+         continue 
+       fi
+    fi
+
+    #
+
+    HOBJECTS=`cat "$HSQLFILE" | grep -P "^[ \t]*----each----:" |
+              sed -re "s/^[ \t]*----each----://" | tr -d "\r\n\t " | 
+              tr "A-Z" "a-z" | sed -r -e "s/unsigned/ unsigned/g" -e "s/zerofill/ zerofill/g"` 
+
+    # macro substitition etc.
+
+    cat "$HSQLFILE" | sed -e "s/\/\//-- /g" |
+    grep -v -E  "^----each----:" | 
+    sed -re "s/##gh#/\(hotel_group_id=#group_id# and hotel_id=#hotel_id#\)/g" |  
+    sed -re "s/#([a-z])#gh#/\(\1.hotel_group_id=#group_id# and \1.hotel_id=#hotel_id#\)/g" |  
+    sed -re "s/#([a-z])([a-z])#gh#/\(\1\.hotel_group_id=\2\.hotel_group_id and \1\.hotel_id=\2\.hotel_id\)/g" |  
+    sed -re "s/#group_id#/$HGROUP_ID/g"  |  
+    sed -re "s/#hotel_id#/$HHOTEL_ID/g" > $MYSQLF 
+
+    if /root/mode/testobjects $HMYSQLDIP "$HOBJECTS" "$HDBNAME"; then
+       HDISPINFO="Executing $HSQLFILE --------------------------------------------------------------" 
+       HDISPINFO=`expr substr "$HDISPINFO" 1 80` 
+       /root/mode/seecfg $HMYSQLDIP "$MYSQLF" "$HDBNAME" > $MYFILE 2> $MYERRFILE
+       if cat $MYERRFILE | grep -E "seecfg.*SQL syntax" >/dev/null; then
+          HRESULT="${HDISPINFO} SQL syntax error"
+       elif cat $MYERRFILE | grep -E "seecfg.*ERROR " >/dev/null; then
+          HRESULT="${HDISPINFO} SQL execution error"
+       else
+          HLINES=`cat $MYFILE | wc -l`
+          if [ $HLINES -eq 0 ]; then
+             HRESULT="${HDISPINFO} `date '+%Y-%m-%d %H:%M:%S'` Pass"
+          else
+             HRESULT="${HDISPINFO} `date '+%Y-%m-%d %H:%M:%S'` `expr $HLINES - 4` errors"
+          fi
+       fi
+       if (echo "$HRESULT"  | grep -E  "error[s]?$" > /dev/null); then
+          echo >> /root/mode/logs/each_detail.log
+          echo $HRESULT | tee -a /root/mode/logs/each_detail.log
+          if [ -n "$HSQLTITLE" ]; then
+             echo "$HSQLTITLE" >> /root/mode/logs/each_detail.log
+          fi
+          echo >> /root/mode/logs/each_detail.log
+          cat $MYFILE    >> /root/mode/logs/each_detail.log
+          cat $MYERRFILE >> /root/mode/logs/each_detail.log
+       else
+          echo $HRESULT
+       fi
+    fi
+done
+rm -f $MYFILE 
+rm -f $MYERRFILE 
+rm -f $MYSQLF 
+#
+echo  | tee -a /root/mode/logs/each_detail.log
+echo "check ended at `LANG=en_US;date`"  | tee -a /root/mode/logs/each_detail.log
+echo | tee -a /root/mode/logs/each_detail.log
+# 
+exec 1>&3 3>&-
+
+# end of check 
+
+

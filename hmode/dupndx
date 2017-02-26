@@ -1,0 +1,75 @@
+#!/bin/bash 
+# -----------------------------------------------------------------------------------------------------------------------------
+# function:
+#          display all tables and their indexes in a database,when option '-a' is given 
+#          display the tables and their indexes in a database,when the tables have redundant indexes 
+#          display the tables and their indexes in a database,when the tables have redundant indexes and primary key 
+#          display the tables and their indexes in a database,when the tables have redundant indexes but haven't primary key 
+# -----------------------------------------------------------------------------------------------------------------------------
+# usages  :
+#          ./dupndx [<options>] [<MySQL-server-ip>] <dbname>
+# -----------------------------------------------------------------------------------------------------------------------------
+# e.g.    :
+#          ./dupndx -a portal_f_pms              # all tables will be displayed 
+#          ./dupndx portal_f_pms                 # only tables with redundant indexes 
+#          ./dupndx -P portal_f_pms              # only tables with redundant indexes and primary key
+#          ./dupndx -p portal_f_pms              # only tables with redundant indexes,but without primary key
+#          ./dupndx 192.168.0.50 portal_f_pms 
+# -----------------------------------------------------------------------------------------------------------------------------
+
+# get options
+
+HOPTIONS=""
+while (echo "'$1'"  | grep -E  -e "^'-" > /dev/null)
+do
+   HOPTIONS="$HOPTIONS$1"
+   shift
+done
+
+#
+
+. /root/mode/mysqldip 
+
+# database name
+
+HDBNAME="$1"
+if [ -z "$HDBNAME" ]; then
+   /root/mode/modemsg dupndx "Database name must be provided!" more
+   exit 1
+fi
+
+# $HDBNAME must exist
+
+if [ -z `/root/mode/seecfg -s $HMYSQLDIP "show databases like '$HDBNAME'"|grep -i "^$HDBNAME"` ]; then
+   /root/mode/modemsg dupndx "Database '$HDBNAME' doesn't exist in MySQL server at $HMYSQLDIP" more
+   exit 1
+fi
+
+#
+
+Hdisp_table_mode=
+if echo "$HOPTIONS" | grep -E -e "-a(-|$)" >/dev/null; then
+   Hdisp_table_mode="-a"
+elif echo "$HOPTIONS" | grep -E -e "-P(-|$)" >/dev/null; then
+   # "-P" considered first 
+   Hdisp_table_mode="-P"
+elif echo "$HOPTIONS" | grep -E -e "-p(-|$)" >/dev/null; then
+   Hdisp_table_mode="-p"
+fi
+if echo "$HOPTIONS" | grep -E -e "-d(-|$)" >/dev/null; then
+   if [ `/root/mode/traceps "crond"` = 'suc' ]; then
+      Hdisp_table_mode="$Hdisp_table_mode -d"
+   elif [ "$HDUPNDX_force_drop" = "FoRcE" ]; then
+      Hdisp_table_mode="$Hdisp_table_mode -d"
+   fi
+fi
+
+#
+
+/root/mode/find_tables $HMYSQLDIP "$HDBNAME" |
+while read -r i;do
+    /root/mode/dupndx1 $Hdisp_table_mode $HMYSQLDIP "$HDBNAME" "$i" nocheck
+done
+
+#
+

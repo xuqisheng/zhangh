@@ -1,0 +1,10 @@
+#!/bin/bash
+# ------------------------------------------------------
+# function:
+#          test if this is a sql file from mysql binlog
+# ------------------------------------------------------
+
+if head "$1" | grep -E '^DELIMITER /\*!\*/;$' >/dev/null; then
+   exit 0
+fi
+exit 1

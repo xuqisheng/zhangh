@@ -1,0 +1,82 @@
+#!/bin/bash 
+
+#
+
+/root/mode/modepv setdsta $$ "/bin/bash .*/setdsta"
+
+#
+
+Holdsta=`cat /etc/modetsk/dp/dpstatus 2>/dev/null`
+if [ -z "$Holdsta" ]; then
+   Holdsta=init
+   Holdtime=null
+else
+   Holdtime=`cat /etc/modetsk/dp/$Holdsta 2>/dev/null`
+fi
+if [ -z "$1" ]; then
+   echo "$Holdsta#$Holdtime"
+else
+   if [ "$1" = "send-completed" ]; then
+      if echo "$Holdsta" | grep -E "^(init|deploy-completed|send-completed)$" >/dev/null; then
+         echo "$1" > /etc/modetsk/dp/dpstatus
+         date '+%Y-%m-%d %H:%M:%S' > /etc/modetsk/dp/$1
+         echo "`cat /etc/modetsk/dp/dpstatus`#`cat /etc/modetsk/dp/\`cat /etc/modetsk/dp/dpstatus\``"
+         exit 0
+      else
+         echo "$Holdsta#$Holdtime"
+         exit 1
+      fi
+   elif [ "$1" = "send-all-completed" ]; then
+      if echo "$Holdsta" | grep -E "^(send-completed)$" >/dev/null; then
+         echo "$1" > /etc/modetsk/dp/dpstatus
+         date '+%Y-%m-%d %H:%M:%S' > /etc/modetsk/dp/$1
+         echo "`cat /etc/modetsk/dp/dpstatus`#`cat /etc/modetsk/dp/\`cat /etc/modetsk/dp/dpstatus\``"
+         exit 0
+      else
+         echo "$Holdsta#$Holdtime"
+         exit 1
+      fi
+   elif [ "$1" = "downloading" ]; then
+      if echo "$Holdsta" | grep -E "^(send-all-completed)$" >/dev/null; then
+         echo "$1" > /etc/modetsk/dp/dpstatus
+         date '+%Y-%m-%d %H:%M:%S' > /etc/modetsk/dp/$1
+         echo "`cat /etc/modetsk/dp/dpstatus`#`cat /etc/modetsk/dp/\`cat /etc/modetsk/dp/dpstatus\``"
+         exit 0
+      else
+         echo "$Holdsta#$Holdtime"
+         exit 1
+      fi
+   elif [ "$1" = "download-completed" ]; then
+      if echo "$Holdsta" | grep -E "^(downloading)$" >/dev/null; then
+         echo "$1" > /etc/modetsk/dp/dpstatus
+         date '+%Y-%m-%d %H:%M:%S' > /etc/modetsk/dp/$1
+         echo "`cat /etc/modetsk/dp/dpstatus`#`cat /etc/modetsk/dp/\`cat /etc/modetsk/dp/dpstatus\``"
+         exit 0
+      else
+         echo "$Holdsta#$Holdtime"
+         exit 1
+      fi
+   elif [ "$1" = "deploying" ]; then
+      if echo "$Holdsta" | grep -E "^(download-completed)$" >/dev/null; then
+         echo "$1" > /etc/modetsk/dp/dpstatus
+         date '+%Y-%m-%d %H:%M:%S' > /etc/modetsk/dp/$1
+         echo "`cat /etc/modetsk/dp/dpstatus`#`cat /etc/modetsk/dp/\`cat /etc/modetsk/dp/dpstatus\``"
+         exit 0
+      else
+         echo "$Holdsta#$Holdtime"
+         exit 1
+      fi
+   elif [ "$1" = "deploy-completed" ]; then
+      if echo "$Holdsta" | grep -E "^(deploying)$" >/dev/null; then
+         echo "$1" > /etc/modetsk/dp/dpstatus
+         date '+%Y-%m-%d %H:%M:%S' > /etc/modetsk/dp/$1
+         echo "`cat /etc/modetsk/dp/dpstatus`#`cat /etc/modetsk/dp/\`cat /etc/modetsk/dp/dpstatus\``"
+         exit 0
+      else
+         echo "$Holdsta#$Holdtime"
+         exit 1
+      fi
+   fi
+fi
+
+

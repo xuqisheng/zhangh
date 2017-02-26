@@ -1,0 +1,33 @@
+#!/bin/bash
+
+if cat /etc/redhat-release 2>/dev/null | grep -E " release 6\..*" > /dev/null; then
+   if /root/mode/isdump "$1"; then
+      echo "UTF-8"
+      exit 
+   elif /root/mode/isblsql "$1"; then
+      echo "UTF-8"
+      exit 
+   fi
+fi
+
+# command 'file' can recognize most encodings 
+
+if file "$1" | grep -E '(ASCII|UTF-8|UTF-16|ISO-8859)'; then
+   exit
+fi
+
+# detect UCS-2 by BOM
+
+if cat "$1" | sed -n "1 p" | (LANG=C;grep -P "^(\xff\xfe|\xfe\xff)" >/dev/null); then
+   echo "UCS-2"
+   exit
+fi
+
+# using enca
+
+if [ -x /usr/local/bin/enca ]; then
+   /usr/local/bin/enca -L zh_CN "$1"
+fi
+
+#
+

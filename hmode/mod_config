@@ -1,0 +1,87 @@
+#!/bin/bash
+
+# -----------------------------------------------------
+# function:
+#          modify configuration value 
+# -----------------------------------------------------
+
+Hconfigfile="$1"
+Hconfigitem="$2"
+Hafteritem="$3"
+
+# check configuration file
+
+if [ -z "$Hconfigfile" ]; then
+   /root/mode/modemsg mod_config "Configuration file not provided!" more
+   exit 1
+elif [ ! -f "$Hconfigfile" ]; then
+   /root/mode/modemsg mod_config "File $Hconfigfile doesn't exist!" more
+   exit 1
+fi
+
+# check configuration item 
+
+if [ -z "$Hconfigitem" ]; then
+   /root/mode/modemsg mod_config "Configuration item not provided!" more
+   exit 1
+elif echo "$Hconfigitem" | grep -E "=.*=" >/dev/null; then
+   /root/mode/modemsg mod_config "More than 1 \"=\" in Configuration item is not allowed!" more
+   exit 1
+elif echo "$Hconfigitem" | grep -P "[^ \t=]+[ \t]+[^ \t=]+.*=" >/dev/null; then
+   /root/mode/modemsg mod_config "Invalid Configuration item!" more
+   exit 1
+fi
+
+# extract itemname and itemvalue
+
+Hconfigitem=`echo "$Hconfigitem" | sed -re "s/^[ \t]*//" | sed -re "s/[ \t]*$//"`
+HConfigitem=$(echo "$Hconfigitem" |  sed -re "s/\[/\\\\\[/g" | sed -re "s/\]/\\\\\]/g" | sed -re "s/\//\\\\\//g")
+Hc1=`echo "$Hconfigitem" | sed -re "s/^([^ =\t]+).*/\1/"`
+HC1=$(echo "$Hc1" | sed -re "s/\[/\\\\\[/g" | sed -re "s/\]/\\\\\]/g" | sed -re "s/\//\\\\\//g" )
+
+if [ `cat "$Hconfigfile" | grep -P "^${HC1}([ \t=]|$)" | wc -l` -gt 1 ]; then
+   /root/mode/modemsg mod_config "Multiple occurences of item \"$Hc1\"!" more
+   exit 1
+fi
+
+Hc2=`echo "$Hconfigitem" | sed -re "s/^$HC1(.*)/\1/" -e "s/^([ \t]*)(=?)([ \t]*)(.*)/\2\4/" -e "s/[ \t]*$//"`
+HC2=$(echo "$Hc2" | sed -re "s/\//\\\\\//g")
+
+# adjust $Hc2
+
+if [ -z "$Hc2" ]; then
+   :
+elif echo "$Hc2" | grep -E "^[^=]" > /dev/null; then
+   Hc2=" $Hc2"
+   HC2=" $HC2"
+fi
+
+# added temporarily
+
+if [ "$Hafteritem" = "#Get#"   ]; then
+   HC1=$(echo "$HC1" | sed -re 's/\./\\./g')
+   cat "$Hconfigfile" | sed -nre "s/^$HC1 *= *(.*)/\1/ p"
+   exit
+fi
+
+if cat "$Hconfigfile" | grep -P "^${HC1}([ \t=]|$)" >/dev/null; then
+   if ! cat "$Hconfigfile" | grep -P "^${HC1}([ \t]+|[ \t]*=[ \t]*)00.*$" >/dev/null; then
+      cat "$Hconfigfile" | sed -re "s/^($HC1)([ \t=].*|$)/$HC1$HC2/" > /root/mode/tmp/hmodconfig$$.tmp
+      if ! cmp -s /root/mode/tmp/hmodconfig$$.tmp "$Hconfigfile" 2>/dev/null; then
+         cp -f /root/mode/tmp/hmodconfig$$.tmp "$Hconfigfile"
+      fi
+      rm -f /root/mode/tmp/hmodconfig$$.tmp
+   fi
+else
+   if [ -n "$Hafteritem" ]; then
+      HAfteritem=$(echo "$Hafteritem" | sed -re "s/\[/\\\\\[/g" | sed -re "s/\]/\\\\\]/g" | sed -re "s/\//\\\\\//g")
+      cat "$Hconfigfile" | sed -re "/^$HAfteritem/ a$HC1$HC2" > /root/mode/tmp/hmodconfig$$.tmp
+      if ! cmp -s /root/mode/tmp/hmodconfig$$.tmp "$Hconfigfile" 2>/dev/null; then
+         cp -f /root/mode/tmp/hmodconfig$$.tmp "$Hconfigfile"
+      fi
+      rm -f /root/mode/tmp/hmodconfig$$.tmp
+   fi
+fi
+
+#
+

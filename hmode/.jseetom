@@ -1,0 +1,25 @@
+#!/bin/bash 
+# ------------------------------------------------------------------
+# function:
+#          display all tomcats and their categories 
+# usages  :
+#          ./.jseetom
+# ------------------------------------------------------------------
+
+cd /usr/local
+for i in `ls -d tomcat*/ 2>/dev/null | sed -re "s/\/$//"`;do
+    /root/mode/.jgettomp $i
+done | 
+sed -re "s/apache /apache0/"     |
+sed -re "s/tomcat6  /tomcat601/" |
+sed -re "s/tomcat([1-9])  /tomcat0\1 /" |
+sed -re "s/^([s|S]ingle *(tomcat[^ ]+))/1 \2 \1/" |
+sed -re "s/^apache/2 apache apache/"    |
+sort | sed -re "s/^([^ ]+ *[^ ]+) //"  |
+sed -re "s/apache0/apache /"     |
+sed -re "s/tomcat601/tomcat6  /" |
+sed -re "s/tomcat0([0-9]) /tomcat\1  /" |
+grep -E "$1"
+
+#
+

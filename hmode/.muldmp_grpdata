@@ -1,0 +1,119 @@
+#!/bin/bash 
+# -----------------------------------------------------------------------------------------
+# function:
+#          dump data of a group
+# usages  :
+#          ./.muldmp_grpdata <mysqld-ip> <dbname> <group_id> <dumpname.sql>
+# -----------------------------------------------------------------------------------------
+# e.g.    :  
+#          ./.muldmp_grpdata 6.15 portal 2 /g2data.sql
+# -----------------------------------------------------------------------------------------
+
+# get options
+
+HOPTIONS=""
+while (echo "'$1'"  | grep -E  -e "^'-" > /dev/null)
+do
+   HOPTIONS="$HOPTIONS$1"
+   shift 
+done
+
+# get mysql server ip 
+
+. /root/mode/mysqldip
+
+# database name
+
+HDBNAME="$1"
+if [ -z "$HDBNAME" ]; then
+   /root/mode/modemsg muldmp_grpdata "Database name must be provided!" more
+   exit 1
+fi
+
+# $HDBNAME must exist 
+
+if [ -z `/root/mode/seecfg -s $HMYSQLDIP "show databases like '$HDBNAME'"|grep -i "^$HDBNAME"` ]; then
+   /root/mode/modemsg muldmp_grpdata "Database '$HDBNAME' doesn't exist in MySQL server at $HMYSQLDIP" more
+   exit 1
+fi
+
+# $HDBNAME must be gc ipms 
+
+if [ -z `/root/mode/seecfg -s $HMYSQLDIP "show tables from \\\`$HDBNAME\\\` like 'audit\_flag'"` ]; then
+   /root/mode/modemsg muldmp_grpdata "Database '$HDBNAME' IS NOT a gc ipms!" more
+   exit 1
+fi
+
+# group_id
+
+HGROUPID="$2"
+
+if [ -z "$HGROUPID" ]; then
+   /root/mode/modemsg muldmp_grpdata "Group id must be provided!" more
+   exit 1
+fi
+
+if (echo "$HGROUPID"  | grep -E  "^[0-9]+$" > /dev/null); then
+   if [ "$HGROUPID" -le 0 ]; then
+      /root/mode/modemsg muldmp_grpdata "Group id must be greater than 0" more
+      exit 1
+   fi
+else
+   /root/mode/modemsg muldmp_grpdata "Group id must be a positive integer!" more
+   exit 1
+fi
+
+HGROUP_ID=`/root/mode/seecfg -s $HMYSQLDIP "select id       from \\\`$HDBNAME\\\`.hotel_group where id='$HGROUPID'"`
+HGROUPDES=`/root/mode/seecfg -s $HMYSQLDIP "select descript from \\\`$HDBNAME\\\`.hotel_group where id='$HGROUP_ID'"`
+
+if [ -z "$HGROUPDES" ]; then
+   /root/mode/modemsg muldmp_grpdata "The group id '$HGROUPID' doesn't exist in table hotel_group!" more
+   exit 1
+fi
+
+# dump name
+
+if [ -z "$3" ]; then
+   /root/mode/modemsg muldmp_grpdata "Please provide a dump name ending with \".sql\""  more
+   exit 1
+elif echo "$3" | grep "\.sql$" >/dev/null; then
+   HDUMPNAME="$3"
+else
+   /root/mode/modemsg muldmp_grpdata "User designated dump name must end with \".sql\""  more
+   exit 1
+fi
+
+# confirmation 
+
+/root/mode/modemsg muldmp_grpdata "dump group data" 
+/root/mode/modemsg muldmp_grpdata "MySQL server ip   : $HMYSQLDIP" less
+/root/mode/modemsg muldmp_grpdata "Database          : $HDBNAME"   less
+/root/mode/modemsg muldmp_grpdata "group id          : $HGROUP_ID" less
+/root/mode/modemsg muldmp_grpdata "group description : $HGROUPDES" less
+/root/mode/modemsg muldmp_grpdata "dump name         : $HDUMPNAME" less
+
+/root/mode/confirm "Are you sure that the information above is completely right" more || exit 1 
+
+# --------------------------------------------
+# Here is the body,very short in fact 
+# --------------------------------------------
+
+{
+echo
+echo "############# muldmp_grpdata $HOPTIONS $HMYSQLDIP $* #############"
+echo
+
+echo "dump group data of group id $HGROUP_ID from database $HDBNAME at $HMYSQLDIP began at `LANG=en_US;date`"
+echo
+
+mysqldump -uroot $Hmodepass -h$HMYSQLDIP --opt --single-transaction -t -y --skip-add-drop-table --skip-triggers -w "id=$HGROUP_ID" $HDBNAME `/root/mode/find_tables $HMYSQLDIP $HDBNAME 00 | grep -E  '^hotel_group$'` > "$HDUMPNAME"
+mysqldump -uroot $Hmodepass -h$HMYSQLDIP --opt --single-transaction -t -y --skip-add-drop-table --skip-triggers -w "hotel_group_id=$HGROUP_ID" $HDBNAME `/root/mode/find_tables $HMYSQLDIP $HDBNAME 10` >> "$HDUMPNAME"
+mysqldump -uroot $Hmodepass -h$HMYSQLDIP --opt --single-transaction -t -y --skip-add-drop-table --skip-triggers -w "hotel_group_id=$HGROUP_ID and hotel_id=0 " $HDBNAME `/root/mode/find_tables $HMYSQLDIP $HDBNAME 11` >> "$HDUMPNAME"
+
+echo
+echo "dump group data of group id $HGROUP_ID from database $HDBNAME at $HMYSQLDIP ended at `LANG=en_US;date`"
+echo
+} 2>&1 | tee -a /root/mode/logs/muldmp_grpdata.log
+
+# end
+

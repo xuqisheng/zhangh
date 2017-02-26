@@ -1,0 +1,60 @@
+#!/bin/bash 
+# --------------------------------------------------------------
+# function:
+#           retrieve table fields and their attibutes 
+# usage   :
+#          ./mod_flds <ip> <dbname> <filter> 
+# --------------------------------------------------------------
+
+. /root/mode/mysqldip
+
+HDB="$1"
+HDB="hry"
+if [ -n "$2" ]; then
+   HFILTER=" and $2"
+fi
+
+# get attributes
+
+/root/mode/seecfg -s $HMYSQLDIP "select table_name,column_name,column_type,is_nullable,
+                                        ifnull(concat('default ''',replace(column_default,'''',''''''),''''),'default null')
+                          from information_schema.columns
+                          where table_schema='$HDB' $HFILTER" | 
+
+while read -r HTAB HCOL HTYPE HISNULL HDEFAULT;do
+
+   if [ "$HISNULL" = "NO" ]; then
+      HISNULL="not null" 
+      if [ "$HDEFAULT" = "default null" ]; then
+         HDEFAULT=
+      fi
+   else
+      HISNULL="null" 
+   fi
+
+   # case and execute
+   
+   if echo "$HTYPE" | grep -E "^(var)?char" >/dev/null; then
+      HNDALTER=0
+      if echo "$HTYPE" | grep -E "^char" >/dev/null; then
+         HTYPE="var$HTYPE"
+         HNDALTER=1
+      fi
+      if [ "$HISNULL" = "not null" ]; then
+         HISNULL="null"
+         HNDALTER=1
+      fi
+      if [ $HNDALTER -eq 1 ]; then
+         echo "alter table $HTAB change $HCOL $HCOL $HTYPE $HISNULL $HDEFAULT" at $HMYSQLDIP2 in database $HDB
+         /root/mode/seecfg $HMYSQLDIP "alter table \`$HTAB\` change \`$HCOL\` \`$HCOL\` $HTYPE $HISNULL $HDEFAULT" $HDB
+      fi
+      echo "update $HTAB set $HCOL = null where $HCOL = ''" at $HMYSQLDIP2 in database $HDB
+      /root/mode/seecfg $HMYSQLDIP "update \`$HTAB\` set \`$HCOL\` = null where \`$HCOL\` = ''" $HDB
+   fi
+
+done 
+
+# end
+
+
+

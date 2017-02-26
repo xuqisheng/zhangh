@@ -1,0 +1,167 @@
+#!/bin/bash
+
+# PV signal 
+
+MYFILE=/root/mode/tmp/htompv$$.tmp
+ps -ef > $MYFILE
+if [ `grep -E ".*/bin/bash *.*/tompv *$" $MYFILE | wc -l` -gt 1 ]; then
+   rm -f $MYFILE 
+   exit 11
+fi
+rm -f $MYFILE 
+
+#
+
+Hantexp="(publish_(war|wfl|qqfail))"
+if [ `/root/mode/traceps "$Hantexp"` = 'suc' ]; then 
+   Hiamfrom=hicz
+   Hpno=
+elif [ -n "$Hgcsrvpno" ]; then 
+   Hiamfrom=$Hlnserver
+   Hpno=$Hgcsrvpno
+elif [ -n "$Htompno" ]; then
+   Hiamfrom=tomcat
+   Hpno=$Htompno
+else
+   /root/mode/modemsg "$Htompvext" "It's nice to see you here!" more
+   exit 0
+fi
+Hgcexp="$Hlnserver +(start|stop|restart|cluster) *$"
+
+#   
+
+if [ "$Hiamfrom" = "tomcat" ]; then
+   Htompvext="tompv - $1 $2"
+else
+   Htompvext="tompv - (from $Hiamfrom) $1 $2"
+fi
+
+# clear marks
+
+if [ -f /root/mode/proc/hicz ]; then
+   if ps -ef | grep -E "$Hantexp" | grep -v grep > /dev/null; then
+      :
+   else
+      rm -f /root/mode/proc/hicz
+   fi
+fi
+cd /root/mode/proc
+for i in `ls -1 gcserver* 2>/dev/null`; do 
+   if ps -ef | grep -E "^[^ ]+ +$(cat /root/mode/proc/$i) +.*$i" | grep -v grep >/dev/null; then
+      :
+   else
+      rm -f /root/mode/proc/$i
+   fi 
+done
+if [ -f /root/mode/proc/tomcat ]; then
+   > /root/mode/tmp/Htomps$$.tmp
+   cat /root/mode/proc/tomcat | 
+   while read -r i j k;do
+      if [ -z "$k" ]; then
+         continue
+      elif [ "$k" = "$Htompno" ]; then
+         continue
+      fi
+      if ps -ef | grep -P "^[^ ]+ +$k +.*/$i +$j( |$)" | grep -v grep >/dev/null; then
+         echo "$i $j $k" >> /root/mode/tmp/Htomps$$.tmp
+      fi
+   done
+   if [ `cat /root/mode/tmp/Htomps$$.tmp | wc -l` -gt 0 ]; then
+      cp -f /root/mode/tmp/Htomps$$.tmp /root/mode/proc/tomcat
+      rm -f /root/mode/tmp/Htomps$$.tmp
+   else
+      rm -f /root/mode/tmp/Htomps$$.tmp /root/mode/proc/tomcat
+   fi
+fi
+
+
+# set marks
+
+Hfno=`ls -1 /root/mode/proc | wc -l`
+
+if [ $Hfno -eq 0 ]; then
+   if [ $Hiamfrom = "tomcat" ]; then
+      echo $1 $2 $Hpno > /root/mode/proc/$Hiamfrom
+   else
+      echo $Hpno > /root/mode/proc/$Hiamfrom
+   fi
+elif [ $Hfno -eq 1 ]; then
+   cd /root/mode/proc
+   Hctask=`ls`
+   if [ "$Hctask" != "$Hiamfrom" ]; then
+      if [ "$Hctask" = "hicz" ]; then
+         /root/mode/modemsg "$Htompvext" "iHotel on deployment!!!"
+      elif [ "$Hctask" = "tomcat" ]; then
+         # ----------------------------------------------------------------------------
+         # When this happens,we make gcserver and hicz wait.
+         # Fine tuning is available that allows some gcserver or hicz to go on,
+         # but currentlly,I'm not going to do it
+         # ----------------------------------------------------------------------------
+         /root/mode/modemsg "$Htompvext" "A standalone tomcat start/stop process is going on!"
+      else
+         # $Hctask must be a gcserver
+         if echo "$Hctask$Hiamfrom" | grep -E "gcserver.*gcserver.*" >/dev/null; then
+            # $Hctask and $Hiamfrom are different gcservers
+            # this adds file no in /root/mode/proc directory
+            echo $Hgcsrvpno > $Hlnserver
+            exit 0
+         else
+            # I'm not gcserver
+            /root/mode/modemsg "$Htompvext" "A gcserver start/stop process is going on!"
+         fi
+      fi
+      if [ "$Hiamfrom" = "tomcat" ]; then
+         exit 2
+      else
+         exit 1
+      fi
+   fi
+   # $Hctask and $Hiamfrom are of same type
+   if [ "$Hiamfrom" = "hicz" ]; then
+      exit 0
+   elif echo "$Hiamfrom" | grep -E "gcserver" >/dev/null; then
+      # --------------------------------------------------------------------------------
+      # This is the case when the second or third tomcat of the same server starts/stops 
+      # So the following statement is not neccessary,but we reserve it 
+      # --------------------------------------------------------------------------------
+      echo $Hgcsrvpno > $Hlnserver
+   elif [ "$Hiamfrom" = "tomcat" ]; then
+      # --------------------------------------------------------------------------------
+      # This is the case of single tomcat starting/stopping. 
+      # tomcat may be different
+      # --------------------------------------------------------------------------------
+      if cat /root/mode/proc/tomcat | grep -E "^start_tomcat +$2 " >/dev/null; then 
+         # same tomcat instance
+         /root/mode/modemsg "$Htompvext" "A standalone 'start_tomcat $2' process is going on!"
+         exit 2
+      elif cat /root/mode/proc/tomcat | grep -E "^stop_tomcat +$2 " >/dev/null; then 
+         # same tomcat instance
+         /root/mode/modemsg "$Htompvext" "A standalone 'stop_tomcat $2' process is going on!"
+         exit 2
+      else
+         # different tomcat instance
+         echo $1 $2 $Hpno >> /root/mode/proc/tomcat
+      fi
+   fi
+   exit 0
+elif [ $Hfno -gt 1 ]; then
+   # All gcservers under proc
+   cd /root/mode/proc
+   if echo $Hiamfrom | grep gcserver >/dev/null; then
+      # both new or old gcserver are allowed 
+      echo $Hgcsrvpno > $Hlnserver
+      exit 0
+   else
+      # prevent tomcat and hicz cases
+      /root/mode/modemsg "$Htompvext" "Some gcserver start/stop processes are going on!"
+      if [ "$Hiamfrom" = "tomcat" ]; then
+         exit 2
+      else
+         exit 1
+      fi
+   fi
+fi
+
+#
+
+

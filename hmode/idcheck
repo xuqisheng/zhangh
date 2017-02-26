@@ -1,0 +1,142 @@
+#!/bin/bash
+# -------------------------------------------------------------------------------------
+# function:
+#           check and fix auto_increment of tables
+# usage:
+#           ./idcheck [<mysql server ip>] [fix]
+# e.g.:
+#           ./idcheck 6.13         
+#           ./idcheck 6.13 fix
+#           ./idcheck fix
+# -------------------------------------------------------------------------------------
+
+. /root/mode/mysqldip
+
+# 
+
+HFIXOPTION="$1"
+
+# test MySQL server connectivity
+
+HLOOP=0
+HCONN=0
+echo -n "Checking mysql connection: "
+while [ 1 -eq 1 ]; do
+   if /root/mode/seecfg $HMYSQLDIP 2>/dev/null; then
+      HCONN=1
+      echo "connection ok!"
+      break
+   else
+      HLOOP=$[$HLOOP + 1]
+      echo -n "$HLOOP "
+      sleep 1
+      [ $HLOOP -eq 15 ] && break
+   fi 
+done
+if [ $HCONN -eq 0 ]; then
+   echo "connection failure!"
+   {
+   echo "############# idcheck ${1} #############"
+   echo "MySQL server at $HMYSQLDIP2 can not be connected!!"
+   echo "############# idcheck ${1} #############"
+   } |  tee -a /root/mode/logs/idcheck.log
+   exit 1
+fi
+
+#
+
+if [ "$HMYSQLDIP" = "localhost" ]; then
+   /root/mode/tune_mysql
+fi
+
+#
+
+Hcolfiletmp=/root/mode/tmp/hcolfiletmp$$.tmp
+Hidtmpsql=/root/mode/tmp/hidtmpsql$$.sql
+
+{
+echo "############# idcheck ${1} #############"
+echo 
+echo "Checking MySQL $HMYSQLDIP2 server database auto_increment at `LANG=en_US;date`"
+
+# do check
+
+/root/mode/seecfg -s $HMYSQLDIP "select table_schema,table_name from tables where table_name like '%\_history'" information_schema | 
+while read -r HDBNAME HTBNAME; do
+   HBASETB=`echo $HTBNAME | sed -re "s/(.*)_history$/\1/"`
+   /root/mode/seecfg -s $HMYSQLDIP "select table_name,column_key,extra
+                                           from columns
+                                           where table_schema='$HDBNAME' and 
+                                                 (table_name='$HBASETB' or table_name='$HTBNAME') and
+                                                 column_name='id'" information_schema > $Hcolfiletmp
+   #
+   
+   if [ `cat $Hcolfiletmp | wc -l` -ne 2 ]; then
+      continue
+   elif ! cat $Hcolfiletmp | grep -Pi "^$HBASETB\tPRI\tauto_increment$" >/dev/null; then
+      continue
+   elif   cat $Hcolfiletmp | grep -Pi "^$HTBNAME\tPRI\tauto_increment$" >/dev/null; then
+      continue
+   elif ! /root/mode/testobject $HMYSQLDIP "[$HTBNAME:primarykey=id]" $HDBNAME; then
+      continue
+   fi
+
+   # prepare sql
+
+cat > $Hidtmpsql << EOF
+select ifnull(max(id),0) from \`$HBASETB\`;
+select ifnull(max(id),0) from \`$HTBNAME\`;
+select auto_increment from information_schema.tables where table_schema='$HDBNAME' and table_name='$HBASETB';
+EOF
+   
+   # execute sql 
+
+   /root/mode/seecfg -s $HMYSQLDIP $Hidtmpsql $HDBNAME > $Hcolfiletmp
+
+   HBASE_IC=`cat $Hcolfiletmp | sed -n "1 p"`
+   HHIST_IC=`cat $Hcolfiletmp | sed -n "2 p"`
+   HINFO_IC=`cat $Hcolfiletmp | sed -n "3 p"`
+
+   # check and correct auto_increment of HBASETB
+
+   if [ $HINFO_IC -le $HHIST_IC ]; then
+      echo
+      echo "$HDBNAME: $HBASETB=$HBASE_IC $HTBNAME=$HHIST_IC $HBASETB.auto_increment=$HINFO_IC"
+      echo "Error ID value found!!"
+      if [ "$HFIXOPTION" = "fix" ]; then
+         # auto_increment needs to be adjusted 
+         HNEW_IC=`echo "$HHIST_IC+1" | bc`
+         /root/mode/seecfg $HMYSQLDIP "alter table \`$HBASETB\` auto_increment=$HNEW_IC" $HDBNAME
+         echo "auto_increment corrected to $HNEW_IC"
+      fi
+      echo
+   fi 
+
+   # check duplicate ids between HBASETB and HTBNAME(excluding tables beginning with "rep_"
+
+   if echo $HBASETB | grep -v "^rep_" >/dev/null; then
+      # exclude tables if $HBASE_IC is equal to $HHIST_IC because of tables like bursar_out and bursar_out_history
+      if [ $HBASE_IC -ne $HHIST_IC ]; then
+         Hwithdup=`/root/mode/seecfg -s $HMYSQLDIP "select if(exists(select a.id from \\\`$HBASETB\\\` a use index(primary),\\\`$HTBNAME\\\` b where a.id=b.id),1,0)" $HDBNAME`
+         if [ $Hwithdup -eq 1 ]; then
+            echo
+            echo "$HDBNAME: $HBASETB $HTBNAME"
+            echo "Duplicate id found! Manual work is needed!"
+            /root/mode/seecfg $HMYSQLDIP "select a.id from \`$HBASETB\` a use index(primary),\`$HTBNAME\` b where a.id=b.id" $HDBNAME
+            echo
+         fi
+      fi
+   fi
+done
+echo
+echo "Checking completed at `LANG=en_US;date`"
+echo
+} | tee -a /root/mode/logs/idcheck.log
+
+#
+
+rm -f $Hcolfiletmp
+rm -f $Hidtmpsql
+
+#
+

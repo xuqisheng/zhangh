@@ -1,0 +1,37 @@
+#!/bin/bash
+# -----------------------------------------------------
+# function:
+#           confirmation question
+# -----------------------------------------------------
+
+#
+
+if [ -n "$HBLACKBOX2" ]; then
+   exit 0
+fi
+
+if [ -z "$2" ]; then
+   Hconfirmcnt=1
+else
+   # TODO 
+   Hconfirmcnt=3
+fi
+
+#
+
+Hconfirmloop=0
+while [ $Hconfirmloop -lt $Hconfirmcnt ]; do 
+   Hconfirmloop=$[$Hconfirmloop+1]
+   echo  
+   echo -n "${1}?[Y/N]" 
+   read Hyesno
+   if [ "$Hyesno" = 'y' -o "$Hyesno" = 'Y' ]; then
+      :
+   else
+      echo  
+      exit 1
+   fi
+done
+echo  
+exit 0
+

@@ -1,0 +1,41 @@
+#!/bin/bash 
+# --------------------------------------------------------------
+# function:
+#           rename table field to another name
+# usage   :
+#          ./mod_fldname <ip> <dbname> <fieldname> <new-fieldname> 
+# --------------------------------------------------------------
+
+. /root/mode/mysqldip
+
+HDB="$1"
+HTAB="$2"
+HCOL="$3"
+HNCOL="${4-${HCOL}_}"
+
+# get attributes
+
+HSTAT=`/root/mode/seecfg -s $HMYSQLDIP "select concat(column_type,if(is_nullable='YES',' null',' not null'),
+                                        ifnull(concat(' default=''',
+                                                        replace(column_default,'''',''''''),''''),' HrYhBy'))
+                          from information_schema.columns
+                          where table_schema='$HDB' and table_name = '$HTAB' and column_name='$HCOL'"`
+HSTAT=`echo "$HSTAT" | sed -re "s/HrYhBy$/default null/" | sed -re "s/not null default null$/not null/" | sed -re "s/default=/default /"`
+
+#
+
+cat > /root/mode/tmp/hmod_fldname$$.sql << EOF
+/*
+----each----:[$HTAB][$HTAB.$HCOL][#$HTAB.$HNCOL]
+*/
+alter table \`$HTAB\` change \`$HCOL\` \`${HNCOL}\` $HSTAT;
+EOF
+
+# execute the sql
+
+/root/mode/seecfg $HMYSQLDIP /root/mode/tmp/hmod_fldname$$.sql $HDB
+
+rm -f /root/mode/tmp/hmod_fldname$$.sql
+
+#
+

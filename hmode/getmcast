@@ -1,0 +1,43 @@
+#!/bin/bash
+# -------------------------------------------
+# function:
+#          get multicast address
+# -------------------------------------------
+
+export HHRYMCAST HHRYMCAST1 HHRYMPORT
+cd /usr/local
+if echo $1 | grep -E "^tomcat" >/dev/null; then
+   if /root/mode/isctom $1; then
+      HHRYMCAST=`cat $1/conf/server.xml | grep "22[48]\." | sed -re "s/^.*(22[48]\.[0-9]+\.[0-9]+\.[0-9]+).*/\1/"`
+      HHRYMPORT=`cat $1/conf/server.xml | grep -E "port=\"45[0-9]{3}\"" | sed -re "s/^.*port=\"(.*)\".*/\1/"`
+   fi
+else
+   for i in `ls -d tomcat*/ 2>/dev/null | sed -re "s/\/$//" `;do
+       /root/mode/check_tomcat $i || continue
+       if /root/mode/isatom $i $1; then
+          HHRYMCAST=`cat $i/conf/server.xml | grep "22[48]\." | sed -re "s/^.*(22[48]\.[0-9]+\.[0-9]+\.[0-9]+).*/\1/"`
+          HHRYMPORT=`cat $i/conf/server.xml | grep -E "port=\"45[0-9]{3}\"" | sed -re "s/^.*port=\"(.*)\".*/\1/"`
+          HiMARK=1
+          break
+       fi
+   done
+   if [ -z "$HiMARK" ]; then
+      /root/mode/getadr >/dev/null || exit 1
+      HHRYMCAST="228.0.0.`/root/mode/getadr`"
+      if [ "$1" = "" -o "$1" = "apache" ]; then
+         HHRYMPORT=$[45565+`/root/mode/getadr 1`]
+      else
+         Hapachetail=`echo $1 | sed -re "s/apache(.*)/\1/"`
+         HHRYMPORT=$[45565+$Hapachetail+`/root/mode/getadr 1`]
+      fi
+   fi
+fi
+
+#
+
+HHRYMCAST1=`echo $HHRYMCAST | sed -re 's/\./\\\\./g'`
+
+if [ "$2" = "-l" ]; then
+   echo $HHRYMCAST $HHRYMCAST1 $HHRYMPORT
+fi
+

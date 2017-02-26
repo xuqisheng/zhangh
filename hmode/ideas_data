@@ -1,0 +1,171 @@
+#!/bin/bash
+# ------------------------------------------------------------------------------
+# function:
+#          ideas data preparation
+# ------------------------------------------------------------------------------
+# usages:
+#          ./ideas_data [<apachemode>] <sqldir> <db|dbtr> <htlcode> <biz_date>
+# ------------------------------------------------------------------------------
+# e.g.  :
+#          ./ideas_data                          
+#          ./ideas_data apache
+#          ./ideas_data apache  /ideas_sql
+#          ./ideas_data apache  /ideas_sql  db
+#          ./ideas_data apache  /ideas_sql  db  eng
+#          ./ideas_data apache  /ideas_sql  db  eng '2013-12-25'
+# ------------------------------------------------------------------------------
+
+#
+
+. /root/mode/apachemode
+
+# apache existence check 
+
+[ -d /usr/local/$Hapachemode/conf ] || exit 1
+
+# sql file directory
+
+Hsqldir=${1:-/ideas_sql}
+
+if [ ! -d "$Hsqldir" ]; then
+   /root/mode/modemsg ideas_data "sql file directory '$Hsqldir' doesn't exist!" more
+   exit 1
+fi
+Hezkeep=
+if echo "$Hsqldir" | grep -E 'keepold' >/dev/null; then
+   Hezkeep=1
+fi
+
+# ip and database 
+
+if [ "$2" = "" -o "$2" = "db" ]; then
+   HmydbR=$HdbR
+   HmydbN=$HdbN
+   Hmydbmark=db
+elif [ "$2" = "dbtr" ]; then
+   HmydbR=$HdbRtr
+   HmydbN=$HdbNtr
+   Hmydbmark=dbtr
+else
+   /root/mode/modemsg ideas_data "db parameter must be 'db','dbtr' or empty!" more
+   exit 1
+fi
+
+# htlcode filter
+
+if [ -z "$3" ]; then
+   Hhtlcodecond="1=1"
+else
+   Hhtlcodecond="code='$3'"
+fi
+
+# biz_date 
+
+if [ -n "$4" ]; then
+   Hbdate12=`/root/mode/seecfg -s $HmydbR "select date_format('$4','%Y%m%d')"`
+   if [ "$Hbdate12" = "NULL" ]; then
+      /root/mode/modemsg ideas_data "Invalid biz_date '$4'" more
+      exit 1
+   fi
+   Hbdate11=`echo $Hbdate12 | sed -re 's/^(....)(..)(..)$/\1-\2-\3/'`
+fi
+
+# ideas data directory
+
+mkdir -p /usr/local/$Hapachemode/htdocs/ideas_data
+
+#
+
+Holdir="/root/mode/tmp/Holdir$$"
+Holsql="/root/mode/tmp/Holsql$$.sql"
+mkdir -p $Holdir
+
+#
+
+/root/mode/seecfg -s $HmydbR \
+          "select hotel_group_id,
+                  (select lower(b.code) from hotel_group b where b.id=hotel.hotel_group_id) as hotel_group_code,
+                  id as hotel_id,
+                  lower(code) as hotel_code,
+                  (select adddate(b.biz_date,-1) from audit_flag b where b.hotel_group_id=hotel.hotel_group_id and b.hotel_id=hotel.id) as bdate 
+                  from hotel where $Hhtlcodecond order by hotel_group_id,id" $HmydbN |  
+while read -r Hgid Hgcode Hhid Hhcode Hbdate21; do
+   Hbdate21=`echo $Hbdate21 | sed -re "s/^(.{10}).*/\1/"` 
+   Hbdate22=`echo $Hbdate21 | sed -re "s/^(....).(..).(..).*/\1\2\3/"` 
+   if [ -z "$Hbdate11" ]; then
+      Hbdate31="$Hbdate21" 
+      Hbdate32="$Hbdate22" 
+   elif [ "$Hbdate11" \> "$Hbdate21" ]; then
+      Hbdate31="$Hbdate21" 
+      Hbdate32="$Hbdate22" 
+   else
+      Hbdate31="$Hbdate11" 
+      Hbdate32="$Hbdate12" 
+   fi
+
+   # grpcode-htlcode mapping
+
+   Htocode=`/root/mode/mod_config "$Hsqldir"/htlcode.cnf "${Hgcode}-${Hhcode}" "#Get#" 2>/dev/null`
+   if [ -z "$Htocode" ]; then
+      Htocode="${Hgcode}-${Hhcode}"
+   fi
+
+   # get the time
+
+   Hthetime=`/root/mode/seecfg -s $HmydbR "select date_end from audit_date where hotel_group_id=$Hgid and hotel_id=$Hhid and biz_date='$Hbdate31'" $HmydbN`
+   Hthetime=`echo $Hthetime | sed -re "s/.* (..):(..).*/\1\2/"`
+
+   #
+
+   /root/mode/modemsg ideas_data "Generating ideas data for hotel '$Hhcode' from group '$Hgcode' on '$Hbdate31'" more
+
+   #
+   
+   rm -f $Holdir/*
+   find -L "$Hsqldir" -name "*.sql" | sed -re "s/\.sql$//" | sort | sed -re "s/$/.sql/" | 
+   while read -r i;do
+      [ ! -r "$i" ] && continue 
+      j=`echo "$i" | sed -re 's/.*\/(.*)\.sql/\1/' | tr 'A-Z' 'a-z'`
+      J="${Htocode}_${Hbdate32}_${Hthetime}_${j}.csv"
+      
+      {
+      echo "propertyCode,captureDate,captureTime"
+      echo "${Htocode},$Hbdate31,$Hthetime"
+      } > $Holdir/$J
+
+      # column heads
+      
+      cat "$i" | grep -P "^[ \t]*----cols----:" | sed -re "s/^[ \t]*----cols----://" | tr -d "[]\r\n\t " >> $Holdir/$J
+      if [ `cat $Holdir/$J 2>/dev/null | wc -l` -ne `sed -nre "$ =" $Holdir/$J` ]; then
+         echo >> $Holdir/$J
+      fi
+
+      #
+
+      cat "$i" | 
+      sed -re "s/##gh#/\(hotel_group_id=#group_id# and hotel_id=#hotel_id#\)/g" |
+      sed -re "s/#([a-z])#gh#/\(\1.hotel_group_id=#group_id# and \1.hotel_id=#hotel_id#\)/g" |
+      sed -re "s/#([a-z])([a-z])#gh#/\(\1\.hotel_group_id=\2\.hotel_group_id and \1\.hotel_id=\2\.hotel_id\)/g" |
+      sed -re "s/#hotel_group_id#/$Hgid/g"        |
+      sed -re "s/#group_id#/$Hgid/g"              |
+      sed -re "s/#hotel_id#/$Hhid/g"              | 
+      sed -re "s/#bdate#/'$Hbdate31'/g"           | 
+      sed -re "s/#biz_date#/'$Hbdate31'/g"        > $Holsql
+      echo "$i"
+      /root/mode/seecfg -z $HmydbR $Holsql $HmydbN | sed -re "s/\r$//" >> $Holdir/$J
+   done
+   cd $Holdir
+   mkdir -p /usr/local/$Hapachemode/htdocs/ideas_data/$Hmydbmark/$Hgcode/$Hhcode/$Hbdate32
+   if [ -z "$Hezkeep" ]; then
+      rm -fR /usr/local/$Hapachemode/htdocs/ideas_data/$Hmydbmark/$Hgcode/$Hhcode/$Hbdate32/*
+   fi
+   mv -f $Holdir/*.csv /usr/local/$Hapachemode/htdocs/ideas_data/$Hmydbmark/$Hgcode/$Hhcode/$Hbdate32 2>/dev/null
+
+done
+
+#
+
+rm -fR $Holdir
+rm -f  $Holsql
+
+#

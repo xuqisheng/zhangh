@@ -1,0 +1,159 @@
+#!/bin/bash
+# -------------------------------------------
+# function:
+#          install mysql client/server
+# -------------------------------------------
+
+#
+
+/root/mode/modelog "$0 $*"
+
+# install common parts
+
+/root/mode/inst_com
+
+# install pt
+
+/root/mode/.inst_pt
+
+# install mysql client
+
+if rpm -qa | grep "^MySQL-client-" > /dev/null; then
+   :
+else
+   if uname -a | grep "x86_64" >/dev/null; then
+      if [ -f /root/packages/MySQL-client-5.5.50-1.linux2.6.x86_64.rpm ]; then
+         rpm -ivh /root/packages/MySQL-client-5.5.50-1.linux2.6.x86_64.rpm
+      else
+         /root/mode/modemsg inst_mysql_55 "No MySQL client 5.5.50 64bit RPM package in directory /root/packages" more
+         exit 
+      fi
+   else
+      if [ -f /root/packages/MySQL-client-5.5.50-1.linux2.6.i386.rpm ]; then
+         rpm -ivh /root/packages/MySQL-client-5.5.50-1.linux2.6.i386.rpm
+      else
+         /root/mode/modemsg inst_mysql_55 "No MySQL client 5.5.50 32bit RPM package in directory /root/packages" more
+         exit 
+      fi
+   fi
+fi
+
+# prepare to install mysql server
+
+if rpm -qa | grep "^MySQL-server-" > /dev/null; then
+   exit 
+fi
+
+if [ "$HNCONFIRM_MODE" = 'y' ]; then
+   :
+else
+   /root/mode/confirm "Are you sure to install mysql server at this machine" || exit 1 
+fi 
+
+if uname -a | grep "x86_64" >/dev/null; then
+   if [ ! -f /root/packages/MySQL-server-5.5.50-1.linux2.6.x86_64.rpm ]; then
+      /root/mode/modemsg inst_mysql_55 "No MySQL server 5.5.50 64bit RPM package in directory /root/packages" more
+      exit
+   fi
+else
+   if [ ! -f /root/packages/MySQL-server-5.5.50-1.linux2.6.i386.rpm ]; then
+      /root/mode/modemsg inst_mysql_55 "No MySQL server 5.5.50 32bit RPM package in directory /root/packages" more
+      exit
+   fi
+fi
+
+#
+
+Hmhis=`/root/mode/chkmhis -l`
+if [ -z "$Hmhis" ]; then
+   :
+elif [ "$Hmhis" = "5.5" ]; then
+   :
+elif [ "$Hmhis" \< "5.5" ]; then
+   if [ -z "$HmUpGrAdE" ]; then
+      /root/mode/modemsg inst_mysql_55 "MySQL server $Hmhis data in /var/lib/mysql"
+      /root/mode/modemsg inst_mysql_55 "Please use /root/mode/.inst_mysql_`echo $Hmhis | tr -d '.'` to reinstall or use /root/mode/.upgrade_mysql_to_5.5.50 to upgrade" reverse
+      exit 1
+   fi
+else
+   /root/mode/modemsg inst_mysql_55 "MySQL server $Hmhis data in /var/lib/mysql"
+   /root/mode/modemsg inst_mysql_55 "Please use /root/mode/.inst_mysql_`echo $Hmhis | tr -d '.'` to reinstall" reverse
+   exit 1
+fi
+
+# configure mysql my.cnf  
+
+export Huse_secure_file_priv=1
+/root/mode/config_mysql 
+
+# install mysql server 
+
+# test if new installation -- 2012.3.8 --
+
+if [ -d /var/lib/mysql ]; then
+   if [ -n "`ls /var/lib/mysql/*.err 2>/dev/null`" ]; then
+      Hnewinst=0
+   else
+      Hnewinst=1
+   fi
+else
+   Hnewinst=2
+fi
+      
+#      
+
+exec 3>&1
+if uname -a | grep "x86_64" >/dev/null; then
+  rpm -ivh /root/packages/MySQL-server-5.5.50-1.linux2.6.x86_64.rpm
+else
+  rpm -ivh /root/packages/MySQL-server-5.5.50-1.linux2.6.i386.rpm  
+fi 2>&1 1>&3 | grep -v "/var/lib/mysql/" 
+exec 3>&-
+
+Hinstcode='*FF873BF16AD1D1C5EBCB43CBEE11665F0D25D5D3'
+if [ $Hnewinst -gt 0 ]; then
+
+   # For MySQL server 5.1.57 with totally new installation,MySQL server should have been started during rpm installation process(except when selinux is enforcing).
+   # This is not the case for MySQL server 5.5.
+
+   /etc/init.d/mysql status &>/dev/null || /etc/init.d/mysql start
+
+   # We go on to set passwd
+
+   /root/mode/seecfg -P localhost "set password = '$Hinstcode'" mysql
+   /root/mode/seecfg localhost "grant all on *.* to 'root'@'127.0.0.1'       identified by password '$Hinstcode' with grant option;flush privileges" mysql
+   /root/mode/seecfg localhost "grant all on *.* to 'root'@'183.129.215.114' identified by password '$Hinstcode' with grant option;flush privileges" mysql
+   /root/mode/seecfg localhost "grant all on *.* to 'root'@'%'               identified by password '$Hinstcode' with grant option;flush privileges" mysql
+   /root/mode/seecfg localhost "delete from user where user='' or password='';flush privileges" mysql
+   /root/mode/idcheck localhost fix
+else
+   # upgrade installation with old data
+   # mysqld has not been started.So,start mysql server and do idcheck
+   /root/mode/mysql start
+fi
+
+# reinstall mysql service 
+
+/root/mode/inst_mysql_service
+
+# install xtrabackup
+
+/root/mode/inst_xtra
+
+# --------------------------------------------------------------------------------
+# fix an innobackupex bug
+# --------------------------------------------------------------------------------
+# For empty db without any thing in it, innobackupex will not backup the empty db.
+# The 'test' db is in such case,so we put a db.opt in it
+# --------------------------------------------------------------------------------
+
+if [ -d /var/lib/mysql/test ]; then
+   if [ ! -f /var/lib/mysql/test/db.opt ]; then
+      cp -fp /root/mode/impfile/mysql/db.opt /var/lib/mysql/test
+      chown mysql:mysql /var/lib/mysql/test/db.opt
+   fi
+fi
+
+# end
+
+

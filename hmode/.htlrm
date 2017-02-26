@@ -1,0 +1,13 @@
+#!/bin/bash 
+# --------------------------------------------------------------------------
+# function:
+#          remove the data of a hotel
+# usages:
+#          ./.htlrm <mysqld-ip> <dbname> <hotel_id>
+# e.g.  :  
+#          ./.htlrm 6.15 portal_f 6
+# --------------------------------------------------------------------------
+
+/root/mode/.htltool --remove "$@"
+
+

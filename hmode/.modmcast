@@ -1,0 +1,90 @@
+#!/bin/bash
+
+# exclusive execution with wait mode
+
+/root/mode/modepv modmcast $$ " /bin/bash .*/\.modmcast"
+
+#
+
+/root/mode/getadr >/dev/null || exit 1
+
+#
+cd /usr/local
+for i in `ls -d tomcat*/ 2>/dev/null | sed -re "s/\/$//" `;do
+   /root/mode/check_tomcat $i || continue
+   if /root/mode/isctom $i; then
+      # get cluster 
+      if ! cat /usr/local/$i/conf/server.xml | grep -E "<!-- apache[1-7] -->" >/dev/null; then
+         Hamode=apache
+      else
+         Hamode=`cat /usr/local/$i/conf/server.xml | grep -E "<!-- apache[1-7]? -->" | sed -re "s/.*<!-- (apache[1-7]?) -->.*/\1/" | sed -n "1 p"`
+      fi
+      # calculate standard mcast
+      Hmcasttomcat=$i
+      HHRYMCAST="228.0.0.`/root/mode/getadr`"
+      if [ "$Hamode" = "apache" ]; then
+         HHRYMPORT=$[45565+`/root/mode/getadr 1`]
+      else
+         Hapachetail=`echo $Hamode | sed -re "s/apache(.*)/\1/"`
+         HHRYMPORT=$[45565+$Hapachetail+`/root/mode/getadr 1`]
+      fi
+      # set standard mcast to server.xml
+      cat /usr/local/$i/conf/server.xml |
+      sed -re "s/$/HrYhByHsC/" |
+      tr -d "\n" |
+      sed -re "s/(address=\")22[48]\.0\.0\.[0-9]+(\"[ \t]*HrYhByHsC[ \t]*port=\")[0-9]+(\")/\1$HHRYMCAST\2$HHRYMPORT\3/g" |
+      sed -re "s/HrYhByHsC/\n/g"  > /root/mode/tmp/setmcast$$.tmp
+      cat /root/mode/tmp/setmcast$$.tmp > /usr/local/$i/conf/server.xml
+   fi
+done
+
+#
+
+if [ -n "$HHRYMCAST" ]; then
+
+   HHRYMCAST1=`echo $HHRYMCAST | sed -re 's/\./\\\\./g'`
+
+   # remove multicast routes not equal to $HHRYMCAST
+
+   Hroutestodel=`/sbin/route -n | grep -E "^228\.0\.0\.[0-9]+ .* UH .*" | grep -Ev "^$HHRYMCAST1 " | sed -re "s/^([^ ]+).*/\1/"`
+   if [ -n "$Hroutestodel" ]; then
+      echo "$Hroutestodel" | 
+      while read Hnr; do
+         /sbin/route del -host $Hnr
+      done 
+   fi
+
+   # remove all multicast static routes
+
+   cat /etc/sysconfig/static-routes 2>/dev/null | grep -Ev "^any[ 	]+host[ 	]+228\.0\.0\.[0-9]+[ 	]" > /root/mode/tmp/setmcast$$.tmp
+   cp -f /root/mode/tmp/setmcast$$.tmp /etc/sysconfig/static-routes
+
+   # add multicast static route $HHRYMCAST back to /etc/sysconfig/static-routes
+
+   /root/mode/tomcatsafe $Hmcasttomcat
+
+else
+
+   # remove all multicast routes 
+
+   Hroutestodel=`/sbin/route -n | grep -E "^228\.0\.0\.[0-9]+ .* UH .*" | sed -re "s/^([^ ]+).*/\1/"`
+   if [ -n "$Hroutestodel" ]; then
+      echo "$Hroutestodel" | 
+      while read Hnr; do
+         /sbin/route del -host $Hnr
+      done 
+   fi
+
+   # remove all multicast static routes
+
+   cat /etc/sysconfig/static-routes 2>/dev/null | grep -Ev "^any[ 	]+host[ 	]+228\.0\.0\.[0-9]+[ 	]" > /root/mode/tmp/setmcast$$.tmp
+   cp -f /root/mode/tmp/setmcast$$.tmp /etc/sysconfig/static-routes
+
+fi
+
+# rm tmp file 
+
+rm -f /root/mode/tmp/setmcast$$.tmp
+
+# end
+

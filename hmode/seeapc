@@ -1,0 +1,20 @@
+#!/bin/bash 
+# ------------------------------------------
+# function:
+#          display apache subprocesses
+# ------------------------------------------
+
+#
+
+. /root/mode/apachemode
+
+#
+
+ps -e -o ppid,lstart,cmd |
+grep -E "/usr/local/$Hapachemode/bin/httpd -k (graceful|(re)?start)" | grep -Ev "^ *1 " | sed -re "s/^ *([^ ]+ +){2}//" | 
+sed -r -e "s/^Jan(.*)/01\1/" -e "s/^Feb(.*)/02\1/" -e "s/^Mar(.*)/03\1/" \
+       -e "s/^Apr(.*)/04\1/" -e "s/^May(.*)/05\1/" -e "s/^Jun(.*)/06\1/" \
+       -e "s/^Jul(.*)/07\1/" -e "s/^Aug(.*)/08\1/" -e "s/^Sep(.*)/09\1/" \
+       -e "s/^Oct(.*)/10\1/" -e "s/^Nov(.*)/11\1/" -e "s/^Dec(.*)/12\1/" \
+       -e "s/^([^ ]+) +([^ ]+) ([^ ]+) ([^ ]+).*/\4-\1-\2 \3/" -e "s/([0-9]{4}-[0-9]{2}-)([0-9] )/\10\2/" |
+sort 

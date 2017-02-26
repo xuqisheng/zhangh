@@ -1,0 +1,95 @@
+#!/bin/bash
+# ----------------------------------------------------
+# function:
+#            fix /etc/my.cnf device part configuration  
+# ----------------------------------------------------
+
+# exclusive execution with wait mode
+
+/root/mode/modepv fix_cnf $$ " /bin/bash .*/fix_cnf"
+
+#
+
+[ -f /etc/my.cnf ] ||
+{
+echo "/etc/my.cnf doesn't exist!" && exit 1
+}
+
+# tmp file
+
+Htmpcnf="/root/mode/tmp/hhrycnf$$.tmp"
+
+# -----------------------------------------------------------------------------
+# enable fix when /var/lib/mysql is a directory or a link to a directory
+#                                                              -- 2014-10-14 --
+# -----------------------------------------------------------------------------
+
+if [ -d /var/lib/mysql ]; then
+   
+   # extract ib data ... and do correction if needed
+
+   Hibdatacnt=`ls -lL /var/lib/mysql/ibdata* 2>/dev/null | wc -l`
+   if [ $Hibdatacnt -gt 0 ]; then
+      eval echo $(ls -lL /var/lib/mysql/ibdata* 2>/dev/null | sed -re "s/^([^ ]+ *){4}([0-9]+) .*\/(.*)$/\3:\$[\2\/1024\/1024]M/" |
+      sed -re "s/$/\\\;/" |
+      sed -re "$ s/;$/:autoextend/"|tr -d "\n") > $Htmpcnf 
+      Hdatatail=`cat $Htmpcnf`
+   else
+      if [ ! -x /usr/sbin/mysqld ]; then
+         Hdatatail="ibdata1:10M:autoextend"
+      else
+         # --------------------------------------------------------------------------------------------------------------------------------------------------
+         # probably for preparing xtrabackup recovery
+         # xtrabackup can combine multiple ibdata files into one ibdata file.
+         # but if there are more than one ibdata files at local server configuration,
+         # the easiest way is to make the 'innodb_data_file_path' item at local MySQL server consistent with (or same as ) the one at source MySQL server.
+         # so check the 'innodb_data_file_path' item first before doing xtrabackup recovery
+         # --------------------------------------------------------------------------------------------------------------------------------------------------
+         :
+      fi
+   fi
+   if [ -n "$Hdatatail" ]; then
+      /root/mode/mod_config /etc/my.cnf "innodb_data_file_path=$Hdatatail" "innodb_buffer_pool_size"
+   fi
+
+   # extract ib logs ... and do correction if needed
+
+   Hiblogcnt=`ls -lL /var/lib/mysql/ib_logfile* 2>/dev/null | wc -l`
+   if [ $Hiblogcnt -gt 0 ]; then
+      eval echo $(ls -lL /var/lib/mysql/ib_logfile* 2>/dev/null | sed -n "1 p" | sed -re "s/^([^ ]+ *){4}([0-9]+) .* ([^ ]*)$/\$[\2\/1024\/1024]M/") > $Htmpcnf
+      Hlogtail=`cat $Htmpcnf`
+   else
+      if [ ! -x /usr/sbin/mysqld ]; then
+         if [ -z "$HkPlGfileSiZe" ]; then
+            Hlogtail="1024M"
+         fi
+      else
+         # ----------------------------------------------------------------------------------------------------------------------
+         # probably for preparing xtrabackup recovery
+         # ib_logfiles will be generated according to the local MySQL server configuration of 'innodb_log_file_size' item.
+         # but you'd better to make the 'innodb_log_file_size' item at local MySQL server same as the one at source MySQL server
+         # so check the 'innodb_log_file_size' item first before doing xtrabackup recovery
+         # ----------------------------------------------------------------------------------------------------------------------
+         :
+      fi
+   fi
+   if [ -n "$Hlogtail" ]; then
+      /root/mode/mod_config /etc/my.cnf "innodb_log_file_size=$Hlogtail"   "innodb_buffer_pool_size"
+   fi
+else
+   if [ -h /var/lib/mysql ]; then
+      # ---------------------------------------------------
+      # Offline MySQL server at cluster mode.Do nothing 
+      # ---------------------------------------------------
+      : 
+   else
+      /root/mode/mod_config /etc/my.cnf "innodb_data_file_path=ibdata1:10M:autoextend" "innodb_buffer_pool_size"
+      /root/mode/mod_config /etc/my.cnf "innodb_log_file_size=1024M"                   "innodb_buffer_pool_size"
+   fi
+fi
+
+rm -f $Htmpcnf
+
+#
+
+

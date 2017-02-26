@@ -1,0 +1,135 @@
+#!/bin/bash 
+# ------------------------------------------------------------------------------
+# function:
+#          get mtu to <IP>
+# usages  :
+#          ./getmtu <IP>
+# e.g.    :
+#          ./getmtu 110.189.116.37     
+#          
+#          1400                        # return value 
+# ------------------------------------------------------------------------------
+# remarks :
+#          when called from /root/mode/appmtu,more information can be provided
+# ------------------------------------------------------------------------------
+
+#
+
+. /root/mode/apachemode
+
+# get and put MTU 
+
+Hip=$1
+
+# test if ping is allowed
+
+if ping -A -c 4 -W 5 $Hip | grep -E "100% packet loss" >/dev/null; then
+   echo "mtu server to router: ping failed"
+else
+   # ping is allowed,go on to test mtu
+
+   Hlow=500
+   Hhigh=1472
+   Hmtu=500
+   Hsize=$Hhigh
+   while [ 1 ];do
+      
+      if ping -i 0.4 -c 4 -W 5 -s $Hsize -M do $Hip | grep -E "(truncated|100% packet loss|Frag needed and DF set)" >/dev/null ; then
+         Hhigh=$[$Hsize-1]
+      else
+         Hmtu=$Hsize
+         Hlow=$[$Hsize+1]
+      fi
+      if [ $Hlow -gt $Hhigh ]; then
+         break 
+      fi
+      if [ $Hsize -eq 1472 ]; then
+         Hsize=1452
+      else
+         Hsize=$[$Hlow+($Hhigh-$Hlow)/2]
+      fi
+   done
+
+   # test defragment ability of path 
+
+   if ping -A -c 2 -W 2 -s 10000 $Hip | grep -E "100% packet loss" >/dev/null; then
+      echo "mtu (server to router): $[$Hmtu+28] (No defragment ability of big packets on the path)"
+   else
+      echo "mtu (server to router): $[$Hmtu+28]"
+   fi
+
+fi
+
+# get and put more information when called from /root/mode/appmtu and when 'more' or 'MORE' is given
+
+[ `/root/mode/traceps "appmtu"` = 'suc' -a -n "$2" ] &&
+{
+
+# this is more accurate mtu  
+
+if [ "$2" = "MORE" ]; then
+   #echo
+   #echo "The following mtu,if exists,should be used to configure client side router!!!"
+   #echo
+   echo "mtu (client to server): `/root/mode/getmtu1 $Hapachemode $Hip`"
+   echo
+fi
+
+# guess hotel infomation
+
+cat > /root/mode/tmp/hgh$$.sql << EOF
+/*
+----each----:[work_station_status][user][hotel][sys_error.station_code]
+*/
+select c.descript as hotel,a.login_date,a.station_code,
+       (select count(b.hotel_id) from sys_error b
+                                 where b.hotel_group_id=a.hotel_group_id and b.hotel_id=a.hotel_id and b.station_code=a.station_code and b.create_datetime >= curdate() and 
+                                       b.fault like '%Channel.Call.Failed%'
+       ) as NETERROR,
+       a.work_user,b.name,d.descript,c.hotel_group_id as gid,c.id as hid,
+       left(localip,50)
+       from work_station_status a,user b,hotel c,user_dept d
+       where `if [ -n "$HTname" ]; then 
+                 echo "a.wlanip='$Hip' and c.descript='$HTname' and "
+              else
+                 echo "a.wlanip='$Hip' and "
+              fi`
+             a.status='R' and
+             (a.work_user <> 'admin' and a.login_date > date_add(now(),interval -1 day) or a.work_user = 'admin' and a.login_date > date_add(now(),interval -5 hour)) and 
+             a.hotel_group_id=b.hotel_group_id and
+             a.hotel_id=b.hotel_id and 
+             a.work_user=b.code and 
+             a.hotel_group_id=c.hotel_group_id and
+             a.hotel_id=c.id and
+             b.dept_id=d.id
+      order by NETERROR desc,a.work_user
+; 
+/*
+----each----:[work_station_status][user][hotel][sys_error][#sys_error.station_code]
+*/
+select c.descript as hotel,a.login_date,a.station_code,
+       a.work_user,b.name,d.descript,c.hotel_group_id as gid,c.id as hid,
+       left(localip,50)
+       from work_station_status a,user b,hotel c,user_dept d
+       where `if [ -n "$HTname" ]; then
+                 echo "a.wlanip='$Hip' and c.descript='$HTname' and "
+              else
+                 echo "a.wlanip='$Hip' and "
+              fi`
+             a.status='R' and
+             (a.work_user <> 'admin' and a.login_date > date_add(now(),interval -1 day) or a.work_user = 'admin' and a.login_date > date_add(now(),interval -5 hour)) and
+             a.hotel_group_id=b.hotel_group_id and
+             a.hotel_id=b.hotel_id and
+             a.work_user=b.code and
+             a.hotel_group_id=c.hotel_group_id and
+             a.hotel_id=c.id and
+             b.dept_id=d.id
+;
+EOF
+/root/mode/seecfg $HdbR   /root/mode/tmp/hgh$$.sql $HdbN   2>/dev/null | sed -r -e "1 s/^(.*)/正式库: \1/" -e "2,$ s/^(.*)/        \1/"
+/root/mode/seecfg $HdbRtr /root/mode/tmp/hgh$$.sql $HdbNtr 2>/dev/null | sed -r -e "1 s/^(.*)/培训库: \1/" -e "2,$ s/^(.*)/        \1/"
+rm -f /root/mode/tmp/hgh$$.sql
+}
+
+# end
+
