@@ -21,6 +21,7 @@ BEGIN
 	DECLARE var_pos				INT;
 	DECLARE var_printer			VARCHAR(10);
 	DECLARE var_station			VARCHAR(10);
+	DECLARE var_printer_codes	VARCHAR(50);
 
 	-- 获取桌号及营业点，及桌号中的清单和总单设置
 	SELECT a.tableno,a.pccode,b.descript INTO var_tableno,var_pccode,var_pccode_desc FROM pos_res a,pos_pccode b WHERE a.accnt = arg_accnt AND a.pccode = b.code AND a.hotel_id = arg_hotel_id AND a.hotel_group_id = arg_hotel_group_id AND b.hotel_id = arg_hotel_id AND b.hotel_group_id = arg_hotel_group_id;
