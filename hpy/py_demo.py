@@ -9,9 +9,3 @@ map()是 Python 内置的高阶函数，它接收一个函数 f 和一个 list�
 '''
 print map(bool,[None,0,dict(),tuple(),list(),set(),1])
 
-print int(True),int(False)
-
-a1 = 14
-a2 = 15
-a3 = 15
-print a1 is a2,a2 is a3

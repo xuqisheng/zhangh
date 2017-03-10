@@ -1,0 +1,1 @@
+="insert into jour_map2 (code_old,des_old,code_new,des_new) values ('"&A42&"','"&B42&"','"&C42&"','"&D42&"');"

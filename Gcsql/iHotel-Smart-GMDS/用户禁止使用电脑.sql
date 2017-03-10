@@ -1,0 +1,4 @@
+SELECT * FROM USER WHERE hotel_id = 13 ORDER BY CODE;
+
+UPDATE USER SET is_halt = 'T' WHERE hotel_id = 13 AND CODE <> 'ADMIN'
+ 
