@@ -3,66 +3,65 @@ DELIMITER $$
 DROP PROCEDURE IF EXISTS `up_pos_res_input_dishcard`$$
 
 CREATE DEFINER=`root`@`%` PROCEDURE `up_pos_res_input_dishcard`(
-	IN arg_hotel_group_id	INT,	
+	IN arg_hotel_group_id	INT,
 	IN arg_hotel_id			INT,
 	IN arg_accnt			VARCHAR(20),		-- 预订单单号
-	IN arg_printer_code		VARCHAR(50),		-- 出单打印机编号集 100,110,120,
-	IN arg_isprinter		CHAR(1),			-- 预订点菜是否走厨房打印
 	IN arg_work_station		VARCHAR(50)			-- 哪些站点走厨房打印
-	
+
 	)
     SQL SECURITY INVOKER
-label_0:	
+label_0:
 BEGIN
 	-- 餐饮预订单从厨房打印里出单
-	
+
 	DECLARE	var_tableno			VARCHAR(10);
 	DECLARE	var_tableno_desc	VARCHAR(10);
 	DECLARE	var_pccode			VARCHAR(10);
 	DECLARE	var_pccode_desc		VARCHAR(50);
 	DECLARE var_pos				INT;
 	DECLARE var_printer			VARCHAR(10);
-	DECLARE var_station			VARCHAR(10);	
-	
+	DECLARE var_station			VARCHAR(10);
+
 	-- 获取桌号及营业点，及桌号中的清单和总单设置
 	SELECT a.tableno,a.pccode,b.descript INTO var_tableno,var_pccode,var_pccode_desc FROM pos_res a,pos_pccode b WHERE a.accnt = arg_accnt AND a.pccode = b.code AND a.hotel_id = arg_hotel_id AND a.hotel_group_id = arg_hotel_group_id AND b.hotel_id = arg_hotel_id AND b.hotel_group_id = arg_hotel_group_id;
-	
+
 	SELECT descript INTO var_tableno_desc FROM pos_pccode_table WHERE CODE = var_tableno AND pccode = var_pccode AND hotel_id = arg_hotel_id AND hotel_group_id = arg_hotel_group_id;
-	
+
 	-- 使用站点的 descript_en 来增加要打印的机子
-	SELECT descript_en INTO var_station FROM work_station WHERE hotel_group_id = arg_hotel_group_id AND hotel_id = arg_hotel_id AND code = arg_work_station;
-	
-		
+	SELECT MIN(descript_en) INTO var_station FROM work_station WHERE hotel_group_id = arg_hotel_group_id AND hotel_id = arg_hotel_id AND code = arg_work_station;
+	-- 需要出厨房预订排菜总单的打印机集
+	SELECT GROUP_CONCAT(CODE) INTO var_printer_codes FROM pos_printer WHERE hotel_group_id = arg_hotel_group_id AND hotel_id = arg_hotel_id AND descript_en IN ('P','p');
+
 	-- 获取桌号描述，如果为空则和桌号一致
 	IF var_tableno_desc = '' OR var_tableno_desc IS NULL THEN
 		SET var_tableno_desc = var_tableno;
 	END IF;
 
-	IF SUBSTR(arg_printer_code,CHAR_LENGTH(arg_printer_code),1) <> ',' THEN
-		SET arg_printer_code = CONCAT(arg_printer_code,',');
+	IF SUBSTR(var_printer_codes,CHAR_LENGTH(var_printer_codes),1) <> ',' THEN
+		SET var_printer_codes = CONCAT(var_printer_codes,',');
 	END IF;
-	
-	SET var_pos = INSTR(TRIM(arg_printer_code),',');
-	
+
+	SET var_pos = INSTR(TRIM(var_printer_codes),',');
+
 	DELETE FROM pos_dishcard WHERE hotel_group_id = arg_hotel_group_id AND hotel_id = arg_hotel_id AND accnt = arg_accnt AND isprint = 'F';
 
 
    	WHILE var_pos >=1 DO
   		BEGIN
-			SET var_printer = SUBSTR(arg_printer_code,1,var_pos - 1);
-			
+			SET var_printer = SUBSTR(var_printer_codes,1,var_pos - 1);
+
 			-- changed = '3' 厨师总单
-			IF arg_isprinter = 'T' AND var_station = 'P' THEN	-- 是否同时要走厨房打印方式
+			IF var_station = 'P' THEN	-- 是否同时要走厨房打印方式
 				INSERT INTO pos_dishcard (hotel_group_id,hotel_id,accnt,inumber,tnumber,mnumber,biz_date,pccode,pccode_name,table_code,table_name,gsts,printid,TYPE,sta,code,descript,descript_en,unit,price,number,amount,cook_all,cook,printer,printer1,p_number,p_number1,CHANGED,times,isprint,station,class1,p_sort,foliono,siteno,create_user,create_datetime,modify_user,modify_datetime)
 					SELECT arg_hotel_group_id,arg_hotel_id,arg_accnt,a.inumber,a.tnumber,a.mnumber,b.biz_date,b.pccode,var_pccode_desc,b.tableno,var_tableno_desc,b.gsts,a.id,'1',a.sta,a.plu_code,IF(SUBSTR(flag,10,1)=1,SUBSTR(a.descript,3),a.descript),IF(SUBSTR(flag,10,1)=1=1,SUBSTR(a.descript_en,3),a.descript_en),
-					a.unit,a.price,a.number,a.amount,'厨房备菜',a.cook,var_printer,var_printer,1,1,'3',0,'F','',NULL,a.sort_code,'0',a.siteno,a.create_user,a.create_datetime,NULL,NULL 
-					FROM pos_res_order a,pos_res b WHERE a.hotel_group_id = arg_hotel_group_id AND a.hotel_id = arg_hotel_id 
-						AND b.hotel_group_id = arg_hotel_group_id AND b.hotel_id = arg_hotel_id AND a.accnt = arg_accnt 
-						AND b.accnt = arg_accnt AND a.sta <> 'X' AND b.sta IN ('R','I')	AND SUBSTR(flag,1,1)='0' ORDER BY a.sort_code,a.plu_code;		
+					a.unit,a.price,a.number,a.amount,CONCAT('厨房备菜  就餐日:',DATE(b.biz_date)),a.cook,var_printer,var_printer,1,1,'3',0,'F','',NULL,a.sort_code,'0',a.siteno,a.create_user,a.create_datetime,NULL,NULL
+					FROM pos_res_order a,pos_res b WHERE a.hotel_group_id = arg_hotel_group_id AND a.hotel_id = arg_hotel_id
+						AND b.hotel_group_id = arg_hotel_group_id AND b.hotel_id = arg_hotel_id AND a.accnt = arg_accnt
+						AND b.accnt = arg_accnt AND a.sta <> 'X' AND b.sta IN ('R','I')	AND SUBSTR(flag,1,1)='0' ORDER BY a.sort_code,a.plu_code;
 			END IF;
-			
-			SET arg_printer_code = SUBSTR(arg_printer_code,var_pos + 1);			
-			SET var_pos = INSTR(TRIM(arg_printer_code),',');			
+
+			SET var_printer_codes = SUBSTR(var_printer_codes,var_pos + 1);
+			SET var_pos = INSTR(TRIM(var_printer_codes),',');
  		END;
  	END WHILE;
 
@@ -73,8 +72,8 @@ BEGIN
 	LEFT JOIN pos_pccode_table d ON d.hotel_group_id = arg_hotel_group_id AND d.hotel_id = arg_hotel_id AND a.tableno = d.code
 	,pos_pccode c
 	WHERE a.hotel_group_id = arg_hotel_group_id AND a.hotel_id = arg_hotel_id AND c.hotel_group_id = arg_hotel_group_id
-	AND c.hotel_id = arg_hotel_id AND a.pccode = c.code AND a.accnt =  arg_accnt GROUP BY a.accnt,a.name,a.phone,a.res_date,a.pccode,a.shift;	
-	
+	AND c.hotel_id = arg_hotel_id AND a.pccode = c.code AND a.accnt =  arg_accnt GROUP BY a.accnt,a.name,a.phone,a.res_date,a.pccode,a.shift;
+
 
 END$$
 
