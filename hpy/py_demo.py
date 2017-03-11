@@ -1,5 +1,6 @@
 #!/usr/bin/env python
 #coding=utf-8
+import sys
 
 '''
 测试数据类型的bool情况
@@ -9,3 +10,4 @@ map()是 Python 内置的高阶函数，它接收一个函数 f 和一个 list�
 '''
 print map(bool,[None,0,dict(),tuple(),list(),set(),1])
 
+print sys.path.a
