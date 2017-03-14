@@ -1,9 +1,5 @@
 #!/usr/bin/env python
 #coding=utf-8
-from __future__ import print_function   # 将print从语言语法中移除，让你可以使用函数的形式
-from collections import OrderedDict     # 字典排序
-import pprint                           # 美观打印数据结构
-import sys
 
 '''
 测试数据类型的bool情况
@@ -25,4 +21,7 @@ dict2 = str1.split(':')[0].strip()
 dict3 = str1.split(':')[1].strip()
 print dict2,'<--->',dict3
 '''
-
+services_list = ['anacron','auditd','autofs','avahi-daemon','avahi-dnsconfd','bluetooth','cpuspeed','firstboot','gpm',
+                 'haldaemon','hidd','ip6tables','ipsec','isdn','lpd','mcstrans','messagebus','netfs','nfs','nfslock',
+                 'nscd','readahead_early','restorecond','rpcgssd','rpcidmapd','rstatd','setroubleshoot']
+print services_list
