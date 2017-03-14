@@ -9,9 +9,10 @@ group_list = ['adm','lp','news','uucp','games','dip','pppuers','popusers','slipu
 
 print type(user_list),type(group_list)
 
-with open('/etc/passwd') as f:
+with open('/etc/passwd_bak') as f:
     for line in f:
         for u in user_list:
             if re.match(r'^u',line):
+                cmd1 = "userdel " + u
                 os.system(userdel u)
 
