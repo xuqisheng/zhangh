@@ -1,0 +1,9 @@
+#!/bin/bash
+
+# check if pip exists
+
+if [ -x /usr/bin/pip ]; then
+   echo "pip has been installed"
+   exit 1
+fi
+
