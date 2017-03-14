@@ -3,7 +3,16 @@
 # check if pip exists
 
 if [ -x /usr/bin/pip ]; then
-   echo "pip has been installed"
-   exit 1
+    /root/zhangh/hmsg inst_pip "pip has been installed" more
+    exit 1
 fi
 
+#
+if [ ! -f /root/zhangh/hbox/appdirs-1.4.0.tar.gz ]; then
+    /root/zhangh/hmsg inst_pip "No package appdirs-1.4.0.tar.gz in directory /root/zhangh/hbox" more
+    exit 1
+else
+    cd /root/zhangh/hbox
+    tar zxvf /root/zhangh/hbox/appdirs-1.4.0.tar.gz
+    mv `ls -1d appdirs*/ | sed -n "1 p"` /
+fi
