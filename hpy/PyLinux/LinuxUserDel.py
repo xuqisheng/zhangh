@@ -12,6 +12,6 @@ print type(user_list),type(group_list)
 with open('/etc/passwd') as f:
     for line in f:
         for u in user_list:
-            if re.match(r'u',line):
+            if re.match(r'^u',line):
                 os.system(userdel u)
 
