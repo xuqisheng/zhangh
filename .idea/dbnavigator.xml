@@ -29,6 +29,7 @@
     <last-used-providers />
   </component>
   <component name="DBNavigator.Project.FileConnectionMappingManager">
+    <mapping file-url="file://$PROJECT_DIR$/../TempYs/work/T-SQL.sql" connection-id="" current-schema="" />
     <mapping file-url="file://$PROJECT_DIR$/hsql/maint_droptb.sql" connection-id="" current-schema="" />
   </component>
   <component name="DBNavigator.Project.MethodExecutionManager">
