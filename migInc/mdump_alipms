@@ -1,0 +1,12 @@
+#!/bin/bash
+
+# edm ...
+
+/root/zhangh/migInc/mdumpzlf
+
+# multiple databases
+
+echo "# mode generated header" > /root/mode/dump/portal_pms.sql
+mysqldump -uroot -pdeviskaifa -h10.168.232.205 --opt --single-transaction --master-data=2 -F -R --add-drop-database --databases portal_f >> /root/mode/dump/portal_pms.sql
+
+

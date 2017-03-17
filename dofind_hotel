@@ -1,0 +1,22 @@
+#!/bin/bash
+# ===============================================
+# Function:
+#   do while all sshcodes Demo
+# Date:
+#   :2015-11-18
+# ===============================================
+shopt -s expand_aliases
+alias ssh='ssh -q'
+
+for i in `cat /root/zhangh/sshcodes.txt | grep -v "^#" | grep -E "^${1:-.*}$"`; do
+  echo
+  echo "=================== Server $i ===================="
+  echo
+
+  for j in `ssh $i "/root/mode/seecfg -s 'show databases' | grep portal"`; do
+    if ssh $i "/root/mode/seecode '$j'" | grep "$2" > /dev/null; then
+      echo $i,$j
+    fi  
+  done  
+
+done

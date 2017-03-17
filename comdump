@@ -1,0 +1,22 @@
+#!/bin/bash
+# ---------------------------------------------------------
+# function:
+#          test if this is a complete sql dump
+# ---------------------------------------------------------
+
+if tail "$1" | grep "SET SQL_NOTES=@OLD_SQL_NOTES" >/dev/null; then
+   exit 0
+fi
+exit 1
+
+# current dump tail list 
+
+# 1. SQLYOG dump
+ 
+#/*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
+
+# 2. mysqldump of linux 
+
+#/*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
+#
+#-- Dump completed on 2012-06-09 20:31:30

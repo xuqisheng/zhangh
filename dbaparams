@@ -1,0 +1,55 @@
+#!/bin/bash
+# -------------------------------------------------
+# 1.从/etc/hosts/设置中获得ip地址(从ssh代码中翻译)
+# 2.MySQL基础参数设置,比如:用户,密码,端口
+# -------------------------------------------------
+
+Hip=`cat /etc/hosts | grep -P "( |\t)$1( |\t|$)" | grep -v "^#" |sed -re "s/^([^ \t]+)( |\t)+.*/\1/" | sed -n "1 p"`
+
+if [ -z $Hip ]; then
+   /root/zhangh/hmsg mysqldipcyg "Please provide right ssh code" more
+   exit
+fi
+
+
+if [ "$Hip" = "localhost" ]; then
+   HMYSQLDIP=$Hip
+   shift
+elif echo "$Hip" | grep -E "^[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}$" >/dev/null; then
+   HMYSQLDIP=`/root/zhangh/nmlizeip "$Hip"`
+   shift
+elif echo "$Hip" | grep -E "^[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}$" >/dev/null; then
+   HMYSQLDIP=`/root/zhangh/gsip "$Hip"`
+   [ "$HMYSQLDIP" ] && shift
+elif echo "$Hip" | grep -E "^[0-9]{1,3}\.[0-9]{1,3}$" >/dev/null; then
+   HMYSQLDIP=`/root/zhangh/gsip "$Hip"`
+   [ "$HMYSQLDIP" ] && shift
+fi
+if [ -z "$HMYSQLDIP" ]; then
+   if [ -f /root/antDep/build.properties ]; then
+   #  HMYSQLDIP=`cat /root/antDep/build.properties | grep -E "^db\.root=" | tr -d "\r" |  sed -re "s/^.*=(.*)/\1/"`
+      HMYSQLDIP=localhost
+   elif [ -x /usr/sbin/mysqld ]; then
+      HMYSQLDIP=localhost
+   else 
+      HMYSQLDIP=192.168.6.25
+   fi
+fi
+if [ "$HMYSQLDIP" = "localhost" -o "$HMYSQLDIP" = "127.0.0.1" ]; then
+   HMYSQLDIP1=`/root/zhangh/getips | sed -n "1 p"`
+   HMYSQLDIP2="$HMYSQLDIP($HMYSQLDIP1)"
+else
+   HMYSQLDIP1=$HMYSQLDIP
+   HMYSQLDIP2=$HMYSQLDIP
+fi
+
+#
+
+#Hmodeuser=root
+Hmodeuser=gc_eng
+#Hmodepass=deviskaifa
+Hmodepass=gc_eng127.0.0.l.0613
+Hmodeport=3306
+#Hmodeport=6033
+
+

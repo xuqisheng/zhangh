@@ -1,0 +1,36 @@
+#!/bin/bash
+# --------------------------------------------------
+# Function:
+#		
+# --------------------------------------------------
+
+# Add sshd parameter
+/root/zhangh/config_modify /etc/ssh/sshd_config "TCPKeepAlive yes"          "#TCPKeepAlive"
+/root/zhangh/config_modify /etc/ssh/sshd_config "LoginGraceTime 0"          "#LoginGraceTime"
+/root/zhangh/config_modify /etc/ssh/sshd_config "ClientAliveInterval 10"    "#ClientAliveInterval"
+/root/zhangh/config_modify /etc/ssh/sshd_config "ClientAliveCountMax 10"    "#ClientAliveCountMax"
+/root/zhangh/config_modify /etc/ssh/sshd_config "UseDNS no"                 "#UseDNS"
+
+# replace sshd parmeter
+/root/zhangh/config_replace /etc/ssh/sshd_config "ListenAddress ::"          "comment"
+/root/zhangh/config_replace /etc/ssh/sshd_config "ListenAddress 0.0.0.0"     "uncomment"
+/root/zhangh/config_replace /etc/ssh/sshd_config "Protocol 2,1"              "comment"
+/root/zhangh/config_replace /etc/ssh/sshd_config "Protocol 2"                "uncomment"
+/root/zhangh/config_replace /etc/ssh/sshd_config "GSSAPIAuthentication yes"  "comment"
+/root/zhangh/config_replace /etc/ssh/sshd_config "GSSAPIAuthentication no"   "uncomment"
+/root/zhangh/config_replace /etc/ssh/ssh_config  "GSSAPIAuthentication"      "no"
+
+# modify ssh port
+cat /etc/ssh/sshd_config | grep "^Port" > /dev/null ||
+{
+if cat /etc/ssh/sshd_config | grep "^#Port 22" > /dev/null;then
+	cat /etc/ssh/sshd_config | sed -re "/^#Port 22.*/a Port 22" > /root/zhangh/tmp/Ftmpsshd$$.tmp
+	cp -f /root/zhangh/tmp/Ftmpsshd$$.tmp /etc/ssh/sshd_config
+	rm -f /root/zhangh/tmp/Ftmpsshd$$.tmp
+else
+	echo "Port 22" >> /etc/ssh/sshd_config
+fi
+}
+
+# restart sshd
+/etc/init.d/sshd restart > /dev/null 2>&1

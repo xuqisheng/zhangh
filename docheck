@@ -1,0 +1,18 @@
+#!/bin/bash
+# ===============================================
+# Function:
+#   检查底表不平
+#   cp local script and execute command 
+# Date:
+#   :2016-01-14
+# ===============================================
+shopt -s expand_aliases
+alias ssh='ssh -q'
+
+ssh gc50 "export HBLACKBOX2=1;(/root/imode/Iseecfg /chksql allservers;/root/imode/Iseecfg /chksql allservers portal_f) | tee /docheck.txt"
+
+scp -Cp gc50:/docheck.txt /root/
+
+ssh gc50 "rm -f /docheck.txt"
+
+cat /root/docheck.txt | grep -E "^[\+\|]" | tr -d '\r'

@@ -1,0 +1,45 @@
+#!/bin/bash
+# -----------------------------------------------
+# Function:
+#		set timezone to Asia/Shanghai
+# History:
+#		2013.09.22 Romain
+# -----------------------------------------------
+
+if [ "$HOME" != "/root" -a "$HOME" != "/" ]; then
+	echo "You must login as root" && exit 1
+fi
+
+[ -x /etc/ifconfig ] && exit 1
+
+# redhat,centos
+Vzone1="Asia"
+Vzone2="Shanghai"
+Ftmpfile="/root/romain/tmp/fmnttz$$.tmp"
+cp /etc/sysconfig/clock $Ftmpfile
+
+if [ -f /etc/sysconfig/suseconfig ]; then
+	:
+else
+	/sbin/hwclock -w
+	cat $Ftmpfile |
+	sed -e "s/^ZONE=.*/ZONE=\"$Vzone1\/$Vzone2\"/" |
+	sed -e "s/^UTC=.*/UTC=false/" |
+	sed -e "s/^ARC=.*/ARC=false/" > /etc/sysconfig/clock
+	rm -f /etc/localtime
+	cp /usr/share/zoneinfo/$Vzone1/$Vzone2 /etc/localtime
+	/sbin/hwclock -s
+	/etc/init.d/crond restart > /dev/null
+fi
+
+# synchronize system time with cmos time
+if [ -e /etc/crontab ]; then
+	if grep "root hwclock -s" /etc/crontab > /dev/null; then
+		:
+	else
+		echo "*/5 * * * * root hwclock -s" >> /etc/crontab
+	fi
+fi
+
+# remove tmp file
+rm -f $Ftmpfile

@@ -1,0 +1,13 @@
+#!/bin/bash
+# --------------------------------------------------
+# Function:
+#		maintain host for necessary setting
+# --------------------------------------------------
+
+# create /etc/hosts if necessary
+[ -f /etc/hosts ] || touch /etc/hosts
+
+# 127.0.0.1
+if ! cat /etc/hosts | grep -E "^127\.0\.0\.0\.1([ ] +|$)" > /dev/null; then
+   echo "127.0.0.1 localhost.localdomain localhost" >> /etc/hosts
+fi

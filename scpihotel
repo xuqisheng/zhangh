@@ -1,0 +1,51 @@
+#!/bin/bash
+# =========================================================
+# Function:
+#    From iHotel copy ihotel stardard mysql dump to foxhis
+# Such as:
+#     ./scpihotel sshcode <portal> <dumpdir>
+# Date:
+#   2015-04-28
+# =========================================================
+
+if [ -z "$1" ]; then
+  echo "Please provide Server sshcode!!!"
+  exit
+fi
+
+if [ -z "$2" ]; then
+  Hdataname=portal
+fi
+
+if [ -z "$3" ]; then
+  Hdumpdir=/root/dump
+elif [ -d "$3" ]; then
+  Hdumpdir="$3"
+else  
+  echo "Please right dirname must be provided!!!"
+  exit
+fi
+
+if [ ! -f /root/.ssh/id_rsa.pub ]; then
+  ssh-keygen
+  exit
+fi
+  
+scp -CpP 3305 /root/.ssh/id_rsa.pub $1:/root/tmpssh$Htp
+ssh $1 -p3305 "mkdir -p /root/.ssh;chmod 700 /root/.ssh;touch /root/.ssh/authorized_keys;cat /root/.ssh/authorized_keys | grep \"\`cat /root/tmpssh$Htp\`\" > /dev/null || cat /root/tmpssh$Htp >> /root/.ssh/authorized_keys"
+ssh $1 -p3305 "rm -f /root/tmpssh$Htp"
+
+# check stardard mysql database name
+Hdumpname=`ssh -p3305 $1 "ls -1 /root/mode/dump/$2-[0-9][0-9][0-9][0-9]-[0-9][0-9]-[0-9][0-9]_[0-9][0-9][0-9].sql 2>/dev/null | sed -n '$ p'"`
+
+if [ -z "$Hdumpname" ];then
+ echo "No standard dump of '$2' exists in remote server"
+ exit
+fi
+
+scp -CPp 3305 "$1":"$Hdumpname" "$Hdumpdir"
+
+# remove history dumps
+Hdatedel=`date -d "-7 day" +"%Y-%m-%d"`
+
+rm -f /root/dump/"$2"-"$Hdatedel"_[0-9][0-9][0-9].sql 2>/dev/null

@@ -1,0 +1,82 @@
+#!/bin/bash
+# --------------------------------------------------
+# configure mysql my.cnf
+# --------------------------------------------------
+
+
+#
+
+. /root/zhangh/cpumem
+
+#
+
+HTMPCNF="/root/zhangh/tmp/hmy$$.cnf"
+
+#
+if cat /etc/my.cnf 2>/dev/null | grep -E "mode generated my\.cnf" >/dev/null;then
+   cp -f /etc/my.cnf $HTMPCNF
+else
+   cp -f /root/zhangh/hfile/my.cnf $HTMPCNF
+fi
+
+#
+
+cat $HTMPCNF | grep "^\[mysqld\]" >/dev/null || 
+{
+echo
+echo "There is no [mysqld] section in my.cnf file!"
+echo
+echo "You must correct this error or unexpected event will occur!"
+echo
+exit 1
+}
+
+# --------------------------------------------------------------------
+# innodb_buffer_pool_size
+# --------------------------------------------------------------------
+# For 32bit linux,innodb_buffer_pool_size must not be greater than 4G
+# --------------------------------------------------------------------
+
+HPOOLSIZE=$[$HSQLMEM*70/100]
+if uname -a | grep "x86_64" >/dev/null; then
+   # almost no limit
+   :
+else
+   if [ $HPOOLSIZE -gt 3000 ]; then
+      # ---------------------------------------------------------------------------
+      # We don't adjust the value deliberately. 
+      # ---------------------------------------------------------------------------
+      # Unsuccessfull mysql startup will occur,so that appropriate 64bit OS will be
+      # and should be installed as soon as possible at this machine
+      # ---------------------------------------------------------------------------
+      #HPOOLSIZE=3000
+      :
+   else
+      :
+   fi
+fi
+
+#
+
+cat $HTMPCNF |
+tr -d "\r" | 
+sed -re "s/^#(innodb_)/\1/" |
+sed -re "s/^#skip-locking/skip-external-locking/" |
+sed -re "s/^skip-locking/skip-external-locking/" |
+sed -re "s/^external-locking/skip-external-locking/" |
+sed -re "s/^(default-storage-engine) *=.*$/\1=INNODB/" |
+sed -re "s/^(transaction_isolation) *=.*$/\1=read-committed/" |
+sed -re "s/^#(log-bin=)/\1/" | 
+sed -re "`cat $HTMPCNF | sed -nre '/\[mysqld\]/ ='`,$ s/^default-character-set.*/character-set-server=utf8/" |
+sed -re "s/^(innodb_buffer_pool_size *)=(.*)/\1=${HPOOLSIZE}M/"  > /etc/my.cnf 
+rm -f $HTMPCNF
+
+# 
+
+/root/zhangh/adjcnf
+
+# 
+
+/root/zhangh/fixcnf
+
+

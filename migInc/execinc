@@ -1,0 +1,21 @@
+#!/bin/bash 
+
+# confirmation
+if [ -z "/root/mode/dump/$1" ]; then
+   /root/mode/modemsg execinc "Please check if the dump name is correct"
+fi
+
+if /root/mode/confirm "Are you sure to do incremental load" more; then
+   # execute the incremental sql
+   {
+   /root/mode/modemsg execinc "Executing incremental sql ......" more
+   date
+   export HNoBiNlOg=DaNgEr
+   export Hmysql_force=YeS
+   /root/mode/seecfg $Hlserverip /root/mode/dump/$1
+   date
+   } 2>&1 | tee -a /root/mode/logs/execinc.log
+fi
+
+# end
+

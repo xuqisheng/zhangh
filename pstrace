@@ -1,0 +1,24 @@
+#!/bin/bash
+# =========================================================
+# Function:
+#			According to PPID find the same PID 
+# Date	  :
+#			2015-01-29	
+# =========================================================
+
+Hpsid=$$
+Hpsname="$1"
+
+while [ 1 ];do
+	Hpps=`ps -ef | sed -nre "s/^[^ ]+ +$Hpsid +([0-9]+) +.*/\1/p"`
+
+	if ps -ef | grep -E "^[^ ]+ +$Hpps +.*$Hpsname.*" | grep -v "grep -E" >/dev/null; then
+		echo suc
+		exit 0
+    elif [ $Hpps -eq 1 ]; then
+		echo fail
+		exit 0
+	fi
+
+	Hpsid=$Hpps
+done
