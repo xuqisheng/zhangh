@@ -85,4 +85,9 @@ else
 if
 
 
+# 安装 python-devel
+yum install python-devel
+
+# 安装 psutil
+yum install psutil
 
