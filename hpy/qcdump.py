@@ -1,24 +1,15 @@
 #!/etc/bin/env python
 # coding:utf-8
 
+'''
+操作腾讯云存储
+'''
+
 import os
 from qcloud_cos import CosClient
 from qcloud_cos import UploadFileRequest
 from qcloud_cos import DelFileRequest
 from qcloudcfg import *
-'''
-def dumpfiles(dirpwd,filenames):
-    cos_client = CosClient(appid, secret_id, secret_key, region_info)
-    cos_path = unicode('/' + filenames)
-    local_path = unicode(dirpwd + '\\' + filenames)
-    request = UploadFileRequest(bucket, cos_path, local_path)
-    upload_file_ret = cos_client.upload_file(request)
-    return upload_file_ret
-
-if __name__ == '__main__':
-    dumpfiles('D:\Python27\zhangh\hpy','Route_IP.py')
-    print 'D:\Python27\zhangh\hpy\Route_IP.py'
-'''
 
 class Qcdump(object):
     def __init__(self,dumpfile):
