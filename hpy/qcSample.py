@@ -3,7 +3,7 @@
 # 腾讯云 文件交互操作
 # 设置用户属性, 包括appid, secret_id和secret_key
 # 这些属性可以在cos控制台获取(https://console.qcloud.com/cos)
-from qcloud_cos import *
+import qcloud_cos
 appid = 1253472137                # 替换为用户的appid
 secret_id = u'AKIDteFftzcTs8D8rNxnjT0NTQBj5EBy81FG'         # 替换为用户的secret_id
 secret_key = u'Jk5HJ9nFXcUAduyqqgMqIZdUBfx3ygBT'         # 替换为用户的secret_key
@@ -61,7 +61,7 @@ stat_file_ret = cos_client.move_file(request)
 print 'move file ret:', repr(stat_file_ret)
 
 # 7. 删除文件
-request = qcloud_cos.DelFileRequest(bucket, u'/sample_file_move.txt')
+request = qcloud_cos.DelFileRequest(bucket, u'/py_demo.py')
 del_ret = cos_client.del_file(request)
 print 'del file ret:', repr(del_ret)
 
@@ -69,12 +69,12 @@ print 'del file ret:', repr(del_ret)
 # 目录操作                                                                 #
 ############################################################################
 # 1. 生成目录, 目录名为sample_folder
-request = qcloud_cos.CreateFolderRequest(bucket, u'/sample_folder/')
+request = qcloud_cos.CreateFolderRequest(bucket, u'/Python/')
 create_folder_ret = cos_client.create_folder(request)
 print 'create folder ret:', create_folder_ret
 
 # 2. 更新目录的biz_attr属性
-request = qcloud_cos.UpdateFolderRequest(bucket, u'/sample_folder/', u'这是一个测试目录')
+request = qcloud_cos.UpdateFolderRequest(bucket, u'/Python/', u'这是一个测试目录')
 update_folder_ret = cos_client.update_folder(request)
 print 'update folder ret:', repr(update_folder_ret)
 
