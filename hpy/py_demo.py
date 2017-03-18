@@ -46,7 +46,8 @@ root.mainloop()
 '''
 import os
 
-filename = 'd:\probeip'
-filepath = os.path.dirname(filename)
-file = filename[len(filepath)+1:]
-print filepath,'<---->', bool(filepath),'<---->',file
+filename = 'D:\Python27\zhangh\prob1eip'
+# filepath = os.path.dirname(filename)
+# file = filename[len(filepath)+1:]
+# print os.path.isfile(filename),filepath,'<---->', bool(filepath),'<---->',file
+print os.path.isfile(filename)
