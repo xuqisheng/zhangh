@@ -1,5 +1,21 @@
 #!/usr/bin/env python
 #coding=utf-8
+import Queue
+
+queue = Queue.Queue()
+
+queue.put('a')
+queue.put('b')
+print queue.get(1),queue.get(1)
+
+
+
+
+
+
+
+
+
 
 '''
 测试数据类型的bool情况
@@ -43,7 +59,7 @@ for fm in ['red','blue','yellow','green','white','black']:
     Frame(height=10, width=10, bg=fm).pack
 
 root.mainloop()
-'''
+
 import os
 
 filename = 'D:\Python27\zhangh\prob1eip'
@@ -51,3 +67,4 @@ filename = 'D:\Python27\zhangh\prob1eip'
 # file = filename[len(filepath)+1:]
 # print os.path.isfile(filename),filepath,'<---->', bool(filepath),'<---->',file
 print os.path.isfile(filename)
+'''

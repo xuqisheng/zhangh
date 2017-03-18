@@ -6,10 +6,10 @@ from Queue import Queue
 # Producer thread
 class Producer(threading.Thread):
     def __init__(self, t_name, queue):
-        threading.Thread.__init__(self, name=t_name)
-        self.data = queue
+        threading.Thread.__init__(self, name=t_name)    # 标准写法，空线程
+        self.data = queue   # queue 队列 先进先出
 
-    def run(self):
+    def run(self):      # 重写父类run()方法
         for i in range(10):  # 随机产生10个数字 ，可以修改为任意大小
             randomnum = random.randint(1, 99)
             print "%s: %s is producing %d to the queue!" % (time.ctime(), self.getName(), randomnum)
