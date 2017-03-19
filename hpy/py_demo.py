@@ -1,15 +1,9 @@
 #!/usr/bin/env python
 #coding=utf-8
-import Queue
+import urllib,urllib2,re
 
-queue = Queue.Queue()
-
-queue.put('a')
-queue.put('b')
-print queue.get(1),queue.get(1)
-
-
-
+request = urllib2.urlopen("http://www.ihotel.cn")
+print request.readline()
 
 
 

@@ -60,6 +60,7 @@ class ThreadPool():
         and initialize three queues.
         """
         # pool_size = 0 indicates buffer is unlimited.
+        print num_threads,pool_size,ThreadPool.max_threads
         num_threads = ThreadPool.max_threads \
             if num_threads > ThreadPool.max_threads \
             else num_threads
@@ -67,6 +68,7 @@ class ThreadPool():
         self.out_queue = Queue.Queue(pool_size)
         self.err_queue = Queue.Queue(pool_size)
         self.workers = {}
+
         # print self.in_queue,self.out_queue,self.err_queue,self.workers
         for i in range(num_threads):
             worker = Worker(self.in_queue, self.out_queue, self.err_queue)
@@ -108,7 +110,7 @@ class ThreadPool():
         del self.workers
 
 
+test = ThreadPool(10,1)
+queue =Queue.Queue()
+test.get_task()
 
-if __name__ == 'main':
-    threadPool = ThreadPool(50, 2)
-    threadPool.get_task()

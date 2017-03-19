@@ -58,7 +58,7 @@ BEGIN
 					a.unit,a.price,a.number,a.amount,CONCAT('厨房备菜  就餐日:',DATE(b.biz_date)),a.cook,var_printer,var_printer,1,1,'3',0,'F','',NULL,a.sort_code,'0',a.siteno,a.create_user,a.create_datetime,NULL,NULL
 					FROM pos_res_order a,pos_res b WHERE a.hotel_group_id = arg_hotel_group_id AND a.hotel_id = arg_hotel_id
 						AND b.hotel_group_id = arg_hotel_group_id AND b.hotel_id = arg_hotel_id AND a.accnt = arg_accnt
-						AND b.accnt = arg_accnt AND a.sta <> 'X' AND b.sta IN ('R','I')	AND SUBSTR(flag,1,1)='0' ORDER BY a.sort_code,a.plu_code;
+						AND b.accnt = arg_accnt AND a.sta <> 'X' AND b.sta IN ('R','I','G')	AND SUBSTR(flag,1,1)='0' ORDER BY a.sort_code,a.plu_code;
 			END IF;
 
 			SET var_printer_codes = SUBSTR(var_printer_codes,var_pos + 1);
