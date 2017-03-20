@@ -20,6 +20,8 @@ class Qcdump(object):
 
         # 判断是否为文件
         if os.path.isfile(self._dumpfile):
+            # 获取文件大小
+            self._file_size = os.path.getsize(self._dumpfile)
             # 取得文件的路径
             self._filepath = os.path.dirname(self._dumpfile)
             # 判断是否包含路径
@@ -29,6 +31,10 @@ class Qcdump(object):
                 self._filename = self._dumpfile[len(os.path.dirname(self._dumpfile)):]
         else:
             self._filename = self._dumpfile
+
+    # 定义上传进度条
+    def processBar(self,file_size,file_speed):
+        pass
 
     # 定义返回值信息
     def message_ret(self,cos_code,cos_message,cos_action):

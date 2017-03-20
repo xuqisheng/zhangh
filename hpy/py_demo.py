@@ -1,17 +1,20 @@
 #!/usr/bin/env python
 #coding=utf-8
-import urllib,urllib2,re
 
-request = urllib2.urlopen("http://www.ihotel.cn")
-print request.readline()
+import os
 
-
-
-
+print os.path.getsize('D:\\abc.pdf')
 
 
 
 '''
+import tqdm
+import time
+
+for i in tqdm.tqdm(range(1000)):
+    time.sleep(0.01)
+
+
 测试数据类型的bool情况
 None、 0、空字符串、以及没有元素的容器对象都可视为 False，反之为 True
 map()是 Python 内置的高阶函数，它接收一个函数 f 和一个 list，
