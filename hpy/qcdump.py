@@ -5,6 +5,7 @@
 操作腾讯云存储
 '''
 import os
+import threading
 from qcloud_cos import CosClient
 from qcloud_cos import UploadFileRequest
 from qcloud_cos import DelFileRequest
@@ -36,6 +37,10 @@ class Qcdump(object):
     def processBar(self,file_size,file_speed):
         pass
 
+
+    def threadUpload(self):
+        pass
+
     # 定义返回值信息
     def message_ret(self,cos_code,cos_message,cos_action):
         if cos_code == 0:
@@ -56,7 +61,12 @@ class Qcdump(object):
         path_cos    = unicode('/' + self._filename)
         path_local  = unicode(self._dumpfile)
         request     = UploadFileRequest(bucket, path_cos,path_local)
-        upload_ret  = self._cos_client.upload_file(request)
+        print "Begin"
+        ret_flag = True
+        while ret_flag:
+            upload_ret  = self._cos_client.upload_file(request)
+
+        print "End"
 
         self.message_ret(upload_ret['code'],upload_ret['message'],'upload_file')
 
@@ -99,7 +109,7 @@ class Qcdump(object):
         self.message_ret(delete_folder_ret['code'],delete_folder_ret['message'],'delete_folder')
 
 if __name__ == '__main__':
-    test = Qcdump('Python')
+    test = Qcdump('E:\\bandicam2017.avi')
     # test.qc_upload_file()
     # test.qc_del_file()
     # test.qc_create_folder()

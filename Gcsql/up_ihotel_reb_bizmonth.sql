@@ -12,7 +12,7 @@ label_0:
 BEGIN
 	-- ==================================================================
 	-- 用途：biz_month 会计周期数据生成(针对会计日期为自然月客户) 
-	-- 解释: CALL up_ihotel_reb_bizmonth(酒店集团id,开始年份,生成几年数据)
+	-- 解释: CALL up_ihotel_reb_bizmonth(集团id,开始年份,生成几年数据)
 	-- 范例: CALL up_ihotel_reb_bizmonth(1,2015,10)
 	-- 作者：zhangh 2014.10.31
 	-- ==================================================================
@@ -38,7 +38,7 @@ BEGIN
 	FETCH c_cursor INTO var_hotel_id;
 		WHILE done_cursor = 0 DO
 			BEGIN
-				
+				-- 这一句当时添加时担心存在自定义会计日期的客户
 				IF EXISTS (SELECT 1 FROM biz_month WHERE hotel_group_id=arg_hotel_group_id AND hotel_id=var_hotel_id AND biz_year=arg_year_begin AND biz_month=8 AND DAY(begin_date)=1) THEN			
 					BEGIN
 						DELETE FROM biz_month WHERE hotel_group_id=arg_hotel_group_id AND hotel_id=var_hotel_id AND biz_year>=arg_year_begin;			
