@@ -1,0 +1,2 @@
+trap "" INT
+/root/mode/start_tomcat tomcat6

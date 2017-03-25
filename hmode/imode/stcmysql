@@ -1,0 +1,13 @@
+#!/bin/bash
+
+Ha=`/root/mode/tcmysql`
+echo "$Ha"
+while [ 1 ];do
+   Hb=`/root/mode/tcmysql`
+   if [ "$Ha" != "$Hb" ]; then
+      echo "$Hb"
+   fi
+   Ha="$Hb"
+done
+
+  

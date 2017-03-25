@@ -1,0 +1,48 @@
+#!/bin/bash 
+
+#
+
+if [ -b /dev/sdc ]; then
+   mkdir -p /DISK3
+   if [ ! -b /dev/sdc1 ]; then
+      /sbin/fdisk /dev/sdc
+      sleep 3
+      if [ -b /dev/sdc1 ]; then
+         /sbin/mkfs.ext3 /dev/sdc1 && mount /dev/sdc1 /DISK3
+      fi
+   else
+      if ! df | grep '/DISK3' >/dev/null; then
+         mount /dev/sdc1 /DISK3
+      fi
+   fi
+   if ! cat /etc/fstab | grep '/DISK3' >/dev/null; then
+      if cat /etc/fstab | grep '/DISK2' >/dev/null; then
+         Hlast=`cat /etc/fstab | tail -n 1`
+         echo "$Hlast" | sed -r -e "s/DISK2/DISK3/" -e "s/sdb1/sdc1/" >> /etc/fstab
+      fi
+   fi
+fi
+    
+
+#
+
+if df | grep '/DISK3' >/dev/null; then
+   if ! cat /etc/my.cnf | grep -E 'innodb_data_file_path=.*ibdata2' >/dev/null; then
+      # step 1
+      /root/mode/mysql stop
+      /root/mode/fix_cnf
+      cat /etc/my.cnf | sed -re "s/(innodb_data_file_path=.*)(:autoextend)/\1;ibdata2:10M\2/" > /root/mode/tmp/Hetc$$.tmp
+      cp -f /root/mode/tmp/Hetc$$.tmp /etc/my.cnf
+      rm -f /root/mode/tmp/Hetc$$.tmp
+      # step 2
+      /root/mode/mysql start
+      /root/mode/mysql stop
+      mv /var/lib/mysql/ibdata2 /DISK3
+      cd /var/lib/mysql
+      ln -s /DISK3/ibdata2 ibdata2
+      # step 3
+      /root/mode/mysql start
+   fi
+fi
+
+

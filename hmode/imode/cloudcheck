@@ -1,0 +1,43 @@
+#!/bin/bash 
+
+if hostname | grep -E '^(AY|iZ|VM)' >/dev/null; then
+   if df | grep -E "/dev/x?vdb" >/dev/null; then
+      df | grep -E "/dev/x?vdb" | awk '{print $1}'| 
+      while read H1;do
+         if ! cat /etc/fstab 2>/dev/null | grep -P "$H1[ \t]" >/dev/null; then
+            /root/mode/modemsg cloudcheck "$H1 not added to /etc/fstab" more
+         fi
+         if cat /etc/fstab 2>/dev/null | grep -P "$H1[ \t].*ext4" >/dev/null; then
+            /root/mode/modemsg cloudcheck "$H1 is an ext4 file system !" more
+         fi
+      done
+      # MySQL installation check
+      if [ -x /usr/sbin/mysqld ]; then
+         if [ ! -h /var/lib/mysql ]; then
+            /root/mode/modemsg cloudcheck "/var/lib/mysql is not a symbolic link" more
+         fi
+      fi
+      # /root/mode/dump check
+      if [ ! -h /root/mode/dump ]; then
+         /root/mode/modemsg cloudcheck "/root/mode/dump is not a symbolic link" more
+      fi
+
+      Hrootsize=`df | grep -E "/$" | awk '{print $2}'`
+      if [ $Hrootsize -lt 9000000 ]; then
+         cd /usr/local
+         # tomcat check
+         for i in `ls -d tomcat*/ 2>/dev/null | sed -re "s/\/$//"`;do
+            if [ ! -h $i ]; then
+               /root/mode/modemsg cloudcheck "/usr/local/$i is not a symbolic link" more
+            fi
+         done 
+         # apache check
+         for i in `ls -d apache*/ 2>/dev/null | sed -re "s/\/$//"`;do
+            if [ ! -h $i ]; then
+               /root/mode/modemsg cloudcheck "/usr/local/$i is not a symbolic link" more
+            fi
+         done 
+      fi
+   fi
+fi
+

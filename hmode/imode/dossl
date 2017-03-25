@@ -1,0 +1,13 @@
+##
+. /root/imode/cfg/.imode_aliases
+#
+for i in `cat /root/servers.txt | grep -v "^#" | grep -E "^${1:-.*}$"`; do
+
+   echo
+   echo " ========================================= server $i ======================================== "
+   echo
+
+   ssh $i "cat /etc/re*re* | grep -E 'release 6\..*' && rpm -qa | grep openssl && rpm -q --changelog openssl-1.0.1e | grep -B 1 CVE-2014-0160"
+
+done
+

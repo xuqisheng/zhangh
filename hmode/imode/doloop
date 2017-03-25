@@ -1,0 +1,12 @@
+#!/bin/bash
+
+Hloopno=0
+Hsucno=0
+while [ $Hloopno -lt 50 ]; do
+  Hloopno=$[$Hloopno+1]
+  /root/imode/doroutine "$1" | grep ok && Hsucno=$[$Hsucno+1]
+  echo "$1" $Hloopno $Hsucno `date`
+done
+
+
+

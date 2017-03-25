@@ -1,0 +1,9 @@
+##
+. /root/imode/cfg/.imode_aliases
+#
+for i in `cat /root/rel.txt | grep -v "^#" | grep -E "^${1:-.*}$"`; do
+
+   ssh $i "echo -n '$i  ';cat /etc/re*re* | grep release" | sed -re "s/^([^ ]+)( *)(.*)/\3\2\1/"
+   ssh $i "rpm -qa | grep grep"
+done
+

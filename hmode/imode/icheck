@@ -1,0 +1,23 @@
+#!/bin/bash
+
+#
+
+/root/mode/withyou $$ icheck 1 && exit
+
+#
+
+export HBLACKBOX2=1
+export LANG=zh_CN.UTF-8
+{
+/root/imode/Iseecfg /chksql allservers
+/root/imode/Iseecfg /chksql allservers portal_f
+/root/imode/Iseecfg /chksql allservers portal_f_pms
+/root/imode/Iseecfg /chksql allservers portal_ipms
+/root/imode/Iseecfg /chksql allservers portal_pms
+} | tee /icheck.txt
+if cat /etc/redhat-release | grep -E " release 6\..*" > /dev/null; then
+   cat /icheck.txt | grep -E "^[\+\|]" | tr -d '\r' 
+else
+   cat /icheck.txt | grep -E "^[\+\|]" | tr -d '\r' | iconv -f utf-8 -t gb18030
+fi | 
+mail -s "icheck `LANG=en_US;date`" jrj@ipms.cn glh@ipms.cn support@ipms.cn 4000508509@b.qq.com yyf@ipms.cn 308243244@qq.com

@@ -1,0 +1,11 @@
+##
+. /root/imode/cfg/.imode_aliases
+#
+for i in `cat /root/servers.txt | grep -v "^#" | grep -E "^${1:-.*}$"`; do
+
+   echo
+   echo " ========================================= server $i ======================================== "
+   echo
+   ssh $i "netstat -s  | sed -n '1,/Icmp/ p' | sed -re '$ d'" |
+   grep -E "(invalid|discarded|dropped|failed)" 
+done

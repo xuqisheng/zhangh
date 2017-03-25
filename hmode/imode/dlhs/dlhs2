@@ -1,0 +1,24 @@
+#!/bin/bash
+
+# get mysql server ip 
+
+. /root/mode/mysqldip
+
+# 
+
+mkdir -p /dlhs
+rm -f /dlhs/modrep.sql
+
+#
+
+HDBNAME=${1:-h2}
+/root/mode/seecfg -s $HMYSQLDIP "show tables from \`$HDBNAME\` like 'rep\_%'" | 
+while read i; do
+cat >> /dlhs/modrep.sql << EOF
+/*
+----each----:[$i.hotel_group_id][$i.hotel_id][$i.biz_date]
+*/
+update $i set hotel_id = -1 where hotel_group_id=9 and hotel_id=37 and biz_date<='2012-07-24';
+EOF
+done
+

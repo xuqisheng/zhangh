@@ -1,0 +1,23 @@
+##
+. /root/imode/cfg/.imode_aliases
+#
+for i in `cat /root/ipstat.txt | grep -v "^#" | grep -E "^${1:-.*}$"`; do
+
+   echo
+   echo " ========================================= server $i ======================================== "
+   echo
+   ssh $i "netstat -s  | sed -n '1,/Icmp/ p' | sed -re '$ d'" | grep -E "(invalid|discarded|dropped|failed)" 
+done | tee /ipstat/new
+[ -f /ipstat/old ] || touch /ipstat/old
+if cmp /ipstat/old /ipstat/new; then
+   rm -f /ipstat/new
+else
+   cp -p /ipstat/new /ipstat/old
+   mv /ipstat/new /ipstat/back`date +%m%d-%H:%M:%S`
+fi
+
+
+
+
+
+

@@ -1,0 +1,25 @@
+#!/bin/bash 
+
+#
+
+Hlines=$(
+if [ -n "$1" ];then
+   /root/mode/seecfg -s "select server_code from gc_server_group_info where server_group_code = '$1'" gc_admin 
+fi)
+for i in `echo $Hlines`; do
+   Hsshmac=`/root/imode/gc_sc_sshmac $i`
+   #
+   if ! /root/imode/gc_sshmac_ok "$Hsshmac"; then
+      continue
+   fi
+   #
+   cat /root/imode/.colldata1 | eval $Hsshmac > /root/mode/tmp/Htm$$.txt
+   /root/mode/seecfg "delete from gc_servers_info where server_code='$i'" gc_admin
+   /root/mode/seecfg "set unique_checks=0;
+                      set foreign_key_checks=0;
+                      load data local infile '/root/mode/tmp/Htm$$.txt' into table gc_servers_info" gc_admin
+   rm -f /root/mode/tmp/Htm$$.txt
+done
+
+#
+

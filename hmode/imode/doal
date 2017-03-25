@@ -1,0 +1,22 @@
+##
+. /root/imode/cfg/.imode_aliases
+#
+for i in `cat /root/al.txt | grep -v "^#" | grep -E "^${1:-.*}$"`; do
+
+   echo
+   echo " ========================================= server $i ======================================== "
+   echo
+  
+   #ssh $i "/root/mode/testdb portal   && echo okok" | grep okok &>/dev/null && /root/imode/ser /qxl/qxl3.sql $i portal
+   #ssh $i "/root/mode/testdb portal_f && echo okok" | grep okok &>/dev/null && /root/imode/ser /qxl/qxl3.sql $i portal_f
+   #   ssh $i "ps -ef | grep aegis"
+   #ssh $i "ls -l /usr/local/aegis/aegis_quartz/log/aegis_quartz.log 2>/dev/null"
+   #ssh $i "cat /usr/local/aegis/aegis_quartz/log/aegis_quartz.log 2>/dev/null | grep ERROR"
+   #ssh $i "ps -ef | grep aegis_quartz | grep -v grep"
+   #ssh $i "cat /usr/local/aegis/globalcfg/all_webpath 2>/dev/null"
+   ssh $i "/usr/bin/iostat"
+
+
+
+done
+

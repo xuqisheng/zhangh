@@ -1,0 +1,89 @@
+#!/bin/bash 
+
+if [ -z "$1" ]; then
+   /root/mode/confirm "Are you sure to continue" more || exit 1
+fi
+for Hs in `cat /root/servers.txt 2>/dev/null | grep -E '^[a-zA-Z]' | grep -E "^${1:-.*}$"`;do 
+   #
+   Hs_msg=`ssh -n -v "$Hs" "echo" 2>&1`
+   if echo "$Hs_msg" | head -n 10 | grep -E 'Executing proxy command:' >/dev/null; then
+      Hs_ipport=`echo "$Hs_msg" | head -n 10 | grep -E 'Executing proxy command:'`
+      Hs_ip1=`echo   "$Hs_ipport" | sed -re "s/.*exec nc -x (.*):([0-9]+) ([^ ]+) (.*)/\1/"`
+      Hs_port1=`echo   "$Hs_ipport" | sed -re "s/.*exec nc -x (.*):([0-9]+) ([^ ]+) (.*)/\2/"`
+      Hs_ip0=`echo   "$Hs_ipport" | sed -re "s/.*exec nc -x (.*):([0-9]+) ([^ ]+) (.*)/\3/"`
+      Hs_port0=`echo   "$Hs_ipport" | sed -re "s/.*exec nc -x (.*):([0-9]+) ([^ ]+) ([0-9]+).*/\4/"`
+   elif echo "$Hs_msg" | head -n 10 | grep -E "^debug1: Connecting to $Hs " >/dev/null; then
+      Hs_ipport=`echo "$Hs_msg" | head -n 10 | grep -E "^debug1: Connecting to [^ ]+ "`
+      Hs_ip1=
+      Hs_port1=
+      Hs_ip0=`echo   $Hs_ipport | sed -re "s/.*\[(.*)\].*/\1/"`
+      Hs_port0=`echo $Hs_ipport | sed -re "s/.* port ([0-9]+)\..*/\1/"`
+   else
+      continue
+   fi
+   if echo "$Hs" | grep -E "\." >/dev/null; then
+      Hs_ip0="$Hs"
+      #Hsn="${Hs}.$Hs_port0"
+      Hsn="${Hs}"
+   else
+      Hsn="${Hs}"
+   fi
+   Hdes=`/root/imode/gsurl3 "$Hs"`
+   if [ -z "$Hdes" -o "$Hdes" = "NULL" ]; then
+      Hdes=`/root/imode/gsurl4 "$Hs"`
+   else
+      Hdes1=`/root/imode/gsurl4 "$Hs"`
+      if ! echo "$Hdes1" | grep -P "^[a-zA-Z0-9\._]+$" >/dev/null; then 
+         Hdes=$Hdes1
+      fi
+   fi
+   Hsid=`ssh -q $Hs "/root/mode/.modesid 2>/dev/null"`
+   if [ -n "$Hsid" ]; then
+      if [ -z "`/root/mode/seecfg -s \"select code from gc_servers where code='$Hsid'\" gc_admin`" ]; then
+          /root/mode/seecfg "replace into gc_servers select replace(uuid(),'-',''),'$Hsid','$Hdes','何仁尧','hry',now(),'何仁尧','hry',now()" gc_admin
+      fi
+      if [ -z "`/root/mode/seecfg -s \"select code from gc_sshto_servers where code='$Hsn'\" gc_admin`" ]; then
+         /root/mode/seecfg "insert into gc_sshto_servers select replace(uuid(),'-',''),'$Hsn','$Hsid','$Hdes','$Hs_ip0','$Hs_port0','$Hs_ip1','$Hs_port1','','','何仁尧','hry',now(),'何仁尧','hry',now()" gc_admin
+      else
+         /root/mode/seecfg "update gc_sshto_servers set descript='$Hdes',server_code='$Hsid',ip0='$Hs_ip0',port0='$Hs_port0',ip1='$Hs_ip1',port1='$Hs_port1',ip2='',port2='',
+                                                        update_name='何仁尧',update_by='hry',update_date=now()
+                                   where code='$Hsn'" gc_admin
+      fi
+   fi
+   #
+   if ! grep -E "^$Hs$" /root/mrels.txt >/dev/null && [ "$Hs" != "jjzx-app01" ]; then
+      continue
+   fi
+   #
+   Hrs=`ssh -q $Hs "cat /root/servers.txt 2>/dev/null | grep -E '^[a-zA-Z]' | grep -E \"^${2:-.*}$\""`
+   for j in `echo "$Hrs" | grep -v "^#" | sed -re "/^[ \t]*$/ d"`; do
+      Hrs_msg=`ssh -q $Hs "ssh -q -v $j 'echo' 2>&1"`
+      if echo "$Hrs_msg" | head -n 10 | grep -E "^debug1: Connecting to $j " >/dev/null; then
+         if [ "$Hs" = "jjzx-app01" ]; then
+            Hrsid=`echo "/root/mode/.modesid" | 
+                   ssh -q $Hs "ssh -q $j \"sudo su - root -c \\\\\"cat - | bash 2>/dev/null\\\\\"\""`
+         else
+            Hrsid=`ssh -q $Hs "ssh -q $j \"/root/mode/.modesid 2>/dev/null\""`
+         fi
+         if [ "$Hrsid" = "$Hsid" -a -n "$Hsid" ]; then
+            continue
+         fi
+         Hrs_ipport=`echo "$Hrs_msg" | head -n 10 | grep -E "^debug1: Connecting to $j "`
+         Hs_ip2=`echo   $Hrs_ipport | sed -re "s/.*\[(.*)\].*/\1/"`
+         Hs_port2=`echo $Hrs_ipport | sed -re "s/.* port ([0-9]+)\..*/\1/"`
+         if [ -n "$Hrsid" ]; then
+            if [ -z "`/root/mode/seecfg -s \"select code from gc_servers where code='$Hrsid'\" gc_admin`" ]; then
+               /root/mode/seecfg "replace into gc_servers select replace(uuid(),'-',''),'$Hrsid','${Hdes}__$j','何仁尧','hry',now(),'何仁尧','hry',now()" gc_admin
+            fi
+            if [ -z "`/root/mode/seecfg -s \"select code from gc_sshto_servers where code='${Hsn}__$j'\" gc_admin`" ]; then
+               /root/mode/seecfg "insert into gc_sshto_servers select replace(uuid(),'-',''),'${Hsn}__$j','$Hrsid','${Hdes}_$j','$Hs_ip2','$Hs_port2','$Hs_ip1','$Hs_port1','$Hs_ip0','$Hs_port0',
+                                                                      '何仁尧','hry',now(),'何仁尧','hry',now()" gc_admin
+            else
+               /root/mode/seecfg "update gc_sshto_servers set descript='${Hdes}_$j',server_code='$Hrsid',ip0='$Hs_ip2',port0='$Hs_port2',ip1='$Hs_ip1',port1='$Hs_port1',
+                                                              ip2='$Hs_ip0',port2='$Hs_port0',update_name='何仁尧',update_by='hry',update_date=now()
+                                                              where code='${Hsn}__$j'" gc_admin
+            fi
+         fi
+      fi
+   done
+done

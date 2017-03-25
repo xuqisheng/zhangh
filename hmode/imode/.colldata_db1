@@ -1,0 +1,43 @@
+#!/bin/bash 
+# ------------------------------------------------------------------------------
+# function:
+# ------------------------------------------------------------------------------
+
+#
+
+if [ "`/root/mode/getpip`" = "183.129.215.114" ]; then
+   exit
+fi
+Hsid=`/root/mode/.modesid`
+
+# MySQL server must be running at localhost 
+
+if ! /root/mode/seecfg localhost &>/dev/null; then
+   exit
+fi
+
+# must be gcdb
+
+Hdbs=`/root/mode/seecfg -s localhost "show databases" | grep -Ev "(information_schema|mysql|performance_schema|test)"` 
+for Hdb in `echo $Hdbs`;do
+   if /root/mode/testdb localhost "$Hdb" &>/dev/null; then
+      Hgcdb=1
+      break
+   fi
+done
+if [ -z "$Hgcdb" ]; then
+   exit
+fi
+
+#
+
+Hfiletoget=`ls -1t /var/lib/mysql/*-slow.log.top 2>/dev/null | sed -n '1 p'`
+
+if [ -n "$Hfiletoget" ]; then
+   cat $Hfiletoget
+fi
+
+# end 
+
+
+

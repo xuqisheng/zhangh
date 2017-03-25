@@ -1,0 +1,14 @@
+##
+. /root/imode/cfg/.imode_aliases
+#
+for i in `cat /root/ali.txt | grep -v "^#" | grep -E "^${1:-.*}$"`; do
+
+   echo
+   echo " ========================================= server $i ======================================== "
+   echo
+   #ssh $i "hostname"
+   #ssh $i "df"
+   #ssh $i "cat /etc/fstab | tail -n 1"
+   ssh $i "ls -l /var/lib/mysql;ls -l /root/mode/dump"
+done
+

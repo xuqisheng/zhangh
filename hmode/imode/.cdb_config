@@ -1,0 +1,50 @@
+#
+# --------------------------------------
+# function:
+#           change database path 
+# usage   :
+#           ./cdb_config <newpath>
+# e.g.    : 
+#           ./cdb_config localhost
+# --------------------------------------
+
+/root/mode/gcserver status >/dev/null 2>&1 && 
+{
+echo "App server is running!change denied"
+exit
+}
+
+# build.properties
+
+cat /root/antDep/build.properties |
+sed -re "s/^(db(tr)?\.root)=.*/\1=$1/" > /root/mode/tmp/hhrycdb$$.tmp
+mv -f /root/mode/tmp/hhrycdb$$.tmp /root/antDep/build.properties
+
+cat /usr/local/tomcat6/webapps/ipms/WEB-INF/classes/config/jdbc.mysql.properties |
+sed -re "s/^(jdbc\.url=jdbc:mysql:\/\/)(.*):(.*)/\1$1:\3/"  > /root/mode/tmp/hhrycdb$$.tmp
+mv -f /root/mode/tmp/hhrycdb$$.tmp /usr/local/tomcat6/webapps/ipms/WEB-INF/classes/config/jdbc.mysql.properties
+
+cat /usr/local/tomcat6/webapps/ipms1/WEB-INF/classes/config/jdbc.mysql.properties |
+sed -re "s/^(jdbc\.url=jdbc:mysql:\/\/)(.*):(.*)/\1$1:\3/"  > /root/mode/tmp/hhrycdb$$.tmp
+mv -f /root/mode/tmp/hhrycdb$$.tmp /usr/local/tomcat6/webapps/ipms1/WEB-INF/classes/config/jdbc.mysql.properties
+
+cat /usr/local/tomcat602/webapps/ipms/WEB-INF/classes/config/jdbc.mysql.properties |
+sed -re "s/^(jdbc\.url=jdbc:mysql:\/\/)(.*):(.*)/\1$1:\3/"  > /root/mode/tmp/hhrycdb$$.tmp
+mv -f /root/mode/tmp/hhrycdb$$.tmp /usr/local/tomcat602/webapps/ipms/WEB-INF/classes/config/jdbc.mysql.properties
+
+cat /usr/local/tomcat602/webapps/ipms1/WEB-INF/classes/config/jdbc.mysql.properties |
+sed -re "s/^(jdbc\.url=jdbc:mysql:\/\/)(.*):(.*)/\1$1:\3/"  > /root/mode/tmp/hhrycdb$$.tmp
+mv -f /root/mode/tmp/hhrycdb$$.tmp /usr/local/tomcat602/webapps/ipms1/WEB-INF/classes/config/jdbc.mysql.properties
+
+# ---------------------------
+# gjz web
+# ---------------------------
+# tomcat6 -> tomcat1
+# ipms    -> website
+# /config -> <empty>
+# --------------------------
+
+cat /usr/local/tomcat1/webapps/website/WEB-INF/classes/jdbc.mysql.properties |
+sed -re "s/^(jdbc\.url=jdbc:mysql:\/\/)(.*):(.*)/\1$1:\3/"  > /root/mode/tmp/hhrycdb$$.tmp
+mv -f /root/mode/tmp/hhrycdb$$.tmp /usr/local/tomcat1/webapps/website/WEB-INF/classes/jdbc.mysql.properties
+

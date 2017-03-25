@@ -1,0 +1,57 @@
+#!/bin/bash 
+
+#
+
+if [ ! -f /root/packages/ss5-3.8.9-8.tar.gz ]; then
+   /root/mode/modemsg inst_ss5 "No ss5-3.8.9-8.tar.gz in directory /root/packages" more
+   exit 1
+fi
+
+# 
+
+yum install pam-devel
+yum install openssl-devel
+yum install openldap-devel 
+
+#
+
+mkdir -p /root/mode/hss5_$$
+rm -fR /root/mode/hss5_$$/*
+cd /root/mode/hss5_$$
+tar zxf /root/packages/ss5-3.8.9-8.tar.gz
+cd `ls -d ss5-*`
+./configure --with-defaultport=2222
+make && make install
+chmod u+x /etc/init.d/ss5
+chkconfig ss5 on
+mv -f /usr/lib/ss5/mod_socks4.so /usr/lib/ss5/mod_socks4.so.bk
+
+if ! cat /etc/sysconfig/ss5 2>/dev/null | grep -E "^SS5_OPTS=" >/dev/null; then
+  echo "SS5_OPTS=\" -u root -b 0.0.0.0:2222\"" >> /etc/sysconfig/ss5
+fi
+if ! cat /etc/opt/ss5/ss5.passwd 2>/dev/null | grep -E '^hry ' >/dev/null; then
+   echo "hry Hry${RANDOM}_$RANDOM" > /etc/opt/ss5/ss5.passwd
+fi
+if ! cat /etc/opt/ss5/ss5.conf 2>/dev/null | grep -E '^auth ' >/dev/null; then
+   {
+      echo                         
+      echo "# Mode added 'auth' options"                       
+      echo "auth    0.0.0.0/0               -               u" 
+      echo "auth    183.129.215.114         -               -"
+   }  >> /etc/opt/ss5/ss5.conf
+fi
+if ! cat /etc/opt/ss5/ss5.conf 2>/dev/null | grep -E '^permit ' >/dev/null; then
+   {
+      echo "# Mode added 'permit' options"
+      echo "permit -        0.0.0.0/0       -       0.0.0.0/0       -       -       -       -       -"
+   }  >> /etc/opt/ss5/ss5.conf
+fi
+
+#
+
+cd /root/mode
+rm -fR /root/mode/hss5_$$
+
+# end
+
+

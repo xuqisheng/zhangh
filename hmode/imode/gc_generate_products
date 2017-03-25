@@ -1,0 +1,20 @@
+#!/bin/bash 
+
+exit
+# products 
+
+/root/mode/seecfg "delete from gc_products" gc_admin
+/root/mode/seecfg "insert gc_products select replace(uuid(),'-',''),'fenku','通用分库版',1000,'何仁尧','hry',now(),null,null,null" gc_admin
+/root/mode/seecfg "insert gc_products select replace(uuid(),'-',''),'jjfenku','锦江专用分库版',1010,'何仁尧','hry',now(),null,null,null" gc_admin
+/root/mode/seecfg "insert gc_products select replace(uuid(),'-',''),'zyfenku','住友专用分库版',1020,'何仁尧','hry',now(),null,null,null" gc_admin
+/root/mode/seecfg "insert gc_products select replace(uuid(),'-',''),'kyfenku','开元专用分库版',1030,'何仁尧','hry',now(),null,null,null" gc_admin
+/root/mode/seecfg "insert gc_products select replace(uuid(),'-',''),'pos','餐饮',2010,'何仁尧','hry',now(),null,null,null" gc_admin
+/root/mode/seecfg "insert gc_products select replace(uuid(),'-',''),'mobilepms','手机pms',3010,'何仁尧','hry',now(),null,null,null" gc_admin
+
+# products and versions
+
+ 
+/root/mode/seecfg "delete from gc_products_version" gc_admin
+/root/mode/seecfg "insert gc_products_version (id,product_code,product_version,sta) select replace(uuid(),'-',''),'fenku','2.07.94','I'" gc_admin
+/root/mode/seecfg "insert gc_products_version (id,product_code,product_version,sta) select replace(uuid(),'-',''),'pos','2.2.0','I'" gc_admin
+/root/mode/seecfg "insert gc_products_version (id,product_code,product_version,sta) select replace(uuid(),'-',''),'mobilepms','2.04.12','I'" gc_admin

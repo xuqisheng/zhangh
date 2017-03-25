@@ -1,0 +1,36 @@
+#!/bin/bash 
+# --------------------------------------------------
+# function:
+#          remove information about server code '$1'
+# --------------------------------------------------
+
+# server code must not be empty
+
+if [ -z "$1" ]; then
+   exit 1
+fi
+
+#
+
+/root/mode/confirm "Are you sure to remove all information of server code '$1'" || exit 
+
+#
+
+/root/mode/seecfg "delete from gc_servers            where code='$1'" gc_admin
+/root/mode/seecfg "delete from gc_servers_info       where server_code='$1'" gc_admin
+/root/mode/seecfg "delete from gc_sshto_servers      where server_code='$1'" gc_admin
+/root/mode/seecfg "delete from gc_server_exceptions  where server_code='$1'" gc_admin
+
+#
+
+Hsgcode1=`/root/mode/seecfg -s "select server_group_code from gc_server_group_info where server_code='$1'" gc_admin`
+if [ -n "$Hsgcode1" ]; then 
+   /root/mode/seecfg "delete from gc_server_group_info where server_code='$1'" gc_admin
+   Hsgcode2=`/root/mode/seecfg -s "select distinct server_group_code from gc_server_group_info where server_group_code='$Hsgcode1'" gc_admin`
+   if [ -z "$Hsgcode2" ]; then 
+      /root/mode/seecfg "delete from gc_server_group where code='$Hsgcode1'" gc_admin
+   fi
+fi
+
+#
+

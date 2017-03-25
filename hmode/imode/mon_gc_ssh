@@ -1,0 +1,27 @@
+#!/bin/bash 
+
+
+#
+
+if echo "$1" | grep -E "(\(|\[|\{|\*|\+|\|)" >/dev/null; then
+   Hpat="regexp '^($1)$'"
+else
+   Hpat="like '$1%'"
+fi
+
+#
+
+/root/mode/seecfg "SELECT a.code,a.descript as ssh_descript,
+                          a.ip0,a.ip1,a.ip2,
+                          a.server_code,
+                          d.descript as server_descript,
+                          b.server_group_code,
+                          c.descript as server_group_descript
+                   FROM   gc_sshto_servers a left join gc_servers d 
+                          on a.server_code=d.code 
+                          left join gc_server_group_info b
+                          on a.server_code=b.server_code
+                          left join gc_server_group c 
+                          on b.server_group_code=c.code
+                   WHERE  a.code $Hpat and (a.server_code is not null and trim(a.server_code) <> '')
+                   order by a.code,a.server_code " gc_admin

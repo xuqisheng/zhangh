@@ -1,0 +1,33 @@
+#!/bin/bash 
+
+#
+
+/root/mode/modepv gc_reg_col $$ "/bin/bash .*/gc_reg_col"
+
+#
+
+if [ ! -d "$1" ]; then
+   mkdir -p "$1"
+fi
+
+#
+
+if [ ! -f "$1/$2" ]; then
+   touch "$1/$2"
+fi
+
+#
+
+if cat "$1/$2" | grep -E "^$3$" >/dev/null; then
+   cat "$1/$2" | grep -En "^$3$" | sed -re "s/^([0-9]+):.*/\1/" | sed -re "s/^/00/" -e "s/.*(..)/\1/"
+else
+   echo "$3" >> "$1/$2"
+   cat "$1/$2" | wc -l | sed -re "s/^/00/" -e "s/.*(..)/\1/"
+fi
+   
+#
+
+
+
+
+ 

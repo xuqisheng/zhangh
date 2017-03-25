@@ -1,0 +1,9 @@
+##
+. /root/imode/cfg/.imode_aliases
+#
+for i in `cat /root/servers.txt | grep -v "^#" | grep -E "^${1:-.*}$"`; do
+   echo
+   echo " ========================================= server $i ======================================== "
+   echo
+   ssh $i "/root/mode/eval_app -ll 2>&1"
+done | tee /app

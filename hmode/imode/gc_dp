@@ -1,0 +1,289 @@
+#!/bin/bash 
+# ------------------------------------------------------------------------------------
+# function:
+# usages  :
+#          ./gc_dp <server-group-code>  <deploytime> { <product>:<version> ... }
+# ------------------------------------------------------------------------------------
+# e.g.    :
+#          ./gc_dp gc628 "2016-11-30 23:30:00" fenku:2.07.94 pos:2.2.0
+# ------------------------------------------------------------------------------------
+
+# get options
+
+HOPTIONS=""
+while (echo "'$1'"  | grep -E  -e "^'-" > /dev/null)
+do
+   HOPTIONS="$HOPTIONS$1"
+   shift
+done
+
+# server group code etc.
+
+Hsg_code="$1"
+if [ -z "$Hsg_code" ]; then
+   /root/mode/modemsg gc_dp "Please provide server group code" more
+   exit 1
+fi
+Hsg_des=`/root/mode/seecfg -s "select descript from gc_server_group where code='$Hsg_code'" gc_admin`
+if [ -z "$Hsg_des" ]; then
+   /root/mode/modemsg gc_dp "Server group code '$Hsg_code' does not exist" more
+   exit 1
+fi
+
+
+# regenerate server data of server group code when with option -r
+
+if echo "'$HOPTIONS" | grep -E -e "(-r)(-|$)" >/dev/null; then
+   /root/imode/gc_sdata_bygcode "$Hsg_code"
+fi
+
+# 
+
+Hs_codes=`/root/mode/seecfg -s "SELECT server_code FROM gc_server_group_info where server_group_code='$Hsg_code'" gc_admin`
+shift 
+if [ -z "$*" ]; then
+   echo
+   echo "==============================================="
+   echo "Server group code       : $Hsg_code"
+   echo "Server group description: $Hsg_des"
+   echo "==============================================="
+
+   for i in `echo $Hs_codes`; do
+       # ssh way for server code $i
+       Hsshcode=`/root/imode/gc_sc_sshc $i`
+       Hsshmac=`/root/imode/gc_sshc_sshmac "$Hsshcode"`
+       Hhasbeendeployed=`echo "[ -f /etc/modetsk/dp/dp.conf ] && echo hasbeendeployed "  | eval $Hsshmac`
+       if ! echo $Hhasbeendeployed | grep hasbeendeployed >/dev/null; then
+          continue 
+       fi
+       #
+       Hs_des=`/root/mode/seecfg -s "select descript from gc_servers where code='$i'" gc_admin`
+       Hdpapps=`echo "cat /etc/modetsk/dp/dpfiles 2>/dev/null | grep -Ev '/sql.war$' | sed -re 's/.*\/(.*)\/(.*)\.war/\2 \1;/'" | eval $Hsshmac`
+       Hdptime=`echo "/root/mode/mod_config /etc/modetsk/dp/dp.conf 'time' '#Get#'" | eval $Hsshmac`
+       Hsvtime=`echo "date '+%Y-%m-%d %H:%M:%S'" | eval $Hsshmac`
+       #
+       Hsta_time=`/root/imode/gc_set_dp '' "$Hsshmac"`
+       Hsta=`echo "$Hsta_time"  | sed -re "s/(.*)#(.*)/\1/"`
+       Htime=`echo "$Hsta_time" | sed -re "s/(.*)#(.*)/\2/"`
+       #
+       echo
+       echo "-----------------------------------------------"
+       echo "Server code             : $i"
+       echo "Server description      : $Hs_des"
+       echo "Server ssh code         : $Hsshcode"
+       echo "Server deploy time      : $Hdptime"
+       echo "Server deploy apps      : `echo $Hdpapps`"
+       echo "-----------------------------------------------"
+       echo "Server current time     : $Hsvtime"
+       echo "Server current status   : $Hsta (set at $Htime)"
+       #
+   done
+   echo
+   exit 0
+fi
+
+
+# ------------------------------------------------------------------------------------------------------
+# deploy-time-threshold 
+# ------------------------------------------------------------------------------------------------------
+# deploy-time-threshold is a string like datetime,but it need not be valid datetime
+# '2016-02-30 10:10:10' is a valid deploy-time-threshold,though it's not a valid datetime
+# ------------------------------------------------------------------------------------------------------
+
+Hsg_time="$1"
+
+if ! echo "$Hsg_time" | grep -E "^[0-9]{4}-[0-9]{2}-[0-9]{2} [0-9]{2}(:[0-9]{2}(:[0-9]{2})?)?$" >/dev/null; then
+   /root/mode/modemsg gc_dp "Please use time format like '2017-01-01 10','2017-01-01 10:10' or '2017-01-01 10:10:10'" more
+   exit 1
+fi
+shift 
+
+# ----------------------------------------------------------------------------------
+# apps already deployed in server group $Hsg_code
+# ----------------------------------------------------------------------------------
+
+Hsg_apps=`/root/mode/seecfg -s "SELECT distinct c.apps        
+                                FROM   gc_server_group a,
+                                       gc_server_group_info b,
+                                       gc_servers_info c
+                                WHERE  a.code=b.server_group_code and b.server_code=c.server_code and
+                                       a.code='$Hsg_code'" gc_admin | grep -Ev " ipms1$"`
+if [ -z "$Hsg_apps" ]; then
+   /root/mode/modemsg gc_dp "No deployable apps have been installed at server group of '$Hsg_code'" more
+   exit 1
+fi
+Hsg_apps=`echo $Hsg_apps | tr ' ' '\n' | sort | uniq | grep -E "^(ipms(thef|thek|group|member|sync)?|mobilepms|pos)$"`
+if [ -z "$Hsg_apps" ]; then
+   /root/mode/modemsg gc_dp "No apps may be automatically deployed at server group of '$Hsg_code'" more
+   exit 1
+fi
+
+# ----------------------------------------------------------------------------------
+# products/versions which will be deployed 
+# ----------------------------------------------------------------------------------
+
+Hsg_prov1="$*"
+if [ -z "$Hsg_prov1" ]; then
+   /root/mode/modemsg gc_dp "Please designate products and their versions" more
+   exit 1
+fi
+Hsg_prov2=
+for i in `echo $Hsg_prov1 | tr ' ' '\n' | sort | uniq`;do
+    Hp=`echo $i | sed -re "s/(.+):(.+)/\1/"`
+    Hv=`echo $i | sed -re "s/(.+):(.+)/\2/"`
+    if [ "$Hp" = "$Hv" ]; then
+       continue
+    fi
+    #
+    Hpvcheck=`/root/mode/seecfg "select 1 from gc_products_version where product_code='$Hp' and product_version='$Hv'" gc_admin`
+    if [ -z "$Hpvcheck" ]; then
+       continue
+    fi
+    #
+    if echo "$Hp" | grep 'fenku' >/dev/null; then
+       if echo "$Hsg_prov2" | grep -E ":ipmsthef " >/dev/null; then
+          continue
+       fi
+       # expand macro
+       Hsg_prov2="$Hsg_prov2 $Hp:$Hv:ipms $Hp:$Hv:ipmsthef $Hp:$Hv:ipmsthek $Hp:$Hv:ipmsgroup $Hp:$Hv:ipmsmember $Hp:$Hv:ipmssync $Hp:$Hv:sql"
+    else
+       if echo "$Hsg_prov2" | grep -E " $Hp:" >/dev/null; then
+          continue
+       fi
+       Hsg_prov2="$Hsg_prov2 $Hp:$Hv:$Hp"
+    fi
+done
+if [ -z "$Hsg_prov2" ]; then
+   /root/mode/modemsg gc_dp "No valid products to deploy" more
+   exit 1
+fi
+Hsg_prov2=`echo $Hsg_prov2 | tr ' ' '\n' | sed -re "s/$/.war/"`
+
+# ----------------------------------------------------------------------------------
+# url from which to download wars
+# CDN is not safe 
+# ----------------------------------------------------------------------------------
+
+#Hwget="http://192.168.0.50:8090/"
+#Hwget="http://gcadmin-10049437.file.myqcloud.com/"
+Hwget="http://gcadmin-10049437.cos.myqcloud.com/"
+
+# ----------------------------------------------------------------------------------
+# network checking 
+# crontab setting
+# ----------------------------------------------------------------------------------
+
+for i in `echo $Hs_codes`; do
+
+    # ssh way for server code $i
+    Hsshmac=`/root/imode/gc_sc_sshmac "$i"`
+
+    #
+    if ! /root/imode/gc_sshmac_ok "$Hsshmac"; then
+       /root/mode/modemsg gc_dp "Connection to '$i' failed"
+       /root/mode/modemsg gc_dp "Automatic deployment will not continue" more
+       exit 1
+    fi
+    if ! /root/imode/gc_sshmac_ok "$Hsshmac" 1; then
+       /root/mode/modemsg gc_dp "Server '$i' is unable to connect to internet"
+       /root/mode/modemsg gc_dp "Automatic deployment will not continue" more
+       exit 1
+    fi
+
+    # set crontab modedtask
+
+    echo "mkdir -p /etc/modetsk/dp" | eval $Hsshmac
+    echo "cat /etc/crontab | grep -E '^[^#].*root /root/mode/modedtask' >/dev/null || echo '*/1 * * * * root /root/mode/modedtask' >> /etc/crontab"  | eval $Hsshmac
+
+done
+
+# confirmation
+
+echo
+echo "=================================================================="
+echo "Server group code        : $Hsg_code"
+echo "server group description : $Hsg_des "
+echo "planned deploy time      : $Hsg_time"
+Hltag=
+for i in `echo $Hsg_prov2`;do
+    if [ -z "$Hltag" ]; then
+       Hltag=1
+       echo "products                 : $i" 
+    else
+       echo "                         : $i"
+    fi
+done
+/root/mode/confirm "Are you sure to use the above information to do deployment" more || exit 1
+
+# ------------------------------------------------------------------------
+# loop for each server code
+# ------------------------------------------------------------------------
+
+Hs_codes_net=
+for i in `echo $Hs_codes`; do
+
+    # ssh way for server code $i 
+
+    Hsshmac=`/root/imode/gc_sc_sshmac "$i"`
+    Holdsta=`/root/imode/gc_set_dp '' "$Hsshmac"`
+ 
+    #
+
+    if ! echo "$Holdsta" | grep -E "^(init|deploy-completed|send-completed)#" >/dev/null; then
+       continue
+    fi
+
+    # apps already deployed in server code $i 
+
+    Hs_apps=`/root/mode/seecfg -s "SELECT distinct c.apps
+                                   FROM   gc_server_group_info b,
+                                          gc_servers_info c
+                                   WHERE  b.server_code='$i' and b.server_code=c.server_code" gc_admin | grep -Ev "\(ipms ipms1\)"`
+    Hs_apps=`echo $Hs_apps | sed -re "s/ /\n/g" | sort | uniq | grep -E "^(ipms|ipmsthef|ipmsthek|ipmsgroup|ipmsmember|ipmssync|mobilepms|pos)$"`
+    if echo "$Hs_apps" | grep -E "^ipms(thef|thek|group|member)$" >/dev/null; then
+       Hs_apps=`echo -e "${Hs_apps}\nsql"`
+    fi
+
+    # get the intersection of "$Hsg_prov2" and "$Hs_apps"
+
+    Hinterset=$(/root/imode/gc_and "$Hs_apps" "`echo \"$Hsg_prov2\" | sed -re 's/.*:(.*)\.war/\1/'`")
+    if [ -z "$Hinterset" ]; then
+       # reset 
+       echo "rm -f /etc/modetsk/dp/*" | eval $Hsshmac
+       continue
+    fi
+    Hinterset_war=`echo "$Hsg_prov2" | grep -E ".*:(\`echo $Hinterset | sed -re 's/ /\|/g'\`)\.war$" | sed -re "s/:/\//g"`
+
+    #
+
+    if echo "$Holdsta" | grep -E "^(deploy-completed)#" >/dev/null; then
+       Holdtime=`echo "cat /etc/modetsk/dp/dp.conf 2>/dev/null  | grep -E '^time=' | sed -re 's/.*=(.*)/\1/'" | eval $Hsshmac`
+       Holdwars=`echo "cat /etc/modetsk/dp/dpfiles 2>/dev/null" | eval $Hsshmac`
+       if [ "$Holdtime" = "$Hsg_time" -a "$Holdwars" = "$Hinterset_war" ]; then
+          continue
+       fi
+    fi
+
+    # syncronize time and clear old deploy information
+    
+    echo "date `date +%m%d%H%M%Y.%S` >/dev/null;/sbin/hwclock -w;rm -f /etc/modetsk/dp/*" | eval $Hsshmac
+
+    # send wars to download,url and deploy time to remote server $i
+
+    echo "$Hinterset_war" |
+    sed -re "s/^/echo /" -e "s/$/ >> \/etc\/modetsk\/dp\/dpfiles/" | 
+    sed -re "1 i > \/etc\/modetsk\/dp\/dpfiles" |
+    sed -re "1 i echo url=$Hwget > /etc/modetsk/dp/dp.conf;echo time=$Hsg_time >>/etc/modetsk/dp/dp.conf" |
+    eval $Hsshmac
+
+    /root/imode/gc_set_dp 'send-completed' "$Hsshmac" >/dev/null
+    Hs_codes_net=`echo -e "$Hs_codes_net\n$i"`
+done
+for i in `echo $Hs_codes_net`; do
+    # ssh way for server code $i 
+    Hsshmac=`/root/imode/gc_sc_sshmac "$i"`
+    /root/imode/gc_set_dp 'send-all-completed' "$Hsshmac" >/dev/null
+done
+
+# end
+

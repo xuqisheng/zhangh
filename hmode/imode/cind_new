@@ -1,0 +1,45 @@
+#!/bin/bash
+# ------------------------------------------------------------------------------------------
+# function:
+#          generate script to create index using pt
+# usages  :
+#          ./cind_new <MySQL-server-addr> <patten> <MySQL-server-db>
+# e.g.    :
+#          ./cind_new localhost "doorcard_log:hotel_group_id,hotel_id,biz_date" portal_f_pms
+# ------------------------------------------------------------------------------------------
+
+#
+
+[ -z "$1" ] && exit 1
+[ -z "$2" ] && exit 1
+[ -z "$3" ] && exit 1
+
+#
+
+Hip="$1"
+Hpt="$2"
+Hdb="$3"
+
+#
+
+Hpt=`echo $Hpt | tr "A-Z" "a-z" | sed -re "s/ //g"`
+Hext=`echo $Hpt | sed -re "s/(.*)::(.*)/\2/"`
+if [ "$Hext" != "$Hpt" ]; then
+   Hpt=`echo $Hpt | sed -re "s/(.*)::(.*)/\1/"`
+else
+   Hext=
+fi
+
+#
+
+Htab=`echo $Hpt | sed -re "s/(.*):(.*)/\1/"`
+Hind=`echo $Hpt | sed -re "s/(.*):(.*)/\2/"`
+Hcol=`echo $Hind | sed -r -e "s/,/\]\[/g" -e "s/^/\[/" -e "s/$/\]/" -e "s/\[/\[$Htab\./g"`
+Hindn=`echo $Hind | sed -re "s/,/_/g" | sed -re "s/hotel_group_id/gid/g" | sed -re "s/hotel_id/hid/g"`
+
+#
+
+echo "/root/mode/testobjects $Hip \"$Hcol[#$Htab:$Hind]$Hext\" \"$Hdb\" && /root/mode/ptmode $Hip --e --alter=\"add index imi_$Hindn($Hind)\" D=\"$Hdb\",t=\"$Htab\""
+
+#
+

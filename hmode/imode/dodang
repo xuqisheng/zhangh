@@ -1,0 +1,14 @@
+##
+. /root/imode/cfg/.imode_aliases
+#
+for i in `cat /root/danger.txt | grep -v "^#" | grep -E "^${1:-.*}$"`; do
+
+   echo
+   echo " ========================================= server $i ======================================== "
+   echo
+   #ssh $i "/root/mode/.do1au 2>/dev/null | grep gc >/dev/null || echo danger"
+
+
+
+done
+

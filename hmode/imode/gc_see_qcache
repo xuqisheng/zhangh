@@ -1,0 +1,17 @@
+#!/bin/bash 
+
+if /root/mode/seecfg localhost &>/dev/null; then
+   Hparms=`/root/mode/seecfg -s localhost 'show global status' | grep -E '(Qcache_hits|Qcache_inserts|Qcache_lowmem_prunes)'`
+   Hhit=`echo "$Hparms" | grep -E Qcache_hits    | awk '{print $2}'`
+   Hins=`echo "$Hparms" | grep -E Qcache_inserts | awk '{print $2}'`
+   Hpru=`echo "$Hparms" | grep -E Qcache_lowmem_prunes | awk '{print $2}'`
+   if [ $Hins -gt 0 ]; then
+      echo "Hins:$Hins"
+      echo "Hits:$Hhit"
+      echo "Hpru:$Hpru"
+      echo "perc1:`echo \"$Hpru*100/$Hins\" | bc -l`"
+      echo "perc2:`echo \"$Hhit*100/$Hins\" | bc -l`"
+   fi
+fi
+
+

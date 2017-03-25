@@ -1,0 +1,29 @@
+#!/bin/bash
+
+. /root/mode/mysqldip 
+
+if [ -n "$1" ]; then
+   HDBNAME="$1"
+else
+   HDBNAME=`cat /root/antDep/build.properties 2>/dev/null | tr -d "\r" | grep -E "^db\.name=" | sed -re "s/.*=(.*)/\1/"`
+   [ -z "$HDBNAME" ] && exit 1
+fi
+
+#
+
+echo
+echo "============ yet to audit hotel information of $HDBNAME at $HMYSQLDIP2 ==========="
+echo
+
+#
+
+/root/mode/seecfg $HMYSQLDIP \
+"select hotel_group_id,(select b.code from hotel_group b where b.id=hotel.hotel_group_id) as hotel_group_code,id as hotel_id,code hotel_code,
+        descript hotel_descript,(select min(c.biz_date) from audit_flag c where c.hotel_group_id=hotel.hotel_group_id and c.hotel_id=hotel.id ) as biz_date
+        from hotel
+        where (select min(c.biz_date) from audit_flag c where c.hotel_group_id=hotel.hotel_group_id and c.hotel_id=hotel.id ) < date(now())
+        order by hotel_group_id,id" $HDBNAME
+
+# end
+
+

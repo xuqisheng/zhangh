@@ -1,0 +1,13 @@
+##
+. /root/imode/cfg/.imode_aliases
+#
+for i in `cat /root/bad.txt | grep -v "^#" | grep -E "^${1:-.*}$"`; do
+
+   echo
+   echo " ========================================= server $i ======================================== "
+   echo
+
+   ssh $i "echo ok"
+
+done
+

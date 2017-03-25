@@ -1,0 +1,7 @@
+#!/bin/bash 
+
+cat /root/gc_err.txt | 
+while read -r Hs;do
+   cat /etc/hosts | grep -P " $Hs( |\t|$)" | grep -v '^#' |  sed -re "s/^([^ \t]+).*/\1/"
+done
+

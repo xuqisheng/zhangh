@@ -1,0 +1,6 @@
+#!/bin/bash 
+
+cat /lcrel | tr '\r' '\n' > /lcrel.log
+cat /lcrel.log | grep 'lost co' | wc -l
+
+

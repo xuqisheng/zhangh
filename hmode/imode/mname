@@ -1,0 +1,25 @@
+#!/bin/bash
+
+[ -z "$1" ] && exit 1
+
+# check file existence
+
+if [ ! -f "$1" ]; then
+   /root/mode/modemsg cind "File $1 doesn't exists!" 
+   exit 1
+fi
+
+#
+
+cat $1 |
+while read i; do
+   if [ -z "$i" ]; then
+      continue
+   fi
+   i=`echo $i | sed -re "s/ //g"`
+   echo $i
+   HTAB=`echo $i | sed -re "s/(.*):(.*)/\1/"`
+   HCOL=`echo $i | sed -re "s/(.*):(.*)/\2/"`
+   /root/mode/mod_fldname 6.15 portal15 $HTAB $HCOL
+done
+

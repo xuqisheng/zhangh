@@ -1,0 +1,83 @@
+#!/bin/bash 
+
+
+# get options
+
+HOPTIONS=""
+while (echo "'$1'"  | grep -E  -e "^'-" > /dev/null)
+do
+   HOPTIONS="$HOPTIONS$1"
+   shift
+done
+
+#
+
+Hpmdir=/hgdir
+mkdir -p $Hpmdir
+
+#
+
+Hctype=
+if [ -z "$1" ]; then
+   # if called from crond
+   if [ `/root/mode/traceps "crond"` = 'suc' ]; then
+      . /root/.bashrc 2>/dev/null
+      export HBLACKBOX2=1
+   else
+      /root/mode/confirm "Are you sure to fetch hotel and hotel_group information of all server group codes" more || exit 1
+   fi
+   Hlines=`/root/mode/seecfg -s "select b.server_code from gc_server_group_info b
+                                                       order by b.server_group_code,b.server_code" gc_admin` 
+else 
+   if echo "'$HOPTIONS" | grep -E -e "(-h)(-|$)" >/dev/null; then
+      # ssh code
+      Hctype=ssh
+      Hlines="$1"
+   else
+      Hlines=`/root/mode/seecfg -s "select b.server_code from gc_server_group_info b 
+                                                         where b.server_group_code = '$1'" gc_admin` 
+   fi
+fi
+
+#
+
+for i in `echo $Hlines`; do
+   if [ "$Hctype" = "ssh" ]; then
+      Hsc=`/root/imode/gc_sshc_sc "$i"`
+      j="$i"
+   else
+      Hsc=$i
+      j=`/root/imode/gc_sc_sshc "$i"`
+   fi
+   Hsshmac=`/root/imode/gc_sshc_sshmac "$j"`
+   Hsgc=`/root/imode/gc_sc_sgc "$Hsc"`
+   if [ -z "$Hsshmac" -o  -z "$Hsgc" ]; then
+      continue
+   fi
+   if ! /root/imode/gc_sshmac_ok "$Hsshmac"; then
+      continue
+   fi
+   echo 
+   echo "===== [ sgc ]: $Hsgc [ sshc ]: $j [ sc ]: $Hsc =====" >&2
+   Hdbs=`cat /root/imode/.colldata_db | eval $Hsshmac`
+   if [ -z "$Hdbs" ]; then
+      continue
+   fi
+   Hdbs=`echo "$Hdbs" | sort | uniq`
+   Honlyone=
+   if [ `echo "$Hdbs" | wc -l` -eq 1 ]; then
+      Honlyone=1
+   fi 
+   for i1 in `echo $Hdbs`;do
+       Hip=`echo $i1 | sed -re "s/(.*):(.*)/\1/"`
+       Hdb=`echo $i1 | sed -re "s/(.*):(.*)/\2/"`
+       echo '-----' Hip Hdb $Hip $Hdb
+
+       Htxt=`echo "/root/mode/seecfg -s $Hip 'select a.code as hotel_code,b.code as hotel_group_code from hotel a,hotel_group b where a.hotel_group_id=b.id' $Hdb" | eval $Hsshmac`
+       echo "$Htxt" >> $Hpmdir/codes.txt
+   done
+done
+
+#
+
+

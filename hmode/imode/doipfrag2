@@ -1,0 +1,32 @@
+#
+. /root/imode/cfg/.imode_aliases
+#
+trap "rm -f /root/mode/tmp/ipfrag$$.tmp;exit" INT
+for i in `cat /root/ipfrag.txt | grep -v "^#" | grep -E "^${1:-.*}$"`; do
+
+   echo
+   echo " ========================================= server $i ======================================== "
+   echo
+   ssh $i "netstat -s" > /root/mode/tmp/ipfrag$$.tmp 
+   rm -fR /ipfrag/$i
+   mkdir -p /ipfrag/$i
+
+   {
+   cat /root/mode/tmp/ipfrag$$.tmp | sed -n '1,/Icmp/ p' | sed -re '$ d' |
+   grep -E "(reassemblies required)"
+   } > /ipfrag/$i/new$$
+
+   [ -f /ipfrag/$i/old ] || touch /ipfrag/$i/old
+
+   if cmp /ipfrag/$i/old /ipfrag/$i/new$$; then
+      rm -f /ipfrag/$i/new$$
+   else
+      cp -p /ipfrag/$i/new$$ /ipfrag/$i/old 
+      mv /ipfrag/$i/new$$    /ipfrag/$i/back`date +%Y%m%d-%H:%M:%S`
+   fi
+   if [ `ls -1 /ipfrag/$i/* 2>/dev/null | wc -l` -le 1 ]; then
+      rm -fR /ipfrag/$i
+   fi
+   rm -f /root/mode/tmp/ipfrag$$.tmp
+
+done 

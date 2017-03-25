@@ -1,0 +1,10 @@
+#
+. /root/imode/cfg/.imode_aliases
+#
+cd /idumps/
+for i in `ls -d *`; do
+   HDB=`echo db_$i | sed -re "s/\./_/g"`
+   echo "create database $HDB"
+   /root/mode/seecfg "create database if not exists \`$HDB\` character set utf8"
+   /root/mode/mload  $HDB `ls -1 /idumps/$i/*tar.gz|sed -n "$ p"`   
+done

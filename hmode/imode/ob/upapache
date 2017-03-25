@@ -1,0 +1,21 @@
+#
+. /root/imode/cfg/.imode_aliases
+#
+for i in `cat /root/servers.txt | grep -v "^#" | grep -E "^${1:-.*}$"`; do
+   Huname=`ssh $i "uname -a"`
+   Huname=`echo "$Huname" | sed -re "s/(^[^ ]+ )[^ ]+ (.*)/\1\2/"`
+
+#   2.6.18-164.el5 x86_64
+
+#   if echo "$Huname" | grep "2.6.18-164.el5 .*x86_64" >/dev/null; then
+#      echo $i
+#   fi
+
+#   2.6.18-308.el5 x86_64
+
+   if echo "$Huname" | grep "2.6.18-308.*x86_64" | grep -v "164" >/dev/null; then
+      echo $Huname
+      echo $i
+   fi
+
+done

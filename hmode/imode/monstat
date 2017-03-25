@@ -1,0 +1,7 @@
+##
+. /root/imode/cfg/.imode_aliases
+#
+for i in `cat /root/servers.txt | grep -v "^#" | grep -E "^${1:-.*}$"`; do
+    echo " ========================================= server $i ======================================== "
+    ssh $i "/root/mode/jvstat"
+done | tee /stat

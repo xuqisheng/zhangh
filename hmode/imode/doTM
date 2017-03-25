@@ -1,0 +1,15 @@
+##
+. /root/imode/cfg/.imode_aliases
+#
+for i in `cat /root/tm.txt | grep -v "^#" | grep -E "^${1:-.*}$"`; do
+
+   echo
+   echo " ========================================= server $i ======================================== "
+   echo
+   #ssh $i "ss -s" | grep TCP
+   ssh $i "/root/mode/eval_app -ll"
+   #ssh $i "/root/mode/jvstat"
+   #ssh $i "ss -ant | grep SYN-REC"
+   #Ha=$?
+   #echo $Ha
+done

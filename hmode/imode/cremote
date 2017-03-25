@@ -1,0 +1,17 @@
+#!/bin/bash 
+
+find -L /usr/local -name remoteip.properties |
+while read -r Hre; do
+   Hserveradd=/root/antDep/server.add
+   cat $Hserveradd 2>/dev/null | grep "=" | sed -re "s/^([ \t]+)//" | sed -re "s/([ \t]+)$//" |
+   while read -r Hipport; do
+      Hlpart=`echo $Hipport | sed -re "s/(.*)=(.*)/\1/"`
+      Hrpart=`echo $Hipport | sed -re "s/(.*)=(.*)/\2/"`
+      cat $Hre |
+      sed -re "s/^($Hlpart.*=http:\/\/)(.*)(\/.*)/\1$Hrpart\3/" >/root/mode/tmp/f$$.tmp
+      cp -f /root/mode/tmp/f$$.tmp $Hre
+   done
+done
+rm -f /root/mode/tmp/f$$.tmp
+
+#

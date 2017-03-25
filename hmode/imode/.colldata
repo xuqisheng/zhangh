@@ -1,0 +1,43 @@
+#!/bin/bash 
+# ---------------------------------------------------------------------------------------------------------------------------------------------------------------
+# function:
+# ----------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+
+Hsid=`/root/mode/.modesid`
+Hsapache=
+/root/mode/seetom | 
+while read -r Hc1 Hc2 Hcother;do
+   #
+   if ! echo "$Hcother" | grep -E "ipms" | grep -v "ipmssync" >/dev/null; then
+      continue
+   fi
+   #
+   if echo $Hc1 | grep -E "^[sS]ingle$" >/dev/null; then
+      Hsapache=
+      Hat=$Hc2
+   else
+      if [ "$Hsapache" = "$Hc1" ]; then
+          continue
+      fi
+      Hsapache=$Hc1
+      Hat=$Hc1
+   fi
+   if echo "$Hat" | grep -E "^apache" >/dev/null; then
+      Hat1=`echo $Hat | sed -re "s/^apache(.*)/build\1.properties/"`
+   else
+      Hat1="$Hat.properties"
+   fi
+   Hdbip=`/root/mode/mod_config /root/antDep/$Hat1 'db.root' '#Get#' 2>/dev/null`
+   Hdbname=`/root/mode/mod_config /root/antDep/$Hat1 'db.name' '#Get#' 2>/dev/null`
+   if /root/mode/testobjects $Hdbip "[#sync_ip]" $Hdbname; then
+      /root/mode/seecfg -s $Hdbip "select 'danku','$Hsid','$Hat',a.code,b.code,'' from hotel a,hotel_group b where a.hotel_group_id=b.id" $Hdbname
+   else
+      /root/mode/seecfg -s $Hdbip "select 'fenku','$Hsid','$Hat',a.code,a.descript,b.server_ip from hotel a,sync_ip b where a.server_name=b.server_name" $Hdbname 
+   fi
+
+done
+ 
+#
+
+

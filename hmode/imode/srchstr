@@ -1,0 +1,22 @@
+#!/bin/bash
+# ----------------------------------------------------------------------------
+# function:
+#          search a directory for certain type of files matching given pattern 
+# ----------------------------------------------------------------------------
+
+Htype=${1:-sql}
+Hpat=${2:-each}
+Hdir=${3:-/root/wflcz/export/database}
+
+[ ! -d "$Hdir" ] && exit
+
+find $Hdir -name "*.$Htype" | sort |
+while read i; do
+   if cat "$i" | grep -E -i "$Hpat" >/dev/null; then
+      echo
+      echo "---- $i ----"
+      echo
+      cat "$i" | grep -E -i -A 5 "$Hpat"
+   fi
+done
+

@@ -1,0 +1,28 @@
+#!/bin/bash 
+
+# 
+
+exit
+
+#
+
+Hpublish_id=`/root/mode/seecfg -s "select replace(uuid(),'-','')" gc_admin`
+
+# gc_deploy_sgroup_master 
+
+/root/mode/seecfg "delete from gc_deploy_sgroup_master" gc_admin
+/root/mode/seecfg "insert gc_deploy_sgroup_master select replace(uuid(),'-',''),'$Hpublish_id','gc628','2016-12-14 09:02:00','C','何仁尧','hry',now(),null,null,null" gc_admin
+
+# gc_deploy_sgroup_detail
+
+/root/mode/seecfg "delete from gc_deploy_sgroup_detail" gc_admin
+#/root/mode/seecfg "insert gc_deploy_sgroup_detail select replace(uuid(),'-',''),'$Hpublish_id','fenku','2.08.01'" gc_admin
+/root/mode/seecfg "insert gc_deploy_sgroup_detail select replace(uuid(),'-',''),'$Hpublish_id','pos','2.2.0'" gc_admin
+/root/mode/seecfg "insert gc_deploy_sgroup_detail select replace(uuid(),'-',''),'$Hpublish_id','mobilepms','2.04.12'" gc_admin
+
+
+# gc_deploy_server_info
+
+/root/mode/seecfg "delete from gc_deploy_server_info" gc_admin
+
+#

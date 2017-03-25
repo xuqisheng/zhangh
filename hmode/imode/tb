@@ -1,0 +1,11 @@
+#!/bin/bash
+
+exit
+Hip="$1"
+[ -z "$Hip" ] && exit 1
+Hip=`echo $Hip | sed -re 's/\./\\\./g'`
+mysqldump -uroot -pdeviskaifa -hlocalhost portal bill_template > /tb.sql
+cat /tb.sql | sed -re "s/($Hip)\//\1:8090\//g" > /htb$$.tmp
+mv -f  /htb$$.tmp /tb.sql
+/root/mode/seecfg /tb.sql portal
+/root/mode/seecfg /tb.sql portal_tr

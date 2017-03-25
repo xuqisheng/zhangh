@@ -1,0 +1,74 @@
+#
+. /root/imode/cfg/.imode_aliases
+#
+# -------------------------------------------------
+# set hotel/group code for $HDBNAME
+#              -- writen for wfl ------------------
+# -------------------------------------------------
+
+. /root/mode/mysqldip
+
+# filter 
+
+
+if ! echo $HMYSQLDIP | grep -E "^192\.168\.([06]\.(11|13|14|15|25|27|100|231|106|89|104)|1\.40)$" >/dev/null; then
+   /root/mode/modemsg setcode "IP not allowed!!"
+   exit 1
+fi
+
+# deal with parms
+
+if echo "$1" | grep -E "^portal_" > /dev/null; then
+   Hp1=$1
+   Hp2=$2
+elif echo "$2" | grep -E "^portal_" > /dev/null; then
+   Hp1=$2
+   Hp2=$1
+elif [ -n "$1" ]; then
+   Hp1=$2
+   Hp2=$1
+elif [ -n "$2" ]; then
+   Hp1=$1
+   Hp2=$2
+else
+   Hp1=$1
+   Hp2=$2
+fi
+
+
+# dbname for which to set code
+
+if [ -n "$Hp1" ]; then
+   HDBNAME="$Hp1"
+else
+   if /root/mode/getips | grep -E "^$HMYSQLDIP$" >/dev/null && [ -f /root/antDep/build.properties ]; then
+      HDBNAME=`cat /root/antDep/build.properties | tr -d "\r" | grep -E "^db\.name=" | sed -re "s/.*=(.*)/\1/"`
+   else
+      /root/mode/modemsg setcode "Database name not provided"
+      exit 1 
+   fi
+fi
+
+# code name prefix 
+
+if [ -n "$Hp2" ]; then
+   Hname=`echo "$Hp2" | tr "a-z" "A-Z"`
+else
+   Hname=M`echo $HMYSQLDIP | sed -re "s/.*\.([0-9]+)\.([0-9]+)/\1\2/"`
+fi
+
+#
+
+cat > /root/mode/tmp/hsetcode$$.sql << EOF
+UPDATE hotel_group SET CODE=CONCAT('${Hname}G',TRIM(CONVERT(id, CHAR(10)))),
+                       descript=CONCAT('${Hname}G',TRIM(CONVERT(id, CHAR(10)))),
+                       descript_en=CONCAT('${Hname}G',TRIM(CONVERT(id, CHAR(10))),'_en'),
+                       descript_short=CONCAT('${Hname}G',TRIM(CONVERT(id, CHAR(10))));
+UPDATE hotel       SET CODE=CONCAT('${Hname}H',TRIM(CONVERT(id, CHAR(10)))),
+                       descript=CONCAT('${Hname}H',TRIM(CONVERT(id, CHAR(10)))),
+		       descript_en=CONCAT('${Hname}H',TRIM(CONVERT(id, CHAR(10))),'_en'),
+                       descript_short=CONCAT('${Hname}H',TRIM(CONVERT(id, CHAR(10))));
+EOF
+/root/mode/seecfg $HMYSQLDIP /root/mode/tmp/hsetcode$$.sql $HDBNAME
+rm -f /root/mode/tmp/hsetcode$$.sql
+/root/imode/seecode $HMYSQLDIP $HDBNAME

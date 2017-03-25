@@ -1,0 +1,8 @@
+for i in `cat /root/servers.txt | grep -v "^#" | grep -E "^${1:-.*}$"`; do
+   echo
+   echo " ========================================= server $i ======================================== "
+   echo
+   scp /root/packages/tomcat-connectors-1.2.37-src.tar.gz $i:/root/packages
+   scp /root/packages/httpd-2.2.31.tar.bz2 $i:/root/packages
+   scp /root/imode/update_apache $i:/
+done

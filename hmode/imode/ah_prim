@@ -1,0 +1,34 @@
+#!/bin/bash 
+
+#
+
+if [ `/root/mode/.pt_stat` != 'installed-ok' ]; then
+   exit 1
+fi
+
+#
+
+if /root/mode/testobjects ##IP## '[account_history][account_history:keymi_id=id][#account_history:primarykey=id]' ##DB##; then
+  Hdupcheck=`/root/mode/seecfg -s ##IP## "select id,count(1) cnt from account_history group by id having cnt>1" ##DB##`
+  if [ -z "$Hdupcheck" ]; then
+     /root/mode/ptmode ##IP## --e --chunk-index=mi_id --alter "add primary key(id)" D=##DB##,t=account_history
+     /root/mode/dupndx1 -d ##IP## ##DB## account_history
+  fi
+fi
+if /root/mode/testobjects ##IP## '[account_history][account_history:keyimi_id=id][#account_history:primarykey=id]' ##DB##; then
+  Hdupcheck=`/root/mode/seecfg -s ##IP## "select id,count(1) cnt from account_history group by id having cnt>1" ##DB##`
+  if [ -z "$Hdupcheck" ]; then
+     /root/mode/ptmode ##IP## --e --chunk-index=imi_id --alter "add primary key(id)" D=##DB##,t=account_history
+     /root/mode/dupndx1 -d ##IP## ##DB## account_history
+  fi
+fi
+if /root/mode/testobjects ##IP## '[account_history][account_history:keyindex_id=id][#account_history:primarykey=id]' ##DB##; then
+  Hdupcheck=`/root/mode/seecfg -s ##IP## "select id,count(1) cnt from account_history group by id having cnt>1" ##DB##`
+  if [ -z "$Hdupcheck" ]; then
+     /root/mode/ptmode ##IP## --e --chunk-index=index_id --alter "add primary key(id)" D=##DB##,t=account_history
+     /root/mode/dupndx1 -d ##IP## ##DB## account_history
+  fi
+fi
+
+#
+

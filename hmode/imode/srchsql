@@ -1,0 +1,23 @@
+#
+. /root/imode/cfg/.imode_aliases
+#
+# -------------------------------------------------------------------
+# function:
+#          search a directory for sql files matching given patterns 
+# -------------------------------------------------------------------
+
+Hpat=${1:-each}
+Hdir=${2:-/root/wflcz/export/database}
+
+[ ! -d "$Hdir" ] && exit
+
+find $Hdir -name "*.sql" | sort |
+while read i; do
+   if cat "$i" | grep -E -i "$Hpat" >/dev/null; then
+      echo
+      echo "---- $i ----"
+      echo
+      cat "$i" | grep -E -i -A 5 "$Hpat"
+   fi
+done
+

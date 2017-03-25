@@ -1,0 +1,19 @@
+##
+. /root/imode/cfg/.imode_aliases
+#
+for i in `cat /root/servers.txt | grep -v "^#" | grep -E "^${1:-.*}$"`; do
+   echo
+   echo " ========================================= server $i ======================================== "
+   echo
+   Hmth=`ssh $i "/root/mode/seecfg -s 'show global status'" | grep -i '^threads_c' | sed -re 's/^[^ \t]+[ \t]+(.*)/\1/'`
+#   Htca=`ssh $i "/root/mode/seecfg -s 'show variables'" | grep -i '^thread_cache_size' | sed -re 's/^[^ \t]+[ \t]+(.*)/\1/'`
+#   Hmax=`ssh $i "/root/mode/seecfg -s 'show variables'" | grep -i '^max_connections' | sed -re 's/^[^ \t]+[ \t]+(.*)/\1/'`
+   if [ `echo "$Hmth" | wc -l` -eq 3 ]; then
+      H1=`echo "$Hmth" | sed -n '1 p'`
+      H2=`echo "$Hmth" | sed -n '2 p'`
+      H3=`echo "$Hmth" | sed -n '3 p'`
+      if [ $[$H1+$H2] -ne $H3 ]; then
+         echo "$i       Threads_created:$H3  Threads_connected:$H2  Threads_cached:$H1"
+      fi
+   fi
+done

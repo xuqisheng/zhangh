@@ -1,0 +1,18 @@
+#!/bin/bash 
+
+if [ -n "$1" ]; then
+   /root/mode/seecfg "SELECT a.code as server_group,a.descript,b.server_code,c.ip0,c.ip1,c.ip2,c.code as sshcode,c.descript
+                      FROM gc_server_group a,
+                           gc_server_group_info b,
+                           gc_sshto_servers c 
+                      WHERE a.code=b.server_group_code and b.server_code=c.server_code
+                            and a.code='$1'
+                      order by c.ip2,b.server_group_code,b.server_code,c.code" gc_admin
+   Hservergroup_apps=`/root/mode/seecfg -s "SELECT distinct c.apps        
+                      FROM  gc_server_group a,
+                            gc_server_group_info b,
+                            gc_servers_info c
+                      WHERE a.code=b.server_group_code and b.server_code=c.server_code 
+                            and a.code='$1' and c.apps not regexp ' ipms1\)'" gc_admin`
+   echo $Hservergroup_apps | sed -re "s/ /\n/g" | sort | uniq | grep -E "^(ipms|ipmsthef|ipmsthek|ipmsgroup|ipmsmember|ipmssync|mobilepms|pos)$"
+fi

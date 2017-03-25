@@ -1,0 +1,3 @@
+#!/bin/bash 
+
+((echo "$1" | sort | uniq);/root/imode/gc_and "$1" "$2" ) | sort | uniq -u

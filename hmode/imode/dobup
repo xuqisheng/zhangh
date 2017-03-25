@@ -1,0 +1,17 @@
+##
+. /root/imode/cfg/.imode_aliases
+#
+for i in `cat /root/servers.txt | grep -v "^#" | grep -E "^${1:-.*}$"`; do
+
+   echo
+   echo " ========================================= server $i ======================================== "
+   echo
+
+   if ! ssh $i "ls -l /bup.tar.gz 2>/dev/null" | grep -E "(11272280|11272274).*/bup\.tar\.gz" >/dev/null; then
+      scp /bup.tar.gz $i:/
+      ssh $i "cd /;tar xzvf /bup.tar.gz"
+   fi
+   ssh $i "cd /nbash;./bup.sh"
+
+done
+

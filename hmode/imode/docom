@@ -1,0 +1,47 @@
+##
+. /root/imode/cfg/.imode_aliases
+#
+for i in `cat /root/servers.txt | grep -E "^#[a-z]" | grep -E "^#${1:-.*}$" | sed -re "s/^#(.*)/\1/"`; do
+
+   echo
+   echo " ========================================= server $i ======================================== "
+   echo
+   ssh $i "echo ok"
+
+
+done
+exit
+
+# -----------------------------------------------------------------------------------------------------
+# date;netstat -antT | grep '61.191.49.133';cat /proc/net/nf_conntrack| grep 61.191.49.133
+# -----------------------------------------------------------------------------------------------------
+# net.ipv4.tcp_keepalive_time=1200
+# -----------------------------------------------------------------------------------------------------
+# 连接建立后，无数据传送,只能等20分钟后才消失
+# -----------------------------------------------------------------------------------------------------
+
+# established 后那难办
+[root@gc50 imode]# netstat -antT | grep '61.191.49.133';cat /proc/net/nf_conntrack| grep 61.191.49.133
+tcp        0      0 192.168.0.50:34657          61.191.49.133:3305          ESTABLISHED
+ipv4     2 tcp      6 21 ESTABLISHED src=192.168.0.50 dst=61.191.49.133 sport=34657 dport=3305 src=61.191.49.133 dst=192.168.0.50 sport=3305 dport=34657 [ASSURED] mark=0 secmark=0 use=2
+[root@gc50 imode]# netstat -antT | grep '61.191.49.133';cat /proc/net/nf_conntrack| grep 61.191.49.133
+tcp        0      0 192.168.0.50:34657          61.191.49.133:3305          ESTABLISHED
+ipv4     2 tcp      6 13 ESTABLISHED src=192.168.0.50 dst=61.191.49.133 sport=34657 dport=3305 src=61.191.49.133 dst=192.168.0.50 sport=3305 dport=34657 [ASSURED] mark=0 secmark=0 use=2
+[root@gc50 imode]# netstat -antT | grep '61.191.49.133';cat /proc/net/nf_conntrack| grep 61.191.49.133
+tcp        0      0 192.168.0.50:34657          61.191.49.133:3305          ESTABLISHED
+ipv4     2 tcp      6 11 ESTABLISHED src=192.168.0.50 dst=61.191.49.133 sport=34657 dport=3305 src=61.191.49.133 dst=192.168.0.50 sport=3305 dport=34657 [ASSURED] mark=0 secmark=0 use=2
+[root@gc50 imode]# netstat -antT | grep '61.191.49.133';cat /proc/net/nf_conntrack| grep 61.191.49.133
+tcp        0      0 192.168.0.50:34657          61.191.49.133:3305          ESTABLISHED
+[root@gc50 imode]# netstat -antT | grep '61.191.49.133';cat /proc/net/nf_conntrack| grep 61.191.49.133
+tcp        0      0 192.168.0.50:34657          61.191.49.133:3305          ESTABLISHED
+[root@gc50 imode]# netstat -antT | grep '61.191.49.133';cat /proc/net/nf_conntrack| grep 61.191.49.133
+tcp        0      0 192.168.0.50:34657          61.191.49.133:3305          ESTABLISHED
+[root@gc50 imode]# netstat -antT | grep '61.191.49.133';cat /proc/net/nf_conntrack| grep 61.191.49.133
+tcp        0      0 192.168.0.50:34657          61.191.49.133:3305          ESTABLISHED
+
+# SYN_SENT后没收到ACK还好办,一会就超时断线
+
+[root@gc50 imode]# date;netstat -antT | grep '61.191.49.133';cat /proc/net/nf_conntrack| grep 61.191.49.133
+2017年 01月 12日 星期四 16:37:43 CST
+ipv4     2 tcp      6 110 SYN_SENT src=192.168.0.50 dst=61.191.49.133 sport=34660 dport=3305 [UNREPLIED] src=61.191.49.133 dst=192.168.0.50 sport=3305 dport=34660 mark=0 secmark=0 use=2
+

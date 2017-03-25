@@ -1,0 +1,14 @@
+##
+. /root/imode/cfg/.imode_aliases
+#
+for i in `cat /root/servers.txt | grep -v "^#" | grep -E "^${1:-.*}$"`; do
+   echo
+   echo " ========================================= server $i ======================================== "
+   echo
+   #ssh $i "echo -n 'apache connection: ';/root/mode/gcserver | grep http | wc -l"
+   #ssh $i "echo -n 'mysql ';/root/mode/seecfg -s \"show variables\" | grep -i max_connections"
+   #ssh $i "echo -n 'mysql ';/root/mode/seecfg -s \"show status\" | grep -i max_used_connections"
+   ssh $i "/root/mode/seecfg \"show variables\" | grep -E \"(thread_concur)\""
+   #ssh $i "/root/mode/seecfg \"show variables\" | grep -E \"(tick)\""
+   #ssh $i "/root/mode/seecfg \"show status\" | grep -iE 'threads_(cached|connected|running|created)'"
+done

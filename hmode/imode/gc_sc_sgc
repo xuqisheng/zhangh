@@ -1,0 +1,24 @@
+#!/bin/bash 
+# -----------------------------------------------
+# function:
+#          get server_group_code from server_code 
+# -----------------------------------------------
+
+# server_code must not be empty
+
+if [ -z "$1" ]; then
+   exit 1
+fi
+
+# server_group_code must not be empty
+
+Hsgc=`/root/mode/seecfg -s "select server_group_code from gc_server_group_info
+                                                     where server_code='$1'" gc_admin`
+if [ -z "$Hsgc" ]; then
+   exit 1
+fi
+echo "$Hsgc"
+
+# end
+
+

@@ -1,0 +1,15 @@
+#!/bin/bash 
+
+#
+
+Hsshcs=`/root/mode/seecfg -s "select code from gc_sshto_servers where code regexp '^$1' order by code" gc_admin`
+
+for i in `echo $Hsshcs`; do
+   Hsshmac=`/root/imode/gc_sshc_sshmac $i`
+   #echo "echo $i;ss -s | grep -E 'TCP:'" | eval $Hsshmac
+   echo "echo;echo $i;echo \" Cpu cores:\`/root/mode/cpucores\`\";uptime | sed -re 's/.*(load.*)/ \1/'" | eval $Hsshmac
+done
+
+#
+
+

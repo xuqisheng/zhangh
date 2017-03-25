@@ -1,0 +1,15 @@
+##
+. /root/imode/cfg/.imode_aliases
+#
+for i in `cat /root/servers.txt | grep -v "^#" | grep -E "^${1:-.*}$"`; do
+
+   echo
+   echo " ========================================= server $i ======================================== "
+   echo
+   cat /root/imode/chktom | ssh $i "cat - | bash"
+   #echo "/root/mode/config_apaches;/root/mode/gcserver apache;/root/mode/gcserver1 apache;/root/mode/gcserver2 apache" | ssh $i "cat - | bash"
+
+
+
+done
+

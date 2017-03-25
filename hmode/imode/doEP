@@ -1,0 +1,14 @@
+##
+. /root/imode/cfg/.imode_aliases
+#
+for i in `cat /root/rel.txt | grep -v "^#" | grep -E "^${1:-.*}$"`; do
+
+   echo
+   echo " ========================================= server $i ======================================== "
+   echo
+   if ! ssh $i "ls -1 /EP 2>/dev/null" &>/dev/null; then
+      scp -Cr /EP $i:/
+   fi
+   ssh $i "cat /etc/re*re*;cd /EP;./1.sh $2"
+done
+

@@ -1,0 +1,74 @@
+#!/bin/bash 
+
+# test if apache exists
+
+if [ ! -d /usr/local/apache ]; then
+   /root/mode/modemsg update_apache "/usr/local/apache doesn't exist!"
+   exit
+fi
+
+# test if correct linux version
+
+if ! uname -a | grep "2.6.18-164.el5 .*x86_64" >/dev/null; then
+   /root/mode/modemsg update_apache "Not correct linux version!"
+   exit
+fi
+
+# check if update has done
+
+if [ -f /etc/modeupdateapache ]; then
+   /root/mode/modemsg update_apache "apache has been updated!"
+   exit
+fi
+
+# save Listen port
+
+if [ `cat /usr/local/apache/conf/httpd.conf | grep "^Listen" | wc -l` -eq 1 ]; then
+   Hlistenport=`cat /usr/local/apache/conf/httpd.conf | grep "^Listen"`
+   echo $Hlistenport >> /etc/modeupdateapache
+else
+   /root/mode/modemsg update_apache "unnormal 'Listen port' defination"
+   exit
+fi
+ 
+# save backup
+
+tar czvf /lapache.tar.gz /usr/local/apache 
+tar czvf /lhtdocs.tar.gz /usr/local/apache/htdocs 
+
+# 
+
+/usr/local/apache/bin/apachectl -k stop
+
+# 
+
+rm -fR /usr/local/apache
+
+# extract new apache
+
+cd /
+tar xzvf /apache.tar.gz
+
+# extract old htdocs
+
+cd /
+tar xzvf /lhtdocs.tar.gz
+
+# replace apache listen port
+
+/root/mode/mod_config /usr/local/apache/conf/httpd.conf "$Hlistenport"
+
+# reconfigure
+
+/root/mode/config_apache
+
+# start apache
+
+/usr/local/apache/bin/apachectl -k start
+
+# congratulation
+
+/root/mode/modemsg update_apache "update apache complete"
+
+# end
+

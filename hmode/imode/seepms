@@ -1,0 +1,8 @@
+#!/bin/bash 
+
+/root/mode/seecfg -s "show databases" | grep -Ev "^(mysql|performance_schema|information_schema)$" |
+while read -r Hdb;do
+   /root/mode/testdb $Hdb &>/dev/null && echo $Hdb
+done
+
+

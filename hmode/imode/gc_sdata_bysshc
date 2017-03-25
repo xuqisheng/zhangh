@@ -1,0 +1,27 @@
+#!/bin/bash 
+
+/root/mode/withyou $$ gc_sdata_bysshc 1 && exit
+
+#
+
+Hlines=$(
+if [ -z "$1" ];then
+   /root/mode/seecfg -s "select code from gc_sshto_servers where trim(server_code) <> ''" gc_admin 
+else
+   /root/mode/seecfg -s "select code from gc_sshto_servers where code regexp '^${1}$' and trim(server_code) <> ''" gc_admin 
+fi)
+for i in `echo $Hlines`; do
+   Hsc=`/root/imode/gc_sshc_sc $i`
+   Hsshmac=`/root/imode/gc_sshc_sshmac $i`
+   if ! /root/imode/gc_sshmac_ok "$Hsshmac"; then
+      continue
+   fi
+   cat /root/imode/.colldata1 | eval $Hsshmac > /root/mode/tmp/Htm$$.txt
+   /root/mode/seecfg "delete from gc_servers_info where server_code='$Hsc'" gc_admin
+   /root/mode/seecfg "set unique_checks=0;set foreign_key_checks=0;
+                      load data local infile '/root/mode/tmp/Htm$$.txt' into table gc_servers_info" gc_admin
+   rm -f /root/mode/tmp/Htm$$.txt
+done
+
+#
+

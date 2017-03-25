@@ -1,0 +1,8 @@
+#!/bin/bash 
+
+if [ -z "$2" ]; then
+   echo "echo C_hRy_Ok" | eval $1 2>/dev/null | grep "C_hRy_Ok" >/dev/null
+else
+   echo "/root/mode/.netok && echo C_hRy_Ok" | eval $1 2>/dev/null | grep "C_hRy_Ok" >/dev/null
+fi
+

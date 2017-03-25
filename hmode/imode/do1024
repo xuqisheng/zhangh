@@ -1,0 +1,12 @@
+##
+. /root/imode/cfg/.imode_aliases
+#
+for i in `cat /root/p1024.txt | grep -v "^#" | grep -E "^${1:-.*}$"`; do
+
+   echo
+   echo " ========================================= server $i ======================================== "
+   echo
+   ssh $i "cat /etc/re*re*;uname -a"
+   ssh $i "ulimit -a"
+   
+done

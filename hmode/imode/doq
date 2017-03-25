@@ -1,0 +1,18 @@
+##
+. /root/imode/cfg/.imode_aliases
+#
+for i in `cat /root/servers.txt | grep -v "^#" | grep -E "^${1:-.*}$"`; do
+
+   echo
+   echo " ========================================= server $i ======================================== "
+   echo
+   
+   #ssh $i "cat /usr/local/apache*/logs/access_log 2>/dev/null | wc -l | tr -d '\n';echo \" $i\""
+   ssh $i "Ha=\`ls -l /usr/local/apache*/logs/access_log 2>/dev/null | wc -l\`;
+           Hb=\`cat /usr/local/apache*/logs/access_log 2>/dev/null | wc -l\`;
+           Hc=\$[\$Hb-10000*\$Ha];[ \$Hc -lt 0 ] && Hc=0;
+           Hc=\"\$Hc                               \";
+           j=\"$i                                 \";
+           echo \"Requests: \${Hc:0:10}  Server: \${j:0:20}  Cpu: \`/root/mode/cpuinf\`\""
+done
+

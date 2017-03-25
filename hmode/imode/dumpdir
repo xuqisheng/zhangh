@@ -1,0 +1,22 @@
+#!/bin/bash
+
+Hday=`/root/mode/seecfg -s "select now()"`
+if [ -z "$Hday" ]; then
+   echo idumps
+   exit
+fi
+Hday=${Hday:0:10}
+Hday=`/root/mode/seecfg -s "select datediff('$Hday','2012-11-30')"`
+Hremain=$[$Hday%7]
+if [ $Hremain -ge 1 -a $Hremain -le 3 ]; then
+   Hdir=idumps3
+   if [ $Hremain -eq 3 ]; then
+      rm -fR /idumps/*
+   fi
+elif  [ $Hremain -ge 4 -a $Hremain -le 6 -o $Hremain -eq 0 ]; then
+   Hdir=idumps
+   if [ $Hremain -eq 0 ]; then
+      rm -fR /idumps3/*
+   fi
+fi
+echo $Hdir

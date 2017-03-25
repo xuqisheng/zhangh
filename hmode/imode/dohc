@@ -1,0 +1,35 @@
+##
+#. /root/imode/cfg/.imode_aliases
+#
+for i in `cat /root/servers.txt | grep -v "^#" | grep -E "^${1:-.*}$"`; do
+
+   echo
+   echo " ========================================= server $i ======================================== "
+   echo
+
+   Httype=
+   if ssh $i "hostname" 2>/dev/null | grep -E "^AY[0-9]{12}" >/dev/null; then
+      Httype=ali
+   else
+      Hrip=`ssh $i "echo" 2>&1 | sed -re "s/.*added '[^,]+,([0-9\.]+).*/\1/"`
+      if ssh -q $i "/root/mode/getips" | grep -E "$Hrip" >/dev/null ; then
+         if echo $Hrip | grep -E "^192\.168\." >/dev/null; then
+            if echo $i | grep -E "^gc" >/dev/null; then
+               Httype=dev
+            else
+               Httype=inn
+            fi
+         else
+            Httype=pub
+         fi
+      else
+        if echo $i | grep -E "^gcihotel" >/dev/null; then
+           Httype=dev
+        else
+           Httype=inn
+        fi
+      fi
+   fi
+   echo $Httype
+done
+

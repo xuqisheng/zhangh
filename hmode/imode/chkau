@@ -1,0 +1,10 @@
+#!/bin/bash 
+# ------------------------------------------------------------------
+# function:
+# usages  :
+# ------------------------------------------------------------------
+
+! /root/mode/seecfg "show variables" | grep -E "(5\.1\.57|5\.5\.50)" >/dev/null && exit
+/root/mode/.do1au 2>/dev/null | grep gc >/dev/null || echo danger
+
+

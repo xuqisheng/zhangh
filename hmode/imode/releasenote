@@ -1,0 +1,1319 @@
+#!/bin/bash
+echo "mode4.0(2017.03.20 release)"
+
+# add /root/mode/setmisc  ---- 2012.01.04 ----
+
+# modify seecfg and tutf8 to support unicode->utf8 conversion  ---- 2012.01.05 ----
+
+# modify testobjects,testobject,seecfg and tutf8 to support debug status message display  -- 2012.01.08~09 ----
+
+# modify updatedb.sh,testkey   -- 2012.01.08~09 ----
+
+# add /root/mode/modemsg to display message
+
+# replace /root/antDep/build.properties,/root/antDep/build.xml
+# replace /usr/local/jdk6 with latest version
+# modify config_tomcat to adjust memory configuration             -- 2012.03.01 ---
+# modify stop_tomcat,adding process test                          -- 2012.03.01 ---
+
+# modify install.sh ,reset path in /root/.bashrc instead of in /etc/profile -- 2012.03.05 ---
+# remark: Chenzhen put path setting in /etc/profile
+#         hry originally put path setting in /root/.bashrc
+#         hry put path in /etc/profile to be compatible with chenzhen(this is faulty modification)
+#         hry put path back in /root/.bashrc to restore correct setting
+
+# modify config_tomcat to set MaxPermSize from 256M to 200M,in order to save memory  -- 2012.03.05 --
+
+# modified to support high availability  -- 2012.03.07 -- 
+
+# add clrcache to some scripts
+
+# add config_sshd,and put it into setmisc -- 2012.03.10 -- 
+
+# add -R option to mysqldump -- 2012.03.17 -- 
+# --triggers --events may be added later  
+
+# modify tomcat related scripts -- 2012.03.31 -- 
+
+# add adjcnf script -- 2012.04.01 -- 
+
+# modify config_apache to solve session invalid issure -- 2012.04.16 -- 
+
+# modify inst_tomcat to support noncluster tomcat installation -- 2012.04.19 -- 
+
+# modify inst_tomcat,getmcast,getadr and tomcatsafe to generate better mutilcast address and port -- 2012.04.24 -- 
+
+# modify stop_tomcat,test more "stop" marks to save stop time  -- 2012.04.25 -- 
+
+# -----------------------------------------------------------------------------
+# add mnthosts,nmlizeip,getips;
+# modify mysqldip,install.sh
+# -----------------------------------------------------------------------------
+# add trun_log;modify clrlogs
+# -----------------------------------------------------------------------------
+#                                                              -- 2012.04.25 --
+# -----------------------------------------------------------------------------
+
+# modify idcheck                                               -- 2012.05.10 --
+
+# modify each to record error information                      -- 2012.05.11 --
+
+# dig into account_deposit,account_audit,master_snapshot,resrv_base,resrv_base_till
+#                                                              -- 2012.05.12 --
+
+# happy 12 anniversary of ...                                  -- 2012.05.12 --
+
+# create a configuration file /etc/modemem                     -- 2012.05.18 --
+
+# add inst_com which installs common parts in both app server and MySQL server   -- 2012.05.18 --
+
+# modify start_tomcat and stop_tomcat                                            -- 2012.05.23 --
+
+# optimize stop_tomcat                                                           -- 2012.05.24 --
+
+# add script isctom                                                              -- 2012.05.24 --
+
+# more optimization on stop_tomcat and start_tomcat                              -- 2012.05.25 --
+
+# modify seecfg to support multisegment precheck and execution                   -- 2012.05.29 --
+
+# add script set_cron to do some routine jobs                                    -- 2012.05.29 --
+
+# modify clrcache to satisfy new demands                                         -- 2012.05.30 --
+
+# modify dlsql,testobjects,testobject to support column attributes check         -- 2012.05.31 --
+
+# enhance dlsql compatibility                                                    -- 2012.06.04 --
+
+# modify testobject testobjects                                                  -- 2012.06.05 --
+
+# adjust clrcache,config_sshd                                                    -- 2012.06.11 --
+
+# add comdump to check dump completeness                                         -- 2012.06.12 --
+# modify mload to avoid loading incomplete dump                                  -- 2012.06.12 -- 
+# add isdump                                                                     -- 2012.06.12 -- 
+
+# adjust tctomcat start_tomcat stop_tomcat gcserver                              -- 2012.06.13 --
+
+# modify tctomcat start_tomcat stop_tomcat gcserver to avoid reentrance          -- 2012.06.14 --
+
+# modify config_sshd to change port 22 to  3305                                  -- 2012.06.20 --
+
+# add 'trap "" INT' statement to gcserver,start_tomcat and stop_tomcat scripts
+# to prohibit them from being interrupted                                        -- 2012.07.03 --  
+
+# add modelog to record critical script execution                                -- 2012.07.03 --
+
+# modify seecfg to enhance performance                                           -- 2012.07.04 --
+
+# add tbcmp to compare related tables in a database                              -- 2012.07.08 --
+
+# optimize testobject with method in tbcmp                                       -- 2012.07.09 --
+
+# move config_sshd from setmisc to inst_com                                      -- 2012.07.10 -- 
+
+# rename setmisc to srvman to manage linux services                              -- 2012.07.10 --
+
+# replace call to setmisc with call to srvman                                    -- 2012.07.10 --
+                            
+# add script mod_config to facilitate configuration modification                 -- 2012.07.11 --
+
+# modify mysqld max_connections to 300                                           -- 2012.07.13 --
+
+# optimize tomcat memory allocation                                              -- 2012.07.19 --
+
+# modify clrlogs to save mysql-bin logs in recent 48 hours no matter what 
+# parameter is given                                                             -- 2012.07.24 --
+ 
+# optimize mod_config and adjcnf to enhance compatibility                        -- 2012-07-28 --
+# add script isblsql                                                             -- 2010-07-31 --
+
+# optimize clrcache to deal with swap                                            -- 2012-08-04 --
+
+# modify config_apache to add minbandwidth item                                  -- 2012-08-07 --
+# modify mod_config to support "[]" in item                                      -- 2012-08-07 --
+
+# modify updatedb.sh for correct sorting                                         -- 2012-09-12 --
+
+# modify mload to show load progress                                             -- 2012-09-16 --
+# adding getstrips and monload scripts
+
+# modify mdump                                                                   -- 2012-09-17 --
+
+# modify clrcache                                                                -- 2012-09-18 --
+# if [ $HUSED1PT -ge 95 ]; then
+#                -->
+# if [ $HUSED1PT -ge 95 -o $HUSED3 -gt 0 ]; then
+
+# add xtrabackup                                                                 -- 2012-09-28 --
+
+# modify start_tomcat                                                            -- 2012-10-15 --
+
+# add script netfix                                                              -- 2012-10-18 --
+                                                              
+# fix centos6.2 bug ( = controller)                                              -- 2012-10-29 --
+
+# adjust configurations to be compatible with centos6.x                          -- 2012-11-01 --
+
+# adjust mysql log size from 256M to 1024M                                       -- 2012-11-07 --
+
+# add script lbugfix                                                             -- 2012-11-09 --
+
+# modify mload,disabling confirmation when called from crond                     -- 2012-11-13 --
+
+# modify mdump,enabling "-F --master-data"                                       -- 2012-11-14 --
+# modify mdump,MySQL server time is recorded in dump and log                     -- 2012-11-14 --
+
+# add script modegate to controll some services                                  -- 2012-11-15 --
+
+# fix a bug in seecfg which doesn't test if MySQL client is installed            -- 2012-11-15 --
+
+# modify config_tomcat,using CMS gc                                              -- 2012-11-16 --
+
+# add mod_tthread                                                                -- 2012-11-18 --
+# mod inst_tomcat                                                                -- 2012-11-18 -- 
+
+# add rep_config                                                                 -- 2012-11-19 --
+# mod mod_config,adjcnf                                                          -- 2012-11-19 --
+
+# add config_apache_more                                                         -- 2012-11-19 --
+# mod config_apache,install.sh                                                   -- 2012-11-19 --
+
+# modify stop_tomcat,"vi save" inode change problem                              -- 2012-12-06 --
+
+# modify adjcnf,add log-slow-queries etc.                                        -- 2012-12-07 --
+
+# add script tune_mysql                                                          -- 2012-12-08 --
+# modify set_cron to add tune_mysql to /etc/crontab                              -- 2012-12-08 --
+
+# modify rep_config and config_apache_more -- some further optimization          -- 2012-12-09 --
+
+# modify tune_mysql with app factor considered                                   -- 2012-12-11 --
+
+# add eval_app to help adjusting parameters                                      -- 2012-12-12 --
+
+# modify eval_app                                                                -- 2012-12-13 --
+# modify eval_app                                                                -- 2012-12-14 --
+
+# modify clrlogs,slowquery log truncation added                                  -- 2012-12-14 --
+
+# modify cpumem and config_tomcat(change perm size from 200M to 256M)            -- 2012-12-15 --
+# (Only smarthotels exceeded 200M on 2012-12-15 10:20)
+
+# isolate path setting part to script setpath                                    -- 2012-12-21 --
+
+# decrease apache connection size from 300M to configurable 100M,
+# saving memory for cluster tomcats of poor machine                              -- 2012-12-24 --
+
+# modify find_tables for future use                                              -- 2012-12-24 --
+
+# htl...                                                                         -- 2012-12-25 --
+
+# modify install.sh(using latest releases of apache and mod_jk in /root/packages -- 2012-12-28 --
+
+# No significant changes.Only as a mark of 2012 final                            -- 2012-12-31 --
+
+# modify seeapc                                                                  -- 2013-01-01 --
+
+# modify gcserver                                                                -- 2013-01-05 --
+
+# change log-slow-queries to slow-query-log                                      -- 2013-01-06 --
+
+# modify script adjcnf(add innodb_autoinc_lock_mode=2 to /etc/my.cnf)            -- 2013-01-08 --
+# modify script adjcnf(add wait_timeout=300 to /etc/my.cnf)                      -- 2013-01-10 --
+
+# optimize script idcheck                                                        -- 2013-01-10 --
+
+# add script gcmode for future tuning                                            -- 2013-01-12 --
+# modify config_tomcat                                                           -- 2013-01-12 --
+ 
+# modify gcmode                                                                  -- 2013-01-13 --
+
+# adjcnf -> back_log,max_connect_errors                                          -- 2013-01-14 --
+# modify config_sshd                                                             -- 2013-01-14 --
+# add #!/bin/bash to all scripts                                                 -- 2013-01-15 --
+
+# modify install.sh,apache port 8090 designated                                  -- 2013-01-16 --
+
+# add script tcp_recycle                                                         -- 2013-01-18 --
+
+# mode 2.0 start date                                                            -- 2013-01-20 --
+
+# add HMYSQLDIP1 HMYSQLDIP2 variables and related scripts were modified          -- 2013-01-21 --
+
+# modify cpumem,isolating memory percent to /etc/modememp because of 615         -- 2013-01-22 --
+
+# modify getstrips and monload                                                   -- 2013-01-28 --
+
+# modify clrcache                                                                -- 2013-01-29 --
+# add script 'withyou' and use it to enhance clrcache                            -- 2013-01-30 --
+# add script 'dumpnamepv' and use it to enhance mdump solidity                   -- 2013-01-31 --
+
+# rm  script getip                                                               -- 2013-02-02 --
+# add script gsip                                                                -- 2013-02-02 --
+# modify scripts getips and mysqldip                                             -- 2013-02-02 -- 
+# modify scripts setpath and inst_xtra                                           -- 2013-02-02 --
+
+# optimize nmlizeip                                                              -- 2013-02-04 --
+
+# modify seeapc('-k start' or '-k restart')                                      -- 2013-02-04 --
+ 
+# add script /root/mode/apachectl                                                -- 2013-02-05 --
+# replace /usr/local/$Hapachemode/bin/apachectl
+#    with /root/mode/apachectl $Hapachemode in gcserver                          -- 2013-02-05 --
+
+# add script cpufreq to set cpu policy                                           -- 2013-02-18 --
+ 
+# modify script inst_com to call cpufreq                                         -- 2013-02-19 --
+
+# modify seecfg to preserve comments in procedure defination                     -- 2013-02-22 --
+
+# modify adjcnf,adjusting binlog_cache_size to 16M                               -- 2013-02-27 --
+
+# adjust parameters in adjcnf                                                    -- 2013-03-02 --
+
+# some more kernel pamameters in msysctl                                         -- 2013-03-02 --
+
+# some more parameters in adjcnf                                                 -- 2013-03-03 --
+
+# change 'cmp' to 'cmp -s' in mod_config and rep_config                          -- 2013-03-04 --
+
+# rewrite script config_sshd using mod_config for compactness                    -- 2013-03-04 --
+
+# ----------------------------------------------------------                     -- 2013-03-07 --  
+# add another kind of tomcat:Nonclustertomcat                                           
+# ----------------------------------------------------------                            
+# added script:isNtom
+# modified scripts:inst_tomcat,cpumem,ctomno,config_tomcat
+# ---------------------------------------------------------- 
+
+# modify mod_tthread                                                             -- 2013-03-07 --
+
+# rewrite script 'fix_cnf' using mod_config for compactness                      -- 2013-03-07 --
+# women's day mark                                                               -- 2013-03-08 --
+
+# add scripts chkmlog and tcmysql                                                -- 2013-03-10 --
+
+# modify tcmysql                                                                 -- 2013-03-10 --
+# modify mysql,move idcheck position behind 'touch lockfile'                     -- 2013-03-10 --
+#              change misleading failure msg with modemsg information            -- 2013-03-10 --
+
+
+# add script ltcmysql and ./impfile/mysql/mysqlsta                               -- 2013-03-11 --
+# rewrite script tcmysql using ltcmysql                                          -- 2013-03-11 --
+
+# adjust fix order                                                               -- 2013-03-12 --
+
+# add script setw...                                                             -- 2013-03-12 --
+
+# isolate jktomcat/parms                                                         -- 2013-03-14 --
+
+# modify tompv to be compatible with new release script 'publish_wfl'            -- 2013-03-15 --
+
+# uncomment packetsize setting in scripts 'config_apache' and 'mod_tthread'      -- 2013-03-16 --
+# call function 'apache' at the end of function 'cluster' in script gcserver     -- 2013-03-16 --
+
+# use JkOption +DisableReuse to avoid ajp permanent connections                  -- 2013-03-17 --
+# No performance degrade was seen                                                 
+
+# disabling ttr                                                                  -- 2013-03-18 --
+  
+# remove -c option when calling mysql client because of mysql client -c bug      -- 2013-03-19 --
+
+# test tcp_sack off                                                              -- 2013-03-20 --
+
+# test hybla ...   Test result is bad                                            -- 2013-03-21 --
+# minor optimization of seecfg                                                   -- 2013-03-21 --
+
+# ...wfl                                                                         -- 2013-03-22 --
+
+# add script addctom                                                             -- 2013-03-22 --
+# modify script inst_tomcat                                                      -- 2013-03-22 --
+
+# add /etc/modeopts ... ,allowing certain servers to use long http connections   -- 2013-03-23 --
+# accordingly modify config_apache_more                                          -- 2013-03-23 --
+
+# add script tune_app                                                            -- 2013-03-23 --
+
+# add a parameter of ping count to appclt                                        -- 2013-03-24 --
+
+# httpkeepalive is confirmed usless for iHotel                                   -- 2013-03-26 --
+
+# httpd-info.conf related                                                        -- 2013-03-27 --
+
+# add usages of scripts tcmysql and ltcmysql                                     -- 2013-03-28 --
+
+# test recovery_options=3  error_escalation_time=0                               -- 2013-03-29 --
+
+# optimize 2 each sqls,further optimization will be made                         -- 2013-04-01 --
+
+# modify script appclt                                                           -- 2013-04-04 --
+
+# add some comments in msysctl                                                   -- 2013-04-07 --
+
+# add scripts appmtu and getmtu                                                  -- 2013-04-07 --
+
+# optimize getmtu to shorten test speed                                          -- 2013-04-08 --
+
+# modify jvstat(skip a java bug)                                                 -- 2013-04-08 --
+                            
+# modify jvstat                                                                  -- 2013-04-09 --
+
+# modify getmtu (reamrks --> remarks)                                            -- 2013-04-11 --
+
+# modify getmtu                                                                  -- 2013-04-16 --
+
+# modify getmtu(further modification may be made)                                -- 2013-04-17 --
+
+# mv appmtu to appmtu1 and write a new appmtu                                    -- 2013-04-18 --
+
+# getmtu ...                                                                     -- 2013-04-19 --
+
+# add getmtu1 (get mtu from iHotel to router)...                                 -- 2013-04-24 --
+# modify appmtu                                                                  -- 2013-04-24 --
+
+# optimize appmtu and getmtu                                                     -- 2013-04-28 --
+
+# modify getmtu1                                                                 -- 2013-05-02 --
+
+# adjust tune_mysql leisure time factor                                          -- 2013-05-14 --
+
+# add script mdscp                                                               -- 2013-05-20 --
+
+# modify script eval_app,with diversity report removed                           -- 2013-06-05 --
+
+# modify script apachectl,with apache installation check added                   -- 2013-06-14 --
+
+# modify mdump,with default database changed from portal to portal or portal_f   -- 2013-06-18 --
+
+# modify mload,with portal_f and portal_f_tr consideration                       -- 2013-06-19 --
+
+# modify mload,with forced load confirmation for all databases added             -- 2013-06-21 --
+
+# add a script ***                                                               -- 2013-06-26 --
+
+# modify script inst_tomcat to allow 3 nonclustered tomcat                       -- 2013-06-26 --
+
+# modify msysctl to enable ip_forwarding                                         -- 2013-06-27 --
+
+# modify inst_tomcat to call inst_com when needed                                -- 2013-06-27 --
+
+# add script appdb,modify scripts appips and getmtu                              -- 2013-06-27 --
+
+# modify dbsync                                                                  -- 2013-06-28 --
+
+# mode2.1                                                                        -- 2013-07-02 --
+
+# add comments in tompv which is the most difficult one to understand            -- 2013-07-03 --
+
+# add clrlogs to /etc/crontab                                                    -- 2013-07-05 --
+
+# adjust tcp kernel parameters                                                   -- 2013-07-07 --
+
+# disable tcp_window_scaling                                                     -- 2013-07-08 --
+
+# modify script msysctl with 2 parms adjusted (6->3)                             -- 2013-07-18 --
+# modify script htldel with more accurate information                            -- 2013-07-19 --
+
+# grp...                                                                         -- 2013-07-23 --
+
+# modify tune_mysql                                                              -- 2013-07-24 --
+
+# publish_wfl ...                                                                -- 2013-07-28 --
+      
+# msysctl 30 -> 20                                                               -- 2013-07-29 --
+
+# srvman: disable yum-updatesd                                                   -- 2013-08-05 --
+ 
+# modify each,with end time of sql execution added                               -- 2013-08-07 --
+ 
+# sql package update                                                             -- 2013-08-08 --
+
+# use lastbl as tillbl of last day except continuity check                       -- 2013-08-11 --
+
+# new pos_menu balance check                                                     -- 2013-08-12 --
+
+# add hotelcodepatten to beac                                                    -- 2013-08-12 --
+
+# msysctl 12M -> 16M                                                             -- 2013-08-13 --
+
+# mload slb                                                                      -- 2013-08-20 --
+
+# add 6 sql checks about master_snapshot(reser)                                  -- 2013-08-21 --
+
+# modify msysctl and srvman for centos6.4                                        -- 2013-08-22 --
+
+# add appblk                                                                     -- 2013-08-23 --
+
+# adjust monload for SQLYOG dump loading                                         -- 2013-08-23 --
+
+# msysctl 20 -> 10                                                               -- 2013-08-24 --
+
+# modify srvman,firewall part                                                    -- 2013-08-25 --
+
+# add net.ipv4.ipfrag_high_thresh configuration to msysctl                       -- 2013-08-25 --
+
+# modify appblk                                                                  -- 2013-08-27 --
+
+# modify srvman,firewall part                                                    -- 2013-08-30 --
+
+# modify rmdump                                                                  -- 2013-09-02 --
+
+# modify tune_mysql                                                              -- 2013-09-04 --
+
+# modify mdscp,preserving the time properties of the original file               -- 2013-09-04 --
+
+# modify clrcache 95 -> 88                                                       -- 2013-09-05 --
+
+# modify config_apache_more(T15)                                                 -- 2013-09-06 --
+
+# modify config_apache_more(T40)                                                 -- 2013-09-11 --
+
+# publish_wfl ...                                                                -- 2013-09-16 --
+
+# modify seecfg to support csv format output                                     -- 2013-09-19 --
+# modify seecfg to optimize csv format output                                    -- 2013-09-22 --
+
+# add script ol_data                                                             -- 2013-09-22 --
+
+# modify script ol_data                                                          -- 2013-09-23 --
+# modify script srvman                                                           -- 2013-09-23 --
+
+# optimize script appserver                                                      -- 2013-09-23 --
+# optimize start_tomcat,tomcatsafe,getmcast,getadr                               -- 2013-09-23 --
+
+# modify isatom,"for a apache" -> "for an apache"                                -- 2013-09-24 --
+
+# modify apachemode and ol_data                                                  -- 2013-09-24 --
+# recover srvman from 2013-09-22 release                                         -- 2013-09-24 --
+
+# modify tomcatsafe                                                              -- 2013-09-24 --
+
+# modify tomcatsafe,with 'sleep 2' added after 'route add ...'                   -- 2013-09-26 --
+# modify ol_data,tar -> zip                                                      -- 2013-09-26 --
+
+# modify appserver,with 'graceful' considered first                              -- 2013-09-27 --
+
+# modify ol_data according to zpj                                                -- 2013-09-29 --
+# modify idcheck,with tune_mysql inserted ...                                    -- 2013-09-29 --
+
+# modify tspeed,with the procedure created in 'mysql' instead of 'portal'        -- 2013-09-30 --
+
+# msysctl 81920 -> 122880                                                        -- 2013-10-12 --
+# mrel    add option '-p' to scp                                                 -- 2013-10-12 --
+
+# modify seecfg,correcting a literal error (bask -> back)                        -- 2013-10-14 --
+
+# modify lbugfix,disabling NetworkManager on CentOS 6.X                          -- 2013-10-18 --
+
+# modify cpufreq for CentOS 6.x                                                  -- 2013-10-19 --
+# modify lbugfix,with some comments added to NetworkManager part                 -- 2013-10-19 --
+
+# modify mload (database 'mysql' special treatment)                              -- 2013-10-20 --
+# further optimization with cpufreq                                              -- 2013-10-20 --
+
+# modify scripts apachectl and seeapc for graceful parameter                     -- 2013-10-20 --
+
+# add modepv1,modepv                                                             -- 2013-10-23 --
+# modify mysql,with modepv check added                                           -- 2013-10-23 --
+
+# change the order of 2 each sqls                                                -- 2013-10-24 --
+
+# modify getmtu1 because of different output of tcpdump on CentOS 6.X            -- 2013-10-25 --
+
+# add some each sqls about table biz_month                                       -- 2013-10-28 --
+# modify some each sqls about table biz_month                                    -- 2013-10-29 --
+
+# add script tfile,and modify scripts kpfile & tutf8                             -- 2013-10-29 --
+
+# modify getmtu1 (wscale)                                                        -- 2013-11-01 --
+# modify msysctl 122880 -> 245760 3->2                                           -- 2013-11-01 --
+# optimize 2 pos related checks                                                  -- 2013-11-05 --
+# modify msysctl 245760 -> 262144                                                -- 2013-11-05 --
+
+# optimize 3 each sqls                                                           -- 2013-11-07 --
+# add some each sqls (rep_dai_history credits consistency)                       -- 2013-11-07 --
+
+# modify lbugfix for Ali CentOS 5.8                                              -- 2013-11-13 --
+# import 3 updated each sqls                                                     -- 2013-11-13 --
+
+# modify getmtu 'mtu ihotel to router' -> 'mtu client to server'                 -- 2013-11-22 --
+ 
+# modify cpumem                                                                  -- 2013-11-26 --
+# modify config_tomcat,with share mode added                                     -- 2013-11-26 --
+
+# modify testobject and testobjects to support proc/func precheck                -- 2013-11-28 --
+
+# modify msysctl for arp realted ...                                             -- 2013-12-04 --
+
+# modify config_tomcat (because Yangnan added some opitons to JAVA_OPTS)         -- 2013-12-20 --
+
+# modify seecfg                                                                  -- 2013-12-26 --
+# add script ezrms_data                                                          -- 2013-12-26 --
+
+# modify ezrms_data about column heads related                                   -- 2013-12-27 --
+
+# add an each sql (master_snapshot vs account balance check - master_base part)  -- 2014-01-09 --
+
+# add two each sqls (snapshot with (ar_)account,charge and pay check)            -- 2014-01-13 --
+
+# add two each sqls (create index ...)                                           -- 2014-01-13 --
+
+# rename some column headers for certain each sqls                               -- 2014-01-14 --
+
+# modify cpufreq with bios-limitations disabled                                  -- 2014-02-13 --
+
+# ------------------------------------------------------------------------------------------------
+# modify config_tomcat because of whxkjd                                         -- 2014-02-14 --
+# when 2 or more gcservers are installed,sharemode is used                       
+# ------------------------------------------------------------------------------------------------
+
+# modify cpufreq (chkconfig cpuspeed off 2>/dev/null)                            -- 2014-02-17 --
+
+# optimize clrcache                                                              -- 2014-02-27 --
+
+# add script kmproc                                                              -- 2014-03-31 --
+
+# optimize ezrms_data                                                            -- 2014-04-11 --
+# optimize install.sh (1.2.3* --> 1.2.*)                                         -- 2014-04-11 --
+
+# optimize appips and getmtu (183.129.215.114 will not be filtered)              -- 2014-04-21 --
+
+# enforce fix_cnf(-l -> -lL)                                                     -- 2014-04-22 --
+
+# modify script kmproc('Copying to tmp table' , -P --> -Pi)                      -- 2014-04-29 --
+
+# modify clrlogs                                                                 -- 2014-04-30 --
+
+# modify scripts tctomcat and stop_tomcat(use 'kill -9' instead of 'kill')       -- 2014-05-12 --
+
+# add some htl related scripts                                                   -- 2014-05-15 --
+
+# modify kmproc,excluding threads of dump sqls(with 40001 SQL_NO_CACHE）         -- 2014-05-16 --
+# modify idcheck (Errow -> Error)                                                -- 2014-05-16 --
+
+# enforce script getmtu (defragment test)                                        -- 2014-05-27 --
+
+# optimize script stop_tomcat (with tomcat name added to first parm of modemsg)  -- 2014-05-28 --
+
+# optimize jvstat because of java 1.7                                            -- 2014-05-29 --
+# modify inst_java for compatibility of java 1.7 installation                    -- 2014-05-29 --
+
+# optimize jvstat ( with tomcat name displayed behind process  id)               -- 2014-05-30 --
+
+# modify script appips for a literal error in remarks(appmtu -> appips)          -- 2014-06-06 --
+# modify script appmtu (add remarks)                                             -- 2014-06-06 --
+# modify script getmtu (insert a filter)                                         -- 2014-06-06 --
+# modify msysctl to enforce fin_wait1 related tuning of tcp patameters           -- 2014-06-06 --
+
+# modify set_cron,fix a CentOS 5.4 tmpwatch problem with java ...                -- 2014-06-11 --
+
+# modify mload (let options '-q' etc. be logged)                                 -- 2014-06-20 --
+# add script mondump                                                             -- 2014-06-20 --
+# modify mdump (use asyncronous dump,so monitoring dump is possible)             -- 2014-06-20 --
+
+# Optimize script mdump                                                          -- 2014-06-21 --
+
+# modify scripts appips and getmtu (to gather information also from 'tr')        -- 2014-06-23 --
+
+# enhance scripts mload,rmdump and mdscp                                         -- 2014-06-24 --
+
+# modify config_sshd                                                             -- 2014-06-25 --
+
+# modify mysql,modepv and modepv1 to make them more robust against powerfailure  -- 2014-06-26 --
+# add a lot of comments to modepv1                                               -- 2014-06-27 --
+
+# modify config_tomcat with some new memory allocation options added             -- 2014-06-27 --
+# modify apachectl to make it more robust against powerfailure and misuse        -- 2014-06-27 --
+
+# ----------------------------------------------------------------------------
+# modify 4 each sqls(remove 'unique' in creating index because of cc's misuse)   -- 2014-07-01 --
+# commentded the above 4 each sqls                                               -- 2014-07-04 --
+# ----------------------------------------------------------------------------
+ 
+# modify adjcnf to make sure 'character-set-server=utf8' is there                -- 2014-07-04 --
+# (It is neccessary for /etc/my.cnf not generated by mode utilities)             -- 2014-07-04 --
+
+# check and fix scripts cpufreq,lbugfix,set_cron and tfile for compatibility of  -- 2014-07-07 --
+# linux versions (CentOS vs Red Hat Enterprise Linux Server)(5.x 5.xx vs 6.x)                                                               
+
+# modify scripts cpumem,config_tomcat and start_tomcat                           -- 2014-07-10 --
+# (because of Red Hat Enterprise Linux Server release 6.4 (Santiago))           
+
+# modify script start_tomcat,with redundant 'hry@ipms.cn' removed                -- 2014-07-11 --
+
+# modify script config_sshd                                                      -- 2014-07-12 --
+
+# modify script jvstat,using absolute path for commands java,jmap and jstat      -- 2014-07-16 --
+
+# modify script getmtu1,using absolute path for command tcpdump                  -- 2014-07-16 --
+
+# modify appblk,using 'ss' instead of 'netstat'                                  -- 2014-07-23 --
+
+# continue using 'netstat -ntlp' in scripts tcmysql,tctomcat and stop_tomcat     -- 2014-07-24 --
+# ss's behaviour in server smarthotels has not been explained and resolved yet   -- 2014-07-24 --
+
+# optimize tctomcat                                                              -- 2014-07-24 --
+
+# add script badsql_rows_sent which extracts and saves some kind of bad sqls     -- 2014-07-29 --
+# modify clrlogs(badsql_rows_sent is called before truncating mysql slow log)    -- 2014-07-29 --
+
+# modify badsql_rows_sent (SQLs with rows_sent below 1000 are filtered out)      -- 2014-07-31 --
+
+# add some comments about rfc1337                                                -- 2014-08-01 --
+
+# modify mdump,with dump retry times and waitlength adjusted                     -- 2014-08-02 --
+
+# modify msysctl  '10000 65500' ---> '1024 65535'                                -- 2014-08-07 --
+
+# modify msysctl (test buffer default 524288 )                                   -- 2014-08-07 --
+
+# modify msysctl                                                                 -- 2014-08-08 --
+
+# A special release  ^-^ ^-^ ^-^ ^-^ ^-^ ^-^                                     -- 2014-08-09 --
+
+# Happy birth day,He Sichen !                                                    -- 2014-08-09 --
+
+# modify msysctl (disable tcp_ecn explicitly)                                    -- 2014-08-13 --
+
+# rebuild packages.tar.gz(with flex_sdk deleted)                                 -- 2014-08-14 --
+# modify install.sh,tompv and publish_... etc.                                   -- 2014-08-14 --
+
+# modify tctomcat                                                                -- 2014-08-14 --
+# optimize a grep expression in scripts start_tomcat,stop_tomcat and tctomcat    -- 2014-08-15 --
+
+# optimize a grep expression in script jvstat                                    -- 2014-08-20 --
+# modify gcmode (add customized controll of 'UseParallelOldGC')                  -- 2014-08-20 --
+
+# modify script getmtu to make some descriptions more clearly                    -- 2014-08-25 --
+# 'mtu server to router'  --> 'mtu (server to router)'                           -- 2014-08-25 --
+# 'mtu client to server'  --> 'mtu (client to server)'                           -- 2014-08-25 --
+
+# modify msysctl  '1024 65535' ---> '10000 65535'                                -- 2014-08-27 --
+# modify config_tomcat (add option 'modetom_mold')                               -- 2014-08-27 --
+ 
+# enhance tctomcat because of possible undesired ajp port autobinding            -- 2014-08-27 --
+# modify start_tomcat (with more accurate monitor output )                       -- 2014-08-27 --
+
+# modify ezrms_data (with 'keepold' functionality added )                        -- 2014-08-28 --
+
+# modify mod_tthread (with option 'nsbacklog' added for flexibility)             -- 2014-08-29 --
+
+# modify gcserver (optimization or not?)                                         -- 2014-08-29 --
+# modify addctom                                                                 -- 2014-08-30 --
+
+# This should be the final release of 2014 August                                -- 2014-08-30 --
+
+# modify appips                                                                  -- 2014-09-01 --
+
+# modify msysctl( with arp related problems solved )                             -- 2014-09-04 --
+
+# grp... for wfl ^-^ ^-^ ^-^ ^-^ ^-^ ^-^                                         -- 2014-09-16 --
+
+# optimize some scripts to be compatible with old server.xml ending with '\r\n'  -- 2014-09-17 --
+# (...... whsdx server.xml ......)
+
+# ...wfl                                                                         -- 2014-09-19 --
+# ...wfl ...                                                                     -- 2014-09-20 --
+
+# add script kdthread and enhance script mdump                                   -- 2014-09-21 --
+
+# add script disusb and modify script inst_com                                   -- 2014-09-22 --
+
+# modify msysctl ( Hcurvl ... )                                                  -- 2014-09-23 --
+
+# modify srvman for firewall settting                                            -- 2014-09-24 --
+
+# modify script lbugfix (with CentOS bash bug fix integrated)                    -- 2014-09-30 --
+# This should be the final release of 2014 September                             -- 2014-09-30 --
+
+# add a script ndxcmp (table index comparisons among databases)                  -- 2014-10-08 --
+
+# modify config_sshd (fix a bug caused by Ali)                                   -- 2014-10-13 --
+# modify adjcnf (with max_user_connections configured)                           -- 2014-10-13 --
+
+# add some comments to config_sshd                                               -- 2014-10-14 --
+
+# modify scripts fix_cnf and mod_config                                          -- 2014-10-14 --
+
+# publish_wfl ... u ... p ...                                                    -- 2014-10-14 --
+
+# enhance mdump (with Mysql thread/sql saved,which blocked dump thread)          -- 2014-10-15 --
+
+# enhance script kdthread                                                        -- 2014-10-16 --
+# enhance script mdump                                                           -- 2014-10-16 --
+
+# modify and add some comments to script kdthread                                -- 2014-10-21 --
+# It is regretful that kdthread is unable to solve the MySQL bug #44884          -- 2014-10-21 -- 
+
+# optimize scripts inst_tomcat and config_apache                                 -- 2014-10-22 --
+
+# ...htldmp ...                                                                  -- 2014-10-28 --
+
+# modify scripts appips and getmtu,allowing to obtain MTU information from       -- 2014-10-29 --
+# client requests of iHotel user 'admin'                                         -- 2014-10-29 --
+
+# enhance script getmtu1                                                         -- 2014-10-29 --
+
+# enhance mdump (starttime of checking 'killedbyoth' status: +5 -> +10)          -- 2014-10-30 --
+
+# enhance script rmdump                                                          -- 2014-11-07 --
+# enhance script ndxcmp                                                          -- 2014-11-07 --
+
+# enhance script gcserver                                                        -- 2014-11-10 --
+# enhance scripts appips and getmtu                                              -- 2014-11-10 --
+
+# modify script ezrms_data                                                       -- 2014-11-17 --
+
+# modify jvstat,with fullgc-average time added to the output                     -- 2014-12-08 --
+# optimize jvstat                                                                -- 2014-12-09 --
+
+# optimize and enhance jvstat for poor jmap of java                              -- 2014-12-18 --
+# enhance jvstat & start_tomcat
+# (initialize related files before executing the following background process)   -- 2014-12-19 --
+
+# optimize tune_mysql                                                            -- 2014-12-19 --
+
+# modify tspeed                                                                  -- 2014-12-25 --
+
+# put ...pub...war into /root/mode                                               -- 2014-12-26 --
+ 
+# modfiy apachemode,ezrms_data,ol_data,setwsta,isatom,getmcast,inst_tomcat and   -- 2015-01-04 --
+# install.sh                                                                     -- 2015-01-04 --
+# add symbolic links gcserver3~gcserver7 to appserver                            -- 2015-01-04 --
+
+# add scripts gettomp and seetom                                                 -- 2015-01-05 --
+
+# enhance gettomp                                                                -- 2015-01-07 --
+
+# put montoms into mode                                                          -- 2015-01-20 --
+
+# enhance ...pub...war                                                           -- 2015-01-21 --
+
+# add ...mcast                                                                   -- 2015-03-23 --
+
+# enhance xtrabackup 1.6.4                                                       -- 2015-04-15 --
+
+# add script xbback                                                              -- 2015-04-15 --
+# enhance script xbback                                                          -- 2015-04-21 --
+# enhance script xbback                                                          -- 2015-04-23 --
+
+# modify adjcnf with default-character-set=utf8 commented in /etc/my.cnf         
+# (for use of mysqlbinlog)                                                       -- 2015-04-24 --
+
+# modify inst_mysql and xbback to avoid a bug of innobackupex                    -- 2015-04-24 --
+
+# modify config_apache_more                                                      -- 2015-05-18 --
+
+# modify jvstat ( memory -> memory or disk space )                               -- 2015-05-22 --
+
+# modify stop_tomcat                                                             -- 2015-06-18 --
+
+# modify addctom(to be compatible with SDB version)                              -- 2015-06-19 --
+
+# modify config_tomcat (add option -XX:ReservedCodeCacheSize=64m)                -- 2015-06-22 --
+
+# modify config_tomcat (add option -XX:+UseCodeCacheFlushing)                    -- 2015-06-24 --
+# modify cpumem                                                                  -- 2015-06-24 --
+
+# modify cpumem and config_tomcat (remove options limit_tom and modetom_mold)    -- 2015-06-26 --
+
+# add script tomtop to monitor tomcat total memory used                          -- 2015-06-27 --
+
+# modify msysctl (explicitly set net.ipv4.tcp_max_tw_buckets back to 180000)     -- 2015-07-01 --
+# (Ali set net.ipv4.tcp_max_tw_buckets to 5000,which caused bucket overflow)
+
+# enhance scripts tfile and seecfg (with CR line terminaters compatibility)      -- 2015-07-02 --
+# add script apcfull and enhance scripts setwsta and gcserver                    -- 2015-07-02 --
+
+# enhance script seecfg                                                          -- 2015-07-03 --
+# enhance script seecfg                                                          -- 2015-07-05 --
+
+# modify tutf8,tfile and seecfg (fix CentOS 6.x Little-endian test)              -- 2015-07-06 --
+# modify tfile and seecfg (add some comments on modifications)                   -- 2015-07-07 --
+
+# enhance testkey and testobjects (with more strong index test)                  -- 2015-07-11 --
+# enhance testkey (with more strong primary key,unique key and key test)         -- 2015-07-12 --
+
+# enhance testobjects ( with 'or' ability of sql precheck )                      -- 2015-07-13 --
+
+# modify mnthosts (Fix Ali's problem of sendmail)                                -- 2015-07-13 --
+
+# modify apcfull                                                                 -- 2015-07-14 --
+# modify gcserver (add apachestart,apachestop,apacherestart parms)               -- 2015-07-14 --
+# ###########################################################################
+# ./gcserver apache                ## auto
+# ./gcserver apachestart     
+# ./gcserver apachestop
+# ./gcserver apacherestart
+#############################################################################
+
+# optimize trun_log                                                              -- 2015-07-16 --
+
+# modify start_tomcat                                                            -- 2015-07-17 --
+# modify tomcatsafe and start_tomcat                                             -- 2015-07-18 --
+
+# modify mysqldip                                                                -- 2015-07-21 --
+
+# enhance tomcatsafe                                                             -- 2015-07-30 --
+
+# enhance ...mcast for clone machines                                            -- 2015-08-03 --
+# enhance lbugfix                                                                -- 2015-08-04 --
+
+# modify config_tomcat ( with user.timezone option added to JAVA_OPTS)           -- 2015-08-05 --
+
+# modify getadr                                                                  -- 2015-08-10 --
+# modify config_mysql and adjcnf                                                 -- 2015-08-10 --
+
+# modify idcheck                                                                 -- 2015-08-12 --
+
+# modify config_tomcat (with optimizations for low memory servers)               -- 2015-08-20 --
+
+# add script tomhl,and modify cpumem and config_tomcat                           -- 2015-08-21 --
+
+# enhance apachectl                                                              -- 2015-08-24 --
+# modify modegate and config_tomcat (add option 'force_tomcat_mixmode')          -- 2015-08-25 --
+
+# add muldmp...                                                                  -- 2015-08-26 -- 
+# modify lbug...                                                                 -- 2015-08-27 -- 
+
+# modify scripts tctomcat,start_tomcat,stop_tomcat and gcserver                  -- 2015-08-28 --
+# add script tomtoact                                                            -- 2015-08-28 --
+
+# modify gcserver                                                                -- 2015-08-30 --
+
+# modify mrel                                                                    -- 2015-09-01 --
+# modify p...w...                                                                -- 2015-09-02 --
+
+# EiPi batch modifications                                                       -- 2015-09-02 --
+
+# modify lbugfix (CentOS 5.x 'grep' replaced with CentOS 6.4 'grep')             -- 2015-09-06 --
+# modify testkey                                                                 -- 2015-09-06 --
+
+# add script tomupdtl                                                            -- 2015-09-08 --
+# enhance tctomcat and gcserver                                                  -- 2015-09-08 --
+
+# modify mnthosts (copy tmp... to /etc/hosts only if needed)                     -- 2015-09-08 --
+
+# modify start_tomcat ( pgid ... )                                               -- 2015-09-10 --
+
+# Have a happy Teachers' Day                                                     -- 2015-09-10 --                                    
+
+# modify ...pub...wa...                                                          -- 2015-09-14 --
+
+# modify seecfg and adjcnf                                                       -- 2015-09-17 --
+
+# add scripts sdump and sload (mainly for data migration)                        -- 2015-09-25 --
+
+# modify tomupdtl                                                                -- 2015-10-08 --
+# modify cpumem (HPERMMAX 400M -> 600M)                                          -- 2015-10-08 --
+# modify start_tomcat                                                            -- 2015-10-08 --
+
+# add script ideas_data                                                          -- 2015-10-09 --
+
+# modify msysctl (about /etc/security/limits.d/90-nproc.conf)                    -- 2015-10-12 --
+
+# enhance ...pub...wa... (server.add extensions)                                 -- 2015-10-21 --
+
+# enhance sload (add options '-f' and '-q')                                      -- 2015-10-30 --
+# enhance sdump (record binlog position)                                         -- 2015-10-30 --
+
+# modfiy mysqldip (with force mode '-f' added)                                   -- 2015-11-06 --
+# official use of innodb plugin                                                  -- 2015-11-06 --
+
+# add .mdumpzlf                                                                  -- 2015-11-08 --
+# modify mdump and enhance mdscp                                                 -- 2015-11-08 --
+
+# add script dumpattr                                                            -- 2015-11-10 --    
+# enhance seecfg (keep the error log in mysql_force mode)                        -- 2015-11-10 --
+
+# enhance tctomcat                                                               -- 2015-11-10 --
+
+# enhance tomcatsafe                                                             -- 2015-11-16 --
+
+# modify lbugfix (fix centos 6.6 bug of 'grep')                                  -- 2015-11-17 --
+
+# enhance testmysql                                                              -- 2015-11-21 --
+
+# enhance clrlogs                                                                -- 2015-11-22 --
+
+# enhance mdscp                                                                  -- 2015-11-24 --
+# enhance mdscp                                                                  -- 2015-11-25 --
+# enhance clrlogs                                                                -- 2015-11-25 --
+
+# enhance rmdump (with strict d2-d7 mdumpmode rules obeyed)                      -- 2015-11-29 --
+
+# modify ideas_data                                                              -- 2015-11-30 --
+
+# modify cpumem (HPERMMAX 600M -> 800M)                                          -- 2015-12-06 --
+# modify jvstat (Hwlimit  5 -> 10 )                                              -- 2015-12-06 --
+
+# enhance montoms                                                                -- 2015-12-08 --
+# enhance montoms                                                                -- 2015-12-09 --
+
+# modify setpath,inst_xtra and inst_com                                          -- 2015-12-15 --
+
+# enhance jvstat                                                                 -- 2015-12-16 --
+# modify ol_data                                                                 -- 2015-12-16 --
+
+# enhance kdthread (Add MySQL 5.5 server specific samples)                       -- 2015-12-20 --
+
+# modify srvman (disable packagekit)                                             -- 2015-12-21 --
+
+# modify lbugfix                                                                 -- 2015-12-23 --
+
+# enhance mdump with more precise information displayed/recorded                 -- 2015-12-26 --
+
+# enhance kdthread (more MySQL 5.5 server specific samples)                      -- 2015-12-29 --
+
+# enhance jvstat                                                                 -- 2015-12-30 --
+
+# enhance mdump with more precise probing                                        -- 2016-01-03 --
+
+# enhance fix_cnf                                                                -- 2016-01-07 --
+
+# enhance mysqldip                                                               -- 2016-04-05 --
+# enhance tspeed                                                                 -- 2016-04-05 --
+
+# enhance mnthosts                                                               -- 2016-04-06 --
+
+# enhance seeapc                                                                 -- 2016-04-07 --
+# enhance apachectl(modified to allow non-root to start apache)                  -- 2016-04-07 --
+# enhance tctomcat                                                               -- 2016-04-07 --
+# enhance start_tomcat                                                           -- 2016-04-07 --
+# enhance stop_tomcat                                                            -- 2016-04-07 --
+# enhance gcserver                                                               -- 2016-04-07 --
+# enhance ...publish_war(wfl)                                                    -- 2016-04-07 --
+
+# enhance tctomcat(root cases in various situations)                             -- 2016-04-08 --
+# enhance apachectl                                                              -- 2016-04-08 --
+
+# enhance getadr,tomcatsafe,getmcast and .modmcast                               -- 2016-04-12 --
+
+# enhance tune_mysql                                                             -- 2016-04-13 --
+
+# add fixhosts,and modify mnthosts and lbugfix                                   -- 2016-04-15 --
+
+# put .....repl_jar into mode officially                                         -- 2016-04-20 --
+# modify seecfg                                                                  -- 2016-04-20 --
+
+# enhance montoms (with option '-a')                                             -- 2016-04-22 --
+
+# modify apachectl and install.sh (with HAPACHE_OVERRIDE mode added)             -- 2016-04-25 --
+
+# enhance tomupdtl and tomtoact                                                  -- 2016-04-27 --
+# enhance montoms                                                                -- 2016-04-27 --
+
+# enhance tomupdtl and tomtoact                                                  -- 2016-04-29 --
+
+# modify ol_data (prohibit re-entrance of ol_data)                               -- 2016-04-29 --
+
+# modify config_tomcat (ReservedCodeCacheSize 64M -> 128M)                       -- 2016-04-30 --
+# enhance tomupdtl(OutOfMemory: unable to create new native thread)              -- 2016-04-30 --
+
+# modify montoms (add basic condition "$Holdmax > 300")                          -- 2016-04-30 --
+
+# enhance tomupdtl,tomtoact and montoms                                          -- 2016-05-06 --
+# ( with java to mysql connection pool monitored)                                       
+
+# enhance sload (with indexes substitution in the table structure)               -- 2016-05-18 --
+
+# enhance clrlogs (exclusive execution with wait mode)                           -- 2016-05-20 --
+# modify badsql_rows_sent (analyze only the last 500000 lines of slow sql file)  -- 2016-05-20 --
+
+# enhance tompv (with more clear messages)                                       -- 2016-05-21 --
+# enhance tompv                                                                  -- 2016-05-22 --
+
+# enhance modepv                                                                 -- 2016-05-23 --
+# enforce exclusiveness for basic/importent scripts                              -- 2016-05-23 --
+
+# enhance kmproc                                                                 -- 2016-05-25 --
+
+# modify trun_log and start_tomcat                                               -- 2016-06-08 --
+# modify kmproc (adjust the default kill threshold from 360 to 480)              -- 2016-06-08 --
+
+# modify stop_tomcat and tctomcat (tomcat 7.x version compatibility)             -- 2016-06-13 --
+# enhance tctomcat (deal with extra 'down' port of tomcat being stopped)         -- 2016-06-13 --
+# modify mysqldip                                                                -- 2016-06-13 --
+
+# modify seecfg (suppress the warning of MySQL server 5.6)                       -- 2016-06-15 --
+# modify montoms(do java dump before stopping tomcat)                            -- 2016-06-15 --
+
+# mode3.0 begins with MySQL 5.5 version                                          -- 2016-06-15 --
+# modify adjcnf,tune_mysql and inst_mysql( MySQL 5.5 compatibility related)      -- 2016-06-15 --
+
+# modify stop_tomcat (shorten wait loop from 60 to 40)                           -- 2016-06-17 --
+
+# modify ...wfl...                                                               -- 2016-06-17 --
+
+# modify montoms(disable java dump)                                              -- 2016-06-18 --
+# enhance jvstat and montoms (with 'detecting dead tomcat' added)                -- 2016-06-18 --
+ 
+# enhance jvstat                                                                 -- 2016-06-19 --
+# modify tune_mysql (audit tickets base 5000->2000 )                             -- 2016-06-19 --
+
+# enhance jvstat and montoms                                                     -- 2016-06-20 --
+
+# enhance jvstat (with dynamic Hwlimit)                                          -- 2016-06-21 --
+# enhance montoms (insert an empty line before 'uptime')                         -- 2016-06-21 --
+
+# enhance jvstat (with more cases)                                               -- 2016-06-22 --
+# enhance montoms (with '-d' option added)                                       -- 2016-06-22 -- 
+
+# modify lbugfix (fix /etc/bashrc of tencent new CentOS releases)                -- 2016-06-22 --
+# modify srvman  (disable some useless and often harmful services)               -- 2016-06-22 --
+
+# enhance gettomp and seetom                                                     -- 2016-06-24 --
+# modify config_apache (preserve extra JkMount options)                          -- 2016-06-24 --
+
+# modify ...pub...war...                                                         -- 2016-06-27 --
+
+# modify seecfg                                                                  -- 2016-06-29 --
+# add  ...pt...                                                                  -- 2016-06-29 --
+# add script ptmode (a simple shell of pt-online-schema-change)                  -- 2016-06-29 --
+
+# modify kmproc (add monitoring of 'Preparing' state)                            -- 2016-07-04 --
+# modify tune_mysql (use pt to optimize tables if it is installed)               -- 2016-07-04 --
+# modify inst_mysql (install pt first)                                           -- 2016-07-04 --
+
+# enhance tune_mysql                                                             -- 2016-07-07 --
+# modify inst_tomcat (create /root/antDep ... if not created yet)                -- 2016-07-07 --
+
+# enhance modepv,modepv1 and withyou                                             -- 2016-07-10 --
+# modify clrcache,montoms,old_data,tune_mysql,tune_app and kmproc                -- 2016-07-10 --
+
+# enhance modepv and modepv1 ('ps -ef' time version)                             -- 2016-07-11 --
+# enhance modepv and modepv1 ('ps -ef' cnt version)                              -- 2016-07-12 --
+
+# add script skip_pv                                                             -- 2016-07-13 --
+# enhance modepv and modepv1                                                     -- 2016-07-13 --
+# enhance lbugfix                                                                -- 2016-07-13 --
+
+# modify inst_tomcat                                                             -- 2016-07-15 --
+# modify montoms                                                                 -- 2016-07-15 --
+
+# enhance inst_tomcat,addctom and install.sh                                     -- 2016-07-16 --
+# modify montoms                                                                 -- 2016-07-16 --
+
+# add scripts dupndx and dupndx1                                                 -- 2016-07-20 --
+
+# enhance scripts dupndx and dupndx1                                             -- 2016-07-21 --
+# modify testkey (change meaning of [tablename:indexexpression])                 -- 2016-07-21 --
+
+# add .stt_tom and enhance start_tomcat                                          -- 2016-07-22 --
+
+# enhance setwsta and gcserver                                                   -- 2016-07-25 --
+# modify montoms                                                                 -- 2016-07-25 --
+
+# enhance dupndx1                                                                -- 2016-07-26 --
+
+# modify tabprop                                                                 -- 2016-07-27 --
+# enhance sdump (with -u option added)                                           -- 2016-07-27 --
+# enhance sload                                                                  -- 2016-07-27 --
+# make massive modifications of db related scripts (add \`xxx\`)                 -- 2016-07-27 --
+# further treatment                                                              -- 2016-07-28 --
+
+# add ...auto...                                                                 -- 2016-08-01 --
+# enhance ...auto...                                                             -- 2016-08-02 --
+
+# modify  ...auto...                                                             -- 2016-08-03 --
+# modify  settz (Fix a time bug of Tencent CentOS 5.8 2.6.18-398.el5 release)    -- 2016-08-03 --
+
+# enhance settz                                                                  -- 2016-08-04 --
+
+# modify stop_tomcat                                                             -- 2016-08-10 --
+# add script optimize_table                                                      -- 2016-08-10 --
+# enhance dupndx1                                                                -- 2016-08-10 --
+
+# modify script jvstat (Hwlimit_threshold_high 60 -> 90)                         -- 2016-08-11 --
+# enhance tune_mysql with script optimize_table                                  -- 2016-08-11 --
+# modify adjcnf (add configuration item log_bin_trust_function_creators=1)       -- 2016-08-11 --
+
+# enhance stop_tomcat and start_tomcat(change modelog position)                  -- 2016-08-23 --
+# add apc_tom                                                                    -- 2016-08-23 --
+# add getpip                                                                     -- 2016-08-23 --
+# enhance montoms                                                                -- 2016-08-23 --
+ 
+# enhance stop_tomcat and start_tomcat(ajust modelog parameters)                 -- 2016-08-24 --
+# modify clrlogs (truncate my own logs,i.e. /root/mode/logs/*.log)               -- 2016-08-24 --
+
+# massive enhancements of tmpfile/tmpdir initialization parts                    -- 2016-08-25 --
+# massive enhancements of find (use '-L' option for some situations)             -- 2016-08-25 --
+# enhance autopub                                                                -- 2016-08-25 --
+
+# enhance apcfull (with worker & event modes supported)                          -- 2016-09-08 --
+# cf mark                                                                        -- 2016-09-10 --
+# modify apc_tom                                                                 -- 2016-09-26 --
+# enhance inst_mysql and mysql(MySQL server start failure by rpm due to selinux) -- 2016-09-29 --
+# enhance tompv                                                                  -- 2016-09-30 --
+
+# add sbadsql                                                                    -- 2016-10-09 --
+# modify mnthosts(fix ucloud /etc/hosts configuration)                           -- 2016-10-09 --
+# enhance scripts ptmode,optimize_table and dupndx1                              -- 2016-10-09 --
+
+# enhance script optimize_table                                                  -- 2016-10-10 --
+# enhance apcfull and montoms                                                    -- 2016-10-10 --
+
+# add scripts .pt_stat && ....ok                                                 -- 2016-10-11 --
+# enhance lbugfix && .inst_pt                                                    -- 2016-10-11 --
+# enhance ptmode && optimize_table                                               -- 2016-10-11 --
+
+#################################################################################################
+# enhance ptmode (in order to be embedded into sql)                              -- 2016-10-12 --
+# new version of seecfg (support sqls with ptmode embedded in it)                -- 2016-10-12 --
+#################################################################################################
+
+# enhance seecfg,optimize_table                                                  -- 2016-10-13 --
+
+# enhance trun_log                                                               -- 2016-10-17 --
+# enhance trun_log                                                               -- 2016-10-18 --
+# modify seecfg,dupndx1,dupndx and optimize_table                                -- 2016-10-18 --
+ 
+# and script modewait and enhance .inst_pt                                       -- 2016-10-19 --
+# modify ptmode and optimize_table (with more detailed mode messages)            -- 2016-10-19 --
+
+# modify optimize_table and tune_mysql (with more detailed comments)             -- 2016-10-20 --
+
+#################################################################################################
+# new method of java process monitoring 
+#################################################################################################
+# add .tomdirs,.jtomdirs,.jgettomp and .jseetom                                  -- 2016-10-21 --
+# enhance stop_tomcat,tctomcat and jvstat                                        -- 2016-10-21 --
+#################################################################################################
+
+# modify check_tomcat(limit tomcat name to one starting with 'tomcat')           -- 2016-10-23 --
+# modify ...pub...war(for pos)                                                   -- 2016-10-24 --
+
+# enhance clrlogs                                                                -- 2016-10-28 --
+#
+# modify check_tomcat                                                            -- 2016-10-28 --
+# massive check of a series of scripts (with forcive check_tomcat call)          -- 2016-10-28 --
+# enhance clrcache                                                               -- 2016-10-28 --
+
+# modify clrlogs(use linux 'date' calculation in stead of MySQL calculation)     -- 2016-11-02 --
+# modify lbugfix(fix ucloud CentOS 6.5 serious bug of 'grep' )                   -- 2016-11-02 --
+
+# enhance modepv and modepv1(final solution)                                     -- 2016-11-02 --
+
+# modify lbugfix (fix the version 2.20 grep of CentOS 6.x )                      -- 2016-11-03 --
+#
+#################################################################################################
+# modify lbugfix                                                                 -- 2016-11-04 --
+#################################################################################################
+# The 'grep -P' bug of vesion 2.20 grep is related with locale               
+# We simply replace version 2.20 grep with our version 2.6.3 one
+# ('grep -V' will show our version.'yum install grep' still show 2.20 version 
+#################################################################################################
+
+# modify adjcnf (fix MySQL Privilege Escalation/Race Condition Vulnerability)    -- 2016-11-08 --
+# add script health_check                                                        -- 2016-11-09 --
+
+# add scripts health_check_cpu,health_check_disk and health_check_memory         -- 2016-11-10 --
+# modify script health_check                                                     -- 2016-11-10 --
+
+# add ...sid and modify mnthosts                                                 -- 2016-11-11 --
+
+# simplify scripts cpumem and config_tomcat                                      -- 2016-11-14 --
+
+# modify stop_tomcat                                                             -- 2016-11-15 --
+
+# enhance kmproc (with select statement of the form '(select ...)' considered)   -- 2016-11-18 --
+
+# enhance montoms                                                                -- 2016-11-20 --   
+# enhance some mysqldump related scripts                                         -- 2016-11-20 --
+
+# enhance clrcache                                                               -- 2016-11-21 --
+
+# enhance ptmode and optimize_table                                              -- 2016-11-22 --
+# modify set_cron                                                                -- 2016-11-22 --
+
+# enhance sdump and sload (partially support asyncronous sdump/sload)            -- 2016-11-24 --
+
+# enhance montoms (restart certain single tomcats with 'not working' status)     -- 2016-11-26 -- 
+
+# enhance mysqldip (to support domain name)                                      -- 2016-11-28 --
+
+# modify gettomp,publish_war & autopub (with ipmsthek compatible treatment)      -- 2016-11-29 --
+# modify autopub (add pos to allowlist of autopub)                               -- 2016-11-29 --
+
+# enhance MySQL Server installation and upgrade scripts                          -- 2016-12-01 -- 
+
+# add setdsta and modedtask                                                      -- 2016-12-06 --
+
+# modify tomcatsafe,stt_tom,start_tomcat,stop_tomcat and gcserver                -- 2016-12-07 --
+
+# modify setwsta                                                                 -- 2016-12-08 --
+# modify modedtsk and setdstat                                                   -- 2016-12-12 --
+
+# modify srvman and msysctl                                                      -- 2016-12-21 --
+# modify srvman (test 6.x firewall performance)                                  -- 2016-12-22 --
+
+# enhance clrcache                                                               -- 2016-12-27 --
+# modify tctomcat and stop_tomcat                                                -- 2016-12-29 --
+
+# enhance config_tomcat                                                          -- 2017-01-03 --
+# enhance kmproc                                                                 -- 2017-01-07 --
+# modify upgrade_mysql_5.1.57_to_5.5.50(literal error: 5.5.17 should be 5.1.57)  -- 2017-01-07 --
+
+# merge scripts supporting MySQL 5.6.35 and xtrabackup 2.3.6                     -- 2017-01-10 --
+# enhance msysctl                                                                -- 2017-01-11 --
+
+# enhance clrlogs                                                                -- 2017-01-13 --
+# enhance ...stt_tom... (increase tomcat status probing interval)                -- 2017-01-13 --
+
+# EiPi batch modifications again                                                 -- 2017-01-14 --
+
+# add pis and enhance clrcahce & montoms                                         -- 2017-01-15 --
+# enhance clrcache                                                               -- 2017-01-16 --
+# enhance rep_config                                                             -- 2017-01-16 --
+# modify ...inst_mysql_55(56) and adjcnf (MySQL 5.[56] related setting)          -- 2017-01-16 --
+
+# modify xbback and add xbrestore                                                -- 2017-01-17 --
+
+# modify inst_xtra (delete old 1.6.4 version and try to install 2.3.6 version)   -- 2017-01-18 --
+# modify .jseetom and jvstat                                                     -- 2017-01-18 --
+# modify inst_tomcat (with some pos customized support)                          -- 2017-01-18 --
+
+# modify health_check_disk (excluding devtmpfs automount check)                  -- 2017-01-19 --
+# enhance xbback (with -d option)                                                -- 2017-01-19 --
+# add xbrmhis                                                                    -- 2017-01-19 --
+# modify montoms (add server code to mail title)                                 -- 2017-01-19 --
+
+# enhance clrcache                                                               -- 2017-02-06 --
+
+# enhance clrcache                                                               -- 2017-02-09 --
+# add badsql_query_time and modify clrlogs                                       -- 2017-02-09 --
+
+# modify adjcnf                                                                  -- 2017-02-09 --
+
+# modify ptmode(max-load=5->9 because of jjdc dead thread)                       -- 2017-02-10 --
+# -----------------------------------------------------------------------------------------------
+# This is the jjdc dead thread
+# -----------------------------------------------------------------------------------------------
+# update sync_data set json_str = REPLACE(json_str,'\\','\\\\') where id = '25450247'
+# -----------------------------------------------------------------------------------------------
+
+# enhance seecfg                                                                 -- 2017-02-15 --
+# modify tomupdtl                                                                -- 2017-02-15 --
+
+# add mntmail and modify inst_com                                                -- 2017-02-17 --
+
+# modify inst_tomcat                                                             -- 2017-02-20 --
+# enhance mntmail                                                                -- 2017-02-20 --
+
+# rewrite mnthosts                                                               -- 2017-02-22 --
+# enhance mntmail                                                                -- 2017-02-22 --
+
+# enhance tcmysql & mysql(hostname change will not affect 'mysql stop')          -- 2017-02-23 --
+
+# enhance seecfg & tfile (grep 2.20 compatible enhancement)                      -- 2017-02-23 --
+
+# modify adjcnf                                                                  -- 2017-02-28 --
+
+# modify stop_tomcat (log 'stop' to modelog when tomcat is already stopped)      -- 2017-03-15 --
+
+# add qcache_adj and modify tune_mysql                                           -- 2017-03-18 --
+
+# enhance gcserver (with apache dead connection detecting)                       -- 2017-03-20 --
+# enhance apcfull (with estimation of apache dead connection existency)          -- 2017-03-20 --
+

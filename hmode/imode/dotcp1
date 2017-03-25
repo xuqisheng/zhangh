@@ -1,0 +1,18 @@
+#!/bin/bash
+. /root/imode/cfg/.imode_aliases
+Hloop=0
+while [ 1 ];do
+   sleep 1
+   Hloop=$[$Hloop+1]
+   echo -n "loop $Hloop "
+   Hd1=`date '+%H:%M:%S'`
+   ssh $1 "echo -n 'ok '"
+   Ha=$?
+   Hd2=`date '+%H:%M:%S'`
+   if [ $Ha -eq 255 ]; then
+      echo "fail with exit status $Ha [S $Hd1 E $Hd2]"
+      break
+   else
+      echo "[S $Hd1 E $Hd2]"
+   fi
+done

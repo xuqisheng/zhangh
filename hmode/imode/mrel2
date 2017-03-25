@@ -1,0 +1,6 @@
+for i in `cat /root/servers.txt | grep -v "^#" | grep -E "^${1:-.*}$"`; do
+   echo
+   echo " ========================================= server $i ======================================== "
+   echo
+   ssh $i "if [ -f /root/servers.txt ]; then echo 'starting ...';/root/mode/mrel '$2';echo 'complete!!!'; else echo not required to do;fi"
+done

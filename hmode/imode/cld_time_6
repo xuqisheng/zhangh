@@ -1,0 +1,16 @@
+#!/bin/bash 
+
+if cat /etc/re*re* 2>/dev/null | grep -E ' 6\.[0-9] '>/dev/null; then
+   if hostname | grep -E '^(VM|AY|iZ)' >/dev/null; then
+      cat /etc/re*re* 2>/dev/null | grep -E ' 6\.[0-9] '
+      uname -a
+      hostname 
+      cat /etc/sysconfig/clock
+      /sbin/hwclock --localtime
+      date
+      cat /etc/adjtime | tail -n 1
+   fi
+fi
+
+
+

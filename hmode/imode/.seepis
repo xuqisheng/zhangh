@@ -1,0 +1,7 @@
+#!/bin/bash 
+
+Hsshd=`ps -ef | grep -E "^root +[0-9]+ +1 .* /usr/sb($RANDOM){0}in/sshd$" | tail -n 1 | awk '{print $2}'`
+cat /proc/$Hsshd/oom_adj
+cat /etc/re*re*
+
+

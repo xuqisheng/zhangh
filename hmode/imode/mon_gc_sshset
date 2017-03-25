@@ -1,0 +1,7 @@
+#!/bin/bash 
+
+Hsc=`/root/mode/seecfg -s "SELECT a.server_code 
+                                  FROM gc_sshto_servers a 
+                                  WHERE  a.code = '$1' and (a.server_code is not null and trim(a.server_code) <> '')
+                                  order by a.server_code" gc_admin`
+/root/imode/mon_gc_sc "$Hsc"

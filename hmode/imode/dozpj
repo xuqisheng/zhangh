@@ -1,0 +1,11 @@
+##
+. /root/imode/cfg/.imode_aliases
+#
+for i in `cat /root/zpj.txt | grep -v "^#" | grep -E "^${1:-.*}$"`; do
+
+   echo
+   echo " ========================================= server $i ======================================== "
+   echo
+   ssh $i "ls -l /usr/local/apache*/htdocs/update 2>/dev/null | grep -E 'iHotel1\.[0-9]+' | sed -re 's/.*(iHotel.*)/\1/'  | sort -r | sed -n '1 p'"
+done
+

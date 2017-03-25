@@ -1,0 +1,20 @@
+#!/bin/bash 
+
+Hpos=`sed -n "/^$1$/ =" /root/servers.txt`
+[ -z "$Hpos" ] && exit
+while [ $Hpos -ge 2 ];do
+   Hpos=$[$Hpos-1]
+   Hline=`sed -n "$Hpos p" /root/servers.txt | tr -d ' #'`
+   if echo "$Hline" | grep -P '^[0-9a-zA-Z\._-]+$' > /dev/null; then
+      echo "$1"
+      exit
+   elif [ -n "$Hline" ]; then
+      echo "$Hline"
+      exit
+   else
+      :
+   fi
+done
+echo "$1"
+exit
+

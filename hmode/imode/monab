@@ -1,0 +1,21 @@
+##
+. /root/imode/cfg/.imode_aliases
+#
+echo
+echo
+date
+for i in `cat /root/servers.txt | grep -v "^#" | grep -E "^${1:-.*}$"`; do
+   echo
+   echo " ========================================= server $i ======================================== "
+   echo
+   ssh $i "/root/mode/seecfg \"show processlist\""
+   Hv=`ssh $i "/root/mode/seecfg -s \"show global status\"" | grep -E "(Aborted_clients|Connections)"`
+   echo $Hv | 
+   while read Hig1 Hi Hig2 Hj;do
+      echo -n $Hv
+      echo -n " Abrate "
+      Habr=`echo "$Hi*100/$Hj" | bc -l`
+      echo "$Habr%"
+   done
+done
+

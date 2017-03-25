@@ -1,0 +1,116 @@
+#!/bin/sh
+# -------------------------------------------------------------------------------------
+# function:
+#          compare index differences of multiple databases
+# -------------------------------------------------------------------------------------
+# usages  :
+#          ./ndxcmp [<mysql-server-ip>] <dbname1> <dbname2> ... 
+# -------------------------------------------------------------------------------------
+# e.g.    :
+#          ./ndxcmp 6.13 db1 db2 db3 db4
+# -------------------------------------------------------------------------------------
+
+# check reentrance
+
+if [ -x /etc/ifconfig ]; then
+   HSHTMP=""
+else
+   HSHTMP="sh.*"
+fi
+MYFILE="/root/mode/tmp/hryndxcmp$$.tmp"
+ps -ef > $MYFILE
+if [ `grep -E "${HSHTMP}ndxcmp" $MYFILE | grep -v "exectask ndxcmp" | wc -l` -gt 1 ]; then
+   rm -f $MYFILE 
+   echo "Another ndxcmp task is running!" && exit 1
+fi
+rm -f $MYFILE 
+
+# get options
+
+HOPTIONS=""
+while (echo "'$1'"  | grep -E  -e "^'-" > /dev/null)
+do
+   HOPTIONS="$HOPTIONS$1"
+   shift 
+done
+
+# get mysql server ip 
+
+. /root/mode/mysqldip
+
+# check if databases are provided to compare
+
+HDBCNT=$#
+
+if [ "$HDBCNT" -eq 0 ]; then
+   echo "Databases should be provided for ndxcmp to compare!!" && exit 1
+fi
+
+# check if duplicate dbnames exist
+
+HDBS="$*"
+
+if [ `echo $HDBS | tr " " "\n" | wc -l` -ne `echo $HDBS | tr " " "\n" | sort | uniq -u | wc -l` ]; then
+   echo "Duplicate databases are not allowed!!" && exit 1
+fi 
+
+# 2 or more databases are required
+
+if [ $HDBCNT -lt 2 ]; then
+   echo "Two or more databases are required for ndxcmp to compare!" && exit 1
+fi
+
+# check if each database is appropriate 
+
+for i in `echo $HDBS`;do
+   /root/mode/testdb $HMYSQLDIP $i || exit 1
+done
+
+# begin to compare ...
+
+HTBLIST="/root/mode/tmp/htblist$$.tmp"
+
+# prepare table list 
+
+Hwherecond="( 1=0"
+for i in `echo $HDBS`; do
+   Hwherecond="$Hwherecond or table_schema='$i'"
+done
+Hwherecond="$Hwherecond )"
+/root/mode/seecfg -s $HMYSQLDIP "select table_name from information_schema.tables where $Hwherecond group by table_name having count(1) >= $HDBCNT order by table_name" > $HTBLIST
+
+#
+
+{
+echo "############# ndxcmp $HMYSQLDIP2 $* #############"
+echo 
+echo "ndxcmp began at `LANG=en_US;date`"
+for i in `cat $HTBLIST`;do
+    
+    if [ -z "$HOPTIONS" ]; then
+       echo
+       echo "table << $i >>"
+       echo
+       Hpretab=
+    else
+       echo
+       Hpretab="'$i' as tablename,"
+    fi
+
+    /root/mode/seecfg $HMYSQLDIP "select $Hpretab a.m_index_exp as \`index expression\`,group_concat(a.m_db order by m_db) as \`in databases\`
+                                  from (select group_concat(column_name order by seq_in_index) as m_index_exp,table_schema as m_db
+                                        from information_schema.statistics
+                                        where $Hwherecond AND table_name='$i'
+                                        group by table_schema,index_name
+                                       ) a
+                                  group by a.m_index_exp
+                                  order by a.m_index_exp"
+done
+echo 
+echo "ndxcmp completed at `LANG=en_US;date`"
+echo
+} | tee -a /root/mode/logs/ndxcmp.log
+
+# 
+
+rm -f $HTBLIST

@@ -1,0 +1,5 @@
+#!/bin/bash 
+
+export HBLACKBOX2=a
+/root/imode/iseecfg "$@"
+

@@ -1,0 +1,16 @@
+##
+. /root/imode/cfg/.imode_aliases
+#
+for i in `cat /root/curl.txt | grep -v "^#" | grep -E "^${1:-.*}$"`; do
+
+   echo
+   echo " ========================================= server $i ======================================== "
+   echo
+
+   # curl
+
+   ssh $i "ps -ef | grep -Ei '(curl|platform)' | grep -v grep"
+done
+
+
+

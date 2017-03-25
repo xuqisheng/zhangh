@@ -1,0 +1,9 @@
+#!/bin/bash
+
+export HBLACKBOX2=1
+export LANG=zh_CN.UTF-8
+if cat /etc/redhat-release | grep -E " release 6\..*" > /dev/null; then
+   cat /icheck.txt | grep -E "^[\+\|]" | tr -d '\r' 
+else
+   cat /icheck.txt | grep -E "^[\+\|]" | tr -d '\r' | iconv -f utf-8 -t gb18030
+fi  | mail -s "icheck `LANG=en_US;date`" 625835738@qq.com

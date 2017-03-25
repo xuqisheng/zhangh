@@ -1,0 +1,32 @@
+#!/bin/bash 
+# ------------------------------------------------------------------
+# function:
+# usages  :
+# ------------------------------------------------------------------
+
+cd /usr/local
+for i in `ls -d tomcat*/ 2>/dev/null | sed -re "s/\/$//"`;do
+   if /root/mode/isctom $i; then
+      if ! cat $i/conf/server.xml | grep -E "<!-- apache[1-7] -->" >/dev/null; then
+         echo -n "apache "
+      else
+         echo -n `cat $i/conf/server.xml | grep -E "<!-- apache[1-7]? -->" | sed -re "s/.*<!-- (apache[1-7]?) -->.*/\1/" | sed -n "1 p"`
+      fi
+      if [ ${#i} -le 10 ]; then
+         Htom="$i          "
+         Htom=${Htom:0:10}
+      else
+         Htom="$i"
+      fi
+      echo " $Htom"
+   fi
+done | sort | awk '{++state[$1]} END {for(key in state) print key,"\t",state[key]}' |
+while read Ha Htcnt;do
+   Hwcnt=`cat /usr/local/$Ha/conf/workers.properties 2>/dev/null | grep ajp13 | wc -l`
+   if [ $Hwcnt -ne $Htcnt ]; then
+      echo "$Ha Hwcnt=$Hwcnt Htcnt=$Htcnt"
+   fi
+done 
+
+#
+

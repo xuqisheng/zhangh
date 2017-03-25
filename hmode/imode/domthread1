@@ -1,0 +1,13 @@
+##
+. /root/imode/cfg/.imode_aliases
+#
+for i in `cat /root/servers.txt | grep -v "^#" | grep -E "^${1:-.*}$"`; do
+   echo
+   echo " ========================================= server $i ======================================== "
+   echo
+   Hmax=`ssh $i "/root/mode/seecfg -s 'show variables'" | grep -i '^max_connections' | sed -re 's/^[^ \t]+[ \t]+(.*)/\1/'`
+   Htca=`ssh $i "/root/mode/seecfg -s 'show variables'" | grep -i '^thread_cache_size' | sed -re 's/^[^ \t]+[ \t]+(.*)/\1/'`
+   if [ "$Htca" != "$Hmax" ]; then
+      echo "$i       max_connections:$Hmax   thread_cache_buffer:$Htca"
+   fi
+done

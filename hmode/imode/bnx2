@@ -1,0 +1,18 @@
+#
+. /root/imode/cfg/.imode_aliases
+#
+for i in `cat /root/bnx2.txt | grep -v "^#" | grep -E "^${1:-.*}$"`; do
+   echo
+   echo " ========================================= server $i ======================================== "
+   echo
+   #ssh $i "uname -a"
+   #ssh $i "modinfo bnx2 | head -n 3"
+   #ssh $i "ethtool -i eth0"
+   #ssh $i "lsmod | grep bnx2"
+   #ssh $i "find /lib/modules/2*/ -name bnx2.ko"
+   #ssh $i "rm -f /lib/modules/2.6.18-164.el5/updates/*"
+   #ssh $i "rm -f /lib/modules/2.6.18-194.el5/updates/*"
+   #ssh $i "depmod -a"
+   ssh $i "cat /usr/local/tomcat6/logs/catalina.2* 2>/dev/null | grep 'memberDisappeared'"
+
+done

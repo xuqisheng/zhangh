@@ -1,0 +1,59 @@
+#!/bin/bash 
+
+
+# get options
+
+HOPTIONS=""
+while (echo "'$1'"  | grep -E  -e "^'-" > /dev/null)
+do
+   HOPTIONS="$HOPTIONS$1"
+   shift
+done
+
+#
+
+Hctype=
+if [ -z "$1" ]; then
+   # if called from crond
+   if [ `/root/mode/traceps "crond"` = 'suc' ]; then
+      . /root/.bashrc 2>/dev/null
+      export HBLACKBOX2=1
+   else
+      /root/mode/confirm "Are you sure to do batch work of your choice on all server groups" more || exit 1
+   fi
+   Hlines=`/root/mode/seecfg -s "select b.server_code from gc_server_group_info b
+                                                      order by b.server_group_code,b.server_code" gc_admin` 
+else 
+   if echo "'$HOPTIONS" | grep -E -e "(-h)(-|$)" >/dev/null; then
+      # ssh code
+      Hctype=ssh
+      Hlines="$1"
+   else
+      Hlines=`/root/mode/seecfg -s "select b.server_code from gc_server_group_info b 
+                                                         where b.server_group_code = '$1'" gc_admin`
+   fi
+fi
+
+#
+
+for i in `echo $Hlines`; do
+   if [ "$Hctype" = "ssh" ]; then
+      Hsc=`/root/imode/gc_sshc_sc "$i"`
+      Hsshc="$i"
+   else
+      Hsc=$i
+      Hsshc=`/root/imode/gc_sc_sshc "$i"`
+   fi
+   Hsshmac=`/root/imode/gc_sshc_sshmac "$Hsshc"`
+   if ! /root/imode/gc_sshmac_ok "$Hsshmac"; then
+      /root/mode/modemsg dogc "Hsshc:$Hsshc Hsc:$Hsc ...... connection failed"
+      continue
+   fi
+   #echo "/root/mode/.modesid" | eval $Hsshmac
+   echo $Hsshc
+   echo "cat /usr/local/apache*/logs/error_log 2>/dev/null | grep -E 'fuckwdcp' | sed -re 's/.*\[client (.*)\].*/\1/' | sort | uniq"  | eval $Hsshmac
+done
+
+#
+
+

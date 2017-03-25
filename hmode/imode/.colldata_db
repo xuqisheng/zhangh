@@ -1,0 +1,58 @@
+#!/bin/bash 
+# ---------------------------------------------------------------------------------------------------------------------------------------------------------------
+# function:
+# ----------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+
+if [ "`/root/mode/getpip`" = "183.129.215.114" ]; then
+   /root/mode/modemsg blackbox2 "internel ip"  
+   exit
+fi
+Hsid=`/root/mode/.modesid`
+Hsapache=
+/root/mode/seetom | 
+while read -r Hc1 Hc2 Hcother;do
+   #
+   if ! echo "$Hcother" | grep -E "\((ipms|ipmsthef|ipmsthek|ipmsgroup|ipmsmember)( |\))" >/dev/null; then
+      #/root/mode/modemsg blackbox2 "not ipms app"  
+      continue
+   fi
+   #
+   if echo $Hc1 | grep -E "^[sS]ingle$" >/dev/null; then
+      Hsapache=
+      Hat=$Hc2
+   else
+      if [ "$Hsapache" = "$Hc1" ]; then
+          continue
+      fi
+      Hsapache=$Hc1
+      Hat=$Hc1
+   fi
+   #
+   if echo "$Hat" | grep -E "^apache" >/dev/null; then
+      Hat1=`echo $Hat | sed -re "s/^apache(.*)/build\1.properties/"`
+   else
+      Hat1="$Hat.properties"
+   fi
+   Hdbip=`/root/mode/mod_config /root/antDep/$Hat1 'db.root' '#Get#' 2>/dev/null`
+   Hdbname=`/root/mode/mod_config /root/antDep/$Hat1 'db.name' '#Get#' 2>/dev/null`
+   if [ -z "$Hdbip" -o -z "$Hdbname" ]; then
+      /root/mode/modemsg blackbox2 "dbip or dbname empty" more 
+      continue
+   fi
+   if ! /root/mode/seecfg $Hdbip "" $Hdbname &>/dev/null; then
+      /root/mode/modemsg blackbox2 "$Hat:connection to db '$Hdbname' at '$Hdbip' failed"  more
+      continue
+   fi 
+   if ! /root/mode/testobjects $Hdbip "[hotel.app_type][hotel_group]" $Hdbname &>/dev/null; then
+      /root/mode/modemsg blackbox2 "no hotel or hotal_group table"  more
+      continue
+   fi 
+
+   #
+   echo "$Hdbip:$Hdbname"
+done
+ 
+#
+
+

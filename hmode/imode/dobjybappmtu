@@ -1,0 +1,7 @@
+##
+. /root/imode/cfg/.imode_aliases
+#
+echo
+echo " ========================================= server $i ======================================== "
+echo
+ssh bjyb "date;/root/mode/appmtu 124.65.183.14 MORE"

@@ -1,0 +1,17 @@
+##
+. /root/imode/cfg/.imode_aliases
+#
+for i in `cat /root/bv.txt | grep -v "^#" | grep -E "^${1:-.*}$"`; do
+
+   echo
+   echo " ========================================= server $i ======================================== "
+   echo
+
+   #ssh $i "ls -1 /usr/local/apache*/htdocs/update/iHotel1.18* 2>/dev/null | grep -E 'iHotel(1\.187.*|1\.188.*|1\.189)$' >/dev/null &&
+   #        ! ls -1 /usr/local/apache*/htdocs/update/iHotel1.1[89]* 2>/dev/null | grep -E 'iHotel(1\.189\..*|1\.19[0-9].*)$' >/dev/null && 
+   #        { echo bad ihotel version;ls -1 /usr/local/apache*/htdocs/update/iHotel1.18* 2>/dev/null | tail -n 1; }" | grep -E '' && /root/imode/gsurl2 $i
+   #/root/imode/gsurl2 $i
+   #ssh $i "/root/mode/seetom"
+   #ssh $i "/root/mode/jvstat"
+done
+

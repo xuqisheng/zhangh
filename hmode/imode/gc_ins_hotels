@@ -1,0 +1,30 @@
+#!/bin/bash 
+#-----------------------------------------
+
+exit
+
+#
+Hsqls=`find /pjdir -name "?.sql" | sort`
+for i in `echo $Hsqls`;do
+  itxt=`echo $i | sed -re "s/sql/txt/"`
+  j=`echo $i | sed -re "s/.*([gh])\/([0-9]{2}).*/\1/"`
+  k=`echo $i | sed -re "s/.*([gh])\/([0-9]{2}).*/\2/"`
+  echo " ------- $i $itxt -------"
+  # create table 
+  /root/mode/seecfg $i gc_admin 
+  # insert contents 
+  if [ "$j" = 'h' ]; then
+     /root/mode/seecfg -s "set unique_checks=0;set foreign_key_checks=0;
+                           load data local infile '$itxt' into table \`hotel_$k\`" gc_admin
+     /root/mode/seecfg -s "create temporary table h select distinct * from hotel_$k;
+                           truncate table hotel_$k;
+                           insert into hotel_$k select * from h" gc_admin 
+  else
+     /root/mode/seecfg -s "set unique_checks=0;set foreign_key_checks=0;
+                           load data local infile '$itxt' into table \`hotel_group_$k\`" gc_admin
+     /root/mode/seecfg -s "create temporary table h select distinct * from hotel_group_$k;
+                           truncate table hotel_group_$k;
+                           insert into hotel_group_$k select * from h" gc_admin 
+  fi
+done
+

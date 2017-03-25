@@ -1,0 +1,11 @@
+#
+. /root/imode/cfg/.imode_aliases
+#
+Htp=$$
+/root/mode/confirm "Are you sure to set ssh using /root/servers.txt" || exit 
+for i in `cat /root/servers.txt | grep -v "^#" | grep -E "^${1:-.*}$"`; do
+   echo $i
+   scp /root/.ssh/id_rsa.pub $i:/root/chryc$Htp
+   ssh $i "mkdir -p /root/.ssh;chmod 700 /root/.ssh;touch /root/.ssh/authorized_keys;cat /root/.ssh/authorized_keys | grep \"\`cat /root/chryc$Htp\`\" > /dev/null  || cat /root/chryc$Htp >> /root/.ssh/authorized_keys"
+   ssh $i "rm -f /root/chryc$Htp"
+done

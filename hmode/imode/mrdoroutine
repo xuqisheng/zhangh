@@ -1,0 +1,11 @@
+for i in `cat /root/servers.txt | grep -v "^#" | grep -E "^${1:-.*}$"`; do
+   for j in `ssh $i "cat /root/servers.txt 2>/dev/null" | grep -E -v "^#"`;do
+       echo " ========================================= server $i:$j ======================================== "
+       #ssh $i "ssh $j \"/root/mode/mod_tthread;echo ok\""
+
+       #ssh $i "ssh $j \"/root/mode/gcserver cluster\""
+       #ssh $i "ssh $j \"/root/mode/gcserver1 cluster\""
+       #ssh $i "ssh $j \"/root/mode/gcserver2 cluster\""
+
+   done
+done

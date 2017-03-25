@@ -1,0 +1,24 @@
+#!/bin/bash 
+# ----------------------------------------------
+# function:
+#          get a sshcode from server_code 
+# ----------------------------------------------
+
+# server_code must not be empty
+
+if [ -z "$1" ]; then
+   exit 1
+fi
+
+# sshcode must not be empty
+
+Hsshc=`/root/mode/seecfg -s "select code from gc_sshto_servers
+                                         where server_code='$1' order by ip1,ip2,ip0 limit 0,1" gc_admin`
+if [ -z "$Hsshc" ]; then
+   exit 1
+fi
+echo "$Hsshc"
+
+# end
+
+

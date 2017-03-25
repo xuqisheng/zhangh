@@ -1,0 +1,50 @@
+#!/bin/bash
+# --------------------------------------
+# function:
+#           
+# usage   :
+#           ./cdb_new [<apachemode>]
+# e.g.    : 
+#           ./cdb_new apache
+# --------------------------------------
+
+#
+
+. /root/mode/apachemode
+
+#
+
+[ -d /usr/local/$Hapachemode/conf ] || exit 1
+
+#
+
+/root/mode/gcserver$Hapachetail status >/dev/null 2>&1 && echo "App server is running!use gcserver cluster after change"
+
+#
+
+cd /usr/local
+for i in `ls -d tomcat*/ 2>/dev/null | sed -re "s/\/$//"`; do
+   /root/mode/check_tomcat $i || continue
+   if /root/mode/isctom $i; then
+      if /root/mode/isatom $i $Hapachemode; then
+         #ipms
+         cat /usr/local/$i/webapps/ipms/WEB-INF/classes/config/jdbc.mysql.properties |
+         sed -re "s/^(jdbc\.url=jdbc:mysql:\/\/)(.*):(.*)\/(.*)/\1$HdbR:\3\/$HdbN/"  > /root/mode/tmp/hhrycdb$$.tmp
+         cp -f /root/mode/tmp/hhrycdb$$.tmp /usr/local/$i/webapps/ipms/WEB-INF/classes/config/jdbc.mysql.properties
+         #ipms1
+         cat /usr/local/$i/webapps/ipms1/WEB-INF/classes/config/jdbc.mysql.properties |
+         sed -re "s/^(jdbc\.url=jdbc:mysql:\/\/)(.*):(.*)\/(.*)/\1$HdbRtr:\3\/$HdbNtr/"  > /root/mode/tmp/hhrycdb$$.tmp
+         cp -f /root/mode/tmp/hhrycdb$$.tmp /usr/local/$i/webapps/ipms1/WEB-INF/classes/config/jdbc.mysql.properties
+      else
+         continue
+      fi
+   fi
+done
+
+#
+
+rm -f /root/mode/tmp/hhrycdb$$.tmp
+
+#
+
+

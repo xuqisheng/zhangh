@@ -1,0 +1,9 @@
+#!/bin/bash 
+#-----------------------------------------
+
+exit
+
+#
+/root/mode/seecfg -s "set unique_checks=0;set foreign_key_checks=0;
+                      load data local infile '/cfdir/cf.txt' into table hotel_new_collect" gc_admin
+

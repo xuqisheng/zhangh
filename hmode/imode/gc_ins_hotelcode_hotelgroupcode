@@ -1,0 +1,12 @@
+#!/bin/bash 
+#-----------------------------------------
+
+exit
+
+#
+/root/mode/seecfg -s "set unique_checks=0;set foreign_key_checks=0;
+                      load data local infile '/hgdir/codes.txt' into table hotelcode_hotelgroupcode" gc_admin
+/root/mode/seecfg -s "create temporary table h select distinct * from hotelcode_hotelgroupcode;
+                      truncate table hotelcode_hotelgroupcode;
+                      insert into hotelcode_hotelgroupcode select * from h" gc_admin 
+

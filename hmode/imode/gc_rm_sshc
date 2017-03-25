@@ -1,0 +1,36 @@
+#!/bin/bash 
+# --------------------------------------------------
+# function:
+#          remove information about ssh code '$1'
+# --------------------------------------------------
+
+# ssh code must not be empty
+
+if [ -z "$1" ]; then
+   exit 1
+fi
+
+# get server code of ssh code "$1"
+
+Hsc=`/root/imode/gc_sshc_sc "$1"`
+if [ -z "$Hsc" ]; then
+   /root/mode/modemsg gc_rm_sshc "ssh code '$1' doesn't exist or the corresponding server code is empty" more
+   exit 1
+fi
+Hsshcsetcnt=`/root/mode/seecfg -s "select count(1) from gc_sshto_servers where server_code='$Hsc'" gc_admin`
+if [ $Hsshcsetcnt -eq 1 ]; then
+   /root/mode/modemsg gc_rm_sshc "This is the only ssh connection of server code '$Hsc'" more
+   exit 1
+fi
+
+#
+
+/root/mode/confirm "Are you sure to remove all information of ssh code '$1'" || exit 
+
+#
+
+/root/mode/seecfg "delete from gc_sshto_servers      where code='$1'" gc_admin
+/root/mode/seecfg "delete from gc_server_exceptions  where ssh_code='$1'" gc_admin
+
+#
+

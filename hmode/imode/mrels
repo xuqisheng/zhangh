@@ -1,0 +1,5 @@
+. /root/imode/cfg/.imode_aliases
+#
+for i in `cat /root/mrels.txt | grep -v "^#" | grep -E "^${1:-.*}$"`; do
+   /root/imode/mrel2 $i "$2"
+done

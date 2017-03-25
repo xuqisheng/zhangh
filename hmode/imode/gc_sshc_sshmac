@@ -1,0 +1,48 @@
+#!/bin/bash 
+# -----------------------------------------------
+# function:
+#          get sshmac from sshcode
+# -----------------------------------------------
+
+# sshcode must not be empty
+
+if [ -z "$1" ]; then
+   exit 1
+fi
+
+# sshcode should be defined
+
+Holine=`/root/mode/seecfg -s "select code,server_code,ip0,port0,ip1,port1,ip2,port2
+                              from gc_sshto_servers
+                              where code = '$1'" gc_admin` 
+if [ -z "$Holine" ]; then
+   exit 1
+fi
+
+#
+ 
+Hs=`echo "$Holine"     | sed -re "s/^([^\t]*\t){0}(.*)(\t[^\t]*){7}/\2/"`
+Hip0=`echo "$Holine"   | sed -re "s/^([^\t]*\t){2}(.*)(\t[^\t]*){5}/\2/"`
+Hport0=`echo "$Holine" | sed -re "s/^([^\t]*\t){3}(.*)(\t[^\t]*){4}/\2/"`
+Hip1=`echo "$Holine"   | sed -re "s/^([^\t]*\t){4}(.*)(\t[^\t]*){3}/\2/"`
+Hport1=`echo "$Holine" | sed -re "s/^([^\t]*\t){5}(.*)(\t[^\t]*){2}/\2/"`
+Hip2=`echo "$Holine"   | sed -re "s/^([^\t]*\t){6}(.*)(\t[^\t]*){1}/\2/"`
+Hport2=`echo "$Holine" | sed -re "s/^([^\t]*\t){7}(.*)(\t[^\t]*){0}/\2/"`
+#
+if echo "$Hip1" | grep -E "^(NULL| *)$" >/dev/null && echo "$Hip2" | grep -E "^(NULL| *)$" >/dev/null ;then
+   Hsshmac="ssh -C -q -p$Hport0 $Hip0 \"cat - | bash\""
+elif ! echo "$Hip1" | grep -E "^(NULL| *)$" >/dev/null && echo "$Hip2" | grep -E "^(NULL| *)$" >/dev/null ;then
+   Hsshmac="ssh -C -q -oproxycommand=\"nc -x $Hip1:$Hport1 %h %p\" -p$Hport0  $Hip0 \"cat - | bash\""
+elif echo "$Hip1" | grep -E "^(NULL| *)$" >/dev/null && ! echo "$Hip2" | grep -E "^(NULL| *)$" >/dev/null ;then
+   Hsshmac="ssh -C -q -p$Hport2 $Hip2 \"ssh -q -p$Hport0 $Hip0 \\\"cat - | bash\\\"\""
+else
+   Hsshmac="ssh -C -q -oproxycommand=\"nc -x $Hip1:$Hport1 %h %p\"  -p$Hport2 $Hip2  \"ssh -C -q -p$Hport0 $Hip0 \\\"cat - | bash\\\"\""
+fi
+if echo "$Hs" | grep -E "^jjzx-app01__" >/dev/null; then
+   Hsshmac=`echo "$Hsshmac" | sed -re "s/(cat - \| bash)/sudo su - root -c '\1'/"`
+fi
+echo "$Hsshmac"
+
+# end
+
+

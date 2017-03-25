@@ -1,0 +1,53 @@
+##
+. /root/imode/cfg/.imode_aliases
+#
+for i in `cat /root/mservers.txt | grep -v "^#" | grep -E "^${1:-.*}$"`; do
+   if echo "$i" | grep ":" >/dev/null; then
+      j=$(echo $i | sed -re "s/(.*):(.*)/\1/")
+      k=$(echo $i | sed -re "s/(.*):(.*)/\2/")
+   else
+      j=$i
+      k=
+   fi
+   echo
+   echo " ========================================= server $i ======================================== "
+   echo
+   #
+   if echo "$2" | grep -E "^[tT]" >/dev/null; then
+      Hlogtail='.top'
+   elif echo "$2" | grep -E "^[hH]" >/dev/null; then
+      Hlogtail='.top.his'
+   fi
+   #
+   if [ "$k" = "" ]; then
+      Hfiletoget=`ssh $i "ls -1t /var/lib/mysql/*-slow.log$Hlogtail | sed -n '1 p'"`
+      scp -C $i:$Hfiletoget /$i.badsql$$
+   else
+      Hfiletoget=`ssh $j "ssh $k \"ls -1t /var/lib/mysql/*-slow.log$Hlogtail | sed -n '1 p'\""`
+      ssh $j "scp -C $k:$Hfiletoget /$i.badsql$$"
+      scp -C $j:/$i.badsql$$  /
+      ssh $j "rm -f /$i.badsql$$"
+   fi
+   if echo "$2" | grep -E "^[tThH]" >/dev/null; then
+      Hsname=/$i.rows_sent$Hlogtail
+      {
+      echo "#"
+      echo "# This is the rows_sent $Hsname file from $i"
+      cat /$i.badsql$$
+      } > $Hsname 
+   else
+      if echo "$2" | grep -E "^[eE]" >/dev/null; then
+         Hsname=/$i.rows_examined.badsql
+         /root/imode/gbsql_rows_examined /$i.badsql$$ $i > $Hsname
+      elif echo "$2" | grep -E "^[sS]" >/dev/null; then
+         Hsname=/$i.rows_sent.badsql
+         /root/imode/gbsql_rows_sent /$i.badsql$$ $i     > $Hsname
+      else
+         Hsname=/$i.query_time.badsql
+         /root/imode/gbsql_query_time /$i.badsql$$ $i    > $Hsname
+      fi
+   fi
+   rm -f /$i.badsql$$
+   echo "The badsql file of $i is at $Hsname"
+done
+

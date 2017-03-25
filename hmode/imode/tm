@@ -1,0 +1,37 @@
+#
+cat > /htestmess$$.sql <<'EOF'
+/*
+----each----:[async_message]
+*/
+insert async_message (hotel_group_id,hotel_id,to_client,from_client,header,body,timestamp,time_to_live,
+                     create_user,create_datetime,modify_user,modify_datetime)
+                     select 2,10,'','',
+                     'newline in body',
+                     '1\n2\n3\n4',
+                     1000*unix_timestamp(now()),1000000,
+                     'HRY',now(),'HRY',now();
+insert async_message (hotel_group_id,hotel_id,to_client,from_client,header,body,timestamp,time_to_live,
+                     create_user,create_datetime,modify_user,modify_datetime)
+                     select 2,10,'','',
+                     '\\n in body',
+                     '1\\n2\\n3\\n4',
+                     1000*unix_timestamp(now()),1000000,
+                     'HRY',now(),'HRY',now();
+insert async_message (hotel_group_id,hotel_id,to_client,from_client,header,body,timestamp,time_to_live,
+                     create_user,create_datetime,modify_user,modify_datetime)
+                     select 2,10,'','',
+                     'enter-key in body',
+                     '1\r2\r3\r4',
+                     1000*unix_timestamp(now()),1000000,
+                     'HRY',now(),'HRY',now();
+insert async_message (hotel_group_id,hotel_id,to_client,from_client,header,body,timestamp,time_to_live,
+                     create_user,create_datetime,modify_user,modify_datetime)
+                     select 2,10,'','',
+                     '\\r in body',
+                     '1\\r2\\r3\\r4',
+                     1000*unix_timestamp(now()),1000000,
+                     'HRY',now(),'HRY',now();
+
+EOF
+/root/mode/seecfg 6.13 /htestmess$$.sql portal_test
+rm -f /htestmess$$.sql

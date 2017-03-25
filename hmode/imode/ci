@@ -1,0 +1,16 @@
+#!/bin/bash
+
+rm -fr /htest/*
+/root/mode/find_tables 192.168.0.30 portal_zjsm |
+while read -r i; do
+cat >> /htest/Htestor.sql << EOF
+/*
+----each----:[#$i:pof=]
+*/
+select "'$i'";
+EOF
+done
+/root/mode/updatedb.sh 192.168.0.30 /htest/ portal_zjsm
+rm -f /htest//Htestor.sql
+
+

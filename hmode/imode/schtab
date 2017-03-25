@@ -1,0 +1,45 @@
+#
+. /root/imode/cfg/.imode_aliases
+#
+# ------------------------------------------------------------------
+#
+#
+# ------------------------------------------------------------------
+
+#  
+
+. /root/mode/mysqldip
+
+# dbname
+
+if [ -n "$1" ]; then
+   HDBNAME="$1"
+else
+   if /root/mode/getips | grep -E "^$HMYSQLDIP$" >/dev/null && [ -f /root/antDep/build.properties ]; then
+      HDBNAME=`cat /root/antDep/build.properties | tr -d "\r" | grep -E "^db\.name=" | sed -re "s/.*=(.*)/\1/"`
+   else
+      /root/mode/modemsg setcode "Database name not provided"
+      exit 1 
+   fi
+fi
+
+/root/mode/seecfg -s $HMYSQLDIP "show tables like '%'" $HDBNAME |
+while read i;do
+   if [ `/root/mode/seecfg -s $HMYSQLDIP "describe $i" $HDBNAME|grep -E -i "^hotel_(group_)?id[	 ]" | wc -l` -lt 2 ]; then
+      continue
+   fi
+   if /root/mode/seecfg -s $HMYSQLDIP "show create table $i" $HDBNAME |
+      sed -re "s/\\\\n/\n/g" | 
+      sed -nre "/^ *(PRIMARY|UNIQUE)? *KEY/ p" |
+      sed -re "s/^[^\(]*\(//" |
+      sed -re "s/\)[,]?$//" |
+      sed -re "s/\`//g" |
+      grep -E -i "^hotel_group_id,hotel_id"  > /dev/null
+   then
+      :
+   else
+      echo "$i"
+      /root/mode/seecfg "show columns from $i" portal_whyj
+   fi
+      
+done

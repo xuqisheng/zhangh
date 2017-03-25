@@ -1,0 +1,18 @@
+#!/bin/bash
+
+cat $1 |  
+while read a therest;do
+   if cat $2 | grep -E "^$a[ 	]*" >/dev/null; then
+      b=`cat $1 | grep -E "^$a[        ]*" | sed -n '1 p' | sed -re "s/^$a[ \t]+(.*)/\1/"`
+      b1=`cat $2 | grep -E "^$a[        ]*" | sed -n '1 p' | sed -re "s/^$a[ \t]+(.*)/\1/"`
+      if [ "$b" != "$b1" ];then
+         echo "toset $a $b"
+         echo "modifiedvalue:  $b"
+         echo "tencent-rawvl:  $b1"
+         echo 
+      fi
+   fi
+done
+
+
+  

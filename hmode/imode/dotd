@@ -1,0 +1,12 @@
+##
+. /root/imode/cfg/.imode_aliases
+#
+for i in `cat /root/servers.txt | grep -v "^#" | grep -E "^${1:-.*}$"`; do
+   ssh $i "/root/mode/seecfg 2>/dev/null &&
+           (Htmp=\`/root/mode/seecfg -s 'show global status' | grep tmp\`;
+            Hd=\`echo \"\$Htmp\" | sed -nre '1 p' | sed -re 's/^[^ \t]+[ \t]+(.*)/\1/'\`;
+            Ht=\`echo \"\$Htmp\" | sed -nre '3 p' | sed -re 's/^[^ \t]+[ \t]+(.*)/\1/'\`;
+            Hp=\`echo \"scale=3;100*\$Hd/\$Ht\" | bc -l\`;
+            echo \"\$Hp $i\")"
+done
+

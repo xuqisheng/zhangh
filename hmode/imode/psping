@@ -1,0 +1,7 @@
+#!/bin/bash
+
+ping www.baidu.com &
+sleep 10
+Hpps=`ps -ef | grep -E 'ping\ www\.baidu\.com' | sed -e "s/^root *\([0-9]\{1,\}\).*/\1/"`
+kill $Hpps
+

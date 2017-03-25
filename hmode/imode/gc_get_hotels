@@ -1,0 +1,163 @@
+#!/bin/bash 
+
+
+# get options
+
+HOPTIONS=""
+while (echo "'$1'"  | grep -E  -e "^'-" > /dev/null)
+do
+   HOPTIONS="$HOPTIONS$1"
+   shift
+done
+
+#
+
+Hpmdir=/pjdir
+Hcodir=/pjdir
+
+#
+
+Hctype=
+if [ -z "$1" ]; then
+   # if called from crond
+   if [ `/root/mode/traceps "crond"` = 'suc' ]; then
+      . /root/.bashrc 2>/dev/null
+      export HBLACKBOX2=1
+   else
+      /root/mode/confirm "Are you sure to fetch hotel and hotel_group information of all server group codes" more || exit 1
+   fi
+   Hlines=`/root/mode/seecfg -s "select b.server_code from gc_server_group_info b
+                                                       order by b.server_group_code,b.server_code" gc_admin` 
+else 
+   if echo "'$HOPTIONS" | grep -E -e "(-h)(-|$)" >/dev/null; then
+      # ssh code
+      Hctype=ssh
+      Hlines="$1"
+   else
+      Hlines=`/root/mode/seecfg -s "select b.server_code from gc_server_group_info b 
+                                                         where b.server_group_code = '$1'" gc_admin` 
+   fi
+fi
+
+#
+
+for i in `echo $Hlines`; do
+   if [ "$Hctype" = "ssh" ]; then
+      Hsc=`/root/imode/gc_sshc_sc "$i"`
+      j="$i"
+   else
+      Hsc=$i
+      j=`/root/imode/gc_sc_sshc "$i"`
+   fi
+   Hsshmac=`/root/imode/gc_sshc_sshmac "$j"`
+   Hsgc=`/root/imode/gc_sc_sgc "$Hsc"`
+   if [ -z "$Hsshmac" -o  -z "$Hsgc" ]; then
+      continue
+   fi
+   if ! /root/imode/gc_sshmac_ok "$Hsshmac"; then
+      continue
+   fi
+   echo 
+   echo "===== [ sgc ]: $Hsgc [ sshc ]: $j [ sc ]: $Hsc =====" >&2
+   Hdbs=`cat /root/imode/.colldata_db | eval $Hsshmac`
+   if [ -z "$Hdbs" ]; then
+      continue
+   fi
+   Hdbs=`echo "$Hdbs" | sort | uniq`
+   Honlyone=
+   if [ `echo "$Hdbs" | wc -l` -eq 1 ]; then
+      Honlyone=1
+   fi 
+   for i1 in `echo $Hdbs`;do
+       Hip=`echo $i1 | sed -re "s/(.*):(.*)/\1/"`
+       Hdb=`echo $i1 | sed -re "s/(.*):(.*)/\2/"`
+       echo '-----' Hip Hdb $Hip $Hdb
+
+       # get columns
+
+       Hhtl_col=`echo "/root/mode/tabprop $Hip $Hdb hotel 2"       | eval $Hsshmac`
+       Hgrp_col=`echo "/root/mode/tabprop $Hip $Hdb hotel_group 2" | eval $Hsshmac`
+       if [ -z "$Hhtl_col" -o -z "$Hgrp_col" ]; then
+          echo "get columns failded:Hhtl_col '$Hhtl_col' or Hgrp_col '$Hgrp_col' is empty" >&2
+          continue
+       fi
+
+       # register columns
+
+       H_hl=`/root/imode/gc_reg_col $Hcodir hall.txt $Hhtl_col` 
+       H_gl=`/root/imode/gc_reg_col $Hcodir gall.txt $Hgrp_col`
+
+       # do dump
+        
+       if [ -n "$Honlyone" ]; then
+          Hdumped=`echo "[ -f /hg_hg_hg/hotel.sql ] && echo dumped" | eval $Hsshmac`
+          if ! echo $Hdumped | grep dumped >/dev/null; then
+             echo "export HBLACKBOX2=jj;mkdir -p /hg_hg_hg;/root/mode/sdump -u $Hip $Hdb /hg_hg_hg --include-tables hotel hotel_group &>/dev/null" | eval $Hsshmac
+          fi
+       else
+          echo "export HBLACKBOX2=jj;mkdir -p /hg_hg_hg;/root/mode/sdump -u $Hip $Hdb /hg_hg_hg --include-tables hotel hotel_group &>/dev/null" | eval $Hsshmac
+       fi
+
+       #
+
+       Hdumpsuc=`echo "[ -f /hg_hg_hg/hotel.txt ] && echo dumpsuc" | eval $Hsshmac`
+       if ! echo $Hdumpsuc | grep dumpsuc >/dev/null; then
+          echo "sdump failed or get dumpinfo failed" >&2
+          continue
+       fi
+
+       #
+       Hhotel_s=`echo "cat /hg_hg_hg/hotel.sql" | eval $Hsshmac`
+       Hhotel_d=`echo "cat /hg_hg_hg/hotel.txt" | eval $Hsshmac`
+       Hgroup_s=`echo "cat /hg_hg_hg/hotel_group.sql" | eval $Hsshmac`
+       Hgroup_d=`echo "cat /hg_hg_hg/hotel_group.txt" | eval $Hsshmac`
+       if [ -z "$Hhotel_s" ]; then
+          echo "get hotel struc failed" >&2
+          continue
+       fi
+       if [ -z "$Hhotel_d" ]; then
+           echo "get hotel data failed" >&2
+           continue
+       fi
+       if [ -z "$Hgroup_s" ]; then
+          echo "get group struc failed" >&2
+          continue
+       fi
+       if [ -z "$Hgroup_d" ]; then
+          echo "get group data failed" >&2
+          continue
+       fi
+
+       # hotel struc
+       if [ ! -f  "$Hpmdir/h/$H_hl/h.sql" ]; then
+          # need hotel struc
+          mkdir -p $Hpmdir/h/$H_hl
+          echo "$Hhotel_s" |
+          sed -re "/^  (PRIMARY|KEY|UNIQUE|CONSTRAINT)/ d" |
+          sed -re "s/AUTO_INCREMENT[^ ,]*//" | sed -re "s/$/HrYhRy3M/" | tr -d "\n" |
+          sed -re "s/,(HrYhRy3M\) ENGINE)/\1/" | sed -re "s/HrYhRy3M/\n/g" |
+          sed -re "s/\`hotel\`/\`hotel_$H_hl\`/g" > "$Hpmdir/h/$H_hl/h.sql"
+       fi
+       # hotel data
+       echo "$Hhotel_d" >> "$Hpmdir/h/$H_hl/h.txt" 
+  
+       # group struc
+       if [ ! -f  "$Hpmdir/g/$H_gl/g.sql" ]; then
+          # need group struc
+          mkdir -p $Hpmdir/g/$H_gl
+          echo "$Hgroup_s" |
+          sed -re "/^  (PRIMARY|KEY|UNIQUE|CONSTRAINT)/ d" |
+          sed -re "s/AUTO_INCREMENT[^ ,]*//" | sed -re "s/$/HrYhRy3M/" | tr -d "\n" |
+          sed -re "s/,(HrYhRy3M\) ENGINE)/\1/" | sed -re "s/HrYhRy3M/\n/g" |
+          sed -re "s/\`hotel_group\`/\`hotel_group_$H_gl\`/g"  > "$Hpmdir/g/$H_gl/g.sql"
+       fi
+       # group data
+       echo "$Hgroup_d" >> "$Hpmdir/g/$H_gl/g.txt"
+       # 
+       echo "      [hotel] hotel_$H_hl [hotel_group] hotel_group_$H_gl"
+   done
+done
+
+#
+
+

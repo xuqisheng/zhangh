@@ -1,0 +1,32 @@
+##
+. /root/imode/cfg/.imode_aliases
+#
+for i in `cat /root/servers.txt | grep -v "^#" | grep -E "^${1:-.*}$"`; do
+
+   echo
+   echo " ========================================= server $i ======================================== "
+   echo
+
+   Ha1=$(ssh $i "[ \`ls -1 /root/packages/percona-toolkit* 2>/dev/null | wc -l\` -eq 0 ]       && echo noptpack")
+   Ha2=$(ssh $i "[ \`ls -1 /usr/local/bin/pt-on* /usr/bin/pt-on* 2>/dev/null | wc -l\` -eq 0 ] && echo nopt")
+   Ha3=$(ssh $i "[ \`rpm -qa | grep -i mysql | grep perl-DBD-MySQL | wc -l\` -eq 0 ]           && echo incomplete_pt")
+   Hb=$(ssh $i "cat /etc/re*re* 2>/dev/null | grep -E '5\.[45]' >/dev/null && echo notsupported")
+   
+   if [ -n "$Hb" ]; then
+      echo $Hb
+   elif [ "$Ha1" = "noptpack" ]; then 
+      :
+      echo sleep
+      #scp /pt.tar.gz $i:/
+      #echo "export HBLACKBOX2=1;cd /;tar xzvf pt.tar.gz;cd /root/mode;/root/mode/.inst_pt" | ssh $i "cat - | bash"
+   elif [ "$Ha2" = "nopt" ]; then 
+      echo ptinstall-failure
+   elif [ "$Ha3" = "incomplete_pt" ]; then
+      echo ptinstall-incomplete
+   else
+      echo ptdone
+   fi
+
+
+done
+

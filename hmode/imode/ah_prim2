@@ -1,0 +1,18 @@
+#!/bin/bash 
+
+#
+
+if [ `/root/mode/.pt_stat` != 'installed-ok' ]; then
+   exit 1
+fi
+
+#
+
+if /root/mode/testobjects ##IP## '[account_history][#account_history:tof=id]' ##DB##; then
+   echo "do c begin `LANG=C;date`"
+   /root/mode/seecfg  ##IP## "alter table account_history add primary key(id)" ##DB##
+   echo "do c end   `LANG=C;date`" 
+fi
+
+#
+

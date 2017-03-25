@@ -1,0 +1,11 @@
+##
+. /root/imode/cfg/.imode_aliases
+#
+for i in `cat /root/servers.txt | grep -v "^#" | grep -E "^${1:-.*}$"`; do
+   Hip=`cat /etc/hosts | grep -P "( |\t)$i( |\t|$)" | sed -re "s/^([^#][^ \t]+)( |\t)+.*/\1/" | sed -n "1 p"`
+   echo 
+   echo "-- $i --"
+   /root/mode/seecfg -s 115.159.221.14 "select hotel_group_code,
+                                      (select descript from hotel_group where code=hotel_group_code) as group_name,
+                                       url from hotel_group_url where url like 'http://$Hip%'" platform
+done

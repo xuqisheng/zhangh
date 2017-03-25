@@ -1,0 +1,25 @@
+##
+. /root/imode/cfg/.imode_aliases
+#
+for i in `cat /root/servers.txt | grep -v "^#" | grep -E "^${1:-.*}$"`; do
+
+   echo
+   echo " ========================================= server $i ======================================== "
+   echo
+ 
+   if ssh $i "echo ab12345" | grep ab12345 >/dev/null; then 
+      if [ `ssh $i "ls -1d /gst 2>/dev/null" | wc -l` -eq 0 ]; then
+         ssh $i "mkdir -p /gst"                         &>/dev/null    
+         scp /gst/GHOST.c $i:/gst                       &>/dev/null
+         ssh $i "cd /gst;/usr/bin/gcc GHOST.c -o GHOST" &>/dev/null
+      fi
+      if ssh $i "/gst/GHOST" | grep 'not vulnerable' >/dev/null; then
+         /root/mode/modemsg dogst "already fixed" more
+      else
+         /root/mode/modemsg dogst "fixing......" more
+         ssh $i "yum -y install glib*"
+      fi
+   fi
+done
+
+

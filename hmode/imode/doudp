@@ -1,0 +1,7 @@
+##
+. /root/imode/cfg/.imode_aliases
+#
+for i in `cat /root/u.txt | grep -v "^#" | grep -E "^${1:-.*}$"`; do
+   ssh $i "netstat -s | grep -E -A 4 'Udp:' | grep 'packet receive errors' | tr -d '\n';echo -n ' ';echo $i"
+done | grep -v '==' | sed -re "/^$/ d" | sort -n
+

@@ -1,0 +1,12 @@
+#!/bin/bash 
+
+#
+
+[ -z "$1" ] && exit 1
+Hip=`cat /etc/hosts | grep -P "^[1-9].*[ \t]+$1([ \t]|$)" | tail -n 1 | sed -re "s/^([0-9\.]+).*/\1/"`
+[ -z "$Hip" ] && exit 
+echo "host $1"
+echo "     hostname $Hip"
+
+
+

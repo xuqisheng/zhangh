@@ -1,0 +1,30 @@
+##
+. /root/imode/cfg/.imode_aliases
+#
+trap "rm -f /root/mode/tmp/newstat$$.tmp;exit" INT
+for i in `cat /root/newstat.txt | grep -v "^#" | grep -E "^${1:-.*}$"`; do
+
+   echo
+   echo " ========================================= server $i ======================================== "
+   echo
+   ssh $i "netstat -s" > /root/mode/tmp/newstat$$.tmp 
+   mkdir -p /newstat/$i
+
+   {
+   cat /root/mode/tmp/newstat$$.tmp | sed -n '1,/Icmp/ p' | sed -re '$ d' | grep -E "(invalid|discarded|dropped|failed)" 
+   echo
+   cat /root/mode/tmp/newstat$$.tmp | grep -E "(packets pruned from receive queue|of a socket overflowed|SYNs to LISTEN sockets ignored|due to low socket buffer|because of socket buffer overrun)"
+   } > /newstat/$i/new$$
+
+   [ -f /newstat/$i/old ] || touch /newstat/$i/old
+
+   if cmp /newstat/$i/old /newstat/$i/new$$; then
+      rm -f /newstat/$i/new$$
+   else
+      cp -p /newstat/$i/new$$ /newstat/$i/old 
+      mv /newstat/$i/new$$    /newstat/$i/back`date +%Y%m%d-%H:%M:%S`
+   fi
+
+   rm -f /root/mode/tmp/newstat$$.tmp
+
+done 

@@ -1,0 +1,9 @@
+##
+. /root/imode/cfg/.imode_aliases
+#
+for i in `cat /root/servers_lt.txt | grep -v "^#" | grep -E "^${1:-.*}$"`; do
+   echo
+   echo " ========================================= server $i ======================================== "
+   echo
+   ssh $i "ls -l /usr/local/tomcat*/logs/catalina.2* 2>/dev/null"
+done

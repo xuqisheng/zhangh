@@ -1,0 +1,12 @@
+#!/bin/bash 
+
+if [ -f /etc/init.d/sendmail ]; then
+   a=`cat /etc/hosts | grep -n -E "^127\.0\.0\.1" | sed -re "s/^([0-9]+).*/\1/"`
+   b=`cat /etc/hosts | grep -n -E "^::1" | sed -re "s/^([0-9]+).*/\1/"`
+   if [ "$a" \> "$b" ]; then
+      echo a $a
+      echo b $b
+   fi
+fi
+
+

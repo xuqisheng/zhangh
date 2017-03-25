@@ -1,0 +1,36 @@
+#!/bin/bash 
+
+Hlines=`/root/mode/seecfg -s "select code from gc_sshto_servers where code like '$1%' order by code" gc_admin`
+
+for i in `echo $Hlines`; do
+   Hsc=`/root/imode/gc_sshc_sc "$i"`
+   j="$i"
+   Hsshmac=`/root/imode/gc_sshc_sshmac "$j"`
+   if [ -z "$Hsshmac" ]; then
+      continue
+   fi
+   if ! /root/imode/gc_sshmac_ok "$Hsshmac"; then
+      continue
+   fi
+   echo 
+   echo "===== [ sshc ]: $j [ sc ]: $Hsc =====" >&2
+   Hdbs=`cat /root/imode/.colldata_db_cw | eval $Hsshmac`
+   if [ -z "$Hdbs" ]; then
+      continue
+   fi
+   Hdbs=`echo "$Hdbs" | sort | uniq`
+   for i1 in `echo $Hdbs`;do
+       Hip=`echo $i1 | sed -re "s/(.*):(.*)/\1/"`
+       Hdb=`echo $i1 | sed -re "s/(.*):(.*)/\2/"`
+       echo 
+       echo '-----' Hip Hdb $Hip $Hdb
+       echo 
+       cat /cwnew/pms_fenku.sh | sed -re "s/##IP##/$Hip/g" | sed -re "s/##DB##/$Hdb/g" | eval $Hsshmac
+       cat /cwnew/grp_fenku.sh | sed -re "s/##IP##/$Hip/g" | sed -re "s/##DB##/$Hdb/g" | eval $Hsshmac
+   done
+   echo
+done
+
+#
+
+

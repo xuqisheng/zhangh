@@ -1,0 +1,154 @@
+#
+#. /root/imode/cfg/.imode_aliases
+#
+
+if [ -z "$1" ]; then
+   /root/mode/confirm "Are you sure to continue" more || exit 1
+fi
+
+Hwanipfile=/root/mode/tmp/wanip$$.tmp
+Hlanipfile=/root/mode/tmp/lanip$$.tmp
+
+for i in `cat /root/servers.txt | grep -v "^#" | grep -E "^${1:-.*}$"`; do
+
+   echo 
+   echo "------- $i -------"
+   echo 
+
+   # exceptions  
+
+   if ! ssh $i "echo AbcdeF" 2>/dev/null | grep -E AbcdeF >/dev/null;then
+      # ssh failed
+      continue
+   elif ! ssh $i "/root/mode/seecfg -s 'select @@version'" | grep -E '^(5\.1\.57-community-log|5\.5\.50-log)$' >/dev/null;then
+      # MySQL server not the version of mode utilities
+      /root/mode/modemsg '' "Only gc mode installed MySQL server will be allowed to configure mysql users!" more
+      continue
+   fi
+
+   # init 
+
+   Httype=
+
+   # 
+
+   Hrip=`ssh $i "echo" 2>&1 | grep added | sed -re "s/.*added.*'.*,(\[)?([0-9\.]+).*/\2/"`
+   if [ `ssh $i "ls -l /etc/maumode" 2>/dev/null | wc -l` -gt 0 ]; then
+      # when manual authority mode is set,things are done in other place ...
+      Httype=man
+   else
+      if echo "$Hrip" | grep -E "^192\.168\." >/dev/null; then
+         # gc inner 
+         Httype=lde
+      else
+         # other 
+         Httype=oth
+      fi
+   fi
+ 
+   echo "--- $Httype --- "
+
+   # -----------------------------
+   # display user table
+   # -----------------------------
+
+   echo 
+   echo "Display current user list"
+   echo 
+
+   ssh $i "/root/mode/seecfg \"select user,host,password from user order by host desc,user desc\" mysql"
+   
+   # 0. remove unsafe accounts
+   ssh $i "/root/mode/seecfg \"delete from user where user='' or password='';flush privileges\" mysql"
+
+   # 1. localhost & 127.0.0.1
+
+   # 2. 183.129.215.114
+
+   ssh $i "/root/mode/seecfg \"grant all on *.* to 'root'@'183.129.215.114' identified by 'deviskaifa';flush privileges\" mysql"
+   #ssh $i "/root/mode/seecfg \"revoke grant option from 'root'@'183.129.215.114';flush privileges\" mysql"
+   ssh $i "/root/mode/seecfg \"revoke reload,shutdown,create user on *.* from root@'183.129.215.114';flush privileges\" mysql"
+
+   # 3.
+
+   if [ "$Httype" = "man" ]; then
+      :
+   elif [ "$Httype" = "lde" ]; then
+      # gc inner
+      echo
+      echo "gc inner"
+      echo
+      ssh $i "/root/mode/seecfg \"grant all on *.* to root@'192.168.0.*' identified by 'deviskaifa' with grant option;flush privileges\" mysql"
+      ssh $i "/root/mode/seecfg \"grant all on *.* to root@'192.168.1.*' identified by 'deviskaifa' with grant option;flush privileges\" mysql"
+      ssh $i "/root/mode/seecfg \"grant all on *.* to root@'192.168.2.*' identified by 'deviskaifa' with grant option;flush privileges\" mysql"
+      ssh $i "/root/mode/seecfg \"grant all on *.* to root@'192.168.6.*' identified by 'deviskaifa' with grant option;flush privileges\" mysql"
+   else
+      # other  
+      # use IPMODE
+      echo
+      echo "IPs"
+      echo
+
+      ssh $i "ifconfig | grep Mask | grep -v '127\.0\.0\.1'" | grep -v -E '169\.254\.' | 
+      sed -re "s/.*inet addr:([^ ]+).*Mask:(.*)/\1/" |
+      sed -re "s/(.*)/grant all on *.* to 'root'@'\1' identified by 'deviskaifa' with grant option;flush privileges/" |
+      sed -re "s/(.*)/\/root\/mode\/seecfg \"\1\" mysql/" |
+      sed -re 's/(\")/\\\"/g' | sed -re "s/(.*)/ssh -n $i \"\1\"/" | bash
+
+      # specific IPs for mutiple app servers or web server
+
+      ssh $i "cat /etc/modeips 2>/dev/null" |
+      sed -re "s/(.*)/grant all on *.* to 'root'@'\1' identified by 'deviskaifa';flush privileges/" |
+      sed -re "s/(.*)/\/root\/mode\/seecfg \"\1\" mysql/" |
+      sed -re 's/(\")/\\\"/g' | sed -re "s/(.*)/ssh -n $i \"\1\"/" | bash 
+   fi
+
+   # 4..... is removed
+
+   # -----------------------------------------
+   # 5. gc user accounts
+   # -----------------------------------------
+
+   echo
+   echo "gc user accounts"
+   echo
+
+   Hptail=0824
+
+   ssh $i "/root/mode/seecfg \"grant all on *.* to 'gds'@'%'     identified by 'dym1118'                     \" mysql"
+   ssh $i "/root/mode/seecfg \"grant all on *.* to 'zlf'@'%'     identified by 'gcZLF'                       \" mysql"
+   ssh $i "/root/mode/seecfg \"grant all on *.* to 'gc_test'@'%' identified by 'gc_test127.0.0.1.$Hptail'    \" mysql"
+   ssh $i "/root/mode/seecfg \"grant all on *.* to 'gc_web'@'%'  identified by 'gc_webl27.0.0.l.GjZ'         \" mysql"
+   ssh $i "/root/mode/seecfg \"grant all on *.* to 'jd_db'@'%'   identified by '${i}jd_dbl27.0.0.l'          \" mysql"
+   ssh $i "/root/mode/seecfg \"grant all on *.* to 'gc_dev'@'%'  identified by 'gc_devl27.0.0.1.$Hptail'     \" mysql"
+   # gc_mnt
+   Hmntp="zxB[$Hrip][127.0.0.l]$RANDOM"
+   ssh $i "/root/mode/seecfg \"grant all on *.* to 'gc_mnt'@'%'  identified by '$Hmntp'  with grant option   \" mysql"
+   # gc_eng
+   Hengp="gC_eng127.0.0.l.$Hptail.$RANDOM"
+   ssh $i "/root/mode/seecfg \"create database if not exists migrate_db char set utf8\""
+   ssh $i "/root/mode/seecfg \"grant all            on migrate_db.*   to 'gc_eng'@'%'  identified by '$Hengp'     \" mysql"
+   ssh $i "/root/mode/seecfg \"revoke all           on *.*            from 'gc_eng'@'%'  \" mysql"
+   ssh $i "/root/mode/seecfg \"grant select,execute on *.*            to 'gc_eng'@'%'  identified by '$Hengp'     \" mysql"
+   # mail 
+   {
+   echo "i:$Hrip s:$i u:gc_eng p:$Hengp"
+   echo "i:$Hrip s:$i u:gc_mnt p:$Hmntp"
+   } | mail -s "p mail" 12984505@qq.com zxb@ipms.cn
+  
+   # -----------------------------------------
+   # 6. new root@% password
+   # -----------------------------------------
+
+   echo
+   echo "root@% treatment"
+   echo
+
+   ssh $i "/root/mode/seecfg \"grant usage on *.* to 'root'@'%' identified by 'Hsdsadsd$RANDOM';flush privileges\" mysql"
+
+done
+
+#
+
+
+

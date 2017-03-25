@@ -1,0 +1,21 @@
+##
+. /root/imode/cfg/.imode_aliases
+#
+for i in `cat /root/dhc.txt | grep -v "^#" | grep -E "^${1:-.*}$"`; do
+
+   echo
+   echo " ========================================= server $i ======================================== "
+   echo
+
+   #ssh $i "ifconfig;route -n;arp -an"
+   #ssh $i "ps -ef | grep dhc;cat /etc/sysconfig/network-scripts/ifcfg-usb0"
+
+   #ssh $i "ifdown usb0"
+   #ssh $i "/root/mode/rep_config /etc/modprobe.conf 'alias usb0 cdc_ether' 'comment'"
+   #ssh $i "modprobe -r cdc_ether"
+   ssh $i "cat /etc/re*re*"
+
+
+
+done
+

@@ -1,0 +1,11 @@
+#
+. /root/imode/cfg/.imode_aliases
+#
+i=12
+while [ $i -lt 254 ]; do
+  i=$[$i+1]
+  if /root/mode/seecfg 6.$i; then
+     echo 192.168.6.$i 
+  fi
+done
+

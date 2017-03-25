@@ -1,0 +1,11 @@
+##
+. /root/imode/cfg/.imode_aliases
+#
+for i in `cat /root/notx.txt | grep -v "^#" | grep -E "^${1:-.*}$"`; do
+
+   echo
+   echo " ========================================= server $i ======================================== "
+   echo
+   #scp /uc.tar.gz $i:/
+   #ssh $i "cd /; tar xzvf uc.tar.gz;cd /uc;./uc.sh"
+done

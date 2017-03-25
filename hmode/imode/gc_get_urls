@@ -1,0 +1,105 @@
+#!/bin/bash 
+
+#
+
+#/root/mode/seecfg "truncate table gc_servers_httpinfo" gc_admin
+#/root/mode/seecfg "truncate table gc_servers_hogcode_info" gc_admin
+
+# server_group_code list from gc_users
+
+Hsgc_list=`/root/mode/seecfg -s "select distinct server_group_code from gc_users where server_group_code regexp '^${1:-.*}$' order by server_group_code" gc_admin | sort | uniq` 
+
+#
+
+for i in `echo $Hsgc_list`; do
+
+   # check server_group_code existency
+
+   Hsgc=`/root/mode/seecfg -s "select code from gc_server_group where code='$i'" gc_admin`
+   if [ -z "$Hsgc" ]; then
+      /root/mode/modemsg gc_get_urls "Server_group_code '$i' in gc_users is not defined in gc_server_group" more
+      continue
+   fi
+
+   #
+   
+   Hsc_list=`/root/mode/seecfg -s "select server_code from gc_server_group_info where server_group_code='$Hsgc' order by server_code" gc_admin` 
+
+   for Hsc in `echo $Hsc_list`; do
+
+      Hsshc=`/root/imode/gc_sc_sshc "$Hsc"`
+      Hsshmac=`/root/imode/gc_sshc_sshmac "$Hsshc"`
+      if [ -z "$Hsshmac" ]; then
+         continue
+      fi
+      #
+      if ! /root/imode/gc_sshmac_ok "$Hsshmac"; then
+         continue
+      fi
+      #
+      # try to get the best ip information 
+      #
+      Hpip=`echo "/root/mode/getpip" | eval $Hsshmac`
+      Hiip=`echo "/root/mode/getips | head -n 1"  | eval $Hsshmac`
+      Hip0=`/root/mode/seecfg -s "select ip0 from gc_sshto_servers where code='$Hsshc'" gc_admin`
+      Hip1=`/root/mode/seecfg -s "select ip1 from gc_sshto_servers where code='$Hsshc'" gc_admin`
+      Hip2=`/root/mode/seecfg -s "select ip2 from gc_sshto_servers where code='$Hsshc'" gc_admin`
+      # wan ip
+      if [ -z "$Hip2" ]; then
+         Hip="$Hip0"
+      else
+         Hip="$Hip2"
+         if [ -n "$Hpip" ]; then
+            Hip="$Hpip"
+         fi
+      fi
+      #
+      # try to get port and app information 
+      # Hat Hport Happ Happ_type Happ_subtype Happ_ver Hdbip Hdbname
+      #
+
+      cat /root/imode/.colldata_portetc | eval $Hsshmac > /root/mode/tmp/Hportetc$$.tmp
+      Hfcnt=`cat /root/mode/tmp/Hportetc$$.tmp | wc -l`
+      Hi=0
+      while [ $Hi -lt $Hfcnt ]; do
+         Hi=$[$Hi+1]
+         Hportetc=`sed -n "$Hi p" /root/mode/tmp/Hportetc$$.tmp`
+         Happat=`echo "$Hportetc" | awk '{print $1}'`
+         Hport=`echo "$Hportetc" | awk '{print $2}'`
+         Happ=`echo "$Hportetc" | awk '{print $3}'`
+         Happ_type=`echo "$Hportetc" | awk '{print $4}'`
+         Happ_subtype=`echo "$Hportetc" | awk '{print $5}'`
+         Happ_ver=`echo "$Hportetc" | awk '{print $6}'`
+         Hdbip=`echo "$Hportetc" | awk '{print $7}'`
+         Hdbname=`echo "$Hportetc" | awk '{print $8}'`
+
+         #
+         echo 
+         echo "===== [ sgc ]: $Hsgc [ sc ]: $Hsc [ appat ] $Happat " >&2
+
+         # insert into gc_servers_httpinfo
+         /root/mode/seecfg "replace into gc_servers_httpinfo select '$Hsc','$Happat','$Hip','$Hiip','$Hport','$Happ','$Happ_type','$Happ_subtype','$Happ_ver'" gc_admin
+
+         #
+
+         if echo "$Happ" | grep -E 'ipmsgroup' >/dev/null; then
+            echo "/root/mode/seecfg -s $Hdbip \"select code,'$Hsc','$Happat' from hotel_group\" $Hdbname" | eval $Hsshmac > /root/mode/tmp/Hhoginfo$$.txt
+         else
+            echo "/root/mode/seecfg -s $Hdbip \"select code,'$Hsc','$Happat' from hotel\" $Hdbname" | eval $Hsshmac > /root/mode/tmp/Hhoginfo$$.txt
+         fi
+
+         # insert into gc_servers_hogcode_info
+
+         /root/mode/seecfg "load data local infile '/root/mode/tmp/Hhoginfo$$.txt' into table gc_servers_hogcode_info" gc_admin
+
+      done
+   done
+done
+
+#
+
+rm -f /root/mode/tmp/Hportetc$$.tmp
+rm -f /root/mode/tmp/Hhoginfo$$.txt
+
+#
+

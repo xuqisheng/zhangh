@@ -1,0 +1,10 @@
+##
+. /root/imode/cfg/.imode_aliases
+#
+for i in `cat /root/blk.txt | grep -v "^#" | grep -E "^${1:-.*}$"`; do
+
+   echo
+   echo " ========================================= server $i ======================================== "
+   echo
+   ssh $i "/root/mode/appblk"
+done

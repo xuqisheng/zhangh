@@ -1,0 +1,102 @@
+#!/bin/bash 
+# ---------------------------------------------------------------------------------------------------------------------------------------------------------------
+# function:
+# ----------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+
+Hsapache=
+/root/mode/seetom | 
+while read -r Hc1 Hc2 Hcother;do
+   #
+   if ! echo "$Hcother" | grep -E "\((ipms|ipmsthef|ipmsthek|ipmsgroup)( |\))" >/dev/null; then
+      #/root/mode/modemsg blackbox2 "not ipms app"
+      continue
+   fi
+   #
+   if echo $Hc1 | grep -E "^[sS]ingle$" >/dev/null; then
+      Hsapache=
+      Hat=$Hc2
+   else
+      if [ "$Hsapache" = "$Hc1" ]; then
+          continue
+      fi
+      Hsapache=$Hc1
+      Hat=$Hc1
+   fi
+   #
+   if echo "$Hcother" | grep -E " ipms1\)" >/dev/null; then
+      Happ=ipms
+      Happ_type=danku
+      Happ_subtype=normal
+   else
+      Happ=`echo "$Hcother" | sed -re "s/^\((ipms[^ \)]*).*/\1/"`
+      Happ_type=fenku
+      if [ "$Happ" = "ipmsthek" ]; then
+         Happ=ipmsthef
+         Happ_subtype=quick
+      else
+         Happ_subtype=normal
+      fi
+   fi
+   #
+   if echo "$Hat" | grep -E "^apache" >/dev/null; then
+      Hat1=`echo $Hat | sed -re "s/^apache(.*)/build\1.properties/"`
+      Hport=`cat /usr/local/$Hat/conf/httpd.conf 2>/dev/null | grep -E "^Listen" | sed -n "$ p" | awk '{print $2}'`
+   else
+      Hat1="$Hat.properties"
+      Hport=`echo $Hcother | sed -re "s/.* H ([0-9]+).*/\1/"`
+   fi
+   #
+   Happs=`echo "$Hcother" | sed -re "s/\(([^\)]*)\).*/\1/"`
+   # try to get version
+   if echo "$Hat" | grep -E "^apache" >/dev/null; then
+      Hverpos=htdocs
+   else
+      Hverpos=webapps
+   fi
+   if echo "$Happs" | grep -E "ipms" >/dev/null; then
+      if echo "$Happs" | grep -E "ipmsthe" >/dev/null; then
+         Hverfile="/usr/local/$Hat/$Hverpos/thef/update.xml"
+         Hvmark=versionNumber
+      elif [ -d /usr/local/$Hat/$Hverpos/thef ]; then 
+         Hverfile="/usr/local/$Hat/$Hverpos/thef/update.xml"
+         Hvmark=versionNumber
+      else
+         Hverfile="/usr/local/$Hat/$Hverpos/update/update.xml"
+         Hvmark=mainVersion
+      fi
+   elif echo "$Happs" | grep -E "PosClient" >/dev/null; then
+      Hverfile="/usr/local/$Hat/$Hverpos/PosClient/versionupdate.xml"
+      Hvmark=versionNumber
+   elif echo "$Happs" | grep -E "mobilepms" >/dev/null; then
+      Hverfile="/usr/local/$Hat/$Hverpos/mobilepms/version.xml"
+      Hvmark=serverVersion
+   else 
+      Hverfile=
+      Hvmark=versionNumber
+   fi
+   if [ -f "$Hverfile" ]; then
+      Happ_ver=`cat "$Hverfile" 2>/dev/null | grep -E "$Hvmark" | sed -re "s/.*<$Hvmark>(.*)<\/$Hvmark>.*/\1/"`
+      Hdedate=`ls -l --full-time $Hverfile | awk '{print $6}'`
+   else
+      Happ_ver=NULL
+      Hdedate=NULL
+   fi
+
+   #
+   Hdbip=`/root/mode/mod_config /root/antDep/$Hat1 'db.root' '#Get#' 2>/dev/null`
+   Hdbname=`/root/mode/mod_config /root/antDep/$Hat1 'db.name' '#Get#' 2>/dev/null`
+   #
+   if [ -z "$Hdbip" ]; then
+      :
+   elif echo "$Happs" | grep -E '(sync|mobilepms)' >/dev/null; then
+      Hdbip=
+      Hdbname=
+   elif echo "$Happs" | grep -E '^$' >/dev/null; then
+      Hdbip=
+      Hdbname=
+   fi
+   echo -e "$Hat\t$Hport\t$Happ\t$Happ_type\t$Happ_subtype\t$Happ_ver\t$Hdbip\t$Hdbname"
+done
+
+

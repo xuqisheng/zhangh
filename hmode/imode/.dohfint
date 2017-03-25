@@ -1,0 +1,31 @@
+#
+#. /root/imode/cfg/.imode_aliases
+#
+
+if [ -z "$1" ]; then
+   /root/mode/confirm "Are you sure to continue" more || exit 1
+fi
+
+for i in `cat /root/hfint.txt | grep -v "^#" | grep -E "^${1:-.*}$"`; do
+
+   echo 
+   echo "------- $i -------"
+   echo 
+
+   # 
+
+   Hp='Hf.zQL.Pb.iNt.201406l9'
+
+   ssh $i "/root/mode/seecfg -s 'show databases'"  | 
+   while read -r Hdb;do
+      ssh -n -q $i "/root/mode/testdb $Hdb &>/dev/null && echo $Hdb && /root/mode/seecfg \"grant select on ${Hdb}.master_base   to 'hfint'@'%' identified by '$Hp' \" mysql"
+      ssh -n -q $i "/root/mode/testdb $Hdb &>/dev/null              && /root/mode/seecfg \"grant select on ${Hdb}.master_guest  to 'hfint'@'%' identified by '$Hp' \" mysql"
+   done
+   ssh -q $i "/root/mode/seecfg \"flush privileges\" mysql"
+
+done
+
+#
+
+
+

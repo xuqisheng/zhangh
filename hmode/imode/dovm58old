@@ -1,0 +1,17 @@
+##
+. /root/imode/cfg/.imode_aliases
+#
+for i in `cat /root/vm58old.txt | grep -v "^#" | grep -E "^${1:-.*}$"`; do
+
+   echo
+   echo " ========================================= server $i ======================================== "
+   echo
+
+   #echo "grep -i 'Setting clock' /var/log/*" | ssh $i "cat - | bash"
+   #echo "/root/mode/cpuinf; cat /etc/adjtime"   | ssh $i "cat - | bash"
+   #echo "hostname"   | ssh $i "cat - | bash"
+   #echo "/root/mode/settz"   | ssh $i "cat - | bash"
+   #echo "hwclock;date" | ssh $i "cat - | bash"
+   cat /root/imode/cld_time_5 |  ssh $i "cat - | bash"
+
+done

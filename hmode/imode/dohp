@@ -1,0 +1,60 @@
+#!/bin/bash 
+. /root/imode/cfg/.imode_aliases
+
+#
+
+Hserver="$1"
+[ -z "$Hserver" ] && exit 1
+
+#
+
+Hserver_info=`/root/mode/seecfg -s "select * from servers where id='$Hserver' and ssh_ok='T' and sta1='T'" hp`
+/root/mode/confirm "Are you sure to publish gc products to '$Hserver_info'" more || exit 1
+
+#
+
+echo "$Hserver_info" |
+while read -r Hserver_id Hserver_alias Hip Hsshport Hothers;do
+
+   # test ssh 
+   
+   if ssh -p$Hsshport $Hip "echo ok" | grep ok >/dev/null; then
+      echo
+      echo "ssh to '$Hserver_id $Hserver_alias $Hip:$Hsshport' is OK"
+   else
+      continue
+   fi
+
+   #
+
+   /root/mode/seecfg -s "select a.inst_at,b.warname from servers_products a,products b  where a.server_id='$Hserver_id' and a.product_id=b.id order by a.list_order" hp |
+   while read -r Hat Hwar; do 
+      if echo "$Hat" | grep -E "^apache" >/dev/null; then
+         Hat1=`echo $Hat | sed -re "s/^apache(.*)/build\1.properties/"`
+      else
+         Hat1="$Hat.properties"
+      fi
+      Hdbip=`ssh -n -p$Hsshport $Hip "/root/mode/mod_config /root/antDep/$Hat1 'db.root' '#Get#'"`
+      Hdbname=`ssh -n -p$Hsshport $Hip "/root/mode/mod_config /root/antDep/$Hat1 'db.name' '#Get#'"`
+      echo 
+      echo "/root/mode/.publish_war $Hat /fenku/$Hwar"
+      if echo "$Hwar" | grep -E 'sync' >/dev/null; then 
+         :
+      elif echo "$Hwar" | grep -E 'group' >/dev/null; then 
+         echo "/root/mode/updatedb.sh $Hdbip /fenku/updatestructsql/public/ $Hdbname"
+         echo "/root/mode/updatedb.sh $Hdbip /fenku/updatestructsql/group/ $Hdbname"
+         echo "/root/mode/updatedb.sh $Hdbip /fenku/updatedatasql/public/ $Hdbname"
+         echo "/root/mode/updatedb.sh $Hdbip /fenku/updatedatasql/group/ $Hdbname" 
+      elif echo "$Hwar" | grep -E 'member' >/dev/null; then
+         echo "/root/mode/updatedb.sh $Hdbip /fenku/updatestructsql/public/ $Hdbname"
+         echo "/root/mode/updatedb.sh $Hdbip /fenku/updatestructsql/member/ $Hdbname" 
+         echo "/root/mode/updatedb.sh $Hdbip /fenku/updatedatasql/public/ $Hdbname" 
+         echo "/root/mode/updatedb.sh $Hdbip /fenku/updatedatasql/member/ $Hdbname" 
+      elif [ "$Hwar" = "ipms.war" -o "$Hwar" = "ipmsthef.war" ]; then
+         echo "/root/mode/updatedb.sh $Hdbip /fenku/updatestructsql/public/ $Hdbname"
+         echo "/root/mode/updatedb.sh $Hdbip /fenku/updatestructsql/pms/ $Hdbname" 
+         echo "/root/mode/updatedb.sh $Hdbip /fenku/updatedatasql/public/ $Hdbname" 
+         echo "/root/mode/updatedb.sh $Hdbip /fenku/updatedatasql/pms/ $Hdbname" 
+      fi
+   done | ssh -p$Hsshport $Hip "export HBLACKBOX2=1;cat - | bash"
+done

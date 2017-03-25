@@ -1,0 +1,34 @@
+##
+. /root/imode/cfg/.imode_aliases
+#
+for i in `cat /root/servers.txt | grep -v "^#" | grep -E "^${1:-.*}$"`; do
+
+   echo
+   echo " ========================================= server $i ======================================== "
+   echo
+
+   if [ `ssh $i "find /usr/local -name 'struts2-core-2.2.3.jar'" | wc -l` -gt 0 ]; then
+      if [ `ssh $i 'ls -ld /news2.tar.gz 2>/dev/null' | wc -l` -eq 0 ]; then
+         scp /news2.tar.gz $i:/
+      fi 
+      if [ `ssh $i 'ls -ld /olds2 2>/dev/null' | wc -l` -eq 0 ]; then
+         scp /olds2 $i:/
+      fi 
+      # get tomcats
+      Htomcats=`ssh $i "find /usr/local -name 'struts2-core-2.2.3.jar'" | sed -re "s/(.*)(tomcat[0-9a-zA-Z]+).*/\2/" | sort | uniq`
+
+      # stop tomcats
+      echo "$Htomcats" | sed -re "s/(.*)/\/root\/mode\/stop_tomcat \1/" | sed -re "s/(.*)/ssh -n $i \"\1\"/" | bash
+
+      # add new jars
+      ssh $i "find /usr/local -name 'struts2-core-2.*jar'" | sed -re "s/(.*\/).*/cd \1;tar xzvf \/news2.tar.gz/" | sed -re "s/(.*)/ssh -n $i \"\1\"/"  | bash
+
+      # delete old jars 
+      ssh $i "find /usr/local -name 'struts2-core-2.*jar'" | sed -re "s/(.*\/).*/cd \1;rm -f \\\\\\\`cat \/olds2\\\\\\\`/" | sed -re "s/(.*)/ssh -n $i \"\1\"/" | bash
+
+      # start tomcats
+      echo "$Htomcats" | sed -re "s/(.*)/\/root\/mode\/start_tomcat \1/" | sed -re "s/(.*)/ssh -n $i \"\1\"/" | bash
+   fi
+done
+
+

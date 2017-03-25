@@ -1,0 +1,29 @@
+#!/bin/bash
+
+# get mysql server ip 
+
+. /root/mode/mysqldip
+
+# 
+
+mkdir -p /dlhs
+rm -f /dlhs/delother.sql
+
+#
+
+HDBNAME=${1:-h2}
+/root/mode/seecfg -s $HMYSQLDIP "show tables from \`$HDBNAME\`" | 
+while read i; do
+cat >> /dlhs/delother.sql << EOF
+/*
+----each----:[$i.hotel_group_id]
+*/
+delete from $i where hotel_group_id <> 9;
+EOF
+done
+cat >> /dlhs/delother.sql << EOF
+/*
+----each----:
+*/
+delete from hotel_group where id <> 9;
+

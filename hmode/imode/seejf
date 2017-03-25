@@ -1,0 +1,3 @@
+#!/bin/bash
+
+grep fail /ipfrag/$1/b* 2>/dev/null

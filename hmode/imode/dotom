@@ -1,0 +1,24 @@
+#!/bin/bash
+. /root/imode/cfg/.imode_aliases
+
+Hper=90
+Hhost=`ssh $1 hostname`
+Htoms=`ssh $1 "/root/mode/jvstat 2>&1"`
+echo "$Htoms" |
+while read -r Hp Ht Ho; do
+   if echo "$Ho" | grep -E "\[old\]" >/dev/null; then
+      Holdmax=`echo "$Ho" | sed -re "s/.*\[old\] ([0-9\.]+).*/\1/"`
+      Holdcur=`echo "$Ho" | sed -re "s/.*\[old\] ([0-9\.]+) +([0-9\.]+).*/\2/"`
+      if [ $(echo "$Holdcur/$Holdmax*100 > $Hper" | bc -l) -eq 1 ]; then
+         echo "Tomcat '$Ht' at '$Hhost':tomcat memory stress" >> /root/mode/tmp/Hdotom$$.tmp
+      fi
+   fi
+done
+if [ `cat /root/mode/tmp/Hdotom$$.tmp 2>/dev/null | wc -l` -gt 0 ]; then
+   (echo;echo "$Htoms";echo;cat /root/mode/tmp/Hdotom$$.tmp;echo) |  
+   mail -s "Tomcat memory alert...... `LANG=en_US;date`" 12984505@qq.com
+fi
+rm -f  /root/mode/tmp/Hdotom$$.tmp
+
+#
+

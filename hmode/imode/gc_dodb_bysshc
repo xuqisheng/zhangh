@@ -1,0 +1,90 @@
+#!/bin/bash 
+
+#
+
+if echo "$1" | grep -E "(\(|\*|\+|\||\{|\[)" >/dev/null; then 
+   Hpat="regexp '^($1)$'"
+else
+   Hpat="like '$1%'"
+fi
+
+#
+
+Hlines=`/root/mode/seecfg -s "select code from gc_sshto_servers where code $Hpat order by code" gc_admin`
+for i in `echo $Hlines`; do
+   Hsc=`/root/imode/gc_sshc_sc "$i"`
+   j="$i"
+   Hsshmac=`/root/imode/gc_sshc_sshmac "$j"`
+   if [ -z "$Hsshmac" ]; then
+      continue
+   fi
+   if ! /root/imode/gc_sshmac_ok "$Hsshmac"; then
+      continue
+   fi
+   #
+   Hssh_ip0=`/root/mode/seecfg -s "select ip0 from gc_sshto_servers where code='$i'" gc_admin`
+   Hssh_ip2=`/root/mode/seecfg -s "select ip2 from gc_sshto_servers where code='$i'" gc_admin`
+   if [ -z "$Hssh_ip2" ]; then
+      Hssh_ip=$Hssh_ip0
+   else
+      Hssh_ip="$Hssh_ip2 -> $Hssh_ip0"
+   fi
+   #
+   echo 
+   echo "===== [ sshc ]: $j [ sc ]: $Hsc [ ip ]: $Hssh_ip =====" >&2
+   Hdbs=`cat /root/imode/.colldata_db | eval $Hsshmac`
+   if [ -z "$Hdbs" ]; then
+      continue
+   fi
+   Hdbs=`echo "$Hdbs" | sort | uniq`
+   for i1 in `echo $Hdbs`;do
+       Hip=`echo $i1 | sed -re "s/(.*):(.*)/\1/"`
+       Hdb=`echo $i1 | sed -re "s/(.*):(.*)/\2/"`
+       echo '-----' Hip Hdb $Hip $Hdb
+       #/root/imode/cind_new $Hip "doorcard_log:hotel_group_id,hotel_id,biz_date" $Hdb | eval $Hsshmac
+       #/root/imode/cind_new $Hip "doorcard_log:hotel_group_id,hotel_id,accnt"    $Hdb | eval $Hsshmac
+       #/root/imode/cind_new $Hip "card_point_later:hotel_group_id,hotel_id,flag" $Hdb | eval $Hsshmac
+       #/root/imode/cind_new $Hip "production_detail:hotel_group_id,hotel_id,guest_id,accnt" $Hdb | eval $Hsshmac
+       #/root/imode/cind_new $Hip "account:accnt" $Hdb | eval $Hsshmac
+       #/root/imode/cind_new $Hip "rsv_src_history:hotel_group_id,hotel_id,parent_id" $Hdb | eval $Hsshmac
+       #/root/imode/cind_new $Hip "master_base_history:hotel_group_id,hotel_id,rsv_class" $Hdb | eval $Hsshmac
+       #/root/imode/cind_new $Hip "master_base:hotel_group_id,hotel_id,rsv_class" $Hdb | eval $Hsshmac
+       #echo "/root/mode/seecfg $Hip \"show tables like '%master_base_history%'\" $Hdb" | eval $Hsshmac
+       #echo "/root/mode/seecfg $Hip \"select table_rows from information_schema.tables where table_schema='$Hdb' and table_name='master_base_history'\"" | eval $Hsshmac
+       #/root/imode/cind_new $Hip "master_base_history:hotel_group_id,hotel_id,crs_no" $Hdb | eval $Hsshmac
+       #/root/imode/cind_new $Hip "sys_error:hotel_group_id,hotel_id,create_datetime" $Hdb | eval $Hsshmac
+       #echo "/root/mode/seecfg -s $Hip \"select '$Hssh_ip' as ip,count(distinct a.hotel_group_id,a.hotel_id) as htlcnt,count(a.hotel_group_id) as room_count
+       #                                 from room_no a,audit_flag b  where a.hotel_group_id=b.hotel_group_id and a.hotel_id=b.hotel_id and b.biz_date=date(now())\" $Hdb" | eval $Hsshmac
+       #/root/imode/cind_new $Hip "ar_apply:hotel_group_id,hotel_id,close_id,accnt,inumber" $Hdb | eval $Hsshmac
+       #/root/imode/cind_new $Hip "room_check:hotel_group_id,hotel_id,create_datetime" $Hdb | eval $Hsshmac
+       #/root/imode/cind_new $Hip "master_des:hotel_group_id,hotel_id" $Hdb | eval $Hsshmac
+       #/root/imode/cind_new $Hip "master_des_history:hotel_group_id,hotel_id" $Hdb | eval $Hsshmac
+       #/root/imode/cind_new $Hip "rsv_rate:rsv_src_id" $Hdb | eval $Hsshmac
+       #/root/imode/cind_new $Hip "rsv_src:hotel_group_id,hotel_id,arr_date,accnt" $Hdb | eval $Hsshmac
+       #/root/imode/cind_new $Hip "rsv_rate:hotel_group_id,hotel_id,master_id,type" $Hdb | eval $Hsshmac
+       #/root/imode/cind_new $Hip "ar_account:hotel_group_id,hotel_id,modify_datetime" $Hdb | eval $Hsshmac
+       #echo "Hp=\`/root/mode/getpip\`;
+       #      Hi=\`/root/mode/getips | head -n 1\`;
+       #      His=\`/root/mode/getips\`;
+       #      if ! echo \"\$His\" | grep -E \"^\$Hp\$\" >/dev/null; then
+       #         if /root/mode/testobjects $Hip "[sync_ip]" $Hdb && [ -n \"\$Hp\" ]; then
+       #            #He=\`/root/mode/seecfg -s $Hip \"select min(id) from sync_ip where server_ip like '%\$Hi%' and is_local='F' or server_ip like '%\$Hp%' and is_local='T'\" $Hdb\`
+       #            He=\`/root/mode/seecfg -s $Hip \"select min(id) from sync_ip where server_ip like '%\$Hp%' and is_local='T'\" $Hdb\`
+       #            if [ \"\$He\" != \"NULL\" ]; then
+       #               /root/mode/seecfg $Hip 'select * from sync_ip' $Hdb
+       #            fi
+       #         fi
+       #      fi " | eval $Hsshmac 
+       #/root/imode/cind_new $Hip "room_temporary:hotel_group_id,hotel_id,tag" $Hdb | eval $Hsshmac
+       #echo "/root/mode/testobjects $Hip '[account_history:primarykey=]' $Hdb && echo yes" | eval $Hsshmac
+       #/root/imode/cind_new $Hip "account_history:hotel_group_id,hotel_id,close_id" $Hdb | eval $Hsshmac
+       #echo "/root/mode/testobjects $Hip '[account_history][#account_history:hotel_group_id,hotel_id,close_id]' $Hdb && echo yes" | eval $Hsshmac
+       #echo "/root/mode/testobjects $Hip '[account_history][account_history:key=id][#account_history:primarykey=id]' $Hdb && echo yes" | eval $Hsshmac
+       #cat /root/imode/ah_prim | sed -re "s/##IP##/$Hip/g" | sed -re "s/##DB##/$Hdb/g" | eval $Hsshmac
+       cat /root/imode/ah_prim2 | sed -re "s/##IP##/$Hip/g" | sed -re "s/##DB##/$Hdb/g" | eval $Hsshmac
+   done
+done
+
+#
+
+

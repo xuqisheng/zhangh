@@ -1,0 +1,265 @@
+#!/bin/bash
+# ------------------------------------------------------------------------------------------------------------------
+# function:
+#           load mysql database
+# usage   :
+#           ./mload [<mysql-server-ip>] <database> <userfile.sql>|<xxx.tar.gz>
+#           ./mload [<mysql-server-ip>] <database> <dump-database> [|<date>|<date>/<index>|<index>]
+# e.g.    :
+#           ./mload portal_tr /tmp.sql            
+#           ./mload portal_tr portal      
+#           ./mload portal_tr portal 2011-12-18     
+#           ./mload portal_tr portal 2011-12-18/     
+#           ./mload portal_tr portal /1         
+#           ./mload portal_tr portal 2011-12-18/1          
+#           ./mload portal_tr portal 18/1          
+#           ./mload portal_tr portal /1          
+#           ./mload portal_tr portal 18/          
+#           ./mload portal_tr portal 9          
+# ------------------------------------------------------------------------------------------------------------------
+
+# get options
+
+HOPTIONS=""
+while (echo "'$1'"  | grep -E  -e "^'-" > /dev/null)
+do
+   HOPTIONS="$HOPTIONS$1"
+   shift
+done
+
+# get mysql server ip
+
+. /root/mode/mysqldip
+
+# Default database to load is portal_tr
+
+HDBNAME=${1:-portal_tr}
+
+# $HDBNAME must exist 
+
+if [ -z `/root/mode/seecfg -s $HMYSQLDIP "show databases like '$HDBNAME'"|grep -i "^$HDBNAME"` ]; then
+   echo "Database $HDBNAME doesn't exist at $HMYSQLDIP2!" && exit 1
+fi
+
+# dump name
+
+HDUMP="${2:-$HDBNAME}"
+
+HISTAR=0
+if echo "$HDUMP" | grep -E "(\.tar\.gz|\.sql)$" >/dev/null; then
+   # sql file or tar.gz file
+   if [ ! -f "$HDUMP" ]; then
+      echo "File $HDUMP doesn't exist!" && exit 1
+   else
+      if echo "$HDUMP" | grep -E "\.sql$" >/dev/null; then
+         # sql file
+         HDUMPNAME="$HDUMP"
+      else
+         # tar.gz file
+         HISTAR=1
+         HTMPSQLDIR="/root/mode/tmp/tmptardir$$"
+         mkdir -p $HTMPSQLDIR
+         rm -fR $HTMPSQLDIR/*
+         tar xzvf "$HDUMP" -C $HTMPSQLDIR >/dev/null 2>&1
+         HSQLCNT=`find $HTMPSQLDIR -name "*.sql" | grep -E "\.sql$" | wc -l`
+         if [ "$HSQLCNT" -eq 0 ]; then
+            echo "No sql file in $HDUMP!" 
+            rm -fR $HTMPSQLDIR
+            exit 1
+         elif [ "$HSQLCNT" -gt 1 ]; then
+            echo "More than one sql files in $HDUMP!"
+            rm -fR $HTMPSQLDIR
+            exit 1
+         fi
+         HDUMPNAME=`find $HTMPSQLDIR -name "*.sql" | grep -E "\.sql$"`
+      fi
+   fi
+else
+   cd /root/mode/dump
+   HDUMPCNT=`ls -1 $HDUMP-[0-9][0-9][0-9][0-9]-[0-9][0-9]-[0-9][0-9]_[0-9][0-9][0-9].sql 2>/dev/null | wc -l`
+   if [ $HDUMPCNT -eq 0 ]; then
+      echo "No $HDUMP standard dumps exist in  /root/mode/dump directory" && exit 1
+   fi
+   if echo "$3" | grep -E "^$" >/dev/null; then
+      # no date or index
+      HDUMPNAME=/root/mode/dump/`ls -1 $HDUMP-[0-9][0-9][0-9][0-9]-[0-9][0-9]-[0-9][0-9]_[0-9][0-9][0-9].sql 2>/dev/null | sed -n "$ p"`
+   elif echo "$3" | grep -E "^[0-9]{4}-[0-9]{2}-[0-9]{2}[/]?$" >/dev/null; then
+      # pass
+      # complete date only
+      HDATE=$(echo "$3" | sed -re "s/^([^\/]*).*$/\1/")
+      HDUMPCNT=`ls -1 $HDUMP-${HDATE}_[0-9][0-9][0-9].sql 2>/dev/null | wc -l`
+      if [ $HDUMPCNT -eq 0 ]; then
+         echo "No $HDUMP standard dumps of date $HDATE exist in /root/mode/dump directory" && exit 1
+      fi
+      HDUMPNAME=/root/mode/dump/`ls -1 $HDUMP-${HDATE}_[0-9][0-9][0-9].sql 2>/dev/null | sed -n "$ p"`
+   elif echo "$3" | grep -E "^[0-9]{1,2}/[0-9]{1,}$" >/dev/null; then
+      # pass
+      # day part and index
+      HDAY=$(echo "$3" | sed -re "s/^(.*)\/.*$/\1/")
+      HINDEX=$(echo "$3" | sed -re "s/^.*\/(.*)$/\1/")
+      if [ $HDAY -gt 31 ]; then
+           echo "Invalid parameter $3" && exit 1
+      elif [ $HDAY -lt 1 ]; then
+           echo "Invalid parameter $3" && exit 1
+      fi
+      HDAY=$[100+$[10#$HDAY]]
+      HDAY=${HDAY:(-2)}
+      HINDEX=$[1000+$[10#$HINDEX]]
+      HINDEX=${HINDEX:(-3)}
+      HDUMPCNT=`ls -1 $HDUMP-[0-9][0-9][0-9][0-9]-[0-9][0-9]-${HDAY}_$HINDEX.sql 2>/dev/null | wc -l`
+      if [ $HDUMPCNT -eq 0 ]; then
+         echo "No $HDUMP standard dumps of day $HDAY and index $HINDEX exist in /root/mode/dump directory" && exit 1
+      fi
+      HDUMPNAME=/root/mode/dump/`ls -1 $HDUMP-[0-9][0-9][0-9][0-9]-[0-9][0-9]-${HDAY}_$HINDEX.sql 2>/dev/null|sed -n "$ p"`
+   elif echo "$3" | grep -E "^[0-9]{1,2}/$" >/dev/null; then
+      # pass
+      # day part only
+      HDAY=$(echo "$3" | sed -re "s/^(.*)\/$/\1/")
+      if [ $HDAY -gt 31 ]; then
+           echo "Invalid parameter $3" && exit 1
+      elif [ $HDAY -lt 1 ]; then
+           echo "Invalid parameter $3" && exit 1
+      fi
+      HDAY=$[100+$[10#$HDAY]]
+      HDAY=${HDAY:(-2)}
+      HDUMPCNT=`ls -1 $HDUMP-[0-9][0-9][0-9][0-9]-[0-9][0-9]-${HDAY}_[0-9][0-9][0-9].sql 2>/dev/null | wc -l`
+      if [ $HDUMPCNT -eq 0 ]; then
+         echo "No $HDUMP standard dumps of day $HDAY exist in /root/mode/dump directory" && exit 1
+      fi
+      HDUMPNAME=/root/mode/dump/`ls -1 $HDUMP-[0-9][0-9][0-9][0-9]-[0-9][0-9]-${HDAY}_[0-9][0-9][0-9].sql 2>/dev/null|sed -n "$ p"`
+   elif echo "$3" | grep -E "^/[0-9]{1,}$" >/dev/null; then
+      # pass
+      # index only
+      HINDEX=${3:1}
+      HINDEX=$[1000+$[10#$HINDEX]]
+      HINDEX=${HINDEX:(-3)}
+      HDUMPCNT=`ls -1 $HDUMP-[0-9][0-9][0-9][0-9]-[0-9][0-9]-[0-9][0-9]_$HINDEX.sql 2>/dev/null | wc -l`
+      if [ $HDUMPCNT -eq 0 ]; then
+         echo "No $HDUMP standard dumps of index $HINDEX exist in /root/mode/dump directory" && exit 1
+      fi
+      HDUMPNAME=/root/mode/dump/`ls -1 $HDUMP-[0-9][0-9][0-9][0-9]-[0-9][0-9]-[0-9][0-9]_$HINDEX.sql 2>/dev/null | sed -n "$ p"`
+   elif echo "$3" | grep -E "^[0-9]{1,}$" >/dev/null; then
+      # day or index 
+      HDAY=$[100+$[10#$3]]
+      HDAY=${HDAY:(-2)}
+      HINDEX=$[1000+$[10#$3]]
+      HINDEX=${HINDEX:(-3)}
+      HDUMPCNT1=`ls -1 $HDUMP-[0-9][0-9][0-9][0-9]-[0-9][0-9]-${HDAY}_[0-9][0-9][0-9].sql 2>/dev/null | wc -l`
+      HDUMPCNT2=`ls -1 $HDUMP-[0-9][0-9][0-9][0-9]-[0-9][0-9]-[0-9][0-9]_$HINDEX.sql 2>/dev/null | wc -l`
+      if [ $HDUMPCNT1 -eq 0 -a $HDUMPCNT2 -eq 0 ]; then
+         echo "No $HDUMP standard dumps of day(or index) $3 exist in /root/mode/dump directory" && exit 1
+      elif [ $HDUMPCNT1 -gt 0 -a $HDUMPCNT2 -eq 0 ]; then
+         # day match only
+         HDUMPNAME=/root/mode/dump/`ls -1 $HDUMP-[0-9][0-9][0-9][0-9]-[0-9][0-9]-${HDAY}_[0-9][0-9][0-9].sql 2>/dev/null|sed -n "$ p"`
+      elif [ $HDUMPCNT1 -eq 0 -a $HDUMPCNT2 -gt 0 ]; then
+         # index match only
+         HDUMPNAME=/root/mode/dump/`ls -1 $HDUMP-[0-9][0-9][0-9][0-9]-[0-9][0-9]-[0-9][0-9]_$HINDEX.sql 2>/dev/null | sed -n "$ p"`
+      else
+         # match both,must be unique
+         HDUMPCNT3=`ls -1 $HDUMP-[0-9][0-9][0-9][0-9]-[0-9][0-9]-${HDAY}_$HINDEX.sql 2>/dev/null | wc -l`
+         if [ $HDUMPCNT3 -eq 0 ]; then
+            echo "Ambiguous match of dumps" && exit 1
+         else
+            HDUMPNAME=/root/mode/dump/`ls -1 $HDUMP-[0-9][0-9][0-9][0-9]-[0-9][0-9]-${HDAY}_$HINDEX.sql 2>/dev/null | sed -n "$ p"`
+         fi
+      fi
+   elif echo "$3" | grep -E "^[0-9]{4}-[0-9]{2}-[0-9]{2}/[0-9]{1,}$" >/dev/null; then
+      # complete date and index
+      HDATE=`echo $3 | sed -re "s/^(.*)\/.*/\1/"`
+      HINDEX=`echo $3 | sed -re "s/^.*\/(.*)/\1/"`
+      HINDEX=$[1000+$[10#$HINDEX]]
+      HINDEX=${HINDEX:(-3)}
+      HDUMPCNT=`ls -1 $HDUMP-${HDATE}_$HINDEX.sql 2>/dev/null | wc -l`
+      if [ $HDUMPCNT -eq 0 ]; then
+         echo "No $HDUMP standard dumps of $HDATE/$HINDEX exist in /root/mode/dump directory" && exit 1
+      fi
+      HDUMPNAME=/root/mode/dump/`ls -1 $HDUMP-${HDATE}_$HINDEX.sql 2>/dev/null | sed -n "$ p"`
+   else
+      echo "Invalid parameter $3" && exit 1
+   fi
+fi
+
+# check sql dump completeness
+
+if ! /root/mode/comdump "$HDUMPNAME"; then
+   /root/mode/modemsg mload "Incomplete sql dump $HDUMPNAME!"
+   [ $HISTAR -eq 1 ] && rm -fR $HTMPSQLDIR
+   exit 1 
+fi
+
+# load confirmation for all databases,even training databases,because sometimes training databases are not used for training 
+
+if [ "$HNCONFIRM_MODE" = 'y' ]; then
+   :
+elif [ `/root/mode/traceps "crond"` = 'suc' ]; then
+   :
+else
+   /root/mode/confirm "Are you sure to load '$HDUMPNAME' into database $HDBNAME at $HMYSQLDIP2" hellohby || 
+   {
+      [ $HISTAR -eq 1 ] && rm -fR $HTMPSQLDIR
+      exit 1 
+   }
+fi 
+
+# sometimes,databases need to be droped before loading
+
+if ! echo "$HDBNAME" | grep -E "^(mysql|portal|portal_tr|portal_f|portal_f_tr|platform|website.*)$" > /dev/null; then
+   if [ "$HNCONFIRM_MODE" = 'y' ]; then
+      :
+   elif [ `/root/mode/traceps "crond"` = 'suc' ]; then
+      :
+   elif /root/mode/confirm "Drop and recreate database $HDBNAME at $HMYSQLDIP2 before load" hihsc; then
+      /root/mode/seecfg $HMYSQLDIP "drop database if exists \`$HDBNAME\`"
+      /root/mode/seecfg $HMYSQLDIP "create database if not exists \`$HDBNAME\` char set utf8"
+   fi
+fi
+
+# clear linux caches before load process
+
+/root/mode/clrcache 1
+
+# load process
+
+{
+echo
+echo "############# mload $HOPTIONS $HMYSQLDIP2 $* #############"
+echo
+echo "Load database $HDBNAME at $HMYSQLDIP2 from $HDUMPNAME at `LANG=en_US;date`"
+
+# load at background
+
+if echo "$HOPTIONS" | grep -E -e "(-nsqllogbin|-nosqllogbin|-q)(-|$)" >/dev/null; then
+   export HNoBiNlOg=DaNgEr
+fi
+/root/mode/seecfg $HMYSQLDIP "$HDUMPNAME" $HDBNAME &
+Hlprocess=$!
+/usr/bin/renice -5 $Hlprocess &>/dev/null
+
+# monitor load process
+
+echo
+echo -n "^-^"
+while [ 1 ];do
+   sleep 5
+   /root/mode/monload $Hlprocess $HMYSQLDIP $HDBNAME || break
+done
+echo -n "^-^"
+echo
+
+#
+
+echo
+echo "Load ended at `LANG=en_US;date`"
+echo
+} 2>&1 | tee -a /root/mode/logs/dumpload.log
+
+# rm tmp directory
+
+[ $HISTAR -eq 1 ] && rm -fR $HTMPSQLDIR
+
+# clear linux caches after load process
+
+/root/mode/clrcache 1
+
+#
+

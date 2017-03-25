@@ -1,0 +1,10 @@
+#!/bin/bash 
+
+if cat /etc/re*re* 2>/dev/null | grep -E ' 5\.[0-9] '>/dev/null; then
+   /sbin/hwclock --localtime
+   date
+   cat /etc/adjtime | tail -n 1
+fi
+
+
+

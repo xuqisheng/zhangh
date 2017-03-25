@@ -1,0 +1,13 @@
+#!/bin/bash 
+exit
+for i in `cat /cw/ee | grep -v '^#'`;do
+   j=`/root/mode/seecfg -s "select code from gc_sshto_servers where ip0='$i' limit 0,1" gc_admin`
+   if [ -z "$j" ]; then
+      echo "empty" $i $j
+      continue 
+   else
+      echo one $i $j  >&2
+   fi
+   /root/imode/gc_sshc_do "$j"
+done
+

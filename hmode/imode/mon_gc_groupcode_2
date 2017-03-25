@@ -1,0 +1,19 @@
+#!/bin/bash 
+
+if [ -n "$1" ]; then
+   /root/mode/seecfg "SELECT a.code as server_group,a.descript,b.server_code,c.ip0,c.ip1,c.ip2,c.code as sshcode,c.descript
+                      FROM gc_server_group a,
+                           gc_server_group_info b,
+                           gc_sshto_servers c 
+                      WHERE a.code=b.server_group_code and b.server_code=c.server_code
+                            and a.code='$1'
+                      order by c.ip2,b.server_group_code,b.server_code,c.code" gc_admin
+   /root/mode/seecfg "SELECT a.code,a.descript,c.server_code,d.descript,c.app_at,c.apps,c.version,c.deploy_datetime,c.dbip,c.dbname        
+                      FROM gc_server_group a,
+                           gc_server_group_info b,
+                           gc_servers_info c,
+                           gc_servers d
+                      WHERE a.code=b.server_group_code and b.server_code=c.server_code and c.server_code=d.code
+                            and a.code='$1'
+                      order by d.descript,c.app_at,c.apps,c.version,c.deploy_datetime" gc_admin
+fi

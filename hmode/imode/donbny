@@ -1,0 +1,10 @@
+##
+. /root/imode/cfg/.imode_aliases
+#
+for i in `cat /root/netstat.txt | grep -v "^#" | grep -E "^${1:-.*}$"`; do
+
+   echo
+   echo " ========================================= server $i ======================================== "
+   echo
+   ssh $i "netstat -s" | grep -E "(packets pruned from receive queue|of a socket overflowed|SYNs to LISTEN sockets ignored|due to low socket buffer|because of socket buffer overrun)"
+done

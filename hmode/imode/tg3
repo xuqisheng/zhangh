@@ -1,0 +1,15 @@
+#
+. /root/imode/cfg/.imode_aliases
+#
+for i in `cat /root/tg3.txt | grep -v "^#" | grep -E "^${1:-.*}$"`; do
+   echo
+   echo " ========================================= server $i ======================================== "
+   echo
+   ssh $i "uname -a"
+   ssh $i "modinfo tg3 | head -n 3"
+   ssh $i "ethtool -i eth0"
+   #ssh $i "lsmod | grep tg3"
+   #ssh $i "find /lib/modules/2*/ -name tg3.ko"
+   #ssh $i "rm -f /lib/modules/\`uname -r\`/updates/*"
+   #ssh $i "depmod -a"
+done

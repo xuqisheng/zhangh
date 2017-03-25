@@ -1,0 +1,10 @@
+#!/bin/bash 
+
+Hservers1=`cat /root/servers.txt | grep -E "^[a-z]"`
+Hservers2=`/root/mode/seecfg -s "select code from gc_sshto_servers where code not like '%\_\_%'" gc_admin`
+Hservers3=`/root/imode/gc_di "$Hservers1" "$Hservers2"`
+for i in `echo $Hservers3`;do
+   echo $i
+   /root/imode/gservers "$i"
+done
+

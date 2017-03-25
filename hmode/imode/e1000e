@@ -1,0 +1,18 @@
+
+. /root/imode/cfg/.imode_aliases
+#
+for i in `cat /root/e1000e.txt | grep -v "^#" | grep -E "^${1:-.*}$"`; do
+   echo
+   echo " ========================================= server $i ======================================== "
+   echo
+   #ssh $i "uname -a"
+   #ssh $i "depmod -a"
+   ssh $i "modinfo e1000e | head -n 3"
+   ssh $i "ethtool -i eth0"
+   #ssh $i "lsmod | grep e1000e"
+   #ssh $i "find /lib/modules/2*/ -name bnx2.ko"
+   #ssh $i "uname -a"
+   # ssh $i "rm -f /lib/modules/\`uname -r\`/kernel/drivers/net/ethernet/intel/e1000e/*"
+   # ssh $i "cd /lib/modules/\`uname -r\`/kernel/drivers/net/e1000e; cp -f e1000e.ko.b e1000e.ko"
+   # ssh $i "find /lib/modules/\`uname -r\`/ -name \"e1000e.ko*\" | xargs ls -l"
+done

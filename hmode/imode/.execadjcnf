@@ -1,0 +1,33 @@
+#!/bin/bash 
+# ------------------------------------------------------------------------------
+# function:
+# ------------------------------------------------------------------------------
+
+# MySQL server must be running at localhost 
+
+if ! /root/mode/seecfg localhost &>/dev/null; then
+   exit
+fi
+
+#
+
+/root/mode/adjcnf
+
+#
+
+Hmax_c=`/root/mode/mod_config /etc/my.cnf "max_connections" "#Get#"`
+Hmax_u=`/root/mode/mod_config /etc/my.cnf "max_user_connections" "#Get#"`
+Hcache=`/root/mode/mod_config /etc/my.cnf "thread_cache_size" "#Get#"`
+Htcache=`/root/mode/mod_config /etc/my.cnf "table_definition_cache" "#Get#"`
+
+#
+
+/root/mode/seecfg localhost "set global max_connections=$Hmax_c"
+/root/mode/seecfg localhost "set global max_user_connections=$Hmax_u"
+/root/mode/seecfg localhost "set global thread_cache_size=$Hcache"
+/root/mode/seecfg localhost "set global table_definition_cache=$Htcache"
+
+# end 
+
+
+

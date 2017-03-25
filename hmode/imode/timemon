@@ -1,0 +1,7 @@
+#
+. /root/imode/cfg/.imode_aliases
+#
+for i in `cat /root/servers.txt | grep -v "^#" | grep -E "^${1:-.*}$"`; do
+   echo "########## $i ##########"
+   ssh $i "LANG=en_US;hwclock -r;date"
+done

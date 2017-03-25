@@ -1,0 +1,16 @@
+##
+. /root/imode/cfg/.imode_aliases
+#
+for i in `cat /root/servers.txt | grep -v "^#" | grep -E "^${1:-.*}$"`; do
+
+   echo
+   echo " ========================================= server $i ======================================== "
+   echo
+
+   #ssh $i "find /root/mode/logs -name processlist.log -mtime 0"
+   #ssh $i "crontab -l"
+   #ssh $i "[ -f /root/mode/logs/processlist.log ] && mv -f /root/mode/logs/processlist.log /root"
+   ssh $i "ls -l /root/mode/logs/processlist.log 2>/dev/null"
+
+done
+

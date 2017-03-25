@@ -1,0 +1,15 @@
+#
+. /root/imode/cfg/.imode_aliases
+#
+for i in `cat /root/x64_normal.txt | grep -v "^#" | grep -E "^${1:-.*}$"`; do
+   echo
+   echo " ========================================= server $i ======================================== "
+   echo
+   #scp /apache.tar.gz $i:/
+   #scp /root/imode/update_apache $i:/
+   #ssh $i "ls -l /apache.* /update_apa*"
+   #ssh $i "ls -ld /usr/local/apache/htdocs/*pic* 2>/dev/null"
+   #ssh $i "/update_apache"
+   #ssh $i "/root/mode/seecfg \"update code_dir set path='/var/www/ihotel_web_pic/' where CODE ='K' and path='/usr/local/apache/htdocs/pic/' \" portal"
+   ssh $i "/root/mode/seecfg \"SELECT path FROM code_dir WHERE CODE ='K'\" portal"
+done

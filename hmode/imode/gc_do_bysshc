@@ -1,0 +1,62 @@
+#!/bin/bash 
+
+#
+
+Hlines=`/root/mode/seecfg -s "select code from gc_sshto_servers where code like '$1%' order by code" gc_admin`
+
+#
+
+for i in `echo $Hlines`; do
+   #
+   Hsshc="$i"
+   Hsc=`/root/imode/gc_sshc_sc "$i"`
+   Hsshmac=`/root/imode/gc_sshc_sshmac "$Hsshc"`
+   if ! /root/imode/gc_sshmac_ok "$Hsshmac"; then
+      echo "==== $Hsshc ===="
+      /root/mode/modemsg gc_do "Hsshc:$Hsshc Hsc:$Hsc ...... connection failed" more
+      continue
+   fi
+   Hssh_ip0=`/root/mode/seecfg -s "select ip0 from gc_sshto_servers where code='$i'" gc_admin`
+   Hssh_ip2=`/root/mode/seecfg -s "select ip2 from gc_sshto_servers where code='$i'" gc_admin`
+   Hssh_des=`/root/mode/seecfg -s "select descript from gc_sshto_servers where code='$i'" gc_admin`
+   if [ -z "$Hssh_ip2" ]; then
+      Hssh_ip=$Hssh_ip0
+   else
+      Hssh_ip="$Hssh_ip2 -> $Hssh_ip0"
+   fi
+   echo "===== [ sshc ]: $Hsshc [ sc ]: $Hsc [ ip ]: $Hssh_ip [ des ] $Hssh_des" >&2
+   #
+   #cat /root/imode/.execadjcnf | eval $Hsshmac
+   #echo "[ -f /root/mode/mntmail ] && [ -f /etc/redhat-release ] && /root/mode/mnthosts && /root/mode/mntmail" | eval $Hsshmac
+   #echo "[ ! -f /etc/my.cnf ] && /root/mode/config_mysql" | eval $Hsshmac
+   #echo "[ ! -f /etc/init.d/sendmail ] && echo ok" | eval $Hsshmac
+   #echo "cat /etc/re*re* 2>/dev/null | grep -E 'release 5\.' >/dev/null && cat /etc/crontab 2>/dev/null | grep -E '^\*/5 .*hwclock'>/dev/null && hostname | grep 'VM' && echo hw" | eval $Hsshmac
+   #echo "[ `ls -1 /var/spool/clientmqueue| wc -l` -gt 10 ] && echo clientmqueue " | eval $Hsshmac
+   #echo "cat /proc/net/*_conntrack | grep -E 'ESTABLISHED.*UNREPLIED'" | eval $Hsshmac
+   #echo "[ -f /etc/redhat-release ] && /root/mode/inst_com" | eval $Hsshmac
+   #cat /root/imode/.testhost | eval $Hsshmac
+   #( echo "/root/mode/mnthosts;";cat /root/imode/.testhost) | eval $Hsshmac
+   #echo "grep -V" | eval $Hsshmac
+   #echo " lsattr -d /" | eval $Hsshmac
+   #echo "cat /etc/sysctl.conf 2>/dev/null | grep tcp_loose >/dev/null || echo fail" | eval $Hsshmac
+   #echo "/root/mode/seecfg localhost 'show variables' 2>&1 | grep -E 'max_allowed_packet.*1024'" | eval $Hsshmac
+   #echo "ls -l /usr/local/tomcat*/webapps/*/WEB-INF/lib/*struts*.jar 2>/dev/null"  | eval $Hsshmac
+   #echo "[ -f /root/servers.txt ] && echo ok "  | eval $Hsshmac
+   #echo "hostname | grep -E '^VM_' >/dev/null && find -L /DISK2/ -name "*jdbc*.properties" | while read i;do cat \$i | grep 192.168.0.71 && echo \$i;done" | eval $Hsshmac
+   #echo "Hdir=/usr/local/;
+   #      [ -d /DISK2 ] && Hdir=/DISK2/; 
+   #      [ -d /disk2 ] && Hdir=/disk2/;
+   #      hostname | grep -E '^VM_' >/dev/null && find -L \$Hdir -name "*jdbc*.properties" | while read i;do cat \$i | grep 192.168.0.71 && echo \$i;done" | eval $Hsshmac
+   #echo "netstat -antT | grep 192.168.0.71"  | eval $Hsshmac
+   #echo "crontab -l | grep -E '^ *[0-9].*(pms_to|crs_to)' >/dev/null && echo cwcron"  | eval $Hsshmac
+   #echo "hostname | grep -E '^VM_' >/dev/null && cat /usr/local/apache*/logs/error_log 2>/dev/null | grep -E 'Mar 17.*101\.226\.35\.225' >/dev/null && /root/mode/getpip" | eval $Hsshmac
+   #cat /root/imode/gc_see_qcache | eval $Hsshmac
+   #echo "/root/mode/gcserver apache;/root/mode/eval_app -ll 2>&1 | grep -E '[0-9]{4}-[0-9]{2}-[0-9]{2}' | grep -Ev '2017-03-20' && /root/mode/gcserver apacherestart && echo DDDDDDDDD" |  eval $Hsshmac
+   #echo "/root/mode/eval_app -ll 2>&1 | grep -E '[0-9]{4}-[0-9]{2}-[0-9]{2}' | grep -Ev '2017-03-21' && echo DDDDDDDDD" |  eval $Hsshmac
+   #echo "cat /etc/re*re* 2>/dev/null | grep -Pi 'CentOS.*release (5\.[189]|6\.)' >/dev/null && /root/mode/.netok && [ \`/root/mode/.pt_stat\` != 'installed-ok' ] && echo ptnotready"  |  eval $Hsshmac
+
+done
+
+#
+
+

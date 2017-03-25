@@ -1,0 +1,12 @@
+#!/bin/bash 
+# --------------------------------------------
+# function:
+#          get a sshmac from server_code
+# -------------------------------------------- 
+
+#
+
+/root/imode/gc_sshc_sshmac `/root/imode/gc_sc_sshc "$1"`
+
+#
+

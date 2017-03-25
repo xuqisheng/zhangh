@@ -1,0 +1,54 @@
+#!/bin/bash
+
+
+/root/mode/modemsg wy "I'm wy and my process id is $$"
+
+# subprocess
+
+/root/mode/modemsg wy "'sunprocess' subprocesses test" more
+#(date;(date;(echo $2 | ps -ef | grep -E    "(ps -ef|$2)" | grep -E   "(ps -ef|$2)") ) )
+#{ echo $2 | ps -ef | grep -E    "(ps -ef|$2)" | grep -E   "(ps -ef|$2)"; }
+(echo $2 | ps -ef | grep -E    "(ps -ef|$2)" | grep -E   "(ps -ef|$2)")
+read
+
+# pipeline 
+
+/root/mode/modemsg wy "'pipeline' subprocesses test" more
+echo $2 | ps -ef | grep -E    "(ps -ef|$2)" | grep -E   "(ps -ef|$2)"
+read
+
+# while 
+
+/root/mode/modemsg wy "'while' subprocesses test" more
+while [ 1 ];do
+   ps -ef | grep -E "(ps -ef|$2)" | grep -E  "(ps -ef|$2)"
+   read 
+   break
+done
+
+# pipeline and while
+
+/root/mode/modemsg wy "'pipeline and while' subprocesses test" more
+echo $2 | 
+while [ 1 ];do
+   ps -ef | grep -E    "(ps -ef|$2)" |  grep -E    "(ps -ef|$2)"
+   read 
+   break
+done
+echo
+
+# pipeline and for 
+
+/root/mode/modemsg wy "'pipeline and for' subprocesses test" more
+echo $2 |
+for i in 1;do
+   ps -ef | grep -E    "(ps -ef|$2)" |  grep -E    "(ps -ef|$2)"
+   read
+   break
+done
+echo
+
+
+#
+
+

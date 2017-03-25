@@ -1,0 +1,16 @@
+#
+. /root/imode/cfg/.imode_aliases
+#
+
+if [ -d /usr/local/tomcat6 ]; then
+   cat /usr/local/tomcat6/conf/server.xml | sed -re "s/(.*)address=\"auto\"(.*)/\1address=\"localhost\"\2/" > /root/mode/tmp/auto$$.tmp
+   cp -f  /root/mode/tmp/auto$$.tmp /usr/local/tomcat6/conf/server.xml
+   rm -f /root/mode/tmp/auto$$.tmp
+fi
+
+if [ -d /usr/local/tomcat602 ]; then
+   cat /usr/local/tomcat602/conf/server.xml | sed -re "s/(.*)address=\"auto\"(.*)/\1address=\"localhost\"\2/" > /root/mode/tmp/auto$$.tmp
+   cp -f  /root/mode/tmp/auto$$.tmp /usr/local/tomcat602/conf/server.xml
+   rm -f /root/mode/tmp/auto$$.tmp
+fi
+

@@ -1,0 +1,13 @@
+##
+. /root/imode/cfg/.imode_aliases
+#
+for i in `cat /root/keep.txt | grep -v "^#" | grep -E "^${1:-.*}$"`; do
+
+   echo
+   echo " ========================================= server $i ======================================== "
+   echo
+   ssh $i "mkdir -p /etc/modeopts"
+   ssh $i "touch /etc/modeopts/httpkeepalive;/root/mode/config_apache;/root/mode/gcserver apache"
+   ssh $i "rm -f /etc/modeopts/httpkeepalive;/root/mode/config_apache;/root/mode/gcserver apache"
+done
+

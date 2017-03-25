@@ -1,0 +1,29 @@
+##
+. /root/imode/cfg/.imode_aliases
+#
+for i in `cat /root/servers.txt | grep -v "^#" | grep -E "^${1:-.*}$"`; do
+      
+   # Hstand=`ssh $i "ls -l /usr/local/apache*/htdocs/update/iHotel?.* 2>/dev/null  | sed -n '$ p' | sed -re 's/.*\/(apache[0-9]?).*(iHotel.*)/\1 \2/'"`
+    ###########fixed ver range##################
+    Hstand=`ssh $i "ls -l /usr/local/apache*/htdocs/update/iHotel1*  2>/dev/null  | sed -n '$ p' | sed -re 's/.*\/(apache[0-9]?).*(iHotel.*)/\1 \2/'"`
+  
+if [ -n "$Hstand" ]; then
+      
+      echo " ========================================= server $i ======================================== "
+      echo
+      echo "standard version(s):"
+      echo "$Hstand"
+      echo
+      ssh $i "/root/mode/seecode"
+     # /root/imode/gsurl2 $i
+   fi
+ #  Hthefapache=`ssh $i "ls -1 /usr/local/apache*/htdocs/thef/update.xml 2>/dev/null | sed -re 's/.*(apache[0-9]).*/\1/'"`
+ #  Hthef=`ssh $i "cat /usr/local/apache*/htdocs/thef/update.xml 2>/dev/null | grep -E 'versionLabel' | sed -re 's/<versionLabel>(.*)<versionLabel>/\1/'"`
+ #  if [ -n "$Hthef" ]; then
+ #     echo "thef version(s):"
+ #     echo "$Hthefapache"
+ #     echo "$Hthef"
+ #  fi
+done
+
+# /root/mode/seecode| grep -A 2 "hotel_descript" | awk -F '|' {'print$6'} | xargs

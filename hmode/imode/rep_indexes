@@ -1,0 +1,71 @@
+#!/bin/bash
+# ------------------------------------------------------------------
+# function:
+#           replace indexes of a table with new 
+# usages  :
+#           ./rep_indexes [options] [localhost] <database> <table>
+# e.g.    :
+#           ./rep_indexes portal master_guest_history      
+# remarks : 
+#           This script can be used ONLY at local MySQL server
+# ------------------------------------------------------------------
+
+# get options
+
+HOPTIONS=""
+while (echo "'$1'"  | grep -E  -e "^'-" > /dev/null)
+do
+   HOPTIONS="$HOPTIONS$1"
+   shift
+done
+
+# get mysql server ip
+
+. /root/mode/mysqldip
+
+# check $HMYSQLDIP
+
+if [ "$HMYSQLDIP" = "localhost" -o "$HMYSQLDIP" = "127.0.0.1" ]; then
+   :
+elif /root/mode/getips | grep -E "^$HMYSQLDIP$" >/dev/null; then
+   :
+else
+   /root/mode/modemsg rep_indexes "This script can be used ONLY at local MySQL server!" more && exit 1
+fi
+
+# check /usr/sbin/mysqld
+
+if [ ! -x /usr/sbin/mysqld ]; then
+   /root/mode/modemsg rep_indexes "MySQL server has not been installed at this machine!" more && exit 1
+fi
+   
+# check MySQL server status
+
+if ! /root/mode/mysql status &>/dev/null ; then
+   /root/mode/modemsg rep_indexes "MySQL server is not running at this machine!" more && exit 1
+fi
+
+# database name
+
+if [ -z "$1" ]; then
+   /root/mode/modemsg rep_indexes "You must privide database name!" && exit 1
+fi
+HDBNAME="$1"
+if [ -z `/root/mode/seecfg -s $HMYSQLDIP "show databases like '$HDBNAME'"|grep -i "^$HDBNAME"` ]; then
+   /root/mode/modemsg sdump "Database $HDBNAME doesn't exist at $HMYSQLDIP2!" more && exit 1
+fi
+
+# table name
+
+if [ -z "$1" ]; then
+   /root/mode/modemsg rep_indexes "You must privide table name!" && exit 1
+fi
+HTABNAME="$2"
+if ! echo "$2" | grep -E "\_history$" > /dev/null; then
+   /root/mode/modemsg rep_indexes "Only tables ending with '_history' are allowed!" more && exit 1
+fi
+
+
+
+
+

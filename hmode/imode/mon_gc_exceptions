@@ -1,0 +1,40 @@
+#!/bin/bash 
+
+# 
+
+/root/mode/withyou $$ mon_gc_exceptions 1 && exit
+
+#
+
+Hlines=$(
+if [ -z "$1" ];then
+   /root/mode/seecfg -s "select code from gc_sshto_servers where trim(server_code) <> ''" gc_admin 
+else
+   /root/mode/seecfg -s "select code from gc_sshto_servers where code regexp '^${1}$' and trim(server_code) <> ''" gc_admin 
+fi)
+for i in `echo $Hlines`; do
+   Hsc=`/root/imode/gc_sshc_sc $i`
+   Hsshmac=`/root/imode/gc_sshc_sshmac $i`
+   # delete current records of $Hs
+   /root/mode/seecfg "delete from gc_server_exceptions where ssh_code = '$i'" gc_admin
+   #
+   if ! /root/imode/gc_sshmac_ok "$Hsshmac"; then
+      /root/mode/seecfg "insert into gc_server_exceptions 
+                         select replace(uuid(),'-',''),'$i','$Hsc','net','net connection problem','何仁尧','hry',now()" gc_admin
+      continue
+   fi
+   Hcheck_result=`eval "cat /root/mode/health_check | $Hsshmac"`
+   #
+   while read -r Hchk;do 
+      if [ -z "$Hchk" ]; then
+         continue
+      fi
+      Hecode=`echo "$Hchk" | sed -re "s/(.*)#ModeD#(.*)/\1/"`
+      Hedetail=`echo "$Hchk" | sed -re "s/(.*)#ModeD#(.*)/\2/"`
+      /root/mode/seecfg "insert into gc_server_exceptions
+                         select replace(uuid(),'-',''),'$i','$Hsc','$Hecode','$Hedetail','何仁尧','hry',now()" gc_admin
+   done <<< "$Hcheck_result"
+done
+
+#
+

@@ -1,0 +1,12 @@
+#!/bin/bash 
+
+
+Hsta="$1"
+Hssh="$2"
+
+if [ -z "$Hsta" ]; then
+   echo "/root/mode/setdsta" | eval $Hssh
+else
+   echo "/root/mode/setdsta $Hsta" | eval $Hssh
+fi
+

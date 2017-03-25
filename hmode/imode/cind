@@ -1,0 +1,45 @@
+#!/bin/bash
+
+[ -z "$1" ] && exit 1
+
+# check file existence
+
+if [ ! -f "$1" ]; then
+   /root/mode/modemsg cind "File $1 doesn't exists!" 
+   exit 1
+fi
+
+#
+
+mkdir -p /autoindex
+rm -f /autoindex/* 
+
+#
+
+cat $1 |
+while read -r i; do
+   if [ -z "$i" ]; then
+      continue
+   fi
+   i=`echo $i | tr "A-Z" "a-z" | sed -re "s/ //g"`
+   Hext=`echo $i | sed -re "s/(.*)::(.*)/\2/"`
+   if [ "$Hext" != "$i" ]; then
+      j=`echo $i | sed -re "s/(.*)::(.*)/\1/"`
+   else
+      j=$i
+      Hext=
+   fi
+   Htab=`echo $j | sed -re "s/(.*):(.*)/\1/"`
+   Hind=`echo $j | sed -re "s/(.*):(.*)/\2/"`
+   Hcol=`echo $Hind | sed -r -e "s/,/\]\[/g" -e "s/^/\[/" -e "s/$/\]/" -e "s/\[/\[$Htab\./g"`
+   Hindn=`echo $Hind | sed -re "s/,/_/g" | sed -re "s/hotel_group_id/gid/g" | sed -re "s/hotel_id/hid/g"`
+cat >> /autoindex/$Htab.sql << EOF
+/*
+----each----:[$Htab]$Hcol[#$Htab:$Hind]$Hext
+*/
+create index imi_$Hindn on $Htab($Hind);
+EOF
+   
+
+done
+

@@ -1,0 +1,24 @@
+#!/bin/bash 
+
+#2016-04-05:16:02:14
+
+if echo "$1" | grep -E "^apache[1-7]?$" >/dev/null; then
+   Hapachemode=$1
+   Hapachetail=`echo $1 | sed -re "s/apache(.*)/\1/"`
+   shift
+else
+   Hapachemode=apache
+   Hapachetail=
+fi
+
+# 
+
+cat /usr/local/$Hapachemode/logs/access_log 2>/dev/null |
+sed -re "s/^[^[]+\[(..)\/(...)\/(....):(..):(..):(..).*/\3-\2-\1:\4:\5:\6/" | 
+sed -r -e "s/Jan/01/" -e "s/Feb/02/" -e "s/Mar/03/" \
+       -e "s/Apr/04/" -e "s/May/05/" -e "s/Jun/06/" \
+       -e "s/Jul/07/" -e "s/Aug/08/" -e "s/Sep/09/" \
+       -e "s/Oct/10/" -e "s/Nov/11/" -e "s/Dec/12/" | sort | 
+awk 'BEGIN {FIELDWIDTHS="13 6"} {state[$1]++} END {for(key in state) print key,"\t",state[key]}' | sort 
+
+

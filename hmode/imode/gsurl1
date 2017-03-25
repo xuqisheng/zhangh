@@ -1,0 +1,18 @@
+##
+. /root/imode/cfg/.imode_aliases
+#
+for i in `cat /root/servers.txt | grep -v "^#" | grep -E "^${1:-.*}$"`; do
+   if echo $i | grep -E "(web|mysql|old|kasen|back)" >/dev/null; then
+      continue
+   fi
+   Hip=`cat /etc/hosts | grep -P "( |\t)$i( |\t|$)" | sed -re "s/^([^#][^ \t]+)( |\t)+.*/\1/" | sed -n "1 p"`
+   Hurl=$(/root/mode/seecfg -s 115.159.221.14 "select url from hotel_group_url where url like 'http://$Hip%'" platform |
+          sed -n "$ p")
+
+
+   echo "-- $i -- `LANG=en_US;date`"
+   Hcurl=`curl "${Hurl}/wflhry12700l?cmd=list&mime=prop" 2>/dev/null | grep client_errors | grep -v -E "=0$"`
+   if [ "$Hcurl" != "" ]; then
+      echo "$Hcurl"
+   fi
+done | tee -a /gsurl1.txt

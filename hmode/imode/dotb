@@ -1,0 +1,32 @@
+##
+. /root/imode/cfg/.imode_aliases
+#
+for i in `cat /root/tb.txt | grep -v "^#" | grep -E "^${1:-.*}$"`; do
+
+   echo
+   echo " ========================================= server $i ======================================== "
+   echo
+
+   #ssh $i "sysctl -a | grep tcp_max_tw_buckets | grep 5000"
+   #ssh $i "/root/mode/msysctl"
+   #ssh $i "ls -l /var/log/messages* 2>/dev/null"
+   #ssh $i "netstat -s | grep 'delayed acks sent'"
+   #ssh $i "/root/mode/eval_app -ll"
+   #ssh $i "sysctl -a | grep tcp_abc"
+   #ssh $i "ls -l /var/spool/mail 2>/dev/null"
+   #ssh $i "/etc/init.d/sendmail status"
+   #ssh $i  "which bc;which tcpdump;which sendmail;which mail;"
+   #ssh $i "/root/mode/mnthosts"
+   #scp /ali.tar.gz $i:/
+   #ssh $i "cd /;tar xzvf /ali.tar.gz"
+   #ssh $i "/ali/ali.sh"
+   #ssh $i "netstat -s | grep -E -A 10 '^Ip:'"
+   #ssh $i "cat /etc/sysconfig/i18n"
+   #ssh $i "cat /etc/re*re* 2>/dev/null;hostname;locale | sed -n '1 p'"
+   #ssh $i "cat /var/spool/mail/root | grep 'Cannot open /var/log/sa/sa' | wc -l"
+   ssh $i "netstat -s | grep -E -A 4 'Udp:' | grep 'packet receive errors' | tr -d '\n';echo -n ' ';echo $i"
+   
+
+
+done
+

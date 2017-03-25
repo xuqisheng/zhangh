@@ -1,0 +1,7 @@
+#
+#. /root/imode/cfg/.imode_aliases
+#
+for i in `cat /root/servers.txt | grep -v "^#" | grep -E "^${1:-.*}$"`; do
+   echo $i
+   scp -4 -l 8192 -p /sdl.tar.gz $i:/ && ssh -4 $i "echo 'starting...';cd /;tar xzvf sdl.tar.gz >/dev/null 2>&1;echo ok" 2>/dev/null
+done

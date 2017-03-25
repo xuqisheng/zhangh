@@ -1,0 +1,25 @@
+#!/bin/bash 
+
+if [ "$1" = "toreg" ]; then
+   /root/mode/seecfg "SELECT b.code,b.ip0,b.ip1,b.ip2,b.descript,'服务器待注册' as toreg
+                      FROM gc_sshto_servers b
+                      WHERE b.server_code = ''
+                      order by b.code" gc_admin
+elif [ "$1" = "obreg" ]; then 
+   /root/mode/seecfg "select a.code from gc_servers a left join gc_sshto_servers b
+                      on a.code=b.server_code
+                      where b.server_code is null" gc_admin
+elif echo "$1" | grep -E "^(memory|disk|net|cpu)$" >/dev/null ; then
+#   /root/mode/seecfg "SELECT a.ssh_code,b.ip0,b.ip1,b.ip2,a.server_code,b.descript,a.check_descript,date(a.create_date) as date
+   /root/mode/seecfg "SELECT a.ssh_code,b.ip0,b.descript,a.check_descript,date(a.create_date) as date
+                      FROM gc_server_exceptions a,
+                           gc_sshto_servers b
+                      WHERE a.ssh_code=b.code and a.server_code=b.server_code and a.except_code='$1'
+                      order by a.except_code,a.ssh_code,a.server_code,a.create_date" gc_admin
+else
+   /root/mode/seecfg "SELECT a.ssh_code,b.ip0,a.server_code,b.descript,a.check_descript,date(a.create_date) as date
+                      FROM gc_server_exceptions a,
+                           gc_sshto_servers b
+                      WHERE a.ssh_code=b.code and a.server_code=b.server_code 
+                      order by a.except_code,a.ssh_code,a.server_code,a.create_date" gc_admin
+fi

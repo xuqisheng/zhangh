@@ -1,0 +1,11 @@
+#!/bin/bash
+
+. /root/mode/mysqldip
+
+/root/mode/find_tables $HMYSQLDIP "$1" |
+while read -r i; do
+   Hrep=`echo "$2" | sed -re "s/(\[[#]*)([:.])/\1$i\2/"`
+   /root/mode/testobjects $HMYSQLDIP "$Hrep" "$1" && echo "$i"
+done
+
+

@@ -1,0 +1,14 @@
+#!/bin/bash 
+
+Hsshmac=`/root/imode/gc_sshc_sshmac "$1"`
+if [ -z "$Hsshmac" ]; then
+   exit
+fi
+if ! /root/imode/gc_sshmac_ok "$Hsshmac"; then
+   exit
+fi
+cat /root/imode/.colldata_db2 | eval $Hsshmac
+
+# end
+
+

@@ -1,0 +1,59 @@
+#!/bin/bash 
+
+
+#
+
+/root/mode/withyou $$ gc_modetasks 1 && exit 1
+
+# send deploy plan 
+
+Hpids=`/root/mode/seecfg -s "select publish_id from gc_deploy_sgroup_master where sta='C' order by update_date" gc_admin`
+
+for k in `echo $Hpids`;do
+    Hsgc=`/root/mode/seecfg -s "select server_group_code from gc_deploy_sgroup_master where publish_id='$k'" gc_admin`
+    Hdptime=`/root/mode/seecfg -s "select deploy_time from gc_deploy_sgroup_master where publish_id='$k'" gc_admin`
+    Hpro=`/root/mode/seecfg -s "select concat(product_code,':',product_version) from gc_deploy_sgroup_detail where publish_id='$k'" gc_admin`
+    export HBLACKBOX2=cf
+    /root/imode/gc_dp -r "$Hsgc" "$Hdptime" $Hpro
+    if [ $? -eq 0 ]; then
+       /root/mode/seecfg "update gc_deploy_sgroup_master set sta='I',update_name='何仁尧',update_by='hry',update_date=now() where publish_id='$k'" gc_admin
+    fi
+    unset HBLACKBOX2
+done
+
+# monitor deploy progress
+
+Hpids=`/root/mode/seecfg -s "select publish_id from gc_deploy_sgroup_master where sta='I' order by update_date" gc_admin`
+
+for k in `echo $Hpids`;do
+    Hsgc=`/root/mode/seecfg -s "select server_group_code from gc_deploy_sgroup_master where publish_id='$k'" gc_admin`
+    Hs_codes=`/root/mode/seecfg -s "SELECT server_code FROM gc_server_group_info where server_group_code='$Hsgc'" gc_admin`
+    for i in `echo $Hs_codes`;do
+       # ssh way for server code $i
+       Hsshcode=`/root/imode/gc_sc_sshc $i`
+       Hsshmac=`/root/imode/gc_sshc_sshmac "$Hsshcode"`
+       Hsta_time=`/root/imode/gc_set_dp '' "$Hsshmac"`
+       Hsta=`echo "$Hsta_time"  | sed -re "s/(.*)#(.*)/\1/"`
+       Htime=`echo "$Hsta_time" | sed -re "s/(.*)#(.*)/\2/"`
+       if [ "$Htime" = "null" ]; then
+          continue
+       fi
+       #
+       Hosta=`/root/mode/seecfg "select sta from gc_deploy_server_info where publish_id='$k' and server_code='$i'" gc_admin`
+       if [ "$Hsta" != "$Hosta" ]; then
+          /root/mode/seecfg "insert into gc_deploy_server_info
+                                    select replace(uuid(),'-',''),'$k','$i','$Hsta','$Htime'
+                                    on duplicate key update sta='$Hsta',settime='$Htime'" gc_admin
+       fi
+       Hongoing=`/root/mode/seecfg "select 1 from gc_deploy_server_info
+                                             where publish_id='$k' and sta <> 'deploy-completed'" gc_admin`
+       if [ -z "$Hongoing" ]; then
+          /root/mode/seecfg "update gc_deploy_sgroup_master
+                                    set sta='O',update_name='何仁尧',update_by='hry',
+                                        update_date=(select max(settime) from gc_deploy_server_info where publish_id='$k')
+                                    where publish_id='$k' and sta='I'" gc_admin
+       fi
+    done
+done
+
+

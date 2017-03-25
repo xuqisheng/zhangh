@@ -1,0 +1,22 @@
+#!/bin/bash 
+# -----------------------------------------------------------------------
+# function:
+#          generate index expression to be added into tables in target db
+# usages  :
+#          ./genndx <log-generated-by-ndxcmp> <target-db>
+# e.g.    :
+#          ./genndx /sh_qt.log2 qt
+# ----------------------------------------------------------------------
+
+Hlog="$1"
+Htdb="$2"
+
+#
+
+cat "$Hlog" 2>/dev/null | grep -E "tablename.*index expression.*in databases" >/dev/null || exit 1
+
+#
+
+cat $Hlog | grep -E "^\|" | grep -Ev "index expression.*in databases" |
+grep -Ev "^\|[^\|]+\|[^\|]+\|( $Htdb *\|| $Htdb,|.*,$Htdb,.*|.*,$Htdb *\|)" |
+sed -re "s/^\| ([^ ]+) *\| ([^ ]+).*/\1:\2/" 
