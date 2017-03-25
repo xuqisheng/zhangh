@@ -1,4 +1,6 @@
-##
+# 通过gc50检查哪些客户将在一月后到期
+
+#
 . /root/imode/cfg/.imode_aliases
 #
 
@@ -12,7 +14,7 @@ for i in `cat /root/servers.txt | grep -v "^#" | grep -E "^${1:-.*}$"`; do
 
    ssh $i "cat /root/mode/tmp/htmpdb | while read line;do /root/mode/seecfg \"SELECT b.code,b.descript,a.set_value,DATEDIFF(DATE(a.set_value),NOW()) AS diff
         FROM sys_option a,hotel b WHERE a.catalog='system' AND a.item='valid_date' AND a.set_value<>''
-        AND a.hotel_id<>0 AND a.hotel_group_id=b.hotel_group_id AND a.hotel_id=b.id AND b.sta='I'
+        AND a.hotel_id <> 0 AND a.hotel_group_id=b.hotel_group_id AND a.hotel_id=b.id AND b.sta='I'
         AND DATEDIFF(DATE(a.set_value),NOW()) < 30 AND DATEDIFF(DATE(a.set_value),NOW()) > 0 \" \$line; done"
 
    ssh $i "rm -f /root/mode/tmp/htmpdb"
