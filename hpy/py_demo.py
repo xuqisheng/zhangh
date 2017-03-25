@@ -3,8 +3,8 @@
 
 import os
 
-print os.path.getsize('D:\\abc.pdf')
-
+fileSize = round(os.path.getsize('E:\Software\Git_2.12_64.exe') / (1024*1024.00),2)
+print fileSize
 
 
 '''
