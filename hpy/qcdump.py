@@ -23,6 +23,7 @@ class Qcdump(object):
         if os.path.isfile(self._dumpfile):
             # 获取文件大小
             self._file_size = os.path.getsize(self._dumpfile)
+            fileSize = round(os.path.getsize('E:\Software\Git_2.12_64.exe') / (1024 * 1024.00), 2)
             # 取得文件的路径
             self._filepath = os.path.dirname(self._dumpfile)
             # 判断是否包含路径
@@ -61,12 +62,7 @@ class Qcdump(object):
         path_cos    = unicode('/' + self._filename)
         path_local  = unicode(self._dumpfile)
         request     = UploadFileRequest(bucket, path_cos,path_local)
-        print "Begin"
-        ret_flag = True
-        while ret_flag:
-            upload_ret  = self._cos_client.upload_file(request)
-
-        print "End"
+        upload_ret  = self._cos_client.upload_file(request)
 
         self.message_ret(upload_ret['code'],upload_ret['message'],'upload_file')
 
