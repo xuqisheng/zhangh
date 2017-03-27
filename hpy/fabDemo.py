@@ -7,7 +7,7 @@ env.user = 'root'
 env.hosts = ['218.25.99.195']
 env.port = 3305
 # env.password='xxxxxx'
-env.key_filename = "D:\Python27\zhangh\hpy\pyMaint\huiRsa"
+env.key_filename = "D:\Python27\huiRsa"
 
 
 def test():
