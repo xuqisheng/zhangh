@@ -1,0 +1,59 @@
+import os
+os.getcwd()                 获取当前工作目录，即当前python脚本工作的目录路径
+os.chdir("dirname")         改变当前脚本工作目录；相当于shell下cd
+os.curdir                   返回当前目录: ('.')
+os.pardir                   获取当前目录的父目录字符串名：('..')
+os.makedirs('dir1/dir2')    可生成多层递归目录
+os.removedirs('dirname1')   若目录为空，则删除，并递归到上一级目录，如若也为空，则删除，依此类推
+os.mkdir('dirname')         生成单级目录；相当于shell中mkdir dirname
+os.rmdir('dirname')         删除单级空目录，若目录不为空则无法删除，报错；相当于shell中rmdir dirname
+os.listdir('dirname')       列出指定目录下的所有文件和子目录，包括隐藏文件，并以列表方式打印
+os.remove()                 删除一个文件
+os.rename("oldname","new")  重命名文件/目录
+os.stat('path/filename')    获取文件/目录信息
+os.sep                      操作系统特定的路径分隔符，win下为"\\",Linux下为"/"
+os.linesep                  当前平台使用的行终止符，win下为"\t\n",Linux下为"\n"
+os.pathsep                  用于分割文件路径的字符串
+os.name                     字符串指示当前使用平台。win->'nt'; Linux->'posix'
+os.system("bash command")   运行shell命令，直接显示,不能保存执行结果<br>os.popen("bash command").read()   运行shell命令,可以保存执行结果
+os.environ                  获取系统环境变量
+os.path.abspath(path)       返回path规范化的绝对路径
+os.path.split(path)         将path分割成目录和文件名二元组返回
+os.path.dirname(path)       返回path的目录。其实就是os.path.split(path)的第一个元素
+os.path.basename(path)      返回path最后的文件名。如何path以／或\结尾，那么就会返回空值。即os.path.split(path)的第二个元素
+os.path.exists(path)        如果path存在，返回True；如果path不存在，返回False
+os.path.isabs(path)         如果path是绝对路径，返回True
+os.path.isfile(path)        如果path是一个存在的文件，返回True。否则返回False
+os.path.isdir(path)         如果path是一个存在的目录，则返回True。否则返回False
+os.path.join(path1[, path2[, ...]])  将多个路径组合后返回，第一个绝对路径之前的参数将被忽略
+os.path.getatime(path)      返回path所指向的文件或者目录的最后存取时间
+os.path.getmtime(path)      返回path所指向的文件或者目录的最后修改时间
+
+
+import time
+print(time.clock())         #返回处理器时间,3.3开始已废弃
+print(time.process_time())  #返回处理器时间,3.3开始已废弃<br>
+print(time.time())          #返回当前系统时间戳输出：1471161757.5214906
+print(time.ctime())         #输出字符串格式时间：Sun Aug 14 16:04:02 2016 ,当前系统时间
+print(time.ctime(time.time()-86640))   #将时间戳转为字符串格式<br>print(time.gmtime())  #获取结构化时间
+print(time.gmtime(time.time()-86640))  #将时间戳转换成struct_time格式
+print(time.localtime(time.time()-86640)) #将时间戳转换成struct_time格式,但返回的本地时间
+print(time.mktime(time.localtime())) #与time.localtime()功能相反,将struct_time格式转回成时间戳格式
+time.sleep(4)               # 休眠4秒
+print(time.strftime("%Y-%m-%d %H:%M:%S",time.gmtime()) ) #将struct_time格式转成指定的字符串格式
+print(time.strptime("2016-01-28","%Y-%m-%d") ) #将字符串格式转换成struct_time格式
+
+import datetime
+print(datetime.date.today()) #输出格式 2016-01-26
+print(datetime.date.fromtimestamp(time.time()-864400) )  #2016-01-16 将时间戳转成日期格式
+current_time = datetime.datetime.now() #
+print(current_time)   #输出2016-01-26 19:04:30.335935
+print(current_time.timetuple())  #返回struct_time格式
+#datetime.replace([year[, month[, day[, hour[, minute[, second[, microsecond[, tzinfo]]]]]]]])
+print(current_time.replace(2014,9,12))  #输出2014-09-12 19:06:24.074900,返回当前时间,但指定的值将被替换
+str_to_date = datetime.datetime.strptime("21/11/06 16:30", "%d/%m/%y %H:%M") #将字符串转换成日期格式
+new_date = datetime.datetime.now() + datetime.timedelta(days=10) #比现在加10天
+new_date = datetime.datetime.now() + datetime.timedelta(days=-10) #比现在减10天
+new_date = datetime.datetime.now() + datetime.timedelta(hours=-10) #比现在减10小时
+new_date = datetime.datetime.now() + datetime.timedelta(seconds=120) #比现在+120s
+print(new_date)

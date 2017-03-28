@@ -1,6 +1,8 @@
 #!/etc/bin/env python
 # coding:utf-8
 
+# fab -f fabmode.py seetom
+
 from fabric.api import *
 
 env.user = 'root'
@@ -11,8 +13,6 @@ env.key_filename = "D:\Python27\huiRsa"
 
 def get_message():
     run('cat /etc/issue;df;free')
-
-
 
 def seetom():
     # 远程切换目录
@@ -34,6 +34,8 @@ def showlist():
 def showdb():
     run("/root/mode/seecfg 'show databases'")
 
+def showuser():
+    run("/root/mode/.do1au")
 
 
-# fab -f fabmode.py seetom
+
