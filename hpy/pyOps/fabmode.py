@@ -28,6 +28,9 @@ def jvstat():
 def eval_app():
     run('/root/mode/eval_app -ll')
 
+def showlist():
+    run("/root/mode/seecfg 'show processlist'")
+
 def showdb():
     run("/root/mode/seecfg 'show databases'")
 
