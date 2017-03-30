@@ -6,7 +6,7 @@
 from fabric.api import *
 
 env.user = 'root'
-env.hosts = ['115.159.202.175']
+env.hosts = ['115.159.79.108']
 env.port = 3305
 # env.password='xxxxxx'
 env.key_filename = "D:\Python27\huiRsa"
