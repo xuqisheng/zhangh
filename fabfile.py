@@ -6,7 +6,7 @@ from fabric.contrib.console import confirm
 from fabric.api import *
 
 env.user  = 'root'
-env.hosts = ['192.168.12.178']
+env.hosts = ['192.168.12.179']
 env.port  = 22
 env.password='action'
 # env.key_filename = "/root/.ssh/huiRsa"
@@ -49,7 +49,7 @@ def exec_mode():
 
 # 上传本地文件到远程主机
 def put_file():
-    put('D:\Python27\zhangh\pstest','/root/')
+    put('D:\Python27\zhangh\mntOS','/root/')
 
 # 从远程主机下文件到本地
 def get_file():
