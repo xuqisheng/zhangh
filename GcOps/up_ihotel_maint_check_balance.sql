@@ -154,6 +154,6 @@ END$$
 
 DELIMITER ;
 
-CALL up_ihotel_maint_check_balance(2,9);
+-- CALL up_ihotel_maint_check_balance(2,9);
 
-DROP PROCEDURE IF EXISTS `up_ihotel_maint_check_balance`;
+-- DROP PROCEDURE IF EXISTS `up_ihotel_maint_check_balance`;

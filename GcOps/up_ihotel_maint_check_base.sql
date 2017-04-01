@@ -224,6 +224,6 @@ END$$
 
 DELIMITER ;
 
-CALL up_ihotel_maint_check_base(2,9);
+-- CALL up_ihotel_maint_check_base(2,9);
 
-DROP PROCEDURE IF EXISTS `up_ihotel_maint_check_base`;
+-- DROP PROCEDURE IF EXISTS `up_ihotel_maint_check_base`;
