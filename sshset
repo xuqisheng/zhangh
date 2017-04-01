@@ -19,7 +19,7 @@ fi
 echo "Set Hosts code:" $1
 
 if ! cat /root/zhangh/sshcodes.txt | grep -E "$1" > /dev/null; then
-   /root/zhangh/hmsg sshset "Please provide a rights machine code!!!" more
+   /root/zhangh/hmsg sshset "Please provide a right machine code!!!" more
    exit
 fi
 
