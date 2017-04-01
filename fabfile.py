@@ -35,8 +35,8 @@ def get_mode():
 def exec_mode():
     put('D:\Python27\zhangh\\abc', '/')
     # with cd('/'):
-    #     run('chmod u+x mntOS')
-    #     run('/mntOS')
+    #     run('chmod u+x ka')
+    #     run('/ka')
 
         # run('/root/mode/settz')
         # run('/root/mode/disusb')
@@ -49,7 +49,7 @@ def exec_mode():
 
 # 上传本地文件到远程主机
 def put_file():
-    put('D:\Python27\zhangh\mntOS','/root/')
+    put('D:\Python27\zhangh\m','/root/')
 
 # 从远程主机下文件到本地
 def get_file():
