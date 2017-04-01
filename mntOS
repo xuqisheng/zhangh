@@ -1,6 +1,6 @@
 #!/bin/bash
 # -----------------------------------------------------------------
-# function:
+# function: 修复
 #
 # e.g.    :
 #
@@ -14,6 +14,7 @@ SvCentOS=`cat /etc/issue | grep [0-9] | sed -re "s/^CentOS.*([0-9]).*/\1/"`
 if [ $BvCentOS -eq 5 ]; then
     pass
 elif [ $BvCentOS -eq 6 ]; then
+
     if [ $SvCentOS -ge 4 ]; then
         rpm -qa | grep -i mysql | xargs rpm -e --nodeps
         rpm -qa | grep -i mysql
