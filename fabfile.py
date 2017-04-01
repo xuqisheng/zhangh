@@ -17,7 +17,7 @@ def deploy():
 
 # 上传本地文件到远程主机
 def put_file(source_file,object_file):
-    print source_file ,'<-->',object_file
+    pass
 
 # 从远程主机下文件到本地
 def get_file():
