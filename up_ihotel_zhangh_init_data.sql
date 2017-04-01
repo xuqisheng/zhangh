@@ -113,30 +113,30 @@ BEGIN
 	DELETE FROM web_service_log WHERE DATE(create_datetime) < '2016-1-1';	
 	
 	-- drop 不必要的存储过程  | 不在能另一过程中执行，需手工单独执行
-	/*
-	DROP PROCEDURE IF EXISTS `hhryproc9145`;
-	DROP PROCEDURE IF EXISTS `hhryproc9541`;
-	DROP PROCEDURE IF EXISTS `hhryproc9936`;
-	DROP PROCEDURE IF EXISTS `insert_update_for_ImportCharge`;
-	DROP PROCEDURE IF EXISTS `p_guest_sta_internal1`;
-	DROP PROCEDURE IF EXISTS `p_guest_sta_internal2`;
-	DROP PROCEDURE IF EXISTS `p_guest_sta_internal3`;
-	DROP PROCEDURE IF EXISTS `p_guest_sta_overseas1`;
-	DROP PROCEDURE IF EXISTS `p_guest_sta_overseas2`;
-	DROP PROCEDURE IF EXISTS `p_guest_sta_overseas3`;
-	DROP PROCEDURE IF EXISTS `p_reb_guest_sta_inland`;
-	DROP PROCEDURE IF EXISTS `p_reb_guest_sta_overseas`;
-	DROP PROCEDURE IF EXISTS `p_report_cmslist_v6`;
-	DROP PROCEDURE IF EXISTS `p_report_cmslist_v6_sum`;
-	DROP PROCEDURE IF EXISTS `p_statistic_clear_month`;
-	DROP PROCEDURE IF EXISTS `p_statistic_month`;
-	DROP PROCEDURE IF EXISTS `p_statistic_month_nts_check`;
-	DROP PROCEDURE IF EXISTS `p_statistic_month_save`;
-	DROP PROCEDURE IF EXISTS `p_statistic_rebuild`;
-	DROP PROCEDURE IF EXISTS `p_statistic_year`;
-	DROP PROCEDURE IF EXISTS `p_trans_guest_sta`;
-	DROP PROCEDURE IF EXISTS `rep_business_room_statistic_proc1`;
-	*/
+
+--	DROP PROCEDURE IF EXISTS `hhryproc9145`;
+--	DROP PROCEDURE IF EXISTS `hhryproc9541`;
+--	DROP PROCEDURE IF EXISTS `hhryproc9936`;
+--	DROP PROCEDURE IF EXISTS `insert_update_for_ImportCharge`;
+--	DROP PROCEDURE IF EXISTS `p_guest_sta_internal1`;
+--	DROP PROCEDURE IF EXISTS `p_guest_sta_internal2`;
+--	DROP PROCEDURE IF EXISTS `p_guest_sta_internal3`;
+--	DROP PROCEDURE IF EXISTS `p_guest_sta_overseas1`;
+--	DROP PROCEDURE IF EXISTS `p_guest_sta_overseas2`;
+--	DROP PROCEDURE IF EXISTS `p_guest_sta_overseas3`;
+--	DROP PROCEDURE IF EXISTS `p_reb_guest_sta_inland`;
+--	DROP PROCEDURE IF EXISTS `p_reb_guest_sta_overseas`;
+--	DROP PROCEDURE IF EXISTS `p_report_cmslist_v6`;
+--	DROP PROCEDURE IF EXISTS `p_report_cmslist_v6_sum`;
+--	DROP PROCEDURE IF EXISTS `p_statistic_clear_month`;
+--	DROP PROCEDURE IF EXISTS `p_statistic_month`;
+--	DROP PROCEDURE IF EXISTS `p_statistic_month_nts_check`;
+--	DROP PROCEDURE IF EXISTS `p_statistic_month_save`;
+--	DROP PROCEDURE IF EXISTS `p_statistic_rebuild`;
+--	DROP PROCEDURE IF EXISTS `p_statistic_year`;
+--	DROP PROCEDURE IF EXISTS `p_trans_guest_sta`;
+--	DROP PROCEDURE IF EXISTS `rep_business_room_statistic_proc1`;
+
 	
 END$$
 

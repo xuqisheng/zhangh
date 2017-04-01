@@ -40,8 +40,8 @@ if [ -z `/root/mode/seecfg -s $HMYSQLDIP "show tables from \\\`$HDBNAME\\\` like
 fi
 
 # repair hotel.client_type and clean invalid data
-/root/mode/seecfg "/root/zhangh/hsql/up_ihotel_zhangh_init_data.sql" $HDBNAME 
-/root/mode/seecfg "/root/zhangh/hsql/up_ihotel_zhangh_grp_analyse.sql" $HDBNAME 
+/root/mode/seecfg "/root/zhangh/up_ihotel_zhangh_init_data.sql" $HDBNAME
+/root/mode/seecfg "/root/zhangh/up_ihotel_zhangh_grp_analyse.sql" $HDBNAME
 
 # Empty folder file
 rm -Rf /fenku/dumps/
@@ -122,6 +122,6 @@ if [ $Hrows -eq 0 ]; then
 fi
 
 # Drop member tables in pms database 
-/root/mode/seecfg $HMYSQLDIP "/root/zhangh/hsql/maint_droptb.sql" $HDBNAME
+/root/mode/seecfg $HMYSQLDIP "/root/zhangh/maint_droptb.sql" $HDBNAME
 # maint data in pms group member
-/root/mode/seecfg $HMYSQLDIP "/root/zhangh/hsql/maint_group.sql" portal_group
+/root/mode/seecfg $HMYSQLDIP "/root/zhangh/maint_group.sql" portal_group

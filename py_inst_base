@@ -7,12 +7,11 @@
 # ===============================================
 
 
-tar zxvf /root/zhangh/hpackages/mysql-connector-python-2.2.2.tar.gz
+tar zxvf /root/zhangh/hbox/mysql-connector-python-2.2.2.tar.gz
 
-cd /root/zhangh/hpackages/mysql-connector-python-2.2.2
+cd /root/zhangh/hbox/mysql-connector-python-2.2.2
 
 python setup.py install
-
 
 if [-f /usr/local/lib/python2.7/site-packages/mysql_connector_python-2.2.2-py2.7.egg-info ]; then
   echo "install success!!!" && exit 0
