@@ -54,4 +54,4 @@ def put_file():
 
 # 从远程主机下文件到本地
 def get_file():
-    get('/root/zhangh/dbclound','D:\Python27')
+    get('/root/zhangh/dbcloud','D:\Python27')
