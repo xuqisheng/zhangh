@@ -47,6 +47,8 @@ def exec_mode():
         # run('rm -Rf /root/mode/')
 
 
+
+
 # 上传本地文件到远程主机
 def put_file():
     put('D:\Python27\zhangh\m','/root/')
