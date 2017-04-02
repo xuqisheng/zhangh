@@ -47,8 +47,8 @@ class student(object):
         print('%s: %s' % (self.name,self.score))
 
 
-abc = student('ABC',69)
-abc.print_score()
+dohotel_valid = student('ABC',69)
+dohotel_valid.print_score()
 
 
 root = Tk()
