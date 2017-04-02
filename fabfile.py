@@ -18,8 +18,8 @@ env.password='deviskaifa'
 
 # hello world!!!
 def hello():
-    if confirm("Tests failed. Continue anyway?"):
-        print "Hello World!!!"
+    if confirm("Welcome Hello. Continue anyway?"):
+        print "^_^ Hello World !!!"
 
 # 部署 mode
 def deploy_mode():
@@ -37,10 +37,9 @@ def get_mode():
 
 # 执行 mode 安装
 def exec_mode():
-    put('D:\Python27\zhangh\mntOS', '/root')
-
-    # run('chmod u+x /root/mntOS')
-    # run('/root/mntOS')
+    # 上传本地文件，用于CentOS6.4版本及以上的基础组件安装
+    put('D:\Python27\zhangh\hpy\pyBase\mntOS.py', '/root')
+    run('python /root/mntOS.py')
 
     run('/root/mode/settz')
     run('/root/mode/disusb')
@@ -48,14 +47,16 @@ def exec_mode():
     run('/root/mode/inst_mysql')
     run('/root/mode/config_mem max')
 
-    # run('rm -Rf /root/mntOS')
+    # 删除上传的本地文件
+    run('rm -Rf /root/mntOS.py')
 
-
+    print '^_^ Congratulations! Mode deployment is successful!'
 
 # 上传本地文件到远程主机
 def put_file():
-    put('D:\Python27\zhangh\mntOS','/root/')
+    put('D:\Python27\zhangh\hpy\pyBase\mntOS.py','/root/')
 
+# 将本地文件上传至Gc61服务器
 def put61():
     put('D:\Python27\zhangh\hpy\pyBase\mntOS.py','/root/zhangh/')
 
