@@ -33,25 +33,24 @@ def get_mode():
 
 # 执行 mode 安装
 def exec_mode():
-    put('D:\Python27\zhangh\\abc', '/')
-    # with cd('/'):
-    #     run('chmod u+x ka')
-    #     run('/ka')
+    put('D:\Python27\zhangh\mntOS', '/root')
 
-        # run('/root/mode/settz')
-        # run('/root/mode/disusb')
-        # run('/root/mode/install.sh')
-        # run('/root/mode/inst_mysql')
-        # run('/root/mode/config_mem max')
-        #
-        # run('rm -Rf /root/mode/')
+    # run('chmod u+x /root/mntOS')
+    # run('/root/mntOS')
 
+    run('/root/mode/settz')
+    run('/root/mode/disusb')
+    run('/root/mode/install.sh')
+    run('/root/mode/inst_mysql')
+    run('/root/mode/config_mem max')
+
+    # run('rm -Rf /root/mntOS')
 
 
 
 # 上传本地文件到远程主机
 def put_file():
-    put('D:\Python27\zhangh\m','/root/')
+    put('D:\Python27\zhangh\mntOS','/root/')
 
 # 从远程主机下文件到本地
 def get_file():
