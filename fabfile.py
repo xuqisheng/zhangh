@@ -5,12 +5,16 @@ from fabric.api import local, settings, abort
 from fabric.contrib.console import confirm
 from fabric.api import *
 
+# GcEng61的连接
+env.hosts = ['183.129.215.114']
+env.port  = 1300
+
 env.user  = 'root'
-env.hosts = ['192.168.2.69']
-env.port  = 3305
-# env.password='action'
+# env.hosts = ['192.168.2.69']
+# env.port  = 3305
+env.password='deviskaifa'
 # env.key_filename = "/root/.ssh/huiRsa"
-env.key_filename = "D:\Python27\huiRsa"
+# env.key_filename = "D:\Python27\huiRsa"
 
 # hello world!!!
 def hello():
@@ -52,6 +56,10 @@ def exec_mode():
 def put_file():
     put('D:\Python27\zhangh\mntOS','/root/')
 
+def put61():
+    put('D:\Python27\zhangh\hpy\pyBase\mntOS.py','/root/zhangh/')
+
 # 从远程主机下文件到本地
 def get_file():
     get('/root/zhangh/dbcloud','D:\Python27')
+
