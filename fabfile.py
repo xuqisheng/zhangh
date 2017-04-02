@@ -7,7 +7,7 @@ from fabric.api import *
 
 env.user  = 'root'
 env.hosts = ['192.168.2.69']
-env.port  = 22
+env.port  = 3305
 # env.password='action'
 # env.key_filename = "/root/.ssh/huiRsa"
 env.key_filename = "D:\Python27\huiRsa"
@@ -54,4 +54,4 @@ def put_file():
 
 # 从远程主机下文件到本地
 def get_file():
-    get('/root/zhangh/dbapp','D:\Python27')
+    get('/root/zhangh/dbclound','D:\Python27')
