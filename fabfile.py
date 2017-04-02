@@ -6,11 +6,11 @@ from fabric.contrib.console import confirm
 from fabric.api import *
 
 env.user  = 'root'
-env.hosts = ['192.168.12.179']
+env.hosts = ['192.168.2.69']
 env.port  = 22
-env.password='action'
+# env.password='action'
 # env.key_filename = "/root/.ssh/huiRsa"
-# env.key_filename = "D:\Python27\huiRsa"
+env.key_filename = "D:\Python27\huiRsa"
 
 # hello world!!!
 def hello():
@@ -54,4 +54,4 @@ def put_file():
 
 # 从远程主机下文件到本地
 def get_file():
-    get('/root/mode/dump/portal_member-2017-02-20_001.sql','D:\Python27')
+    get('/root/zhangh/dbapp','D:\Python27')
