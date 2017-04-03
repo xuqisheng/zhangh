@@ -2,6 +2,10 @@
 # coding:utf-8
 
 import os,re
+
+# yum remove
+yum remove mysql
+
 # 打开文件
 f = open('/etc/issue','r')
 line = f.readline().strip('\n')

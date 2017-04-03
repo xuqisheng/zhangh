@@ -460,8 +460,17 @@ add(y=6, x=5)  # Keyword arguments can arrive in any order.
 def varargs(*args):
     return args
 
-
 varargs(1, 2, 3)  # => (1,2,3)
+
+
+# 斐波那契数列 递归函数 Recursion
+def Fibonacci(n):
+    if n==0:
+        return 0
+    elif n==1:
+        return 1
+    else:
+        return Fibonacci(n-1)+Fibonacci(n-2)
 
 
 # You can define functions that take a variable number of
