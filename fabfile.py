@@ -16,10 +16,25 @@ env.password='deviskaifa'
 # env.key_filename = "/root/.ssh/huiRsa"
 # env.key_filename = "D:\Python27\huiRsa"
 
-# hello world!!!
 def hello():
     if confirm("Welcome Hello. Continue anyway?"):
         print "^_^ Hello World !!!"
+
+# 上传本地文件到远程主机
+def put_file():
+    put('D:\Python27\zhangh\hpy\pyBase\mntOS.py','/root/')
+
+# 将本地文件上传至Gc61服务器
+def put61():
+    put('D:\Python27\zhangh\\testshell','/')
+
+    # 脚本上传时注意格式转化
+    # run('dos2unix /testshell')
+
+# 从远程主机下文件到本地
+def get_file():
+    get('/root/zhangh/dbcloud','D:\Python27')
+
 
 # 部署 mode
 def deploy_mode():
@@ -51,16 +66,3 @@ def exec_mode():
     run('rm -Rf /root/mntOS.py')
 
     print '^_^ Congratulations! Mode deployment is successful!'
-
-# 上传本地文件到远程主机
-def put_file():
-    put('D:\Python27\zhangh\hpy\pyBase\mntOS.py','/root/')
-
-# 将本地文件上传至Gc61服务器
-def put61():
-    put('D:\Python27\zhangh\hpy\pyBase\mntOS.py','/root/zhangh/')
-
-# 从远程主机下文件到本地
-def get_file():
-    get('/root/zhangh/dbcloud','D:\Python27')
-
