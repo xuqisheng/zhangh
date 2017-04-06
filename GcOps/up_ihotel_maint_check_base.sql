@@ -31,7 +31,7 @@ BEGIN
 		PRIMARY KEY(id) 
 	);
 
-	INSERT INTO tmp_check_base SELECT NULL,'0',CONCAT('检查开始... 酒店 : ',var_hotel_code,' & ',var_hotel_name,' 集团 : ',var_group_code,' & ',var_group_name);
+	INSERT INTO tmp_check_base SELECT NULL,'0',CONCAT('检查日期：',DATE(NOW()),' 酒店 : ',var_hotel_code,' & ',var_hotel_name,' 集团 : ',var_group_code,' & ',var_group_name);
 	INSERT INTO tmp_check_base SELECT NULL,'0',GROUP_CONCAT('\n---------------------------------------------------------------------');
 	INSERT INTO tmp_check_base SELECT NULL,'B',CONCAT('hotel-省份代码 ',CONCAT(a.province_code,' [',b.descript,']'),'  城市代码 ',CONCAT(a.city_code,'[',c.descript,']'),'  区域代码  ',a.district_code,'  检查是否正确') FROM hotel a LEFT JOIN code_province b ON a.province_code=b.code AND b.hotel_id = arg_hotel_id AND b.hotel_group_id = arg_hotel_group_id
 		LEFT JOIN code_city c ON a.city_code=c.code AND c.hotel_id = arg_hotel_id AND c.hotel_group_id = arg_hotel_group_id

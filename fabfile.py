@@ -6,15 +6,18 @@ from fabric.contrib.console import confirm
 from fabric.api import *
 
 # GcEng61的连接
-env.hosts = ['183.129.215.114']
-env.port  = 1300
+# env.hosts = ['183.129.215.114']
+# env.port  = 1300
 
 env.user  = 'root'
-# env.hosts = ['192.168.2.69']
+env.hosts = ['110.80.36.58']
 # env.port  = 3305
 env.password='deviskaifa'
 # env.key_filename = "/root/.ssh/huiRsa"
 # env.key_filename = "D:\Python27\huiRsa"
+
+def test():
+    run('uname -a')
 
 def hello():
     if confirm("Welcome Hello. Continue anyway?"):

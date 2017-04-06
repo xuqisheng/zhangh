@@ -36,7 +36,7 @@ BEGIN
 		KEY index1(biz_date)
 	);
 
-	INSERT INTO tmp_check_balance(check_msg) SELECT CONCAT('检查开始... 酒店 : ',var_hotel_code,' & ',var_hotel_name,' 集团 : ',var_group_code,' & ',var_group_name);
+	INSERT INTO tmp_check_balance(check_msg) SELECT CONCAT('检查日期：',DATE(NOW()),' 酒店 : ',var_hotel_code,' & ',var_hotel_name,' 集团 : ',var_group_code,' & ',var_group_name);
 	INSERT INTO tmp_check_balance(check_msg) SELECT GROUP_CONCAT('\n---------------------------------------------------------------------');
     INSERT INTO tmp_check_balance(check_msg) SELECT '底表余额和快照表余额不一致';
 	-- 检查底表余额和快照表余额不一致
