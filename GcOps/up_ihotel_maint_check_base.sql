@@ -11,11 +11,16 @@ label_0:
 BEGIN
 
 	DECLARE var_client_type	VARCHAR(15);
+	DECLARE var_group_name  VARCHAR(60);
+	DECLARE var_hotel_name  VARCHAR(60);
+	DECLARE var_group_code  VARCHAR(20);
+	DECLARE var_hotel_code  VARCHAR(20);
 	-- ======================================================
 	-- 系统参数、代码及基本配置检查
 	-- 2017.3.28
 	-- ======================================================
-	SELECT client_type INTO var_client_type FROM hotel WHERE hotel_group_id = arg_hotel_group_id AND id=arg_hotel_id;
+	SELECT descript,code INTO var_group_name,var_group_code FROM hotel_group WHERE id = arg_hotel_group_id;
+	SELECT client_type,descript,code INTO var_client_type,var_hotel_name,var_hotel_code FROM hotel WHERE hotel_group_id = arg_hotel_group_id AND id=arg_hotel_id;
 	
 	-- 参数检查结果集
   	DROP TEMPORARY TABLE IF EXISTS tmp_check_base;
@@ -26,9 +31,9 @@ BEGIN
 		PRIMARY KEY(id) 
 	);
 
-	INSERT INTO tmp_check_base SELECT NULL,'0','检查开始...';
+	INSERT INTO tmp_check_base SELECT NULL,'0',CONCAT('检查开始... 酒店 : ',var_hotel_code,' & ',var_hotel_name,' 集团 : ',var_group_code,' & ',var_group_name);
 	INSERT INTO tmp_check_base SELECT NULL,'0',GROUP_CONCAT('\n---------------------------------------------------------------------');
-	INSERT INTO tmp_check_base SELECT NULL,'0',CONCAT('hotel-省份代码 ',CONCAT(a.province_code,' [',b.descript,']'),'  城市代码 ',CONCAT(a.city_code,'[',c.descript,']'),'  区域代码  ',a.district_code,'  检查是否正确') FROM hotel a LEFT JOIN code_province b ON a.province_code=b.code AND b.hotel_id = arg_hotel_id AND b.hotel_group_id = arg_hotel_group_id
+	INSERT INTO tmp_check_base SELECT NULL,'B',CONCAT('hotel-省份代码 ',CONCAT(a.province_code,' [',b.descript,']'),'  城市代码 ',CONCAT(a.city_code,'[',c.descript,']'),'  区域代码  ',a.district_code,'  检查是否正确') FROM hotel a LEFT JOIN code_province b ON a.province_code=b.code AND b.hotel_id = arg_hotel_id AND b.hotel_group_id = arg_hotel_group_id
 		LEFT JOIN code_city c ON a.city_code=c.code AND c.hotel_id = arg_hotel_id AND c.hotel_group_id = arg_hotel_group_id
 		WHERE a.hotel_group_id = arg_hotel_group_id AND a.id=arg_hotel_id;	
 

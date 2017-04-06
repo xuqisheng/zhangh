@@ -9,10 +9,18 @@ CREATE DEFINER=`root`@`%` PROCEDURE `up_ihotel_maint_check_balance`(
     SQL SECURITY INVOKER
 label_0:
 BEGIN
+
+	DECLARE var_group_name  VARCHAR(60);
+	DECLARE var_hotel_name  VARCHAR(60);
+	DECLARE var_group_code  VARCHAR(20);
+	DECLARE var_hotel_code  VARCHAR(20);
 	-- ======================================================
 	-- 余额相关检查
 	-- 2017.3.28
 	-- ======================================================
+
+	SELECT descript,code INTO var_group_name,var_group_code FROM hotel_group WHERE id = arg_hotel_group_id;
+	SELECT descript,code INTO var_hotel_name,var_hotel_code FROM hotel WHERE hotel_group_id = arg_hotel_group_id AND id=arg_hotel_id;
 
 	-- 余额检查结果集
   	DROP TEMPORARY TABLE IF EXISTS tmp_check_balance;
@@ -28,7 +36,7 @@ BEGIN
 		KEY index1(biz_date)
 	);
 
-	INSERT INTO tmp_check_balance(check_msg) SELECT '检查开始...';
+	INSERT INTO tmp_check_balance(check_msg) SELECT CONCAT('检查开始... 酒店 : ',var_hotel_code,' & ',var_hotel_name,' 集团 : ',var_group_code,' & ',var_group_name);
 	INSERT INTO tmp_check_balance(check_msg) SELECT GROUP_CONCAT('\n---------------------------------------------------------------------');
     INSERT INTO tmp_check_balance(check_msg) SELECT '底表余额和快照表余额不一致';
 	-- 检查底表余额和快照表余额不一致
