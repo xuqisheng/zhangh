@@ -138,33 +138,3 @@ else
 fi
 
 
-# 安装 psutil
-pip install psutil
-
-# 用于 不同os之间的转化
-yum install dos2unix
-
-# install mysql-connector-python
-if  [! -f /root/zhangh/hbox/mysql-connector-python-2.2.2.tar.gz ]; then
-    /root/zhangh/hmsg inst_pip mysql-connector-python-2.2.2.tar.gz in directory /root/zhangh/hbox" more
-    exit 1
-else
-    cd /root/zhangh/hbox
-    tar zxvf /root/zhangh/hbox/mysql-connector-python-2.2.2.tar.gz
-    mv `ls -1d mysql-connector-python*/` | sed -n "1 p" /
-
-    cd /
-    cd `ls -1d mysql-connector-python* | sed -n "1 p"`
-    python setup.py install
-    # ? 路径好像有问题
-    if [-f /usr/local/lib/python2.7/site-packages/mysql_connector_python-2.2.2-py2.7.egg-info ]; then
-      echo "install success!!!" && exit 0
-    else
-      echo "install failed!!" && exit 1
-    fi
-fi
-
-
-
-
-
