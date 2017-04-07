@@ -1,5 +1,8 @@
 #!/bin/bash
 
+# 安装 python-devel
+yum install python-devel
+
 # check if pip exists
 
 if [ -x /usr/bin/pip ]; then
@@ -8,13 +11,13 @@ if [ -x /usr/bin/pip ]; then
 fi
 
 # 安装 setuptools依赖包 appdirs
-if [ ! -f /root/zhangh/hbox/appdirs-1.4.0.tar.gz ]; then
-    /root/zhangh/hmsg inst_pip "No package appdirs-1.4.0.tar.gz in directory /root/zhangh/hbox" more
+if [ ! -f /root/zhangh/hbox/pyparsing-1.5.7.tar.gz ]; then
+    /root/zhangh/hmsg inst_pip "No package pyparsing-1.5.7.tar.gz in directory /root/zhangh/hbox" more
     exit 1
 else
     cd /root/zhangh/hbox
-    tar zxvf /root/zhangh/hbox/appdirs-1.4.0.tar.gz
-    mv `ls -1d appdirs*/ | sed -n "1 p"` /
+    tar zxvf /root/zhangh/hbox/pyparsing-1.5.7.tar.gz
+    mv `ls -1d pyparsing*/ | sed -n "1 p"` /
 
     cd /
 
@@ -84,9 +87,6 @@ else
     fi
 fi
 
-
-# 安装 python-devel
-yum install python-devel
 
 # 安装 psutil
 pip install psutil
