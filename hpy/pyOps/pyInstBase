@@ -17,7 +17,7 @@ else
     mv `ls -1d appdirs*/ | sed -n "1 p"` /
 
     cd /
-    cd `ls -1d appdirs* | sed -n "1 p"`
+
     python setup.py install
 fi
 
