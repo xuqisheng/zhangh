@@ -29,10 +29,10 @@ def put_file():
 
 # 将本地文件上传至Gc61服务器
 def put61():
-    put('D:\Python27\zhangh\hpy\pyOps\pytest','/root/zhangh')
+    put('D:\Python27\zhangh\hpy\pyOps\p','/root/zhangh')
 
     # 脚本上传时注意格式转化
-    run('dos2unix /root/zhangh/pytest')
+    run('dos2unix /root/zhangh/')
     run('chmod u+x /root/zhangh/pytest')
 
 # 从远程主机下文件到本地

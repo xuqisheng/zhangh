@@ -3,150 +3,147 @@
 # 安装 python-devel
 yum install python-devel
 
+# 用于 不同os之间的转化
+yum install dos2unix
+
 # check if pip exists
-
 if [ -x /usr/bin/pip ]; then
-    /root/zhangh/hmsg inst_pip "pip has been installed" more
-    exit 1
-fi
-
-# 安装 setuptools依赖包 pyparsing
-if [ ! -f /root/zhangh/hbox/pyparsing-1.5.7.tar.gz ]; then
-    /root/zhangh/hmsg inst_pip "No package pyparsing-1.5.7.tar.gz in directory /root/zhangh/hbox" more
-    exit 1
+    /root/zhangh/hmsg pyInstBase "pip has been installed" more
 else
-    cd /root/zhangh/hbox
-    tar zxvf /root/zhangh/hbox/pyparsing-1.5.7.tar.gz
-    rm -Rf /`ls -1d pyparsing*/ | sed -n "1 p"`
-    mv -f `ls -1d pyparsing*/ | sed -n "1 p"` /
-
-    cd /
-    cd `ls -1d pyparsing* | sed -n "1 p"`
-    python setup.py install
-
-    if [ $? -gt 0 ]; then
-        /root/zhangh/hmsg inst_pip "Sorry !!! Please check again pyparsing " more
+    # 安装 setuptools依赖包 pyparsing
+    if [ ! -f /root/zhangh/hbox/pyparsing-1.5.7.tar.gz ]; then
+        /root/zhangh/hmsg pyInstBase "No package pyparsing-1.5.7.tar.gz in directory /root/zhangh/hbox" more
         exit 1
-    fi
-fi
-
-# 安装 setuptools依赖包 appdirs
-if [ ! -f /root/zhangh/hbox/appdirs-1.4.0.tar.gz ]; then
-    /root/zhangh/hmsg inst_pip "No package appdirs-1.4.0.tar.gz in directory /root/zhangh/hbox" more
-    exit 1
-else
-    cd /root/zhangh/hbox
-    tar zxvf /root/zhangh/hbox/appdirs-1.4.0.tar.gz
-    rm -Rf /`ls -1d appdirs*/ | sed -n "1 p"`
-    mv -f `ls -1d appdirs*/ | sed -n "1 p"` /
-
-    cd /
-    cd `ls -1d appdirs* | sed -n "1 p"`
-    python setup.py install
-
-    if [ $? -gt 0 ]; then
-        /root/zhangh/hmsg inst_pip "Sorry !!! Please check again appdirs " more
-        exit 1
-    fi
-fi
-
-# 安装 setuptools依赖包 packaging
-if [ ! -f /root/zhangh/hbox/packaging-16.8.tar.gz ]; then
-    /root/zhangh/hmsg inst_pip "No package packaging-1.4.0.tar.gz in directory /root/zhangh/hbox" more
-    exit 1
-else
-    cd /root/zhangh/hbox
-    tar zxvf /root/zhangh/hbox/packaging-16.8.tar.gz
-    rm -Rf /`ls -1d packaging*/ | sed -n "1 p"`
-    mv -f `ls -1d packaging*/ | sed -n "1 p"` /
-
-    cd /
-    cd `ls -1d packaging* | sed -n "1 p"`
-    python setup.py install
-    if [ $? -gt 0 ]; then
-        /root/zhangh/hmsg inst_pip "Sorry !!! Please check again packaging " more
-        exit 1
-    fi
-fi
-
-# 安装 setuptools依赖包 six-1.10.0.tar.gz
-if  [! -f /root/zhangh/hbox/six-1.10.0.tar.gz ]; then
-    /root/zhangh/hmsg inst_pip "No package packaging-1.4.0.tar.gz in directory /root/zhangh/hbox" more
-    exit 1
-else
-    cd /root/zhangh/hbox
-    tar zxvf /root/zhangh/hbox/six-1.10.0.tar.gz
-    rm -Rf /`ls -1d six*/ | sed -n "1 p"`
-    mv -f `ls -1d six*/ | sed -n "1 p"` /
-
-    cd /
-    cd `ls -1d six* | sed -n "1 p"`
-    python setup.py install
-
-    if [ $? -gt 0 ]; then
-        /root/zhangh/hmsg inst_pip "Sorry !!! Please check again six " more
-        exit 1
-    fi
-fi
-
-# 安装 setuptools
-if  [! -f /root/zhangh/hbox/setuptools-34.3.2.tar.gz ]; then
-    /root/zhangh/hmsg inst_pip "No package setuptools-34.3.2.tar.gz in directory /root/zhangh/hbox" more
-    exit 1
-else
-    cd /root/zhangh/hbox
-    tar zxvf /root/zhangh/hbox/setuptools-34.3.2.tar.gz
-    rm -Rf /`ls -1d setuptools*/ | sed -n "1 p"`
-    mv -f `ls -1d setuptools*/ | sed -n "1 p"` /
-
-    cd /
-    cd `ls -1d setuptools* | sed -n "1 p"`
-    python setup.py install
-
-    if [ $? -gt 0 ]; then
-        /root/zhangh/hmsg inst_pip "Sorry !!! Please check again setuptools " more
-        exit 1
-    fi
-fi
-
-# 安装 pip
-if  [! -f /root/zhangh/hbox/pip-9.0.1.tar.gz ]; then
-    /root/zhangh/hmsg inst_pip "No package setuptools-34.3.2.tar.gz in directory /root/zhangh/hbox" more
-    exit 1
-else
-    cd /root/zhangh/hbox
-    tar zxvf /root/zhangh/hbox/pip-9.0.1.tar.gz
-    rm -Rf /`ls -1d pip*/ | sed -n "1 p"`
-    mv -f `ls -1d pip*/` | sed -n "1 p" /
-
-    cd /
-    cd `ls -1d pip* | sed -n "1 p"`
-    python setup.py install
-
-    if [ $? -gt 0 ]; then
-        /root/zhangh/hmsg inst_pip "Sorry !!! Please check again pip " more
-        exit 1
-    fi
-
-    if [ -x /usr/bin/pip ]; then
-        /root/zhangh/hmsg inst_pip "Congratulations !!! Python pip is installed Successfully" more
-        exit 0
     else
-        /root/zhangh/hmsg inst_pip "Sorry !!! Please check again" more
+        cd /root/zhangh/hbox
+        tar zxvf /root/zhangh/hbox/pyparsing-1.5.7.tar.gz
+        rm -Rf /`ls -1d pyparsing*/ | sed -n "1 p"`
+        mv -f `ls -1d pyparsing*/ | sed -n "1 p"` /
+
+        cd /
+        cd `ls -1d pyparsing* | sed -n "1 p"`
+        python setup.py install
+
+        if [ $? -gt 0 ]; then
+            /root/zhangh/hmsg pyInstBase "Sorry !!! Please check again pyparsing " more
+            exit 1
+        fi
+    fi
+
+    # 安装 setuptools依赖包 appdirs
+    if [ ! -f /root/zhangh/hbox/appdirs-1.4.0.tar.gz ]; then
+        /root/zhangh/hmsg pyInstBase "No package appdirs-1.4.0.tar.gz in directory /root/zhangh/hbox" more
         exit 1
+    else
+        cd /root/zhangh/hbox
+        tar zxvf /root/zhangh/hbox/appdirs-1.4.0.tar.gz
+        rm -Rf /`ls -1d appdirs*/ | sed -n "1 p"`
+        mv -f `ls -1d appdirs*/ | sed -n "1 p"` /
+
+        cd /
+        cd `ls -1d appdirs* | sed -n "1 p"`
+        python setup.py install
+
+        if [ $? -gt 0 ]; then
+            /root/zhangh/hmsg pyInstBase "Sorry !!! Please check again appdirs " more
+            exit 1
+        fi
+    fi
+
+    # 安装 setuptools依赖包 packaging
+    if [ ! -f /root/zhangh/hbox/packaging-16.8.tar.gz ]; then
+        /root/zhangh/hmsg pyInstBase "No package packaging-1.4.0.tar.gz in directory /root/zhangh/hbox" more
+        exit 1
+    else
+        cd /root/zhangh/hbox
+        tar zxvf /root/zhangh/hbox/packaging-16.8.tar.gz
+        rm -Rf /`ls -1d packaging*/ | sed -n "1 p"`
+        mv -f `ls -1d packaging*/ | sed -n "1 p"` /
+
+        cd /
+        cd `ls -1d packaging* | sed -n "1 p"`
+        python setup.py install
+        if [ $? -gt 0 ]; then
+            /root/zhangh/hmsg pyInstBase "Sorry !!! Please check again packaging " more
+            exit 1
+        fi
+    fi
+
+    # 安装 setuptools依赖包 six-1.10.0.tar.gz
+    if  [ ! -f /root/zhangh/hbox/six-1.10.0.tar.gz ]; then
+        /root/zhangh/hmsg pyInstBase "No package packaging-1.4.0.tar.gz in directory /root/zhangh/hbox" more
+        exit 1
+    else
+        cd /root/zhangh/hbox
+        tar zxvf /root/zhangh/hbox/six-1.10.0.tar.gz
+        rm -Rf /`ls -1d six*/ | sed -n "1 p"`
+        mv -f `ls -1d six*/ | sed -n "1 p"` /
+
+        cd /
+        cd `ls -1d six* | sed -n "1 p"`
+        python setup.py install
+
+        if [ $? -gt 0 ]; then
+            /root/zhangh/hmsg pyInstBase "Sorry !!! Please check again six " more
+            exit 1
+        fi
+    fi
+
+    # 安装 setuptools
+    if  [ ! -f /root/zhangh/hbox/setuptools-34.3.2.tar.gz ]; then
+        /root/zhangh/hmsg pyInstBase "No package setuptools-34.3.2.tar.gz in directory /root/zhangh/hbox" more
+        exit 1
+    else
+        cd /root/zhangh/hbox
+        tar zxvf /root/zhangh/hbox/setuptools-34.3.2.tar.gz
+        rm -Rf /`ls -1d setuptools*/ | sed -n "1 p"`
+        mv -f `ls -1d setuptools*/ | sed -n "1 p"` /
+
+        cd /
+        cd `ls -1d setuptools* | sed -n "1 p"`
+        python setup.py install
+
+        if [ $? -gt 0 ]; then
+            /root/zhangh/hmsg pyInstBase "Sorry !!! Please check again setuptools " more
+            exit 1
+        fi
+    fi
+
+    # 安装 pip
+    if  [ ! -f /root/zhangh/hbox/pip-9.0.1.tar.gz ]; then
+        /root/zhangh/hmsg pyInstBase "No package setuptools-34.3.2.tar.gz in directory /root/zhangh/hbox" more
+        exit 1
+    else
+        cd /root/zhangh/hbox
+        tar zxvf /root/zhangh/hbox/pip-9.0.1.tar.gz
+        rm -Rf /`ls -1d pip*/ | sed -n "1 p"`
+        mv -f `ls -1d pip*/ | sed -n "1 p"` /
+
+        cd /
+        cd `ls -1d pip* | sed -n "1 p"`
+        python setup.py install
+
+        if [ $? -gt 0 ]; then
+            /root/zhangh/hmsg pyInstBase "Sorry !!! Please check again pip " more
+            exit 1
+        fi
+
+        if [ -x /usr/bin/pip ]; then
+            /root/zhangh/hmsg pyInstBase "Congratulations !!! Python pip is installed Successfully" more
+        else
+            /root/zhangh/hmsg pyInstBase "Sorry !!! Please check again" more
+            exit 1
+        fi
     fi
 fi
-
 
 # 安装 psutil
 pip install psutil
 
-# 用于 不同os之间的转化
-yum install dos2unix
 
 # install mysql-connector-python
 if  [! -f /root/zhangh/hbox/mysql-connector-python-2.2.2.tar.gz ]; then
-    /root/zhangh/hmsg inst_pip mysql-connector-python-2.2.2.tar.gz in directory /root/zhangh/hbox" more
+    /root/zhangh/hmsg pyInstBase mysql-connector-python-2.2.2.tar.gz in directory /root/zhangh/hbox" more
     exit 1
 else
     cd /root/zhangh/hbox
