@@ -94,4 +94,4 @@ DELIMITER ;
 
 -- CALL up_ihotel_reb_bizmonth(1,2014,10);
 
-DROP PROCEDURE IF EXISTS `up_ihotel_reb_bizmonth`;
+-- DROP PROCEDURE IF EXISTS `up_ihotel_reb_bizmonth`;

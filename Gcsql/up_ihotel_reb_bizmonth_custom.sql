@@ -70,4 +70,4 @@ DELIMITER ;
 
 -- CALL up_ihotel_reb_bizmonth_custom(1,1,2017,26,10);
 
-DROP PROCEDURE IF EXISTS `up_ihotel_reb_bizmonth_custom`;
+-- DROP PROCEDURE IF EXISTS `up_ihotel_reb_bizmonth_custom`;
