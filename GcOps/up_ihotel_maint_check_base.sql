@@ -10,18 +10,21 @@ CREATE DEFINER=`root`@`%` PROCEDURE `up_ihotel_maint_check_base`(
 label_0:
 BEGIN
 
-	DECLARE var_client_type	VARCHAR(15);
-	DECLARE var_group_name  VARCHAR(60);
-	DECLARE var_hotel_name  VARCHAR(60);
-	DECLARE var_group_code  VARCHAR(20);
-	DECLARE var_hotel_code  VARCHAR(20);
+	DECLARE var_client_type	    VARCHAR(15);
+	DECLARE var_group_name      VARCHAR(60);
+	DECLARE var_hotel_name      VARCHAR(60);
+	DECLARE var_group_code      VARCHAR(20);
+	DECLARE var_hotel_code      VARCHAR(20);
+	DECLARE var_online_date     DATE;
 	-- ======================================================
 	-- 系统参数、代码及基本配置检查
 	-- 2017.3.28
 	-- ======================================================
 	SELECT descript,code INTO var_group_name,var_group_code FROM hotel_group WHERE id = arg_hotel_group_id;
-	SELECT client_type,descript,code INTO var_client_type,var_hotel_name,var_hotel_code FROM hotel WHERE hotel_group_id = arg_hotel_group_id AND id=arg_hotel_id;
-	
+	SELECT client_type,descript,code INTO var_client_type,var_hotel_name,var_hotel_code FROM hotel WHERE hotel_group_id = arg_hotel_group_id AND id = arg_hotel_id;
+	SELECT MIN(biz_date) INTO var_online_date FROM apportion_detail_history WHERE hotel_group_id = arg_hotel_group_id AND hotel_id = arg_hotel_id;
+
+
 	-- 参数检查结果集
   	DROP TEMPORARY TABLE IF EXISTS tmp_check_base;
 	CREATE TEMPORARY TABLE tmp_check_base(
@@ -31,7 +34,7 @@ BEGIN
 		PRIMARY KEY(id) 
 	);
 
-	INSERT INTO tmp_check_base SELECT NULL,'0',CONCAT('检查日期：',DATE(NOW()),' 酒店 : ',var_hotel_code,' & ',var_hotel_name,' 集团 : ',var_group_code,' & ',var_group_name);
+	INSERT INTO tmp_check_base SELECT NULL,'0',CONCAT('检查日期：',DATE(NOW()),' 酒店 : ',var_hotel_code,' & ',var_hotel_name,' 集团 : ',var_group_code,' & ',var_group_name,' 上线时间：',var_online_date);
 	INSERT INTO tmp_check_base SELECT NULL,'0',GROUP_CONCAT('\n---------------------------------------------------------------------');
 	INSERT INTO tmp_check_base SELECT NULL,'B',CONCAT('hotel-省份代码 ',CONCAT(a.province_code,' [',b.descript,']'),'  城市代码 ',CONCAT(a.city_code,'[',c.descript,']'),'  区域代码  ',a.district_code,'  检查是否正确') FROM hotel a LEFT JOIN code_province b ON a.province_code=b.code AND b.hotel_id = arg_hotel_id AND b.hotel_group_id = arg_hotel_group_id
 		LEFT JOIN code_city c ON a.city_code=c.code AND c.hotel_id = arg_hotel_id AND c.hotel_group_id = arg_hotel_group_id
@@ -102,9 +105,11 @@ BEGIN
 	IF NOT EXISTS (SELECT 1 FROM rep_jie WHERE hotel_group_id = arg_hotel_group_id AND hotel_id = arg_hotel_id AND classno='999') THEN
 		INSERT INTO tmp_check_base SELECT NULL,'A',CONCAT('检查 rep_jie : 借方合计classno不为 999 或者不存在借方合计,请注意修改');
 	END IF;
-	IF NOT EXISTS (SELECT 1 FROM rep_jie WHERE hotel_group_id = arg_hotel_group_id AND hotel_id = arg_hotel_id AND classno='998' AND descript LIKE '%款待%') THEN
-		INSERT INTO tmp_check_base SELECT NULL,'A',CONCAT('检查 rep_jie : 借方合计classno不为 999 或者不存在借方合计,请注意修改');
-	END IF;	
+	IF EXISTS (SELECT 1 FROM rep_jie WHERE hotel_group_id = arg_hotel_group_id AND hotel_id = arg_hotel_id AND descript LIKE '%款待%') THEN
+        IF NOT EXISTS (SELECT 1 FROM rep_jie WHERE hotel_group_id = arg_hotel_group_id AND hotel_id = arg_hotel_id AND classno='998' AND descript LIKE '%款待%') THEN
+		    INSERT INTO tmp_check_base SELECT NULL,'A',CONCAT('检查 rep_jie : 借方款待classno不为 998,请注意修改');
+	    END IF;
+	END IF;
 	IF EXISTS (SELECT 1 FROM rep_jie WHERE hotel_group_id = arg_hotel_group_id AND hotel_id = arg_hotel_id AND (orderno='' OR orderno IS NULL)) THEN
 		INSERT INTO tmp_check_base SELECT NULL,'A',CONCAT('检查 rep_jie : 存在orderno字段为空的情况');
 	END IF;
