@@ -6,7 +6,7 @@
 from fabric.api import *
 
 env.user = 'root'
-env.hosts = ['115.159.79.108']
+env.hosts = ['203.118.247.66']
 env.port = 3305
 # env.password='xxxxxx'
 env.key_filename = "D:\Python27\huiRsa"
@@ -36,6 +36,12 @@ def showdb():
 
 def showuser():
     run("/root/mode/.do1au")
+
+def getip():
+    run("ifconfig")
+
+def shutdown():
+    run("shutdown -h now")
 
 
 
