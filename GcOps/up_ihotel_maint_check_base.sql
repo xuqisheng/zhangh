@@ -10,7 +10,8 @@ CREATE DEFINER=`root`@`%` PROCEDURE `up_ihotel_maint_check_base`(
 label_0:
 BEGIN
 
-	DECLARE var_client_type	    VARCHAR(15);
+	DECLARE var_client_version	VARCHAR(20);
+	DECLARE var_hotel_version   VARCHAR(20);
 	DECLARE var_group_name      VARCHAR(60);
 	DECLARE var_hotel_name      VARCHAR(60);
 	DECLARE var_group_code      VARCHAR(20);
@@ -21,8 +22,18 @@ BEGIN
 	-- 2017.3.28
 	-- ======================================================
 	SELECT descript,code INTO var_group_name,var_group_code FROM hotel_group WHERE id = arg_hotel_group_id;
-	SELECT client_type,descript,code INTO var_client_type,var_hotel_name,var_hotel_code FROM hotel WHERE hotel_group_id = arg_hotel_group_id AND id = arg_hotel_id;
+	SELECT client_version,descript,code INTO var_client_version,var_hotel_name,var_hotel_code FROM hotel WHERE hotel_group_id = arg_hotel_group_id AND id = arg_hotel_id;
 	SELECT MIN(biz_date) INTO var_online_date FROM apportion_detail_history WHERE hotel_group_id = arg_hotel_group_id AND hotel_id = arg_hotel_id;
+
+    IF var_client_version = 'IHOTEL' THEN
+        SET var_hotel_version = '标准版';
+    ELSEIF var_client_version = 'THEF' THEN
+        SET var_hotel_version = '商务版';
+    ELSEIF var_client_version = 'THEK' THEN
+        SET var_hotel_version = '快捷版';
+    ELSE
+        SET var_hotel_version = '未知';
+    END IF;
 
 
 	-- 参数检查结果集
@@ -34,7 +45,7 @@ BEGIN
 		PRIMARY KEY(id) 
 	);
 
-	INSERT INTO tmp_check_base SELECT NULL,'0',CONCAT('检查日期：',DATE(NOW()),' 酒店 : ',var_hotel_code,' & ',var_hotel_name,' 集团 : ',var_group_code,' & ',var_group_name,' 上线时间：',var_online_date);
+	INSERT INTO tmp_check_base SELECT NULL,'0',CONCAT('检查日期：',DATE(NOW()),' 酒店 : ',var_hotel_code,' & ',var_hotel_name,' 集团 : ',var_group_code,' & ',var_group_name,' 上线时间：',var_online_date,' 版本：',var_hotel_version);
 	INSERT INTO tmp_check_base SELECT NULL,'0',GROUP_CONCAT('\n---------------------------------------------------------------------');
 	INSERT INTO tmp_check_base SELECT NULL,'B',CONCAT('hotel-省份代码 ',CONCAT(a.province_code,' [',b.descript,']'),'  城市代码 ',CONCAT(a.city_code,'[',c.descript,']'),'  区域代码  ',a.district_code,'  检查是否正确') FROM hotel a LEFT JOIN code_province b ON a.province_code=b.code AND b.hotel_id = arg_hotel_id AND b.hotel_group_id = arg_hotel_group_id
 		LEFT JOIN code_city c ON a.city_code=c.code AND c.hotel_id = arg_hotel_id AND c.hotel_group_id = arg_hotel_group_id
@@ -118,7 +129,7 @@ BEGIN
 	END IF;
 	
 	-- 默认值
-	IF var_client_type = 'IHOTEL' THEN
+	IF var_client_version = 'IHOTEL' THEN
 		INSERT INTO tmp_check_base SELECT NULL,'A',CONCAT('master:',' 主单默认市场码 ',a.value_default,' 不存在') FROM sys_constraint a WHERE a.hotel_group_id = arg_hotel_group_id AND a.hotel_id = arg_hotel_id AND (a.parent_code='SubFitMaster.master_fit' OR a.parent_code='EditResrv.resrvBase_fit' OR a.parent_code='EditResrv.resrvBase_group')
 			AND a.code='market' AND NOT EXISTS(SELECT 1 FROM code_base b WHERE b.hotel_group_id = arg_hotel_group_id AND b.hotel_id = arg_hotel_id AND b.parent_code='market_code' AND a.value_default=b.code);
 		INSERT INTO tmp_check_base SELECT NULL,'A',CONCAT('master:',' 主单默认来源码 ',a.value_default,' 不存在') FROM sys_constraint a WHERE a.hotel_group_id = arg_hotel_group_id AND a.hotel_id = arg_hotel_id AND (a.parent_code='SubFitMaster.master_fit' OR a.parent_code='EditResrv.resrvBase_fit' OR a.parent_code='EditResrv.resrvBase_group')
@@ -136,7 +147,7 @@ BEGIN
 		INSERT INTO tmp_check_base SELECT NULL,'A',CONCAT('sys_option: ',a.descript,' ',a.set_value,' 不存在') FROM sys_option a WHERE a.hotel_group_id = arg_hotel_group_id AND a.hotel_id = arg_hotel_id AND a.catalog='report' AND a.item='room_sta_report_code'
 			AND NOT EXISTS(SELECT 1 FROM report_center b WHERE b.hotel_group_id = arg_hotel_group_id AND b.hotel_id = arg_hotel_id AND b.code=a.set_value);
 
-	ELSEIF (var_client_type='THEF' OR var_client_type='THEK') THEN
+	ELSEIF (var_client_version='THEF' OR var_client_version='THEK') THEN
 		INSERT INTO tmp_check_base SELECT NULL,'A',CONCAT('sys_option: ',a.descript,' ',a.set_value,' 不存在') FROM sys_option a WHERE a.hotel_group_id = arg_hotel_group_id AND a.hotel_id = arg_hotel_id AND a.catalog='account' AND a.item='accredit_default_code'
 			AND NOT EXISTS(SELECT 1 FROM code_transaction b WHERE b.hotel_group_id = arg_hotel_group_id AND b.hotel_id = arg_hotel_id AND b.arrange_code>'9' AND b.code=a.set_value);
 		INSERT INTO tmp_check_base SELECT NULL,'A',CONCAT('sys_option: 现付帐 ',a.set_value,' 不存在') FROM sys_option a WHERE a.hotel_group_id = arg_hotel_group_id AND a.hotel_id = arg_hotel_id AND a.catalog='account' AND a.item='business_accnt'
