@@ -204,9 +204,13 @@ BEGIN
  	INSERT INTO tmp_check_base SELECT NULL,'B',CONCAT('sys_option: ',a.descript,' ',a.set_value,' 不存在') FROM sys_option a WHERE a.hotel_group_id = arg_hotel_group_id AND a.hotel_id = arg_hotel_id AND a.catalog='account' AND a.item='balance_transfer_ta_code'
 		AND NOT EXISTS(SELECT 1 FROM code_transaction b WHERE b.hotel_group_id = arg_hotel_group_id AND b.hotel_id = arg_hotel_id AND a.set_value=b.code);
 
+    -- 自动夜审的时间
 	IF EXISTS (SELECT 1 FROM sys_option WHERE hotel_group_id = arg_hotel_group_id AND hotel_id = arg_hotel_id AND catalog='system' AND item='auto_audit' AND set_value = 'T') THEN
 		INSERT INTO tmp_check_base SELECT NULL,'A',CONCAT('sys_option : 自动夜审时间必须大于22点') FROM sys_option WHERE hotel_group_id = arg_hotel_group_id AND hotel_id = arg_hotel_id AND catalog='audit' AND item = 'audit_time_limit' AND set_value <= 22;
-	END IF;	
+	END IF;
+
+	INSERT INTO tmp_check_base SELECT NULL,'A',CONCAT('sys_option : 夜审时间必须大于21点') FROM sys_option WHERE hotel_group_id = arg_hotel_group_id AND hotel_id = arg_hotel_id AND catalog='audit' AND item = 'audit_time_limit' AND set_value < 21;
+
 
 	-- 会计日期 检查
     INSERT INTO tmp_check_base SELECT NULL,'A',CONCAT("month not between 1 and 12: ",a.biz_year,' ',a.biz_month)    
