@@ -2,6 +2,8 @@
 
 # 安装 python-devel
 yum install python-devel
+yum install zlib
+yum install zlib-devel
 
 # 用于 不同os之间的转化
 yum install dos2unix
@@ -10,26 +12,6 @@ yum install dos2unix
 if [ -x /usr/bin/pip ]; then
     /root/zhangh/hmsg pyInstBase "pip has been installed" more
 else
-    # 安装 setuptools依赖包 pyparsing
-    if [ ! -f /root/zhangh/hbox/pyparsing-1.5.7.tar.gz ]; then
-        /root/zhangh/hmsg pyInstBase "No package pyparsing-1.5.7.tar.gz in directory /root/zhangh/hbox" more
-        exit 1
-    else
-        cd /root/zhangh/hbox
-        tar zxvf /root/zhangh/hbox/pyparsing-1.5.7.tar.gz
-        rm -Rf /`ls -1d pyparsing*/ | sed -n "1 p"`
-        mv -f `ls -1d pyparsing*/ | sed -n "1 p"` /
-
-        cd /
-        cd `ls -1d pyparsing* | sed -n "1 p"`
-        python setup.py install
-
-        if [ $? -gt 0 ]; then
-            /root/zhangh/hmsg pyInstBase "Sorry !!! Please check again pyparsing " more
-            exit 1
-        fi
-    fi
-
     # 安装 setuptools依赖包 appdirs
     if [ ! -f /root/zhangh/hbox/appdirs-1.4.0.tar.gz ]; then
         /root/zhangh/hmsg pyInstBase "No package appdirs-1.4.0.tar.gz in directory /root/zhangh/hbox" more
@@ -43,6 +25,8 @@ else
         cd /
         cd `ls -1d appdirs* | sed -n "1 p"`
         python setup.py install
+
+        rm -Rf /`ls -1d appdirs*/ | sed -n "1 p"`
 
         if [ $? -gt 0 ]; then
             /root/zhangh/hmsg pyInstBase "Sorry !!! Please check again appdirs " more
@@ -63,6 +47,8 @@ else
         cd /
         cd `ls -1d packaging* | sed -n "1 p"`
         python setup.py install
+        rm -Rf /`ls -1d packaging*/ | sed -n "1 p"`
+
         if [ $? -gt 0 ]; then
             /root/zhangh/hmsg pyInstBase "Sorry !!! Please check again packaging " more
             exit 1
@@ -82,6 +68,7 @@ else
         cd /
         cd `ls -1d six* | sed -n "1 p"`
         python setup.py install
+        rm -Rf /`ls -1d six*/ | sed -n "1 p"`
 
         if [ $? -gt 0 ]; then
             /root/zhangh/hmsg pyInstBase "Sorry !!! Please check again six " more
@@ -90,18 +77,20 @@ else
     fi
 
     # 安装 setuptools
-    if  [ ! -f /root/zhangh/hbox/setuptools-34.3.2.tar.gz ]; then
-        /root/zhangh/hmsg pyInstBase "No package setuptools-34.3.2.tar.gz in directory /root/zhangh/hbox" more
+    if  [ ! -f /root/zhangh/hbox/setuptools-33.1.1.tar.gz ]; then
+        /root/zhangh/hmsg pyInstBase "No package setuptools-33.1.1.tar.gz in directory /root/zhangh/hbox" more
         exit 1
     else
         cd /root/zhangh/hbox
-        tar zxvf /root/zhangh/hbox/setuptools-34.3.2.tar.gz
+        tar zxvf /root/zhangh/hbox/setuptools-33.1.1.tar.gz
         rm -Rf /`ls -1d setuptools*/ | sed -n "1 p"`
         mv -f `ls -1d setuptools*/ | sed -n "1 p"` /
 
         cd /
         cd `ls -1d setuptools* | sed -n "1 p"`
         python setup.py install
+        rm -Rf /`ls -1d setuptools*/ | sed -n "1 p"`
+
 
         if [ $? -gt 0 ]; then
             /root/zhangh/hmsg pyInstBase "Sorry !!! Please check again setuptools " more
@@ -122,6 +111,7 @@ else
         cd /
         cd `ls -1d pip* | sed -n "1 p"`
         python setup.py install
+        rm -Rf /`ls -1d pip*/ | sed -n "1 p"`
 
         if [ $? -gt 0 ]; then
             /root/zhangh/hmsg pyInstBase "Sorry !!! Please check again pip " more
@@ -139,29 +129,3 @@ fi
 
 # 安装 psutil
 pip install psutil
-
-
-# install mysql-connector-python
-if  [! -f /root/zhangh/hbox/mysql-connector-python-2.2.2.tar.gz ]; then
-    /root/zhangh/hmsg pyInstBase mysql-connector-python-2.2.2.tar.gz in directory /root/zhangh/hbox" more
-    exit 1
-else
-    cd /root/zhangh/hbox
-    tar zxvf /root/zhangh/hbox/mysql-connector-python-2.2.2.tar.gz
-    mv `ls -1d mysql-connector-python*/` | sed -n "1 p" /
-
-    cd /
-    cd `ls -1d mysql-connector-python* | sed -n "1 p"`
-    python setup.py install
-    # ? 路径好像有问题
-    if [-f /usr/local/lib/python2.7/site-packages/mysql_connector_python-2.2.2-py2.7.egg-info ]; then
-      echo "install success!!!" && exit 0
-    else
-      echo "install failed!!" && exit 1
-    fi
-fi
-
-
-
-
-

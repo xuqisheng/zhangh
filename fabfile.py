@@ -10,7 +10,7 @@ from fabric.api import *
 # env.port  = 1300
 
 env.user  = 'root'
-env.hosts = ['192.168.2.69']
+env.hosts = ['192.168.0.28']
 env.port  = 3305
 # env.password='deviskaifa'
 # env.key_filename = "/root/.ssh/huiRsa"
@@ -29,11 +29,11 @@ def put_file():
 
 # 将本地文件上传至Gc61服务器
 def put61():
-    put('D:\Python27\zhangh\probeip','/root/zhangh')
+    put('D:\Python27\zhangh\hbox\*.tar.gz','/root/zhangh/hbox')
 
     # 脚本上传时注意格式转化
-    run('dos2unix /root/zhangh/')
-    run('chmod u+x /root/zhangh/probeip')
+    # run('dos2unix /root/zhangh/pyInstBase')
+    # run('chmod u+x /root/zhangh/pyInstBase')
 
 # 从远程主机下文件到本地
 def get_file():
