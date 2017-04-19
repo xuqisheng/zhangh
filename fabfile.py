@@ -10,7 +10,7 @@ from fabric.api import *
 # env.port  = 1300
 
 env.user  = 'root'
-env.hosts = ['192.168.0.28']
+env.hosts = ['114.251.134.199']
 env.port  = 3305
 # env.password='deviskaifa'
 # env.key_filename = "/root/.ssh/huiRsa"
