@@ -4,7 +4,7 @@
 import os,re
 
 # yum remove
-yum remove mysql
+os.system('yum remove mysql')
 
 # 打开文件
 f = open('/etc/issue','r')

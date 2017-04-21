@@ -2,14 +2,17 @@
 # coding:utf-8
 
 # fab -f fabmode.py seetom
+# 如何并行???
 
+from fabric.contrib.console import confirm
+from fabric.api import local, settings, abort
 from fabric.api import *
 
 env.user = 'root'
-env.hosts = ['114.251.134.199']
-env.port = 3305
-# env.password='xxxxxx'
-env.key_filename = "D:\Python27\huiRsa"
+env.hosts = ['113.200.163.170']
+env.port = 9005
+env.password='pmsdb2'
+# env.key_filename = "D:\Python27\huiRsa"
 
 def get_message():
     run('cat /etc/issue;df;free')
@@ -45,6 +48,7 @@ def shutdown():
 
 # 部署 mode
 def deploy_mode():
+    # 这里加一步判断，是否已经部署mode
     get_mode()
     exec_mode()
 
