@@ -47,7 +47,7 @@ class Worker(threading.Thread):
         self.in_queue.put((command, None, None, None))
 
     def report_error(self):
-        '''We "report" errors by adding error information to err_queue.'''
+        '''We "Gcrep" errors by adding error information to err_queue.'''
         self.err_queue.put(sys.exc_info()[:2])
 
 
