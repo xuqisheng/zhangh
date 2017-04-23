@@ -1,0 +1,50 @@
+#!/bin/bash
+# =============================================================================
+# Function:
+#			Scp local file to remote server OR Scp remote file to lcoal server
+# Such as :
+#			Scp -l file1 sshcode		Scp -r file1 sshcode
+# Date	  :
+#			2015-02-01
+# =============================================================================
+
+shopt -s expand_aliases
+
+if [ $# -ne 3 ]; then
+	/root/zhangh/hshell/hmsg "scpfile" "Please provide the correct variables!!!"
+fi	
+
+if [ "$1" != "-l" -a "$1" != "-r" ];then
+	/root/zhangh/hshell/hmsg "scpfile" "Please provide the correct variables!!!" more
+	exit 1
+fi
+
+if echo "$3" | grep "root" > /dev/null; then
+  Hsshcode=`echo "$3" | sed -e "s/root@//"`
+fi  
+
+if [ "$1" = "-l" ]; then
+	if [ ! -f "$2" ]; then
+		/root/zhangh/hshell/hmsg "scpfile" "Please provide the correct file!!!" more
+		exit 1
+	fi
+
+	if ! `cat /root/zhangh/hshell/sshcodes.txt | grep "$Hsshcode" >/dev/null`; then
+		/root/zhangh/hshell/hmsg "scpfile" "Please provide the correct sshcode 1 !!!" more
+		exit 1
+	fi	
+	scp -Cp "$2" "$3:/root/"
+fi	
+
+if [ "$1" = "-r" ]; then
+	if ! `cat /root/zhangh/hshell/sshcodes.txt | grep "$Hsshcode" >/dev/null`; then
+		/root/zhangh/hshell/hmsg "scpfile" "Please provide the correct sshcode 2 !!!" more
+		exit 1
+	fi	
+
+	if ! `ssh "$3" "ls -1 $2" >/dev/null`; then
+		/root/zhangh/hshell/hmsg "scpfile" "Please provide the correct file!!!" more
+		exit 1
+	fi
+	scp -Cp "$3:$2" "/root/" 
+fi	

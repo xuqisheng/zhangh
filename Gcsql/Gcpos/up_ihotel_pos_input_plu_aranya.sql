@@ -54,6 +54,7 @@ BEGIN
 	DECLARE CONTINUE HANDLER FOR SQLSTATE '02000' SET done_cursor = 1;
 
     -- 将对方数据导入中间表
+    -- 菜的单位要特殊处理下??
     DELETE FROM pos_input_table WHERE hotel_group_id=arg_hotel_group_id AND hotel_id=arg_hotel_id;
 	INSERT INTO pos_input_table(hotel_group_id,hotel_id,pos_note_name,pos_sort_name,pos_plu_old,pos_plu_name,pos_help,pos_unit,
 	    pos_price,pos_price1,pos_price2,pos_price3)

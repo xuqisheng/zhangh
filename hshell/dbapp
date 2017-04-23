@@ -1,0 +1,82 @@
+#!/bin/bash
+# ===============================================
+# Function:
+#   Database in App Server 
+# Date:
+#   2016-07-15
+# Such as:
+#	/root/zhangh/hshell/dbapp portal_f
+# ===============================================
+
+export HBLACKBOX2=1
+export HNoBiNlOg=DaNgEr
+
+# get mysql server ip
+. /root/mode/mysqldip
+
+# Default database to dump is portal or portal_f
+if [ -z "$1" ]; then
+   HDBNAME=portal
+   if [ -z `/root/mode/seecfg -s $HMYSQLDIP "show databases like '$HDBNAME'" | grep -i "^$HDBNAME"` ]; then
+      HDBNAME=portal_f
+      if [ -z `/root/mode/seecfg -s $HMYSQLDIP "show databases like '$HDBNAME'" | grep -i "^$HDBNAME"` ]; then
+         echo "Neither Database portal nor database portal_f exists at $HMYSQLDIP2!" && exit 1
+      fi
+   fi
+else
+   HDBNAME="$1"
+   if [ -z `/root/mode/seecfg -s $HMYSQLDIP "show databases like '$HDBNAME'" | grep -i "^$HDBNAME"` ]; then
+       echo "Database $HDBNAME doesn't exist at $HMYSQLDIP2!" && exit 1
+   fi
+fi
+
+if [ ! -f /root/mode/sdump ]; then
+  echo "This is no sdump or sload script!!!" && exit 1 
+fi
+
+if [ -z `/root/mode/seecfg -s $HMYSQLDIP "show tables from \\\`$HDBNAME\\\` like 'card\_base'"` ]; then
+  echo "splitdb Cannot be executed repeatedly in Database $HDBNAME!!!" && exit 1 
+fi
+
+# repair hotel.client_type and clean invalid data
+/root/mode/seecfg "/root/zhangh/hshell/hsql/up_ihotel_zhangh_init_data.sql" $HDBNAME 
+/root/mode/seecfg "/root/zhangh/hshell/hsql/up_ihotel_zhangh_grp_analyse.sql" $HDBNAME 
+
+# Empty folder file
+rm -Rf /fenku/dumps/
+
+# create dump directory
+mkdir -p /fenku
+if [ -d /DISK2 ]; then
+  if [ ! -L /fenku ]; then
+    mv /fenku /DISK2
+    ln -s /DISK2/fenku /fenku
+  fi
+fi
+
+mkdir -p /fenku/dumps
+
+rm -Rf /root/zhangh/hshell/logs/*.log
+
+# sdump all tables and tb_nodata.txt structure
+{
+  echo
+  echo "sdump begin at `LANG=en_US;date`"
+  echo
+
+  /root/mode/sdump -R $HDBNAME /fenku/dumps
+
+  echo
+  echo "sdump end at `LANG=en_US;date`"
+  echo
+} 2>&1 | tee -a /root/zhangh/hshell/logs/sdump.log
+
+# check sdump error and stop dbapp process 
+if cat /root/zhangh/hshell/logs/sdump.log | grep "SELECT INTO OUTFILE" > /dev/null; then
+  /root/zhangh/hshell/hmsg splitdb-sdump "An error occurred in sdump process and please check it ......" && exit 1
+fi
+
+if [ ! -f /fenku/dumps/hotel.txt ]; then
+  /root/zhangh/hshell/hmsg splitdb-sdump "Mysqldump Error and please MySQL restart ......" && exit 1
+fi
+

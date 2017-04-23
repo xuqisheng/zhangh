@@ -1,0 +1,20 @@
+#!/bin/bash
+# ----------------------------------------------------------------
+# Function:
+#         clear zhangh log,keep only the last 5 rows
+# Date:
+#     2015-3-13
+# ----------------------------------------------------------------
+
+[ -z "$1" ] && exit
+[ ! -f "$1" ] && exit
+
+Hlineall=`cat "$1" | wc -l`
+Hlineres=5
+
+if [ $Hlineall -gt $Hlineres ]; then
+  Hline=$[$Hlineall-$Hlineres+1]
+  sed -nre "$Hline,$ p" "$1" > /root/zhangh/hshell/logs/hlogtmp$$.tmp
+  cp -f /root/zhangh/hshell/logs/hlogtmp$$.tmp "$1"
+  rm -f /root/zhangh/hshell/logs/hlogtmp$$.tmp
+fi

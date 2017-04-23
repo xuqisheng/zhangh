@@ -1,0 +1,90 @@
+#!/bin/bash
+# -----------------------------------------------------
+# function:
+#           add or adjust certain items of /etc/my.cnf
+#
+# -----------------------------------------------------
+
+[ -f /etc/my.cnf ] || exit 
+
+
+# binlog etc.
+
+/root/zhangh/hshell/hmodify "/etc/my.cnf" "binlog_format=mixed"   "log-bin"
+/root/zhangh/hshell/hmodify "/etc/my.cnf" "binlog_cache_size=16M" "binlog_format"
+
+# innodb_rollback_on_timeout
+
+/root/zhangh/hshell/hmodify "/etc/my.cnf" "innodb_rollback_on_timeout=1" "innodb_lock_wait_timeout"
+/root/zhangh/hshell/hmodify "/etc/my.cnf" "innodb_autoinc_lock_mode=2"   "innodb_rollback_on_timeout"
+/root/zhangh/hshell/hmodify "/etc/my.cnf" "wait_timeout=600"             "innodb_autoinc_lock_mode"
+/root/zhangh/hshell/hmodify "/etc/my.cnf" "max_connect_errors=1000000"   "[mysqld]"
+/root/zhangh/hshell/hmodify "/etc/my.cnf" "back_log=4096"                "[mysqld]"
+
+# innodb_flush_log_at_trx_commit
+
+/root/zhangh/hshell/hmodify "/etc/my.cnf" "innodb_flush_log_at_trx_commit=2"
+
+# max_connections
+
+/root/zhangh/hshell/hmodify "/etc/my.cnf" "max_connections=100" "thread_concurrency"
+Hgetmc=`/root/zhangh/hshell/hmodify /etc/my.cnf "max_connections" "#Get#"`
+Hgetmc=`echo $Hgetmc | sed -re "s/^(0+)(.*)/\2/"`
+Hgetmc=$[$Hgetmc*9/10]
+if [ $Hgetmc -lt 0 ]; then
+   Hgetmc=1
+fi
+/root/zhangh/hshell/hmodify "/etc/my.cnf" "max_user_connections=$Hgetmc" "max_connections"
+
+# thread_cache_size
+
+/root/zhangh/hshell/hmodify "/etc/my.cnf" "thread_cache_size=100" "read_rnd_buffer_size"
+
+# [mysqld_safe]
+
+/root/zhangh/hshell/hmodify "/etc/my.cnf" "[mysqld_safe]" "interactive-timeout"
+/root/zhangh/hshell/hmodify "/etc/my.cnf" "open-files-limit=20000" "[mysqld_safe]"
+
+# make sure they are there 
+
+/root/zhangh/hshell/hmodify "/etc/my.cnf" "character-set-server=utf8"       "[mysqld]"
+/root/zhangh/hshell/hmodify "/etc/my.cnf" "default-storage-engine=INNODB"   "[mysqld]"
+
+# table_open_cache etc.  -- 2012-08-07 --
+
+/root/zhangh/hshell/hmodify "/etc/my.cnf" "table_open_cache=8192"        "max_allowed_packet"
+/root/zhangh/hshell/hmodify "/etc/my.cnf" "tmp_table_size=24M"           "table_open_cache"  
+/root/zhangh/hshell/hmodify "/etc/my.cnf" "max_heap_table_size=24M"      "table_open_cache"  
+/root/zhangh/hshell/hmodify "/etc/my.cnf" "table_definition_cache=1024"  "table_open_cache"
+
+# datadir  -- 2012-08-28 --
+
+/root/zhangh/hshell/hmodify "/etc/my.cnf" "datadir=/var/lib/mysql" "server-id"
+
+# tune_mysql is used to tune this parm dynamically 
+
+/root/zhangh/hshell/hmodify "/etc/my.cnf" "thread_concurrency=8"
+
+# log unefficient queries 
+
+/root/zhangh/hshell/hmodify "/etc/my.cnf" "long_query_time=3"               "default-storage-engine" 
+/root/zhangh/hshell/hmodify "/etc/my.cnf" "log-queries-not-using-indexes"   "default-storage-engine"
+/root/zhangh/hshell/hmodify "/etc/my.cnf" "slow-query-log"                  "default-storage-engine"
+/root/zhangh/hshell/rep_config "/etc/my.cnf" "log-slow-queries"                "comment"
+
+# key_buffer_size,bulk_insert_buffer_size for MYISAM 
+
+/root/zhangh/hshell/hmodify "/etc/my.cnf" "key_buffer_size=4M"
+/root/zhangh/hshell/hmodify "/etc/my.cnf" "bulk_insert_buffer_size=4M" "key_buffer_size"
+
+# buffers for innodb tables(per thread basic)
+
+/root/zhangh/hshell/hmodify "/etc/my.cnf" "read_buffer_size=2M"
+/root/zhangh/hshell/hmodify "/etc/my.cnf" "sort_buffer_size=8M"
+/root/zhangh/hshell/hmodify "/etc/my.cnf" "read_rnd_buffer_size=8M"
+
+# 
+
+/root/zhangh/hshell/hmodify "/etc/my.cnf" "innodb_log_buffer_size=16M"
+
+

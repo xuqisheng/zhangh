@@ -1,6 +1,0 @@
-{
-echo "[exec] $1"
-echo "		at `LANG=en_US;date`"
-#echo "		at `LANG=zh_CN.UTF-8;date`"
-} >> /root/zhangh/logs/hlog
-

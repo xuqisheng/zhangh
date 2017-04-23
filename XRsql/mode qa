@@ -1,0 +1,286 @@
+Questions & Answers
+
+1. mode3.0与mode2.0有什么区别?
+
+   mode3.0是把mode2.0移植到sco unix上而成的版本,与mode2.0完全兼容.在linux上的mode2.0可以用mode3.0覆盖(但需执行./install.sh).
+   sco unix上mode的用法与linux上mode的用法完全一样.
+
+2. 有在sco unix上用的sybase.tar文件吗?
+
+   目前没有.目前只在sco unix+sybase老用户中安装新mode.
+
+3. 在sco unix上安装新mode,有这必要吗?
+
+   有.
+   sco unix上安装新mode后,工程检查可对老用户进行,可提高工程检查的一致性和公平性.
+   sco unix+sybase稳定可靠,节省资源.在虚拟机上装sco unix+sybase优势更明显.
+
+4. 在sco unix上安装新mode,难吗?
+
+   不难.按文档操作就行.
+
+5. 在sco unix上安装新mode,需要执行./install.sh和./sybconfig吗?
+
+   在sco unix上安装新mode,一般只对老用户进行.为了保证原系统稳定运行,避免已有配置被覆盖,
+   一般不执行./install.sh和./sybconfig.
+
+   如果一定要执行.需要输入安装密码iknowthedanger
+
+6. 在sco unix上安装新mode,如果通过安装密码执行了./install.sh,会造成什么后果?
+
+   与在linux上安装mode效果一样.但在sybase配置文件方面,只配置内存,cpu个数，其它配置保留原样.
+
+   另外，因重新连接了内核,需重起sco unix.
+
+7. 在sco unix上安装新mode,如果通过安装密码执行了./sybconfig,会造成什么后果?
+
+   只配置内存,其它配置保留原样.
+
+8. 在sco unix上怎么安装新mode?
+
+   要下面几个步骤.步骤看似较多,其实较简单.第三步开始的语句完全可写成一个脚本执行,但为了便于大家理解,还是一步一步写下来.
+
+   1).把mode.tar,modeup.tar和sql.tar三个文件用二进制方式传到sco unix根目录/下
+
+   2).用root登录sco unix系统
+
+   3).转到/,建目录home,用户和组设为sybase,并转到/home
+
+      cd /
+      mkdir home
+      chown sybase:sybase home
+      cd home
+
+   4).现在已经在/home目录.如果不是,检查第3步.建一符号链接sybase指到/usr/sybase
+
+      ln -s /usr/sybase sybase
+
+      这样/home/sybase以后就指到/usr/sybase了.
+
+   5).转到/,解开mode.tar(首次安装)或modeup.tar(升级),即tar xvf mode.tar或tar xvf modeup.tar
+
+      cd /
+      tar xvf mode.tar
+
+      或
+
+      cd /
+      tar xvf modeup.tar
+
+   6).继续解开sql.tar
+
+      tar xvf sql.tar
+
+   7).转到/home/sybase/mode/logs目录，log初始化
+
+      cd /home/sybase/mode/logs
+      touch dumpload.log
+      touch each.log
+      touch each_detail.log
+
+   8).把mode目录的用户和组设为sybase
+
+      chown -R sybase:sybase /usr/sybase/mode
+
+      这步很重要,因为不同系统上的sybase用户和sybase组,名字一样而id可能不一样.如sco unix上sybase用户的id一般为200,
+      sybase组的id一般为100,而中标linux上sybase用户和组的id一般均为501
+
+   9).转到/home/sybase目录,建一符号链接dump指到已有的dump目录/backup/dump
+
+      cd /home/sybase
+      ln -s /backup/dump dump
+
+      这样/home/sybase/dump以后就指到/backup/dump了.如备份目录不是/backup/dump,做相应修改即可
+
+   10).到此，大部分工作完成.但还要继续.
+
+       如sybase的sa有密码.需修改seecfg脚本倒数第二行.把相应密码加上
+
+       目前sybase的sa密码,foxhis密码安全问题很严重，正在考虑解决中.
+
+   11).如要telnet连接后,在sybase用户下显示中文.需在/home/sybase/.profile最后加上
+       LANG=english_us.8859
+       export LANG
+
+       如要在root用户下也显示中文,需在/.profile最后也加上这两个语句
+
+       注意:这两语句将使sybase backupserver无法启动.因sco sybase的locale中没english_us.8859.
+
+            解决办法有三
+            a./home/sybase/.profile中不加上这两语句.
+
+              这样做,虽然each.log,each_detail.log中的汉字显示为乱码,但内码是正确的,取到客户端后，仍能显示中文
+
+            b./home/sybase/.profile中加上这两语句,但启动sybase backupserver前,把LANG临时改为C,这要找到所有startserver -fRUN_SYB_BACKUP
+              的语句,在这行前面加上一行LANG=C
+
+              这样做既能启动backupserver,又能显示汉字.
+
+              注:在sco上,直接在RUN_SYB_BACKUP文件中加上LANG=C无效,而在中标和suse上这招很灵.
+
+            c.完全安装新mode.
+
+            水平一般者,最好采用方法a.而方法b和c只限资深工程师使用.
+
+   12).至此基本安装完成,可以使用dump,load,ftpg,ftpget,each等基本命令了.
+
+       完整安装需运行./install.sh,这时需修改好/home/sybase/mode/cfg/task.cfg才能进行自动dump等任务.
+
+       运行./install.sh后,原crontab表已被覆盖,这是需要注意的.
+
+9. 在linux或sco unix上完整安装了新mode后,dump,ftp,load,each这些计划任务怎么做?
+
+   在/home/sybase/mode/cfg/task.cfg中定义好即可.
+
+10.在linux或sco unix上完整安装了新mode后,这其中,"完整安装"怎么理解?
+
+   这"完整安装"是相对于"基本安装"而言的,请看第8问.在基本安装好后,执行了./install.sh就是完整安装.
+
+11.主机是sco unix+sybase,dump是老的格式,备机完整安装了新mode,要取主机sco unix上的dump,
+   task.cfg中要怎样写?
+
+   假如sco unix上dump目录为/backup/dump,dump文件为foxdump.dat,备机上task.cfg中ftp任务可写为
+
+   ftpget 主机IP "foxdump.dat" /backup/dump /home/sybase/dump
+
+12.主机是linux+sybase,dump是老的格式,备机完整安装了新mode,要取主机上的dump,task.cfg中怎么写?
+
+   主机上dump目录一般为/home/sybase/dump,dump文件一般为fox1.dat,fox2.dat,fox3.dat和fox4.dat,
+   备机上task.cfg中ftp任务可写为
+
+   ftpget 主机IP "fox?.dat"
+
+13.主机备机都完整安装了新mode,要取主机上的dump,task.cfg中怎么写?
+
+   主机上dump目录一般为/home/sybase/dump,dump文件一般为foxhis-*.*-dat??,备机上task.cfg中ftp任务可写为
+
+   ftpg 主机IP foxhis
+
+14.备机未完整安装了新mode,怎么取主机上的dump?
+
+   用传统的方法取.但要修改原来的ftp脚本，以保证在备机上存放一周的dump.
+
+15.新mode的配置文件task.cfg中,在dump,ftpg,ftpget,load和each等前面有一个"#"字符,是什么意思?
+
+   这个"#"字符是注释的意思,表示后面的任务暂不执行.发出去的标准mode,所有任务都是注释掉的.实际使用时,需根据
+   具体情况修改"#"后面的任务(ip地址,数据库名等),然后把有关任务前的"#"字符删除.
+
+16.windows客户端怎么取新格式dump?
+
+   可简单地写一段文本ftpg.txt,再写个小批处理文件ftpg.bat
+
+   文本文件ftpg.txt可这样写
+
+   open 192.168.2.221
+   user sybase sybase
+   cd /home/sybase/dump
+   bin
+   mget *.*-dat??
+   bye
+
+   批处理文件ftpg.bat可这样写
+
+   ftp -in -s:ftpg.txt
+
+   文件取到ftpg.bat所在目录,根据实际情况修改ftpg.txt文件以符合应用要求
+
+17.windows客户端怎么自动取dump?
+
+   1. 控制面板 -> 管理工具 -> 服务
+
+      把Task Scheduler服务先手工开启(缺省为禁用),再把启动类型设为自动
+
+   2. 附件 -> 系统工具 -> 任务计划
+
+      建一计划任务 定时执行dump目录下的批文件(如C:\dump\ftpg.bat)
+
+      注意:运行方式域需要选定用户和设置密码,这要对方电脑房人员配合.
+
+18.服务器装的是suse linux,ftp只能匿名登录，为什么?
+
+   原因是,安装sybase时,执行老的install.sh,结果把/etc/vsftpd.conf清掉了
+
+   原/home/sybase/install.sh文件中有下列语句
+
+   cat /etc/vsftpd.conf | sed 's/#local_enable=YES/local_enable=YES/' > /etc/vsftpd.conf
+
+   该语句使/etc/vsftpd.conf后半部分丢失,导致sybase用户不能ftp
+
+   类似的，/home/sybase/install.sh中下面的语句也是错误的
+
+   cat /root/.vnc/xstartup | sed 's/twm/startkde/' > /root/.vnc/xstartup
+
+   注:
+      1).中标 linux上使用cat aaa | ... | ... > aaa之语句,将清空aaa文件
+      2).suse linux上使用cat aaa | ... | ... > aaa之语句,在文件aaa较大的情况下,后半部分被截掉,执行多次时，
+         结果不可预测.
+
+19.服务器装的是suse linux,ftp只能匿名登录，有办法补救吗?
+
+   ftp只能匿名登录,主要是/etc/vsftpd.conf文件,部分或全部内容丢失,补救的办法是恢复/etc/vsftpd.conf中丢失的内容.
+
+   方法1:用yast工具,先删除vsftpd，再选择安装;
+   方法2:找一个完整的vsftpd.conf,覆盖/etc/vsftpd.conf;
+   方法3:安装新mode.在/home/sybase/mode下,执行./install.sh后,自动修复本问题.
+
+20.服务器安装了新mode，启动sybase时报错,好像启动了两次,什么原因?
+
+   出现这现象是因为安装新mode前,用老mode安装过了(或用光盘安装过了),导致新老mode都启动sybase.中标linux和suse上都有该问题.
+
+   报错信息样本
+
+   00:2009/04/24 21:49:02.13 kernel  dlock: '/home/sybase/data/master.dat', Resource temporarily unavailable
+   00:2009/04/24 21:49:02.13 kernel  kdconfig: unable to read primary master device
+   00:2009/04/24 21:49:02.13 kernel  kiconfig: read of config block failed
+
+   使用mode3.0最新release(2009.5.8以后版本)自动删除老安装残留(需要执行./install.sh)
+
+21.使用新mode后,dump出来的文件有时是root权限,这有关系吗?
+
+   没有关系.可以正常dump,ftp和load.如sybase backup server是root启动的,权限为root;是sybase启动的,权限为sybase.
+
+22.如要升级为新mode，需做那些工作?
+
+   a).检查原来crontab任务,记下dump,load,ftp等涉及到的库.
+   b).安装mode3.0最新release(2009.5.8以后版本)
+   c).修改好/home/sybase/mode/cfg/task.cfg
+   d).调整好客户端自动ftp脚本,写法见问题16
+
+23.升级新mode时，需重起服务器吗?
+
+   升级新mode时，中标linux和suse linux都无需重起.sybase sql server也不需重起,但有些配置可能要重起后才生效.
+
+   在sco unix上使用mode,需要重起sco,因为内核relink过了.
+
+24.linux系统里服务器时间怎么看?
+   linux系统有两个时间,一个是系统时间,就是平常用date命令看到的时间;另一个是cmos时间,用hwclock -r(sybase用户用/sbin/hwclock -r看)命令可看到这个时间.
+   linux系统开机时,系统时间被置为cmos时间;linux系统停机时,cmos时间被置为系统时间.linux系统运行时,应用程序用的几乎都是系统时间.
+
+25.linux系统时间不准怎么调?
+   linux系统有两个时间,一个是系统时间,另一个是cmos时间.
+   先看一下两个时间.要把两个时间都调对.
+
+   方法一:
+
+   (1).用root登录,用date命令调好系统时间(如执行date 06051034把系统时间改为09年6月5号10点34分)
+   (2).执行hwclock -w用系统时间重置cmos时间
+
+   方法二:
+
+   (1).用root登录,用hwclock --set --date命令调好cmos时间(如执行hwclock --set --date "06/05 10:34:00"把cmos时间改为09年6月5号10点34分0秒)
+   (2).执行hwclock -s用cmos时间重置系统时间
+
+   linux系统中,cmos时间较准,而系统时间误差较大(特别是虚拟机),mode3.0(2009.6.5 release)起,执行./install.sh后,将每隔5分钟用cmos时间重置系统时间,
+   所以执行./install.sh前,务必先调好两个时间(至少要调好cmos时间).
+
+   工程检查中已发现有些酒店cmos时间非常不准.估计平时只用date命令调了系统时间,而没调cmos时间,希望工程师注意.
+
+
+
+
+
+
+
+
+
+

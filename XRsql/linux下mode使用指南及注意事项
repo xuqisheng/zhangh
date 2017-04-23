@@ -1,0 +1,685 @@
+mode是西软linux系统服务器上/home/sybase下的一个shell脚本和sql文件集,是为了简化及规范linux下sybase的安装，配置和备份，
+以及为了便于工程项目的例行自动检查，在原mode基础上大幅修改，扩充和完善而成.适用于中标linux,suse linux下的sybase 11.0.3.3
+及 sybase 12.5.4环境.工程项目检查部分适用于foxhis酒店系统从V到X的每一个版本.
+
+安装后的mode放在/home/sybase/mode目录,为了便于工程师安装,对/home/sybase/mode下的内容按用途分别打了小包.分别取名为
+sql.tar.gz,mode.tar.gz和modeup.tar.gz
+
+sql.tar.gz是mode下sql文件包,由用于工程检查的sql文件组成;
+
+mode.tar.gz是mode下除sql文件外的其它内容(含shell程序包及配置文件)打成的包,用于首次安装及全新安装,安装后，请手动修改配置
+文件/home/sybase/mode/cfg/task.cfg以符合实际需要.已在使用本mode的用户，不要使用mode.tar.gz,以免覆盖掉在使用的配置文件;
+
+modeup.tar.gz仅由mode下shell程序组成,不含配置文件,更不含sql文件,用于升级安装.适用于已经在使用本mode的用户. 需要再执行./install.sh
+
+这三个小包的解压方法都是在根上用tar xzvf命令.(如tar xzvf sql.tar.gz）
+
+1'boot挂载点，100M   ---ext3
+2'swap挂载点，内存*2 ---swap
+3'/挂载点，剩余全部  ---ext3
+
+1.使用前准备
+
+1).安装完linux;
+
+   注意:Red Hat Enterprise Linux Server 5.0(rhel5)安装时请选上vsftpd的安装,缺省时是不选的
+        SuSe linux Enterprise Server 10(sles10)安装时也请选上vsftpd的安装,缺省时是不选的
+        修改root密码  passwd root
+        进入suse  yast
+
+2).按平时方法加好sybase用户及组(主目录/home/sybase,登录shell /bin/bash)
+
+1).安装完linux;
+2).按平时方法加好sybase用户及组(主目录/home/sybase,登录shell /bin/bash)
+3).配置好网卡;
+4).开启必要的服务(vsftpd,vncserver,telnet,tftp,smb);
+5).32位中标下装11.0.3.3版的sybase时，还要装上大内存补丁;
+6).如是64位中标，关闭smartd服务
+
+3).配置好网卡;
+
+   先说明一下,在已正常运行sybase的机器上修改网络地址,需注意:
+   a).修改地址前,请先关闭SYBASE;
+   b).用图形界面或命令行命令修改好地址;
+   c).对于linux,用/etc/init.d/network restart重起网络;对于sco unix,必须重起服务器
+   d).执行./install.sh做相应配置.上面第三步千万别忘了做,否则,下次机器一重起,SYBASE就开不起来了.
+
+4).开启必要的服务(vsftpd,vncserver,telnet,tftp,smb);   用root用户登入，chkconfig xinetd on开启telnet,tftp
+5).32位中标下装11.0.3.3版的sybase时，还要装上大内存补丁;
+6).如是64位中标，关闭smartd服务
+
+2.安装及配置
+
+1).用winscp等工具，先把以下压缩包传到根目录/
+
+  a).sybase压缩包(sybase32-11.0.3.3.tar.gz,或sybase32-12.5.4.tar.gz,或sybase64-12.5.4.tar.gz)
+  b).mode压缩包(mode.tar.gz,modeup.tar.gz和sql.tar.gz）
+
+2).用root登录，转至根目录/,依次解开相应的sybase压缩包和相应的mode压缩包.
+
+   如sybase压缩包为sybase32-11.0.3.3.tar.gz,则执行
+
+   tar xzvf sybase32-11.0.3.3.tar.gz
+   tar xzvf mode.tar.gz
+   tar xzvf sql.tar.gz
+
+3).转至/home/sybase/mode目录,执行./install.sh -c
+
+   install.sh用于安装配置sybase运行环境,其中选项-c,在初次执行install.sh时使用,用来把SYBASE.cfg中的cache配置恢复为缺省值,
+   因为大内存机器上压的sybase.tar.gz解压到小内存机器上时，SYBASE.cfg中的cache配置往往很大(甚至超过机器总内存),如保留原配置，
+   sybase启动时会报错.
+
+   执行./install.sh -c后必须尽快执行./sybconfig进行动态参数配置.sybase 11.0.3.3版本对缺省数据缓存(default data cache)是
+   采用最大剩余内存的机制，即配置后剩下的内存全给default data cache.而sybase 12.5.4版本对缺省数据缓存(default data cache)
+   基本上采用最小配置(一般只给8M),这样如果不对sybase 12.5.4进行缺省数据缓存的配置，系统将很慢.所以必须从速执行./sybconfig.
+
+   Sybase服务器正常运行后，一般无需带参数-c再运行./install.sh.而不带参数运行./install.sh是不用重启sybase sql server的,这是
+   因为不带参数-c时,只配置了内存，engines数目和设备数，其它配置均保留不变。
+
+4).当提示Installation successfully completed说明安装完成.
+
+5).执行./xrserver start启动sybase sql server.等sybase sql server启动完毕做下一步.启动完毕的标志是出现bin_cp850等字样.
+
+6).执行./sybconfig进行动态配置.Sybase 12.5.4基本不用重启SQL server即完成配置；Sybase 11.0.3.3静态参数较多，一般要重启SQL server两次或以上.
+   请按提示操作.
+
+7).至此本机sybase的安装及配置完成.
+
+
+3.安装后使用
+
+   /home/sybase/mode下基本是一些shell小脚本，有一定的依赖关系，编写时尽量使用全路径，少用变量，以便于独立执行及程序易读。
+   执行脚本时请用全路径或脚本前加"./"(root用户和sybase用户都不把当前目录加到PATH里，这一方面是为了安全，另一方面是为了提高效率).
+
+   install.sh,sybconfig和xrserver是三个最基本的脚本，必须掌握;exectask,dump,load,ftpg,ftpget,each是与任务有关的六个脚本，
+   很容易使用，也经常使用。工程师使用这九个脚本一般够用了.
+
+
+   下面对主要的几个脚本作些说明，尽管脚本里有详尽的注释.
+
+1).脚本install.sh
+
+   见前面介绍
+
+2).脚本sybconfig
+
+   见前面介绍
+
+2-1).脚本cpumem
+
+   该脚本用于获取服务器cpu及物理内存信息,为配置sybase server作准备.install.sh及sybconfig脚本都要调用它.另外,getip脚本
+   用于获取服务器的6个不同用途的ip地址,见下面(3-1节)介绍.
+
+   注:执行./cpumem -l可显示ip地址及相关的cpu和内存信息
+
+
+3).脚本xrserver
+   xrserver用来开启,关闭和查看已启动的sybase server及sybase backup server.
+
+   ./xrserver start          开启sybase server及sybase backup server;
+   ./xrserver stop           关闭sybase backup server及sybase server;
+   ./xrserver restart        重启动sybase server及sybase backup server;
+   ./xrserver <除以上参数>   显示当前运行的sybase server
+
+   执行./install.sh时已把xrserver作为linux的服务加到/etc/init.d目录,使sybase随linux系统开关机自动开关.同时保证xrserver与vsftpd,
+   xinetd,crond(suse linux上为cron)在同样的级别范围运行,保证sybase运行时,ftp可以进行.
+
+   在中标linux下sybase将在2,3,4,5四个级别上运行;在Suse linux下sybase将在2,3,5三个级别上运行（所以不要切换到级别4）.
+
+3-1).脚本getip
+   该脚本用来获取服务器的各种用途的ip地址.因与install.sh及xrserver脚本关系极其密切,关系到服务器能否正常运行,所以放在这里讲解.
+   目前用getip可获取6个ip地址.执行./getip -l可显示这些地址.
+
+   1.HSTATICIP
+
+   静态IP地址,这是存放在网卡配置文件中的ip地址.可能有多个HSTATICIP.但我们只取第一块网卡的IP地址.(网络正确配置的前提下)机器重起后(或网络重起后),
+
+   HSTARTIP一般将变成为HSTATICIP.工程师应确保这个IP地址设置正确，机器重起后，能ping通这个地址.
+
+   2.HINSTIP
+
+   安装用IP地址,这个地址是install.sh脚本使用的地址,用于更新interfaces文件中的IP地址,是配置sybase所必需的.如为空,则install.sh脚本会中断执行.
+
+   这个地址一般为HSTATICIP.但双机热备环境下,这个地址是公共的对外地址(也称为浮动地址)
+
+   这个地址显示时有四种可能(以150.0.1.199为例)
+
+    a.)HINSTIP                             # HINST后什么也没有,此时网卡没设好
+    b.)HINSTIP   150.0.1.199               # HINST后有一个地址,此地址为目前有效的第一个网络地址,正常情况下应为HSTATICIP
+    c.)HINSTIP   150.0.1.199 float on      # 表示150.0.1.199为双机热备环境下的公共的浮动地址.而且该浮动地址是在本机网卡上(即本机目前是运行sybase的工作机)
+                                           # (双机热备环境下安装地址使用浮动地址,而不使用静态IP地址)
+    d.)HINSTIP   150.0.1.199 float off     # 150.0.1.199为浮动地址,但所在主机目前不是工作机,而是备用机
+
+   双机环境下浮动地址需要手工加到/etc/xrfloatip中(就一个IP地址,无其它内容),保证sybase用户有读权限.
+
+   3.HSTARTIP
+
+   启动IP.用来启动sybase的IP地址.如为空,则不允许启动sybase.
+
+   HSTARTIP为空有两种情况,一是网卡没设好,二是该机目前为双机热备中的备用机.
+
+   HSTARTIP非空时,这是sybase与外界通讯的IP地址.HSTARTIP未必等于HSTATICIP.双机热备环境下,这是浮动地址;非双机热备环境下,也可通过
+   ifconfig修改IP地址,临时与外界通讯(包括启动SYBASE供客户端使用).
+
+   4.HSYBINTIP
+
+   这是SYBASE interfaces文件中的IP地址，启动sybase时从这里获取IP，但如果该IP与HSTARTIP不一致，则SYBASE不允许启动,或启动不会成功.
+   isql也要用这个IP与SQL Server通讯.
+
+   执行xrserver脚本时会检查HSTARTIP与HSYBINTIP的一致性.不一致时，会提示"请运行./install.sh"
+
+   5.HSYBRUNIP
+
+   这是sybase启动成功后监听的IP.如果该地址不为空,则说明sybase启动时,HSTARTIP与HSYBINTIP是一致的.如在sybase启动成功后又用某种办法
+   改变了HSTARTIP,那地址HSYBRUNIP实际上已无法与外界通讯，继而导致无法将sybase正常shutdown.
+
+   如果这时候用某种办法改变了HSYBINTIP,将使本地isql无法与sybase通讯.
+
+   执行xrserver脚本时会检查HSTARTIP与HSYBRUNIP的一致性.不一致时，会有相关提示，并请运行./install.sh.
+
+   6.HTASKIP
+
+   任务IP.这是exectask脚本执行计划任务时使用的IP地址.task.cfg文件中与这个地址匹配的相关任务,才会被执行.正常情况下,这个地址就是HSTARTIP.
+
+   双机热备环境下,如所在机器为float on状态,则HTASKIP为浮动IP;如所在机器为float off状态,则HTASKIP为HSTATICIP.就是说,运行着sybase的那台
+   机器HTASKIP为浮动地址,可做dump等任务.没运行sybase的备机,使用其本地的网卡地址作为HTASKIP,可以做ftpg等任务(但无法做dump,load,each等任务).
+
+   双机热备环境下,无需load任务(即使加了load任务,由于数据库在使用,也不允许load）
+
+   目前mode里暂不提供脚本直接修改HSTATICIP.中标linux可用system-config-network(或直接在图形界面)修改静态IP地址;suse linux可用yast工具修改
+   静态IP地址.
+
+   修改好静态地址后,请使用/etc/init.d/network restart重起网络或重起服务器.
+
+3-2).脚本chowner
+   用来改变/home/sybase目录下文件的owner.以确保sybase server正常开关.
+3-3).脚本ndase12
+   用来获取linux系统及sybase版本的一些特征.以便install.sh,sybconfig和xrserver随linux及sybase版本的不同采取不同的动作.
+
+4).脚本exectask
+   该脚本用来执行dump,load,ftp和each等任务.目前支持五种任务分别为dump,ftpg,ftpget,load和each.
+
+   dump任务用来做数据库的dump;
+   ftpg和ftpget任务用来ftp传文件;
+   load任务用来做数据库的load;
+   each任务用来做数据库的工程检查
+
+   exectask脚本语法
+
+   ./exectask {dump|ftpg|ftpget|load|each}
+
+   不带任务参数时，显示配置文件/home/sybase/mode/cfg/task.cfg的内容,带任务参数时执行参数指定的任务
+
+   如./exectask dump表示执行本机的dump任务
+
+   该脚本实际上是用本机的任务IP地址HTASKIP查找配置文件/home/sybase/mode/cfg/task.cfg中相应的IP地址块.然后执行相应的地址块中的对应任务.
+
+   假如/home/sybase/mode/cfg/task.cfg中未定义本机HTASKIP的地址块,则exectask返回错误信息.如本机HTASKIP地址块中未定义对应的任务,则exectask不会
+   返回错误信息,但也无任务可执行.
+
+   exectask与crontab相结合,可用来执行计划任务.crontab表中定义任务的执行时间,而/home/sybase/mode/cfg/task.cfg中定义具体的任务.
+
+   执行./install.sh后,一般会在crontab中自动生成以下标准内容.  crontab -e 编辑   crontab -l 显示  crontab -r 删除
+
+   0 2 * * * sh /home/sybase/mode/exectask dump
+   0 4 * * * sh /home/sybase/mode/exectask ftpg
+   0 5 * * * sh /home/sybase/mode/exectask ftpget
+   0 6 * * * sh /home/sybase/mode/exectask load
+   0 9 * * * sh /home/sybase/mode/exectask each
+
+   如执行install.sh时,crontab中已有内容与标准内容不符.install.sh脚本会自动决定是保留原内容还是生成标准内容.
+
+   注:如要install.sh在crontab中强行生成标准内容,请先删除crontab中全部内容,再执行install.sh
+
+
+   例:
+
+   假设/home/sybase/mode/cfg/task.cfg中内容如下(行首的空格是为了易读加上的):
+
+   # --------------------------------------------------------
+   # 1.Modify the ip addresses as needed
+   # 2.uncomment,add or modify the dump,load,ftpg statements
+   # --------------------------------------------------------
+
+   [192.168.2.91]
+   dump foxhis
+   dump foxhis1
+   ftpg 192.168.2.92 xrback
+   load xrback
+   [192.168.2.91/]
+
+   [192.168.2.92]
+   dump xrback
+   ftpg 192.168.2.91 foxhis
+   ftpg 192.168.2.91 foxhis1
+   load foxhis
+   load foxhis1
+   [192.168.2.92/]
+
+   在HTASKIP为192.168.2.91的服务器上执行./exectask dump时,程序首先获取本机的HTASKIP地址即"192.168.2.91",而后根据地址
+   找到[192.168.2.91]与[192.168.2.91/]之间(称为IP地址块)以命令dump开始的行,即
+
+   dump foxhis
+   dump foxhis1
+
+   而后改造成相应的全路径语句
+
+   /home/sybase/mode/dump foxhis
+   /home/sybase/mode/dump foxhis1
+
+   依次执行,其中/home/sybase/mode/dump是shell脚本
+
+4-1).IP地址块的定义
+
+   一个IP地址块是task.cfg中唯一的一段,它满足下列条件,其中<IP-ADDR>为IP地址:
+
+   a).有唯一的一行[<IP-ADDR>],行首行尾不能有其它字符;
+   b).有唯一的一行[<IP-ADDR>/],行首行尾不能有其它字符;
+   c).[<IP-ADDR>]在前,[<IP-ADDR>/]在后;
+
+   IP地址块不能相互交叉，否则里面任务都不被执行,如:
+
+   [192.168.2.91]
+   dump aaa
+   [192.168.2.92]
+   dump bbb
+   [192.168.2.91/]
+   dump ccc
+   [192.168.2.92/]
+
+   地址为192.168.2.91和192.168.2.92上的任务都不会执行.
+
+   IP地址块可以内外嵌套，但外层任务不被执行,如:
+
+   [192.168.2.91]
+   dump outer1
+   [192.168.2.92]
+   dump inner
+   [192.168.2.92/]
+   dump outer2
+   [192.168.2.91/]
+
+   地址为192.168.2.92的任务"dump inner"可执行.地址为192.168.2.91的任务"dump outer1"与"dump outer2"不会执行.
+
+   一个IP地址块，如满足某些其它情况，也可能不被执行.
+
+   所以task.cfg中，除了必要的注释外，就应该是顺序排列的IP地址块，不嵌套，不交叉.
+4-2).task.cfg文件
+   task.cfg文件放在/home/sybase/mode/cfg目录.是由互不交叉，互不嵌套的0个或多个IP地址块构成的,每个地址块中列出相应地址的服务器需要
+   执行的任务,由exectask调用执行.task.cfg目前需要手工编辑,install.sh脚本不会更新task.cfg.
+
+   task.cfg严格定义如下:
+
+   <task.cfg的内容> ::= (<IP地址块>)*                   #<IP地址块>出现零次或多次 ()*为元字符
+   <IP地址块>       ::= [<IP地址>]<任务表>[<IP地址>/]    #[]/不是元字符
+   <任务表>         ::= <空>|<任务>|<任务><任务表>
+   <任务>           ::= <load任务>|<ftpg任务>|<ftpget任务>|<dump任务>|<each任务>
+
+    <load任务>,<ftpg任务>,<ftpget任务>,<dump任务>和<each任务>的写法后面有介绍
+
+4-3).task.cfg的几种典型配置
+
+   以下配置是假设一个配置文件里要包含所有相关服务器的配置信息
+
+   a).单服务器结构(地址假设为192.168.2.91)
+      task.cfg最少需要3行
+
+      [192.168.2.91]
+      dump foxhis
+      [192.168.2.91/]
+   b).主备服务器结构(主服务器地址假设为192.168.2.91;备服务器地址假设为192.168.2.92)
+      task.cfg最少需要7行
+
+      [192.168.2.91]
+      dump foxhis
+      [192.168.2.91/]
+      [192.168.2.92]
+      ftpg 192.168.2.91 foxhis
+      load foxhis
+      [192.168.2.92/]
+   c).双机互备服务器结构(服务器1地址假设为192.168.2.91;服务器2地址假设为192.168.2.92)
+      task.cfg最少需要10行
+
+      [192.168.2.91]
+      dump foxhis
+      ftpg 192.168.2.92 xrback:
+      [192.168.2.91/]
+      [192.168.2.92]
+      dump xrback
+      ftpg 192.168.2.91 foxhis
+      load foxhis
+      [192.168.2.92/]
+   d).其它结构
+
+      根据具体情况增加相应的IP地址块及其任务
+
+   从功能上说,task.cfg里只要包含所在服务器的配置就行了,即task.cfg里只要本server的IP地址块就够了,
+   没必要把其它server的IP地址块写进来.但实际上，为了便于管理，以及避免task.cfg相互覆盖,task.cfg
+   中建议写全所有相关server的配置.保持每个相关server有一样的task.cfg
+4-4).task.cfg中任务的写法
+   load任务的写法
+
+   load [<数据库名1> [<数据库名2>]]    #load前不能有空格
+
+   调用/home/sybase/mode/load脚本，执行具体任务.说明详见"脚本load"那一节
+
+
+   dump任务的写法
+
+   dump [<数据库名> [<片数>]]          #dump前不能有空格
+
+   调用/home/sybase/mode/dump脚本，执行具体任务.说明详见"脚本dump"那一节
+
+
+   each任务的写法
+
+   each [<数据库名>]                   #each前不能有空格
+
+   调用/home/sybase/mode/each脚本，执行工程检查任务.说明详见"脚本each"那一节
+
+
+   ftpg任务的写法
+
+   ftpg <远程IP地址> <数据库名>        #ftpg前不能有空格
+
+   调用/home/sybase/mode/ftpg脚本，把<远程IP地址>的<数据库名>的标准dump,取到本地/home/sybase/dump目录.
+   说明详见"脚本ftpg"那一节
+
+
+   ftpget任务的写法
+
+   ftpget <远程IP地址> "<文件名模式>" <远程目录> <本地目录>      #ftpget前不能有空格
+
+   调用/home/sybase/mode/ftpget脚本，把<远程IP地址>的符合<文件名模式>的文件,从远程的<远程目录>取到本地的<本地目录>.
+   说明详见"脚本ftpget"那一节
+
+
+5).脚本dump
+   dump专门用来制作数据库的标准dump,由exectask调用，当然也可手动调用
+
+   ./dump foxhis  手动生成数据库foxhis的标准dump
+
+5-1).标准dump的特征
+     一个标准dump有以下特征:
+     a).它由一个或多个文件构成;
+     b).每个构成文件以其库名打头，后跟字符"-"。如foxhis的标准dump，其每个构成文件都以 foxhis- 打头;(所以工程师创建数据库时要避免"-"用于库名);
+     c).每个构成文件以 -dat<数字><数字> 结尾。其中<数字>是十进制数字，如foxhis的标准dump，至少有一个构成文件以 -dat01 结尾;
+     d).符合<库名>-*.*-dat<数字><数字> 模式的文件,都将被认定为<库名>的标准dump的构成文件(所以工程师自己命名文件时要回避这种模式);
+     e).使用dump脚本制作标准dump时，其构成文件放在/home/sybase/dump目录;
+     f).使用load脚本装入标准dump时，只从/home/sybase/dump目录找其构成文件;
+     g).用库名引用标准dump，如用foxhis引用foxhis的标准dump.
+     h).库名既能引用数据库，也能引用标准dump,具体引用何者由上下文决定.
+
+5-2).标准dump构成文件的定义
+    标准dump构成文件的严格定义:
+   <标准dump构成文件>   ::= <库名><设备片序列>.<版本>-dat<片号>
+   <库名>               ::= <数据库名>
+   <设备片序列>         ::= <单个设备片>|<单个设备片><设备片序列>
+                            注：每个设备片都有其逻辑地址空间，逻辑地址小的排在<设备片序列>的前面.数据库dump时是根据逻辑地址从小到大
+                                dump的;从dump中load时，也是按逻辑地址从小到大load到数据库的.
+
+                            所以，我们建库准备load时，必须按照<设备片序列>中的顺序、大小和用处，,否则将可能会降低load后数据库的品质.
+   <单个设备片>         ::= -<段映射>d<虚拟设备号>_<设备片大小>
+   <段映射>             ::= segmap,是master库sysusages表中的一个整数字段，1bit对应一个段,32位整数的话一个数据库最多有31个段,用来表示
+                            设备片的用处.
+                            第0位为system段，on时，表示设备片用来存放系统表;
+                            第1位为default段，on时，表示设备片用来存放没指定段(或指定为default段)的对象;
+                            第2位为log段，on时，表示设备片用来存放日志;
+                            第3位及以上，用户定义的段，用来把特定对象放到特定的设备上.
+                            由于一个段只占1bit,segmap中有几位同时on时，表示相应的段共享对应的设备片.
+                            create database时，指定on之句,但无log on之句,<段映射>值为7， 对应二进制 111      -----------数据/日志混用
+                            create database时，指定on和log on之句,on后设备<段映射>值为3，对应二进制 011      -----------系统/缺省混用
+                                                             log on后设备<段映射>值为4，对应二进制 100      -----------日志单独放
+
+                            总结一下，段的使用有四种情况,假如没有用户自定义段，则
+
+                            1.不再用来存放未来数据和日志                     <段映射> 为0
+                            2.只放数据(data only)                           <段映射> 为1,2,3
+                            3.只放日志(log only)                            <段映射> 为4
+                            4.数据与日志混用(data and log mixed)            <段映射> 为5,6,7
+
+                            严格的判断,需用位操作
+                            1.不再用来存放未来数据和日志                    segmap = 0
+                            2.只放数据(data only)                           segmap & 4 = 0 and segmap <> 0          # & 位与
+                            3.只放日志(log only)                            segmap = 4
+                            4.数据与日志混用(data and log mixed)            segmap & 4 = 4 and segmap & ~4 <> 0     # ~ 位取反
+
+                            单个设备片上数据与日志不混用，不表示一数据库其数据与日志不混用,可能同一设备上有两个设备片，分别存放数据与日志
+                            如果一数据库，其数据与日志在其每个设备上不混用，我们给它评为A级;
+                            如果一数据库，其数据与日志至少在其某一设备上混用，但每个设备片上还是不混用的，我们给它评为B级;
+                            如果一数据库，其数据与日志至少在某一设备片上混用，我们给它评为C级;
+
+                            B级的库，可以改造成A级的库;C级的库，通过LOG搬迁可以升到准B级(因LOG无法彻底搬迁)。A级库也可把A级库装坏，变成C级!
+
+                            我们的目标是把我们的foxhis库保持在A级，为将来备日志做准备.
+
+   <虚拟设备号>         ::=  disk init时的vdevno
+
+   <设备片大小>         ::=  以M为单位的设备片大小，一般为create database或alter database中on(log on)之句中每次申请的空间大小
+
+   <版本>               ::= sybase版本号(这项可能要扩充,加上操作系统及32位64位等信息,但程序会兼容)
+
+5-3).标准dump的用途
+
+     从标准dump可以:
+       a).知道数据库的大小;
+       b).知道数据库的版本;
+       c).知道数据库的品质;
+       d).预知load后数据库的品质;
+       e).正确创建数据库，以便load后提升数据库的品质(至少不会降低)
+
+5-4).标准dump的生成
+
+   标准dump是执行./dump脚本后程序生成的,语法
+
+   ./dump [<数据库名> [<片数>]]
+
+   <数据库名>是指要dump出的数据库名，缺省为foxhis
+   <片数>是指构成文件的个数.不指定时，程序自动计算所需片数;指定时，取指定片数与程序自动计算所需片数的较大值;
+   dump脚本根据<数据库名>.dbo.sp_spaceused中reserved项报告的值/2048000 + 1计算所需片数.
+
+   生成的标准dump放在/home/sybase/dump目录备用。
+
+   ./dump         生成foxhis的标准dump,等同于 ./dump foxhis
+   ./dump xrback  生成xrback的标准dump
+
+
+
+   下面条件之一满足时，不做dump
+   a).sql server中无给定库名的数据库;
+   b).分片数不在1--32间(含),  # sybase 12.x文挡里说分片最大为32,实际可超过,先按文档说的限制;
+   c).硬盘空间不够时(用 df /home/sybase/dump查可用空间,用sp_spaceused中reserved项报告的值*110%作为所需空间)
+     注:如数据库是offline状态，不能用sp_spaceused确定所需dump空间,此时改用该数据库大小*110%作为所需空间;如sybsystemprocs系统
+        数据库不存在，或是offline状态,系统过程sp_spaceused就无法使用,此时也用数据库大小*110%作为所需空间.如所需空间满足，则照
+        常dump;否则报告因故不能确定所需dump空间,不做dump.
+   d).给定库名的数据库已在做标准dump
+
+5-5).标准dump构成文件的例子
+   举些例子:
+
+   foxhis-3d3_2000-4d4_2000.11-0-3-3-dat01    # dump自sybase 11.0.3.3的标准 2+2 foxhis库
+   master-7d0_2-7d0_3-7d0_40.11-0-3-3-dat01   # dump自sybase 11.0.3.3的master库,数据日志混用，先后扩了两次(3M和40M),目前45M
+
+6).脚本load
+   load专门用来载入数据库的标准dump,由exectask调用，当然也可手动调用
+
+   ./load x50204 foxhis  把foxhis标准dump,载入到x50204数据库
+
+   load脚本语法
+   ./load [<数据库名1> [<数据库名2>]]
+
+   共两个参数，<数据库名1>引用当前sql server中运行的数据库,<数据库名2>引用<数据库名2>的标准dump.
+   不带参数时,<数据库名1>和<数据库名2>都为foxhis;带一个参数时,<数据库名2>等于<数据库名1>
+   ./load         等同于 ./load foxhis foxhis
+   ./load xrback  等同于 ./load xrback xrback
+
+   下面条件之一满足时，不做load
+   a).sql server中无<数据库名1>的数据库;
+   b)./home/sybase/dump下无<数据库名2>的标准dump;
+   c).<数据库名2>标准dump的sybase版本号比sql server中<数据库名1>的sybase版本号高
+   d).<数据库名2>标准dump(对应数据库)比sql server中<数据库名1>要大
+   e).<数据库名1>为master或<数据库名2>为master
+      注:想把master的标准dump装到其它库里看一下都不行，可恨
+   f).<数据库名1>正在使用中
+
+   注意:1.sybase 11.0.3.3的dump装到sybase 12.5.4版本数据库时，数据库要大些，大1000M的倍数为宜
+        2.sybase 11.0.3.3的dump装到sybase 12.5.4版本数据库时,会自动升迁.但据老潘讲，只会升迁一次.
+          举例说，原11.0.3.3版用了两个库foxhis和foxhis1,dump分别为foxdump和foxdump1
+          在12.5.4的sybase上建好了两个库foxhis和foxhis1,当从foxdump装入到foxhis后会自动升迁，但
+          当从foxdump1装入到foxhis1后就不会自动升迁了.老潘的方法是每升迁好一个库,做一次dump.再解
+          压sybase64.tar.gz,再升迁,依此类推，直到把所有库升迁好,dump出来.
+
+7).脚本ftpg
+   ftpg专门用来把数据库的标准dump从远程服务器取到本地服务器,由exectask调用，当然也可手动调用
+
+   ./ftpg 192.168.2.91 foxhis    # 把服务器192.168.2.91上/home/sybase/dump下foxhis的标准dump取到本地/home/sybase/dump目录
+
+   ftpg 需两个参数，第一个远程ip地址；第二个是数据库名
+
+   ./ftpg <远程IP地址> <数据库名>
+
+   注:1.如果想取其它文件，请用ftpget脚本，该脚本更低级,用途更广.而ftpg只能取标准dump.
+      2.dump,load,ftpg和each都以数据库名为基本参数.
+      3.ftpg实际上是调用ftpget完成文件传送的,ftpget可指定五个参数,那ftpg也可指定五个参数,只是第二个参数含义有所不同
+
+8).脚本ftpget
+   ftpget是比ftpg更低级的脚本,用来把文件从远程服务器取到本地服务器。ftpg脚本就是通过调用ftpget脚本，加上文件名限制，达到专门把数据库的
+   标准dump从远程服务器取到本地服务器的目的.
+
+   ./ftpget 192.168.2.91 "nfoxhis-*.*-dat??"  #把192.168.2.91上nfoxhis的标准dump取到本地
+
+   相当于
+
+   ./ftpg   192.168.2.91 nfoxhis              #把192.168.2.91上nfoxhis的标准dump取到本地
+
+   ftpget脚本有五个参数
+
+   第一个参数指定远程ip地址,必须提供,无缺省值,ftpget将尝试用ftp连接该远程ip地址,如连不上,则程序退出.第二,第三,第四,第五个参数可为空而采用缺省值
+
+   第二个参数指定文件名(可含通配符,但必须用引号引用),为空时,将置为"foxhis-*.*-dat??"
+
+   第三个参数指定远程目录,为空时,将置为/home/sybase/dump
+
+   第四个参数指定本地目录,为空时,将置为第三个参数的值(如第三个参数为/home/sybase/dump,则也为/home/sybase/dump)
+
+   第五个参数指定ftp时临时目录所在目录,为空时,将置为第四个参数的值(如第四个参数为/home/sybase/dump,则也为/home/sybase/dump)
+
+   注: (1).ftpget时,文件并不是直接取到本地目录,而是先取到本地的一个临时目录,再做处理;不指定第五个参数时,临时目录建在本地目录下
+       (2).一般并不需要第五个参数,只有在空间极度紧张,本地目录下无法临时存放ftp文件时,才指定一个临时目录.
+       (3).ftpget时,取到本地目录的文件一般保留一周,分别存放在本地目录下的w1,w2,w3,w4,w5,w6,w7中(w1表示周一,其余类推).但当第四第五个参数不一致时,
+           放弃保留一周的操作,因为空间不够才会指定第五个参数
+
+   当某参数及之后的参数均为空时，可不写,如:
+
+   ./ftpget 192.168.2.91       # 把192.168.2.91上foxhis的标准dump取到本地,相当于./ftpg 192.168.2.91 foxhis
+
+   当某参数为空,而之后的参数非空时，要写成""(空串,起到占位符的作用),如:
+
+   ./ftpget 192.168.2.91  "" ""  /home/sybase/tmp   #把192.168.2.91上/home/sybase/dump下foxhis的标准dump取到本地/home/sybase/tmp目录
+
+9).脚本each
+   each是Engineering project Aid and Check的缩写,意为"工程辅助与检查",用来协助工程师做好工程项目.也是品质部事后及现场检查工程项目的工具.由
+   exectask调用，当然也可手动调用.
+
+   ./each              #检查foxhis库
+   ./each x50204       #检查x50204库
+
+   each脚本只需一个参数，即数据库名，如不带参数则缺省为foxhis数据库
+
+   each执行完成后，检查记录存放在/home/sybase/mode/logs/each.log和/home/sybase/mode/logs/each_detail.log两文件上。
+
+   工程检查主要是对数据库中的一些重要的表进行一致性检查.所有检查的sql都放在/home/sybase/mode/sql目录.与mode.tar.gz相适应，有一个sql包
+   sql.tar.gz对应所有检查用的sql.也要在/上用tar xzvf解压(即tar xzvf sql.tar.gz)
+
+9-1).脚本testobject,testobjects等
+   用于测试某数据库中是否存在某表或其字段.由此判断/home/sybase/mode/sql下的sql,哪些在本server上可以执行，哪些在
+   本server上不能执行，应该跳过.
+
+   有些sql较大,在11.0.3.3的sybase上执行会出错，甚至把dataserver搞死.而这些sql在12.5.4的sybase上执行没问题.为此,在sql文件的注释中添加了
+   版本限定的语法,这样,在服务器上执行./each时会自动选择适当的sql来执行,避免搞死dataserver.但是,这难以阻止工程师把sql.tar.gz包中的sql拿到
+   PB上执行.现在已把所有sql都改写成可在11.0.3.3的sybase上安全地运行.
+
+   不过,仍不建议在PB上执行sql.tar.gz包中sql,因为不是所有的sql都可以执行的.
+
+9-2).脚本reformat
+   reformat对检查结果做一些格式列宽调整,使/home/sybase/mode/logs/each_detail.log更易读.目前主要由each调用.
+
+10).其它脚本
+
+   以上九个脚本是必须熟练掌握的.下面的脚本是更低级的一些脚本，了解一下当然是好的，有一些甚至很有用.
+
+10-1).脚本vsftpd
+   这是为Suse linux写的一个启动standalone vsftpd的脚本，缺省时Suse linux用xinetd服务来处理ftp服务.在Suse下
+   执行./install.sh后，系统自动选择其中一种方式.
+
+   ./vsftpd start   开启 standalone vsftpd
+   ./vsftpd stop    停止 standalone vsftpd       #必须具备root权限
+   ./vsftpd restart 重启 standalone vsftpd       #必须具备root权限
+
+   中标下vsftpd也能用，不过平时不要随便用，免得关掉了vsftpd后，忘了开了.这样晚上就不能自动ftp了
+
+10-1-1).脚本dispmode
+   显示当前vsftpd服务方式,是配置成standalone方式还是xinetd内subservice方式.主要为了正确配置ftp而写
+   ./dispmode     返回00,01,10,11四种方式
+   返回值  说明
+   00      两种方式都没配置,属于错误配置
+   10      standalone 方式
+   01      xinetd内subservice方式
+   11      两种方式都配置了，配置冲突
+
+   执行./install.sh后,vsftpd将自动配置成01或10方式
+
+10-2).脚本seecfg,seemod
+   脚本seemod用于查看SYBASE.cfg，即静态配置;脚本seecfg用于查看sybase动态配置.
+
+   目前seecfg在mode中使用极其广泛,无所不在.因为经过简单扩充,它可用来执行单行sql命令，或sql文件
+
+   ./seecfg                                相当于 ./seecfg ""
+   ./seecfg  ""                            相当于 ./seecfg "sp_configure"
+   ./seecfg  "'memory'"                    相当于 ./seecfg "sp_configure 'memory'" 看内存分配情况
+   ./seecfg  "'lock scheme',0,datarows"    锁机制改成行锁  #sybase 11.0.3.3无此功能
+   ./seecfg  "foxhis.dbo.sp_spaceused"     看foxhis库空间情况
+   ./seecfg  "xxx.sql"                     执行xxx.sql文件
+   ./seecfg  "load database foxhis from '/home/sybase/dump/foxdump.dat'"   # 装入通常dump文件
+
+10-3).脚本nameattr,newname,sqlgen,segmaptran等
+   用于获取数据库的标准dump名,大小,版本和品质等属性.基本上由load及dump调用.
+
+10-4).脚本testtask
+
+   在mode中，each脚本明确限制不能重入.其它脚本没有明显限制.
+
+   dump脚本可以重入,但同一库的dump不允许重入(如不能同时做两个./dump foxhis,但可以同时./dump foxhis和./dump foxhis1)
+   这个限制是由testtask协助完成的.但dump也不鼓励重入,因为dumpload.log的记录将混杂得看不清楚.对each脚本做重入限制就是
+   为了each.log,each_detail.log不混杂.
+
+4.日志记录
+  exectask,dump,load,ftp的事件及过程记录在/home/sybase/mode/logs/dumpload.log中,
+  each(工程检查)的检查结果记录在/home/sybase/mode/logs/each.log和/home/sybase/mode/logs/each_detail.log中.
+
+  请工程人员回来时，把整个mode目录,sybase的日志，sybase配置文件SYBASE.cfg,连同dump文件(*.*-dat??)一起带回公司
+
+  注意:sybase 11.0.3.3中 SYBASE.cfg一般在/home/sybase目录;
+                         日志      一般在/home/sybase/install目录;
+       sybase 12.5.4  中 SYBASE.cfg一般在/home/sybase/ASE-12_5目录
+                                   (执行./install.sh后,在/home/sybase建了一个符号链接文件SYBASE.cfg)
+                         日志      一般在/home/sybase/ASE-12_5/install目录;
+
+5.bug报告
+  使用中发现bug,包括本文档的bug,请发邮件至hry@foxhis.com.谢谢!
+
+6.鸣谢
+  在mode的编写过程中，得到了崔松松，夏凌辉,韩碧波,丁广平,潘有年,郭迪胜等很多同事的帮助,在此一并致谢.对于使用本mode
+  的工程师表示由衷的感谢,正是由于他们的使用及反馈，mode程序的质量得到了提高.老屠与王总的大力支持也保证了工程检查的严
+  要求与持续性，在此万分感谢!
+
+
+                                                   hry
+                                                   2009.1.5  整理
+                                                   2009.1.9  修改
+                                                   2009.1.16 修改
+                                                   2009.3.30 修改
+                                                   2009.3.31 修改完成
+                                                   2009.6.1  按mode3.0修改
+                                                   2009.6.2  修改
+

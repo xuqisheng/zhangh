@@ -1,0 +1,561 @@
+             V55  X5  表对照
+
+ 表 名	                        描    述                 X5变更
+
+account			       当前账务库
+adtrep	                       夜间稽核报表
+alchkout		       上日结账账号
+allouts			       本日结账账号
+arcls	     		       AR账主单──级别代码
+argst			       AR账主单──相关人
+argst_log		       AR账主单──相关人日志
+armst			       AR账主单──当前主单
+armst_last	               AR账主单──前日主单
+armst_log	               AR账主单──主单日志
+armst_till	               AR账主单──上日主单
+artagcode	               AR帐主单──类别代码表
+auditprg	               夜间稽核过程
+auth_dept	               电脑操作员所属部门
+auth_login	               电脑操作员信息
+auth_module	               系统模块代码表
+auth_runsta	               系统运行状态
+auto_dept	               报表专家──报表类别
+auto_report	               报表专家──报表定义
+billmode	               系统账单&发票代码表
+billno	                       结账（部结、转账和冲账）单号明细
+billno_lgfl	               前台账单打印
+billno_pcid	               记录打印账单流水号
+billunit	               账单类别
+bjourrep	               夜间稽核工作底──借方计划数
+blklst	                       黑名单主单──当前主单
+blklst_log	               黑名单主单──日志
+blkmstclass	               黑名单主单──类别代码表
+cashrep	                       现金收入表──本日
+chgcod	                       费用码代码表                              X5  -->pccode
+clscode	                       散客&成员主单──类别代码表
+cntcode	                       市区县代码表
+countrycode	               国家代码表
+credcls	                       付款方式类别代码表
+dairep	                       夜间稽核工作底──本日贷方
+dayrepo	                       客房营业（服务费）报表──本日
+deptdai	                       综合收银收入及财务记录报表──本日贷方
+deptjie	                       综合收银收入及财务记录报表──本日借方
+discount	               优惠汇总表
+discount_detail	               优惠明细──上日
+dynamic_define	               动态INFO,FOXDYN等系统主菜单定义
+erracct	                       夜核帐务处理的错误帐号表
+firstdays	               财务结算日期
+flrcode	                       楼层代码表
+genput_f9		       通用查询打印定义
+gltemp			       上日账务明细
+grpclass		       团体主单──类别代码表
+grpmst			       团体主单──当前主单
+grpmst_last		       团体主单──前日主单
+grpmst_log		       团体主单──日志
+grpmst_till		       团体主单──上日主单
+grpsrc			       团体主单──来源代码表
+gst_type		       客户(客人)档案──类别代码表
+gststa			       进住及在住客人报表(境外客为主)──本日
+gststa1			       进住及在住客人报表(境内客为主)──本日
+guest			       散客&成员──当前主单
+guest_bill					散客&成员──宾客登记单打印
+guest_last					散客&成员──前日主单
+guest_log					散客&成员──日志
+guest_till					散客&成员──上日主单
+haccount					历史账务库
+harmst						AR账主单──历史主单
+hgrpmst						团体主单──历史主单
+hgstinf						客户(客人)档案──当前主单
+hgstinf_add					客户(客人)档案──初始的客人历史单据
+hgstinf_log					客户(客人)档案──日志
+hgsttype					客户(客人)档案──类别代码表
+hguest						散客&成员──历史主单
+hguest_income				        散客&成员──收入表
+hmaster						散客&成员主单──历史主单
+hmaster_income				        散客&成员主单──收入表
+idcode						证件类别代码表
+information_def			                社会信息──项目定义
+information_name		     	        社会信息──内容
+jieplan						夜间稽核工作底表──计划
+jierep					 	夜间稽核工作底表──本日借方
+jierep_jourrep				        数据对照表──夜间稽核工作底→营业日报表
+jierep_njourrep			                数据对照表──夜间稽核工作底→各部门收入日报表
+jobcode						职业代码表
+jourrep						营业日报表──本日
+jscode						预订结算类别
+mail_lgfl					职员留言──阅读日志库
+mail_text					职员留言──留言内容
+master						散客&成员主单──当前主单
+master_bill					散客&成员主单──宾客登记单打印
+master_last					散客&成员主单──前日主单
+master_log					散客&成员主单──日志
+master_quick				        散客&成员主单──快速登记主单
+master_saveas				        散客&成员主单──另存主单
+master_till					散客&成员主单──上日主单
+message						备忘录
+message_type				        备忘录类别代码表
+mktsummaryrep				        客房销售来源分析报表──本日
+mstbalrep					应收帐款余额表
+mststa						主单状态代码表
+mtav						会议主单
+mtav_log					会议主单日志
+njourrep					各部门收入报表──本日
+ostaacct					上日退房账务明细
+outtemp						上日部结账务明细
+package_def					包价定义
+package_name				        包价代码表
+partout						部分结账临时账务明细
+paymth						付款方式代码表
+pcashrep					现金收入表──打印用临时表
+phcodeg						直拨区号组别代码表
+phcoden						直拨区号代码表
+phdeptdef					电话用户──当前代码表
+phdeptdex					电话用户──类别代码表
+phdepthis					电话用户──历史代码表
+phdeptroom					电话用户──当前分机使用情况
+phempty_deal				        漏单电话
+phextroom					分机→房号（用户）对照表
+phfolio						电话流水账──当前
+phncls						直拨区号类别代码表
+phngrade					直拨电话等级代码表
+phteleclos					直拨电话等级修改明细
+phtimedef					节假日时段定义
+phtimename					节假日时段代码表
+phuserdef					分机类别代码表
+pos_deptcls					综合收银分类账单定义
+pos_deptdai					综合收银收入及财务记录报表──本日贷方
+pos_deptjie					综合收银收入及财务记录报表──本日借方
+pos_dish					综合收银点菜明细──本日
+pos_empno					综合收银厨师（服务员）代码表
+pos_hdish					综合收银点菜明细──历史
+pos_hmenu					综合收银点菜单──历史
+pos_itemdef					综合收银营业点数据项
+pos_menu				 	综合收银点菜单──本日
+pos_mode_def				 	模式定义
+pos_mode_descript				模式算法描述代码表
+pos_mode_name					模式代码表
+pos_namedef					综合收银报表数据项代码表
+pos_pccode					综合收银营业点代码（参数）表
+pos_plu						菜谱──当前
+pos_plu_log					菜谱──日志（未来菜谱）
+pos_posdef					综合收银收银点代码（参数）表
+pos_report					综合收银营业情况统计表──本日
+pos_reserve					餐饮预定──预定单主单
+pos_reserve_log			    		餐饮预定──预定单日志
+pos_sort					菜谱类别──当前
+pos_sort_log					菜谱类别──日志（未来菜谱）
+pos_speed					综合收银餐厅+菜谱→报表数据项对照表
+pos_sta						综合收银餐单状态代码表
+pos_station					综合收银站点定义
+pos_std						综合收银标准菜定义
+pos_tag						综合收银餐单类别代码表
+pos_tblsta					综合收银餐桌代码表
+pos_tdish					综合收银点菜明细──上日
+pos_tmenu					综合收银点菜单──上日
+pos_ydeptdai					综合收银收入及财务记录报表──历史贷方
+pos_ydeptjie					综合收银收入及财务记录报表──历史借方
+pos_yreport					综合收银营业情况统计表──历史
+posdai						综合收银交班表──贷方
+posjie						综合收银交班表──借方
+prvcode						省代码表
+racecode					民族代码表
+ratemode_def					房价码──定义
+ratemode_name					房价码──代码表
+reason						优惠理由代码表
+reason_type					优惠理由类别代码表
+regcode						自定区域代码表
+reqcode						特殊要求代码表
+rescode						事由代码表
+resmode						预定方式代码表
+rjcode						入境口岸代码
+rm_ooo						客房维修记录
+rmpostbucket					房租入账明细──本日
+rmratedef					房价明细码
+rmrtchangerep					换房/改房价表
+rmsalerep_new					客房营业报表──本日
+rmsrvdef					客房服务费分别定义
+rmsta_log					客房代码日志
+rmstamap					客房状态代码对照
+rmtmpsta					客房临时态描述
+rsvdtl						客房预留记录---全部
+rsvroom						客房预留记录---客房
+rsvtype						客房预留记录---房类
+salegrp						销售员组别
+saleid						销售员代码
+sexcode						性别代码
+srccode						散客来源代码
+sw_class					失物类别
+sw_grade					失物等级
+swreg						失物登记
+swreg_log					失物登记日志
+swrep						失物报告
+syscode_maint					系统代码维护表
+syscode_maint_detail				系统代码维护定义
+transfer_log					未结账务记录
+txl						经理通讯录
+typim						房类代码表
+vipcard						贵宾卡──主单
+vipcard_log					贵宾卡──日志
+vipcode						贵宾卡──VIP级别
+viptype						贵宾卡──VIP类别
+vod_grd						VOD--等级控制
+vod_grd_cls					VOD--点播等级
+vod_grd_log					VOD--等级控制记录
+vod_src						VOD--计费原始记录
+vodfolio					VOD--计费帐务
+ybosdai						bos营业日报---历史
+ycashrep					现金收入表──历史
+ycus_xf						协议单位消费报表──历史
+ydairep						夜间稽核工作底──历史贷方
+ydayrepo					客房营业(服务费)报表──历史
+ydeptdai					综合收银收入及财务记录报表──历史贷方
+ydeptjie					综合收银收入及财务记录报表──历史借方
+ydiscount					优惠明细──历史
+ygststa						进住及在住客人报表(境外客为主)──历史
+ygststa1					进住及在住客人报表(境内客为主)──历史
+yingjiao					各收银点收银员应缴款表
+yjiedai						夜间稽核工作底表──历史余额
+yjierep						夜间稽核工作底表──历史借方
+yjourrep					营业日报表──历史
+ymktsummaryrep					客房销售来源分析报表──历史
+ynjourrep					各部门收入报表──历史
+yrmpostbucket					房租入账明细──历史
+yrmsalerep_new					客房营业报表──历史
+asscode						签证代码
+assunit						签证机关
+auth_function					操作权限列表
+auth_group					电脑操作员组别
+auth_group_module				电脑操作员组别模块设置
+auth_group_module_function			电脑操作员组别模块功能设置
+auth_module_function				系统模块功能设置
+bos_account	bos 				bos帐务
+bos_dai						bos 报表统计临时表
+bos_detail					bos 库存明细账
+bos_dish					bos 销售明细
+bos_extno					bos 商务中心分机号设置
+bos_folio					bos 主单帐务
+bos_haccount					bos 帐务-历史
+bos_partfolio					bos 入账临时表
+bos_pccode					bos 营业点定义
+bos_plu						bos 菜谱
+bos_plu_class					bos 菜谱类别
+bos_posdef					bos 收银点定义
+bos_provider					bos 供应商
+bos_provider_class				bos 供应商类别
+bos_provider_mkt				bos 供应商市场码
+bos_site					bos 地点
+bos_site_sort					bos 地点类别
+bos_sort					bos 菜谱分类
+bos_station	bos 				站点定义
+bos_store					bos 库存状态
+bos_trans					bos 快速入账临时表
+bosdai						bos 营业日报
+bosjie						bos 营业日报
+checkroom					客房查房
+checkroomset					客房查房站点控制
+cus_xf						协议单位消费报告-每日发生
+cuscls						协议单位类别
+cusdef						协议码
+cusdef_log					协议码日志
+cusinf						协议单位
+cusinf_log					协议单位日志
+deptdef						部门/费用分类等代码
+grprate						团体房价定义
+hallcode					楼号代码
+hgstinf_add_log			   		客户(客人)档案──初始的客人历史单据日志
+hrm_ooo						客房维修-历史
+hswreg						失物登记
+hswrep						失物报告
+interfaces					系统外部接口定义
+meet_hrmav					会议室预留-历史
+meet_ooo					会议室维修
+meet_ooo_log					会议室维修日志
+meet_query1					会议室状态临时表
+meet_remark					会议备注
+meet_rmav					会议室预留-历史
+meet_rmav_log					会议室预留-历史
+meet_rmsta					会议室代码及状态
+meet_type					会议室类型
+rm_ooo_log					客房维修记录日志
+rmratecode					房价码
+rmreason					换房理由
+rmsta						客房代码，状态
+swrep_log					失物报告日志sw_sta   失物单据状态
+transfer					自动转账(允许记账)项目表
+transfer_mem					团体成员批量修改   --  允许记账控制临时表
+vodgrade					VOD--点播等级
+flrcode                                         楼层
+typim                                           房型
+hsregion                                        客房区域
+pos_tblsta                                      餐饮桌号
+
+
+
+gate表中的字段audit在夜间稽核的“统计报表及数据更新”时才会从F变成T。
+rmratecode 	房价码表
+rmratedef  	房价明细码表    导房价码  rmratecode,rmratedef,rmratecode_link
+mktcode    	市场码表
+cntcode    	身份证号码
+genput_f9  	用于定义可穿透
+master_till 	散客&成员主单上日主单
+ar_master_till 	AR账主单上日主单
+account_query   前台账务查询
+
+08--款待
+09--转前台,折扣
+10--转AR账
+
+
+-----电话---
+phdeptdef、phdeptdex、phdepthis、phdeptroom
+----
+
+当发现F6房态图和在分房时出现的房态不一致时，需要修改rmsta时表内容时，请注意：
+1、首先，查找accntset字段有没有相应账户，如果有，取出来在master和hmaster表里查找，如果master表里没有，而hmaster表里有。
+2、然后，将onumber和number修改成0
+3、将ocsta修改成发V，这样，就会成为干净房状态(CL或VC)
+
+
+selected_account   --临时表，表示被选中的帐，一般在一张表里有pc_id字段的表都是临时表
+information_def    --公共信息定义表
+information_name   --公共信息名称表
+
+syscode_maint	 --系统代码设置表，可以从此表中字段parm的cat=？知道在“FOXHIS系统代码设定”在basecode表是哪一项。可编辑的东西都在此。
+
+sysdefault   	 --系统默认表
+gltemp		 --上日账务明细
+
+电话接口相关表：
+toolbar  --系统工具条，在做老接口时，首先需要在此关联窗口。(字段source：存放着各窗口名)
+paradata --华为电话话单路径存放
+foliosrc --华为电话话单源
+sysoption --select * from sysoption where catalog = 'hotel' and item ='phone';中的value值需要与相关窗口的函数一致。
+
+接口相关表
+phcoden 	--电话费率表 p_hry_phone_calculate_fee计算费用过程，被p_hry_phone_xbsuggest_iddcall调用(Smart)
+phfolio 	--电话单表,vodfolio-vod --表,intfolio --上网费表
+phteleclos 	--直拨电话等级修改明细,vod_grd,internet_pms,pms_building
+
+sys_empno --系统工号表，安装客户端后发现语种不对，则查看sys_empno.langid字段。
+
+安装客户端后，发现在系统背景颜色不为白色，若修改sysoption.item字段中的database为服务器地址。
+
+bill_unit,在此表中定义各单据和账单关联的是哪张，从bill_unit.syntax中看出。字段detailrow表示单据每次打印出多少行。
+          字段papertype表示是以窗口或模块等形式打印
+
+调整单据相关表：bill_mode,bill_unit,bill_data
+bill_mode(printtype-单据类型，language-语种，在此表中增加单据),bill_unit(syntax-语法，在这个字段里可以看出哪个单据是采用语法方式，
+哪个单据是采用数据窗口方式，不同的方式可以采用不同的修改方式。数据窗口方式，导成pbd文件，再覆盖到每台PC机，语法方式，导成srd文件，
+再导入或打开srd文件，将语法覆盖。其实也可以把数据窗口变成语法方式的。),bill_data,master_des,repcode,bill_code
+
+argcode 账单编码(argcode字段)
+
+master 		--前台主单表(accnt-帐号,haccnt-档案号，sta-客人状态，roomno-房号，arr-到店日期，dep-离店日期，bdate-营业日期)登记单，预订单，消费帐，AR账。
+		  F911260001表示2009年11月26日第一位散客
+hmaster  	--历史住宿记录表
+master_des	--用来翻译master表的字段
+guest  		--客人档案表(no-档案号，class-类别，name-姓名)   guest.no=master.haccnt
+typim 		--房间类型表(quantity-数量,overquan-超预留，ratecode-房价码)
+rmsta 		--房间列表 (roomno-房号,oroomno-内部房号(02101),其中021为楼号，01为房号,flr楼层号，必须与oroomno的前两位数一致，number,accntset)
+sysoption 	--系统参数表【维护→代码设置→系统设置→系统参数】(catalog-类别,item-项目,value-设置),何时加收半天房费在此修改。
+sys_empno 	--工号表(empno-用户代码,password-密码)
+sys_function 	--权限表
+account  	--帐务表 (accnt)account.accnt=master.accnt  (accnt-帐号,subaccnt-分帐号,modu_id-模块号,log_date-生成日期,bdate-营业日期,date-业务日期
+   		  (用于AR账)原始账单产生时间,pccode-营业代码，argcode-汇总代码，tofrom-转账方向,mode-房费模式,billno-账单号)，字段modu_id可以从basecode
+		  表select * from basecode where cat='moduno'得到，或者【审记→账务查询→高级条件→模块号】
+haccount 	--历史帐务表
+sysdata 	--指针表(hisbase,arbase-AR帐指针)
+
+报表专家，sysoption需要看懂。
+
+夜审的主要表:
+auditprg	--夜审执行的步骤表。里面存放了夜审的存储过程和执行情况。当夜审出现中断或某张夜审报表有错误时，可以查看对应的存储过程。
+adtrep 		--存放了需要打印和显示夜审报表.里面有对应的打印报表函数.一般都放在report0.pbl 和report1.pbl里面,以及对各个函数语法定义解释的
+		  函数f_template_function,如果新增加了报表以及打印函数，需要在该函数里面做好定义。
+sysdata		--存放了系统重要数据，如营业日期，账号目前取值范围
+accthead 	--夜审记录表(audit) 存放夜审的站点及日期，状态，当需要更换机器续做夜审时，需要将audit字段清空，使用update
+		update accthead set audit=''; 先用这条命令让使用其它站点继续做夜审，再自己去查找错误。
+gltemp		--上日前台所发生有的帐务明细，从account 中取得，上日的很多表的前台数据都是从这张表里生成。
+master_till, guest_till 上日的主单和客人信息
+
+chgcode		--账单编码表
+
+act_bal 	--账务发生额表
+basecode 	--基础代码表,如果在代码设置中删除一些记录时，显示无法此代码为系统级代码，无法删除，可以在此表中可以修改sys字段。
+longshort 	--华为长短对照表
+phextroom 	--分机号码对照表
+phteleclos 	--电话等级记录表
+pccode 		--费用码，付款码表(jierep-底表行，modu,jierep,tail,araccnt-AR帐户)(pccode.jierep=jierep.class)【定义错误，将造成底表不平】
+sysdefault 	--系统默认表
+jierep 		--底表(day01-主营，day02-食品，day03-饮品，day04-香烟，day05-其他，day06-服务费，day07-Rebate，day08-款待，day09-折扣，
+		  day99-日合计，month01-月主营，month99-月总计)
+
+餐饮方面表
+pos_plucode 	--菜本表【维护→代码设置→综合收银→菜谱→菜谱定义，编辑‘菜本编辑’将会对使此表产生相应数据】 (字段pccodes：适用营业点)
+pos_sort	--菜类表【维护→代码设置→综合收银→菜谱→菜谱定义，编辑‘菜类编辑’将会对使此表产生相应数据】
+pos_sort_all
+pos_plu		--当前菜谱表【维护→代码设置→综合收银→菜谱→菜谱定义，编辑‘菜项编辑’将会对使此表产生相应数据】 (字段id是关键字，表示全部菜酒水等
+		  编号，由系统自动生成)
+pos_plu_all	--全部菜谱表(包括删除)
+菜谱定义规则：菜本{字段plucode(代码)以两位数01开始}，菜类{按字段plucode归类后，字段sort以四位数0101→,,0102→,0201→,0202→开始}，菜项
+	          {按字段plucode和字段sort归类后，字段code以七位数0101001→,,0102001→,0201001→,0202002→开始}，三张表共同的字段pluid设置为1.
+
+
+pos_tblsta	--台号表【维护→代码设置→综合收银→基本代码→桌号，编辑‘桌号’将会对使此表产生相应数据】(字段tableno：桌号，字段pccode：营业点代码)
+
+pos_pccode	--营业点表【维护→代码设置→综合收银→基本代码→餐厅和费用码对照表，编辑‘餐厅和费用码对照表’将会对使此表产生相应数据】
+		  (字段pccode：营业点代码；字段teaup:T表示开启茶位，F表示关闭茶位；字段chgcod：费用码，设置时必须与pccode表中的字段pccode对应，目的是
+		  为了在餐厅中消费的账可以转之前台，例如，如果是中餐厅产生的账，chgcod的值就应该与pccode表中的pccode的值一致)
+
+pos_int_pccode	--餐别对照表【维护→代码设置→综合收银→基本代码→餐厅和费用码对照表，编辑‘餐厅和费用码对照表’将会对使此表产生相应数据】
+
+pos_namedef	--综合收银报表数据项代码表【维护→代码设置→综合收银→基本代码→报表数据项，编辑‘报表数据项’将会对使此表产生相应数据】
+
+pos_itemdef	--综合收银营业点数据项餐别对照表【维护→代码设置→综合收银→基本代码→餐厅和费用码对照表→报表数据项，编辑‘报表数据项’将会对使此表产生
+		  相应数据】(字段pccode：营业点代码；字段jierep：底表代码，与jierep表中的字段class相对应；字段tail:)
+pos_menu	--*综合收银点菜单表──本日(menu)
+pos_dish	--*综合收银点菜明细表──本日(menu)
+pos_pay		--*餐饮结账付款表──本日(menu)
+
+pos_tmenu	--综合收银点菜单表──上日
+pos_tdish	--综合收银点菜明细表──上日 insert pos_tmenu select * from pos_menu where date = '2010-8-16';在上日数据丢失的情况下插入数据。
+pos_tpay	--餐饮结账付款表──上日  insert pos_tpay select * from pos_hpay where menu in (select menu from pos_tmenu);
+
+pos_hmenu	--综合收银点菜单表──历史
+pos_hdish	--综合收银点菜明细表──历史
+pos_hpay	--餐饮结账付款表──历史
+
+pos_station	--pos站点设置表
+pos_reserve	--餐饮预定表
+pos_mode_def	--模式定义表
+
+
+主要报表：
+night_audit	--夜审步骤报表
+auditprg	--夜审过程报表(字段callform：参与过程，字段duration：时长)
+adtrep		--稽核报表
+
+jierep		--稽核底表(class,rectype,toop,toclass) 			★过程p_gl_audit_jiedai_nar
+   		  借方表jierep,贷方表dairep
+		  day01-主营，day02-食品，day03-饮料，day04-香烟，day05-其他，day06-服务费，day07-扣减，day08-款待，day09-折扣，day99-日折扣。
+jourrep		--营业日报表(class,rectype,toop,toclass,unit,show,day-日数据，month-月数据，year-年数据，day_rebate-日扣减，month_rebate-月扣减，
+		  year_rebate-年扣减)	★过程p_gl_audit_jourrep
+jierep_jourrep	--底表营业日报表对照表(class,day99)
+audit_impdata	--为营业日报表准备数据		过程p_gl_audit_impdata
+ydeptdai,ydeptjie	--餐饮营业日报表		过程p_gl_pos_deptrep
+yrmsalerep_new 	--客房出租率报表(按楼层/房类)	p_gds_audit_rmsale_new 't','E'
+
+res_plu     --系统代码中的租赁物品表
+
+  查看过程的一种方法：将数据另存为报表专家，然后“修改”就可以看到是调用过程，还是查询语句。
+1、p_gl_audit_jiedai_nar	--稽核底表过程
+2、p_gl_audit_jourrep		--营业日报表过程
+3、p_gl_audit_impdata  		--为营业日报表准备数据过程
+4、p_gl_pos_deptrep		--餐饮营业日报表过程
+5、p_foxhis_sys_init 'AR'	--初始化过程
+6、p_hbb_server_speed		--测试服务器速度过程
+7、proc p_yb_armst_transfer	--导客史过程
+8、p_gds_maint_main		--系统数据检测过程
+9、p_gds_audit_deal_mdata	-- 夜审期间 -清理常用的冗余数据
+10、p_hry_audit_fstday
+11、p_gds_reserve_rsvsrc_reb   --预留房重建
+12、p_gds_house_map_create     --房态图
+13、p_gds_bos_quick_input_new  --迷你吧入账过程
+14、p_gds_after_login
+
+15、p_pyn_helpdb		--查看数据库的空间，exec p_pyn_helpdb foxhis;
+16、p_gl_audit_rmpost_check     --夜审时控制在可以在几点入房账
+17、p_gds_reserve_type_rsv_tend ---Ctrl+D 客房可用与占用
+18、p_gds_reserve_house_status  --Ctrl+H 客房实时房情
+    p_gds_reserve_rsv_index
+
+19、p_gl_audit_cashrep		--现金收入表
+20、p_hry_audit_pcashrep	--X5现金收入表
+21、p_cyj_transfer_decimal
+
+
+
+----------修改中标Linux服务器IP地址---------------------------------------
+vi  /etc/sysconfig/network-scripts/ifcfg-eth0  修改IP地址   修改后执行 /etc/init.d/network restart
+使用root用户，进去之后使用setup命令(文本模式设置工具)--->网络配置,修改IP地址后，执行/etc/init.d/network restart
+
+----------修改Suse服务器IP地址---------------------------------------
+vi  /etc/sysconfig/network/目录下  修改IP地址   修改后执行 /etc/init.d/network restart
+
+
+select min(date) from yjourrep;   可以看出库是何时启用。
+
+select name,low/power(2,24) from sysdevices order by low  查看设备
+
+select * from sysoption where item like 'data%'；
+
+select * from sysdefault where datawindow = 'd_wz_reserve_quick_reg' and columnname='ratecode';  快登时“请输入正确的房价方案”的默认值
+
+select * from sysoption where item='cmspost_rebate_accnt';   佣金调整用的哪个消费帐帐号
+
+select * from sysoption where item='breakfast_adjust_accnt';房包餐收入调整账号
+
+select * from sysoption where remark1 like 'R%';  Rebate入账时无法使入的账为负数
+
+select * from sysoption where item like 'id%';定义身份证接口时，需要修改在sysoption表时修改的地方。
+
+select * from sysoption  where catalog='reserve' and item='locksta_part_def';  部分允许记账设置的缺省值
+
+select  * from gltemp where pccode in ('01','02') and not crradjt in ('C ','CO','CA')
+and not tofrom in ('TO','FM') order by  roomno, accnt, number;   房费查询
+
+ exec p_gds_maint_main  系统参数校验处理
+
+substring(convert(char(3),  100+datepart(hh,  dep)),  2,  2)+':'+substring(convert(char(3),  100+datepart(mi,  dep)),  2,  2) > '12:00'
+
+insert pos_tmenu select * from pos_menu where date = '2010-8-16';在上日数据丢失的情况下插入数据。
+insert pos_tpay select * from pos_hpay where menu in (select menu from pos_tmenu);
+
+--HBB处理
+//select * from jierep order by class
+//select distinct jierep from mktcode
+//select * from pccode
+//select tag,* from gltemp where pccode = '0100' and not exists(select 1 from mktcode a where gltemp.tag = a.code)
+//select sum(charge) from gltemp where tag= 'D2'
+//select pccode,ref,sum(charge) from gltemp group by pccode,ref
+//select * from auditprg order by exec_order
+//select * from mktcode where jierep = '010100'
+
+
+select * from rmsta where not exists (select extno from phextroom where rmsta.roomno = phextroom.roomno);
+
+select roomno, substring(roomno,2,4),extno,'A','' from longshort where exists (select roomno from phextroom where longshort.roomno=phextroom.extno);
+
+select * from phextroom a where not exists (select b.room from phdeptroom b where a.extno=b.room ) and a.rgid='B';
+
+
+select * from phparms_setup a where not exists (select 1 from phcoden b where a.code = b.code) ;
+exists返回真假 当 where 后面的条件成立，则列出数据，否则为空。
+IN：确定给定的值是否与子查询或列表中的值相匹配。
+EXISTS：指定一个子查询，检测行的存在。
+
+
+
+//select @@version     查看数据库是什么版本
+uname -a
+lspci
+
+
+
+----------------
+update ycus_xf set lastd = tilld - dtl where (lastd + dtl) - tilld <> 0 and sta is not null;
+update ycus_xf set lastc = tillc - ctl where (lastc + ctl) - tillc <> 0 and sta is not null;
+update ymstbalrep set lastbl = tillbl + credit - charge where (lastbl+charge-credit)-tillbl <> 0;
+update ydairep set last_bl = last_bl - 0.4, till_bl = till_bl - 0.4 where class = '02000' and date >= '2011.07.08' and date <= '2011.07.10';
+update ydairep set last_blm = last_blm - 0.4, till_blm = till_blm - 0.4 where class = '02000' and date >= '2011.07.08' and date <= '2011.07.10';
+update yjiedai set last_charge = last_charge -0.4, till_charge = till_charge -0.4 where class = '02F' and date >= '2011.07.08' and date <= '2011.07.10';
+update yjiedai set last_chargem = last_chargem -0.4, till_chargem = till_chargem -0.4 where class = '02F' and date >= '2011.07.08' and date <= '2011.07.10';
+update yjiedai set apply = last_charge + charge - till_charge where (last_charge + charge - apply - till_charge) <> 0;
+////
+delete dairep
+insert dairep select * from ydairep where date = '2011.07.10' order by class
+
+delete jiedai
+insert jiedai select * from yjiedai where date = '2011.07.10' order by class;
+----------------
+

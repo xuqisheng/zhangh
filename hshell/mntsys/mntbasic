@@ -1,0 +1,77 @@
+#!/bin/bash
+# --------------------------------------------
+# Function:
+#		maintain linux common services
+# --------------------------------------------
+
+# disable iptables | firewall
+iptables -F
+iptables -X
+chkconfig iptables off
+# service iptables stop > /dev/null 2>&1
+/etc/init.d/iptables stop > /dev/null 2>&1
+
+# disable ip6tables | firewall
+chkconfig ip6tables off
+/etc/init.d/ip6tables stop > /dev/null 2>&1
+
+# disable selinux
+if [ -f /etc/sysconfig/selinux ]; then
+	if grep -e "^SELINUX=" /etc/sysconfig/selinux > /dev/null; then
+		cat /etc/sysconfig/selinux | sed -re "s/^(SELINUX=).*/\1disable/" > /root/zhangh/hshell/tmp/Ftmpselinux$$.tmp
+		cp -f /root/zhangh/hshell/tmp/Ftmpselinux$$.tmp /etc/sysconfig/selinux
+		rm -f /root/zhangh/hshell/tmp/Ftmpselinux$$.tmp
+	else
+		echo "SELINUX=disable" >> /etc/sysconfig/selinux
+	fi
+fi
+
+# disable avahi-daemon
+if [ -f /etc/init.d/avahi-daemon ]; then
+	chkconfig avahi-daemon off > /dev/null 2>&1
+	/etc/init.d/avahi-daemon stop > /dev/null 2>&1
+fi
+
+# disable yum-updatesd
+chkconfig yum-updatesd off > /dev/null 2>&1
+/etc/init.d/yum-updatesd stop > /dev/null 2>&1
+
+# disable bluetooth hidd
+if [ -f /etc/init.d/bluetooth ] ; then
+	chkconfig bluetooth off > /dev/null 2>&1
+	/etc/init.d/bluetooth stop > /dev/null 2>&1
+fi
+
+if [ -f /etc/init.d/hidd ]; then
+	chkconfig hidd off > /dev/null 2>&1
+	/etc/init.d/hidd stop > /dev/null 2>&1
+fi
+
+# disable autofs
+if [ -f /etc/init.d/autofs ]; then
+	chkconfig autofs off > /dev/null 2>&1
+	/etc/init.d/autofs stop > /dev/null 2>&1
+fi
+
+# disable hplip
+if [ -f /etc/init.d/hplip ]; then
+	chkconfig hplip off > /dev/null 2>&1
+	/etc/init.d/hplip stop > /dev/null 2>&1
+fi
+
+# set tomezone etc.
+/root/zhangh/hshell/mnttz
+
+# set /etc/sysctl.conf for linux sercurity
+/root/zhangh/hshell/mntsysctl
+
+# set cron
+/root/zhangh/hshell/mntcron
+
+# config sshd such as,port
+/root/zhangh/hshell/mntsshd
+
+# fix linux bugs
+/root/zhangh/hshell/lbugfix
+
+#

@@ -8,11 +8,26 @@ from fabric.contrib.console import confirm
 from fabric.api import local, settings, abort
 from fabric.api import *
 
+# 单个服务器，通过密码连接
 env.user = 'root'
-env.hosts = ['113.200.163.170']
-env.port = 9005
-env.password='pmsdb2'
+env.hosts = ['192.168.0.61']
+env.port = 3305
+env.password='xxx'
+
+# 单个服务器，通过私钥连接
+# env.user = 'root'
+# env.hosts = ['113.200.163.170']
+# env.port = 3305
 # env.key_filename = "D:\Python27\huiRsa"
+
+# 多个服务器，通过密码连接
+# env.user = 'root'
+# env.hosts = ['192.168.0.61','192.168.0.62','192.168.0.63']
+# env.passwords = {
+#     'root@192.168.0.61 3315' : 'passwd61',
+#     'root@192.168.0.62 3325' : 'passwd62',
+#     'root@192.168.0.63 3335' : 'passwd63'
+# }
 
 def get_message():
     run('cat /etc/issue;df;free')

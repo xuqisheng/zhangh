@@ -1,0 +1,32 @@
+#!/bin/bash
+# ===================================================
+# set ssh config scp to remote machine
+#
+# ===================================================
+
+Htp=$$
+
+if [ -z "$1" ]; then
+   /root/zhangh/hshell/hmsg sshset "Please provide a machine code!!!" more
+   exit 
+fi
+
+#if [ -z "$2" ]; then
+#  /root/zhangh/hshell/hmsg sshset "Please provide a Linux Current User!!!" more
+#  exit
+#fi
+
+echo "Set Hosts code:" $1
+
+if ! cat /root/zhangh/hshell/sshcodes.txt | grep -E "$1" > /dev/null; then
+   /root/zhangh/hshell/hmsg sshset "Please provide a right machine code!!!" more
+   exit
+fi
+
+scp /root/.ssh/id_rsa.pub root@$1:/root/tmpssh$Htp
+
+#scp /home/$2/.ssh/id_rsa.pub root@$1:/root/tmpssh$Htp
+
+ssh -lroot $1 "mkdir -p /root/.ssh;chmod 700 /root/.ssh;touch /root/.ssh/authorized_keys;cat /root/.ssh/authorized_keys | grep \"\`cat /root/tmpssh$Htp\`\" > /dev/null || cat /root/tmpssh$Htp >> /root/.ssh/authorized_keys"
+
+ssh -lroot $1 "rm -f /root/tmpssh$Htp"

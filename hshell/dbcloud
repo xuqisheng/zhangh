@@ -1,0 +1,70 @@
+#!/bin/bash
+# ===============================================
+# Function:
+#   load dumps into cloud db 
+# Date:
+#   2016-07-15
+# Such as:
+#	/root/zhangh/hshell/dbcloud portal_f
+# ===============================================
+
+export HBLACKBOX2=1
+export HNoBiNlOg=DaNgEr
+
+# get mysql server ip
+. /root/mode/mysqldip
+
+HDBNAME="$1"
+
+if [ ! -f /root/mode/sload ]; then
+  echo "This is no sload script!!!" && exit 1 
+fi
+
+# create databases pms group member 
+if [ -z `/root/mode/seecfg -s $HMYSQLDIP "show databases like '$HDBNAME'" | grep -i "$HDBNAME"` ]; then
+   /root/mode/seecfg "create database '$HDBNAME' character set utf8"
+fi
+
+if [ -z `/root/mode/seecfg -s $HMYSQLDIP "show databases like 'portal_group'" | grep -i "portal_group"` ]; then
+   /root/mode/seecfg "create database portal_group character set utf8"
+fi
+
+if [ -z `/root/mode/seecfg -s $HMYSQLDIP "show databases like 'portal_member'" | grep -i "portal_member"` ]; then
+   /root/mode/seecfg "create database portal_member character set utf8"
+fi
+
+# sload tables into group or member database
+{ 
+  echo
+  echo "sload begin at `LANG=en_US;date`"
+  echo
+
+  /root/mode/sload -f -S portal_group  /fenku/dumps --include-tables `cat /root/zhangh/hshell/tb_nodata.txt`
+  /root/mode/sload -f -S portal_member /fenku/dumps --include-tables `cat /root/zhangh/hshell/tb_nodata.txt`
+
+  /root/mode/sload -f -R portal_group  /fenku/dumps --include-tables `cat /root/zhangh/hshell/tb_same.txt`
+  /root/mode/sload -f -R portal_member /fenku/dumps --include-tables `cat /root/zhangh/hshell/tb_same.txt`
+
+  /root/mode/sload -f portal_group     /fenku/dumps --include-tables `cat /root/zhangh/hshell/tb_group.txt`
+  /root/mode/sload -f portal_member    /fenku/dumps --include-tables `cat /root/zhangh/hshell/tb_member.txt`
+
+  /root/mode/sload -f -R $HDBNAME      /fenku/dumps --exclude-tables `cat /root/zhangh/hshell/tb_nopms.txt`
+
+  echo
+  echo "sload end at `LANG=en_US;date`"
+  echo
+} 2>&1 | tee -a /root/zhangh/hshell/logs/sload.log
+
+if [ -z `/root/mode/seecfg -s $HMYSQLDIP "show tables from portal_member like 'card\_base'"` ]; then
+  echo "card_base not in Database portal_member and splitdb failed !!!" && exit 1 
+fi
+
+Hrows=`/root/mode/seecfg -s $HMYSQLDIP "select count(1) from hotel" portal_group`
+if [ $Hrows -eq 0 ]; then
+  echo "The table hotel no rows in Group database !!!" && exit 1
+fi
+
+# Drop member tables in pms database 
+/root/mode/seecfg $HMYSQLDIP "/root/zhangh/hshell/hsql/maint_droptb.sql" $HDBNAME
+# maint data in pms group member
+/root/mode/seecfg $HMYSQLDIP "/root/zhangh/hshell/hsql/maint_group.sql" portal_group

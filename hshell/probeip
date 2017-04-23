@@ -1,0 +1,29 @@
+#!/bin/bash
+# ===============================================
+# Function:
+#     Probe ip for ssh connect
+# Date:
+#     2015-6-7
+# ===============================================
+
+i=16
+Hipfile="/root/zhangh/hshell/logs/Hiptmp$$"
+echo > $Hipfile
+while [ $i -lt 255 ];
+do
+  Hip="192.168.0.$i"
+  echo $Hip
+
+  Hprobemsg=`echo | ssh -p3305 $Hip 2>&1`
+  if echo $Hprobemsg | grep "Connection refused" > /dev/null;then
+	  : 
+  elif echo $Hprobemsg | grep "Connection timed out" > /dev/null;then
+	  : 
+  elif echo $Hprobemsg | grep "No route to host" > /dev/null;then
+	  : 	
+  elif echo $Hprobemsg | grep "RSA key" > /dev/null;then
+  	echo $Hip >> $Hipfile
+  fi
+
+  i=$[$i+1]
+done

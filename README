@@ -1,6 +1,9 @@
-
-zhangh主目录下以linux shell脚本为主
-Gcsql 在Gc公司的编写的MySQL脚本
-XRsql XR公司的X5 sybase存储过程及表结构
-hpy   将要编写的python脚本
-hmode hry的mode脚本
+zhangh  文件根目录
+GcOps   工作中常用的运维脚本、文件
+Gcsql   GreenCloud的MySQL脚本
+hbox    常用安装包,比如 tar包
+hdoc    一些文件、手册等资料
+hmode   mode shell脚本
+hpy     python脚本
+hshell  自己编写的shell脚本
+XRsql   foxhis的sybase脚本

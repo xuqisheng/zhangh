@@ -1,0 +1,43 @@
+#!/bin/bash
+# --------------------------------------------------
+# function:
+#          set required path in /root/.bashrc file
+# --------------------------------------------------
+
+# remove and save to tmp file
+cat /root/.bashrc | sed -re "/(JAVA_)/ d" > /root/zhangh/hshell/tmp/hpath$$.tmp
+
+# add jdk6 path
+[ -d /usr/local/jdk6 ] &&
+{
+cat >> /root/zhangh/hshell/tmp/hpath$$.tmp << 'EOF'
+export JAVA_HOME=/usr/local/jdk6
+export JRE_HOME=$JAVA_HOME/jre
+export CLASSPATH=.:$JAVA_HOME/jre/lib:$JAVA_HOME/lib/tools.jar
+if ! echo $PATH | grep -E -q "(^|:)$JAVA_HOME/bin(:|$)";then export PATH=$JAVA_HOME/bin:$PATH;fi
+EOF
+}
+
+# add jdk7 path
+[ -d /usr/local/jdk7 ] &&
+{
+cat >> /root/zhangh/hshell/tmp/hpath$$.tmp << 'EOF'
+export JAVA_HOME=/usr/local/jdk7
+export JRE_HOME=$JAVA_HOME/jre
+export CLASSPATH=.:$JAVA_HOME/jre/lib:$JAVA_HOME/lib/tools.jar
+if ! echo $PATH | grep -E -q "(^|:)$JAVA_HOME/bin(:|$)";then export PATH=$JAVA_HOME/bin:$PATH;fi
+EOF
+}
+
+
+# copy tmp file back to /root/.bashrc
+cp -f /root/zhangh/hshell/tmp/hpath$$.tmp /root/.bashrc
+rm -f /root/zhangh/hshell/tmp/hpath$$.tmp
+
+# delete old path from /etc/profile
+if cat /etc/profile | grep JAVA > /dev/null; then
+  cat /etc/profile | sed -re "/JAVA/ d" > /root/zhangh/hshell/tmp/hpath$$.tmp
+  cp -f /root/zhangh/hshell/tmp/hpath$$.tmp /etc/profile
+  rm -f /root/mode/tmp/hpath$$.tmp
+fi
+

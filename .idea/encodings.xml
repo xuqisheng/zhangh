@@ -9,6 +9,45 @@
     <file url="file://$PROJECT_DIR$/Gcsql/Gcmigrate/iHotel-X5/iHotel-X5" charset="GBK" />
     <file url="file://$PROJECT_DIR$/Gcsql/Gcmigrate/iHotel-X5/iHotel-X50301-FJJL" charset="GBK" />
     <file url="file://$PROJECT_DIR$/XRsql" charset="GBK" />
+    <file url="file://$PROJECT_DIR$/XRsql/1-Sybase（构件块）.pdf" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/XRsql/2-Sybase.11（命令）.pdf" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/XRsql/3-Sybase（过程）.pdf" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/XRsql/4-Sybase11.0.3.3 的安装.doc" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/XRsql/4-Sybase（表格和索引）.pdf" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/XRsql/5-sybase讲义.ppt" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/XRsql/5-扩库说明.doc" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/XRsql/6-PB60的安装以及和数据库的联接.doc" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/XRsql/FOXHIS X 数据字典.pdf" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/XRsql/FOXHIS X系列使用说明--账单编辑.doc" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/XRsql/FOXHIS 穿透报表工程指南.doc" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/XRsql/Foxhis培训提纲.doc" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/XRsql/V55—X5表名对照表.txt" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/XRsql/V5升级X50204.rar" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/XRsql/V6升级X50205.rar" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/XRsql/X版报表介绍.doc" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/XRsql/linux下mode使用指南及注意事项.txt" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/XRsql/mode qa.txt" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/XRsql/mode.tar.gz" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/XRsql/mode5.0.rar" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/XRsql/p_cyj_pos_audit_check_sm.sql" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/XRsql/p_cyj_pos_audit_check_x50110.sql" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/XRsql/p_cyj_pos_audit_check_x50203.sql" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/XRsql/p_gl_update_jiedai.sql" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/XRsql/p_hry_update_jourrep_v5.sql" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/XRsql/p_hry_update_jourrep_x5.sql" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/XRsql/p_hui_audit_act_bal.sql" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/XRsql/p_hui_guest.sql" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/XRsql/p_hui_guest_birth.sql" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/XRsql/p_hui_guest_group.sql" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/XRsql/p_hui_guest_vip.sql" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/XRsql/p_hui_phone_update.sql" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/XRsql/p_wms_jiedai_check_v.sql" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/XRsql/p_wms_jiedai_check_x.sql" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/XRsql/p_xym_week_forecast.sql" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/XRsql/sql.tar.gz" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/XRsql/删除数据说明.doc" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/XRsql/底表不平处理方法.doc" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/XRsql/西软X5代码设计书.doc" charset="UTF-8" />
     <file url="PROJECT" charset="UTF-8" />
   </component>
 </project>

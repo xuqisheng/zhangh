@@ -1,0 +1,264 @@
+#!/bin/bash
+# ---------------------------------------------------------------------------------
+# 直接提供MySQL数据库ip地址
+# --------------------------------------------------------------------------------
+# -t
+# -B 
+# -B -N
+# --------------------------------------------------------------------------------
+
+# get options
+
+HOPTIONS=""
+while (echo "'$1'"  | grep -E  -e "^'-" > /dev/null)
+do
+   HOPTIONS="$HOPTIONS$1"
+   shift 
+done
+
+# get mysql server ip 
+
+. /root/zhangh/hshell/dbaparams
+
+# set option 
+
+if echo "'$HOPTIONS" | grep -E -e "-s" >/dev/null; then
+   HSMODE="-s"
+   HMODE='-B -N'
+elif echo "'$HOPTIONS" | grep -E -e "-c" >/dev/null; then
+   HSMODE="-c"
+   HMODE='-B'		# --batch Don't use history file. Disable interactive behavior.
+elif echo "'$HOPTIONS" | grep -E -e "-z" >/dev/null; then
+   HSMODE="-z"
+   HMODE='-B -N'	# -N Don't write column names in results
+else
+   HSMODE=""
+   HMODE='-t'		# Output in table format
+fi
+if echo "'$HOPTIONS" | grep -E -e "-P" >/dev/null; then
+   Hmodepass=
+fi
+
+HDBNAME=mysql
+[ -n "$2" ] && HDBNAME="$2"
+
+# test connectivity and database existence
+
+HTESTERR=`echo | mysql -u$Hmodeuser -p$Hmodepass -h$HMYSQLDIP -P$Hmodeport --default-character-set=utf8 $HMODE $HDBNAME  2>&1`
+if [ -n "$HTESTERR" ]; then
+   if echo $HTESTERR | grep -E  "mysql: command not found" > /dev/null; then
+      /root/zhangh/hshell/hmsg dbacfg "MySQL client has not been installed at this machine!" more
+   elif echo $HTESTERR | grep -E  "(Can't connect|Access denied)" >/dev/null; then
+      /root/zhangh/hshell/hmsg dbacfg "$HMYSQLDIP2 MySQL server can't be connected!"
+   elif echo $HTESTERR | grep "Unknown database" >/dev/null; then
+      /root/zhangh/hshell/hmsg dbacfg "No database $HDBNAME in $HMYSQLDIP2 MySQL server!"
+   else
+      /root/zhangh/hshell/hmsg dbacfg "$HTESTERR"
+   fi
+   exit 1
+fi
+
+# test if empty statement
+
+if [ -z "$1" ]; then
+   /root/zhangh/hshell/hmsg dbacfg "^_^ Congratulations!Connection to MySQL server at $HMYSQLDIP2 is OK!" more
+   exit 0
+fi
+
+# utf8 test
+TMPFILE="/root/zhangh/hshell/tmp/hryseecfg$$.sql"
+if [ -z "$Hutf8tested" ]; then
+   if (echo "$1"  | grep -E  "\.(sql|SQL)$" > /dev/null); then
+      if [ ! -f "$1" ]; then
+         /root/zhangh/hshell/hmsg dbacfg "File $1 doesn't exist !!!"
+         exit 1
+      fi
+      if /root/zhangh/hshell/kpfile "$1"; then
+         TMPFILE="$1"
+         Hrmtmp=0
+      else
+         cp -f "$1" "$TMPFILE"
+         Hrmtmp=1
+      fi
+   else
+      echo "$1" > "$TMPFILE"
+      Hrmtmp=1
+   fi
+   if [ $Hrmtmp -eq 1 ]; then
+      /root/zhangh/hshell/tutf8 "$TMPFILE" >&2
+   fi
+   export Hutf8tested=1
+else
+   if (echo "$1"  | grep -E  "\.(sql|SQL)$" > /dev/null); then
+      TMPFILE="$1"
+      Hrmtmp=0
+   else
+      echo "$1" > $TMPFILE
+      Hrmtmp=1
+   fi
+fi
+
+# script that supports sql segment precheck and execution - begin 
+if [ -z "$Hbcase" ]; then
+   if /root/zhangh/hshell/isdump "$TMPFILE"; then
+      # no presql check
+      Hbcase=1
+   elif /root/zhangh/hshell/isblsql "$TMPFILE"; then
+      # no presql check
+      Hbcase=1
+   else
+      Heachcnt=`cat "$TMPFILE" | grep -n -A 1 -P "^(\xef\xbb\xbf)?/\*[ \t]*[\r]?$" | grep -P  "^[0-9]+-[ \t]*----each----:" | wc -l`
+      if [ $Heachcnt -eq 0 ]; then
+         # no presql check
+         Hbcase=1
+      elif [ $Heachcnt -eq 1 ]; then
+         if cat "$TMPFILE" | sed -nre "2 p" | grep -P "^[ \t]*----each----:" >/dev/null; then
+            # basic presql check
+            Hbcase=2
+         else
+            Hbcase=
+         fi 
+      else
+         Hbcase=
+      fi
+   fi
+fi
+if [ -z "$Hbcase" ]; then
+   HSEGTMPFILE=/root/zhangh/hshell/tmp/hsegtmp$$.tmp
+   > $HSEGTMPFILE
+   Hstart=1
+   Hend=`sed -n "$ =" "$TMPFILE"`
+   [ -z "$Hend" ] && Hend=0
+   HTMPSQLFILE=/root/zhangh/hshell/tmp/hdlsqln-$$.sql
+   for i in `cat "$TMPFILE" | grep -n -A 1 -P "^(\xef\xbb\xbf)?/\*[ \t]*\r?$"|grep -P "^[0-9]+-[ \t]*----each----:"| sed -re "s/^([0-9]+).*/\1/"`;do 
+      i=$[$i-1]
+      if [ $Hstart -le $[$i-1] ]; then
+         echo "$Hstart,$[$i-1]" >> $HSEGTMPFILE
+      fi
+      Hstart=$i
+   done
+   if [ $Hstart -le $Hend ]; then
+      echo "$Hstart,$Hend" >> $HSEGTMPFILE
+   fi
+   Hcomresult=0
+   for iloop in `cat $HSEGTMPFILE`; do
+       export iloop
+       cat "$TMPFILE" | sed -nre "$iloop p" > $HTMPSQLFILE 
+       export Hbcase=2
+       /root/zhangh/hshell/seesql $HSMODE $HMYSQLDIP $HTMPSQLFILE $HDBNAME
+       if [ $? -gt 0 ]; then
+          Hcomresult=1
+       fi
+   done
+   rm -f $HTMPSQLFILE 
+   rm -f $HSEGTMPFILE 
+   if [ $Hrmtmp -eq 1 ]; then
+      rm -f "$TMPFILE"
+   fi
+   exit $Hcomresult
+fi
+
+# script that supports sql segment precheck and execution - end 
+
+if [ "$Hbcase" = "2" ]; then
+   Hbcase=1
+   /root/zhangh/hshell/dlsql $HMYSQLDIP $HDBNAME "$TMPFILE"
+   Hdlsqlstatus=$?
+else
+   Hdlsqlstatus=0
+fi
+
+if [ $Hdlsqlstatus -eq 0 ]; then
+   Hseecfgmysql=/root/zhangh/hshell/tmp/hseecfgmysql$$.err
+   # adjust for binlog
+   if [ "$HNoBiNlOg" = "DaNgEr" ]; then
+      cat /root/zhangh/hshell/impfile/mysql/sqllogbin.sql "$TMPFILE" | mysql -u$Hmodeuser -p$Hmodepass -h$HMYSQLDIP -P$Hmodeport --default-character-set=utf8 $HMODE $HDBNAME 2>$Hseecfgmysql 
+   else
+      if [ "$HSMODE" != "-c" -a "$HSMODE" != "-z" ]; then
+         mysql -u$Hmodeuser -p$Hmodepass -h$HMYSQLDIP -P$Hmodeport --default-character-set=utf8 $HMODE $HDBNAME < "$TMPFILE" 2>$Hseecfgmysql 
+      elif [ "$HSMODE" = "-c" ]; then
+         set -o pipefail	# 表示在管道连接的命令序列中,只要有任何一个命令返回非0值,则整个管道返回非0值,即使最后一个命令返回0
+         mysql -u$Hmodeuser -p$Hmodepass -h$HMYSQLDIP -P$Hmodeport --default-character-set=utf8 $HMODE $HDBNAME < "$TMPFILE" 2>$Hseecfgmysql | 
+         # deal with double quotes
+         # tabs and newlines in content are already backslashed
+         # tabs which are not backslashed are column separators
+         sed -re 's/"/""/g'    |
+         sed -re 's/\t/"\t"/g' |
+         sed -re 's/^/"/g'     |
+         sed -re 's/$/"/g'     |
+         sed -re 's/\t/,/g'    | 
+         # recover backslashed tabs to real tabs
+         sed -re 's/\\t/\t/g'  | 
+         # newline -> carriage+newline
+         tr -d '\r'            |
+         sed -re 's/$/\r/g'    | 
+         # recover backslashed newlines
+         sed -re 's/\\n/\n/g'  | 
+         # add utf8 BOM if neccessary 
+         sed -re '1 s/^/\xef\xbb\xbf/' 
+      else
+         set -o pipefail
+         mysql -u$Hmodeuser -p$Hmodepass -h$HMYSQLDIP -P$Hmodeport --default-character-set=utf8 $HMODE $HDBNAME < "$TMPFILE" 2>$Hseecfgmysql | 
+         # deal with double quotes
+         # tabs and newlines in content are already backslashed
+         # tabs which are not backslashed are column separators
+         sed -re 's/~/HrYQhF/g'             |
+         sed -re 's/"/""/g'                 |
+         sed -re 's/\t/~\t~/g'              |
+         sed -re 's/^/~/g'                  |
+         sed -re 's/$/~/g'                  |
+         sed -re 's/\t/,/g'                 |
+         sed -re 's/~@@~,~([^~]*)~/"\1"/g'  | 
+         sed -re 's/~//g'                   | 
+         sed -re 's/HrYQhF/~/g'             |
+         # recover backslashed tabs to real tabs
+         sed -re 's/\\t/\t/g'  | 
+         # newline -> carriage+newline
+         tr -d '\r'            |
+         sed -re 's/$/\r/g'    | 
+         # recover backslashed newlines
+         sed -re 's/\\n/\n/g'  | 
+         # add utf8 BOM if neccessary 
+         iconv -f utf-8 -t gb18030 
+      fi
+   fi
+   Hreturnstatus=$?
+   set +o pipefail
+   if [ $Hreturnstatus -gt 0 ]; then
+      if [ -n "$iloop" ]; then
+         Herrline=`cat $Hseecfgmysql | sed -re "s/^ERROR [0-9]+ \([^)]+\) at line ([0-9]+):.*/\1/"`
+         Hsegbeg=`echo $iloop | sed -re "s/(.*),.*/\1/"`
+         Hgline=$[$Herrline+$Hsegbeg-1]
+         if [ $Herrline -eq $Hgline ]; then
+            /root/zhangh/hshell/hmsg dbacfg "`cat $Hseecfgmysql | sed -re \"s/^(ERROR [0-9]+ \([^)]+\) at line )([0-9]+)(:)(.*)/\1$Hgline\3/\"`"
+         else
+            /root/zhangh/hshell/hmsg dbacfg "`cat $Hseecfgmysql | sed -re \"s/^(ERROR [0-9]+ \([^)]+\) at line )([0-9]+)(:)(.*)/\1$Hgline in sql file \/ line $Herrline in sql segment($iloop)\3/\"`"
+         fi
+         /root/zhangh/hshell/hmsg dbacfg "`cat $Hseecfgmysql | sed -re \"s/^[^:]+: (.*)/\1/\"`" less
+         /root/zhangh/hshell/hmsg dbacfg "The rest part of sql segment($iloop) will not be executed" less
+      else
+         /root/zhangh/hshell/hmsg dbacfg "`cat $Hseecfgmysql`"
+         /root/zhangh/hshell/hmsg dbacfg "The rest part of the sql file will not be executed" less
+      fi
+   fi
+   rm -f $Hseecfgmysql 
+elif [ $Hdlsqlstatus -eq 1 ]; then
+   if [ -z "$iloop" ]; then
+      /root/zhangh/hshell/hmsg dbacfg "Sql was not executed according to precheck result"
+   else
+      /root/zhangh/hshell/hmsg dbacfg "Sql segment($iloop) was not executed according to precheck result"
+   fi
+   Hreturnstatus=0
+else 
+   if [ -z "$iloop" ]; then
+      /root/zhangh/hshell/hmsg dbacfg "Sql was not executed"
+   else
+      /root/zhangh/hshell/hmsg dbacfg "Sql segment($iloop) was not executed"
+   fi
+   Hreturnstatus=0
+fi
+if [ $Hrmtmp -eq 1 ]; then
+   rm -f "$TMPFILE"
+fi
+exit $Hreturnstatus
+ 
