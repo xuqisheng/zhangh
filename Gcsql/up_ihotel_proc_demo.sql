@@ -3,10 +3,10 @@ DELIMITER $$
 DROP PROCEDURE IF EXISTS `up_ihotel_proc_demo`$$
 
 CREATE DEFINER=`root`@`%` PROCEDURE `up_ihotel_proc_demo`(
-	IN arg_hotel_group_id 	BIGINT(16),
-	IN arg_hotel_id 		BIGINT(16),
+	IN arg_hotel_group_id 	INT,
+	IN arg_hotel_id 		INT,
 	IN arg_biz_date			DATETIME,
-	OUT arg_ret				BIGINT(16),		
+	OUT arg_ret				INT,
 	OUT arg_msg				VARCHAR(128)
     )
 	
