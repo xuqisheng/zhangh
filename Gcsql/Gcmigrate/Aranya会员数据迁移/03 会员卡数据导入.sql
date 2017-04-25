@@ -24,6 +24,19 @@ BEGIN
 	/* ******************************
 	各酒店统一处理过程
 	****************************** */
+
+	DELETE FROM member_base WHERE hotel_group_id = arg_hotel_group_id;
+	DELETE FROM member_link_base WHERE hotel_group_id = arg_hotel_group_id;
+	DELETE FROM member_link_addr WHERE hotel_group_id = arg_hotel_group_id;
+	DELETE FROM member_type WHERE hotel_group_id = arg_hotel_group_id;
+	DELETE FROM member_prefer WHERE hotel_group_id = arg_hotel_group_id;
+
+	DELETE FROM member_web WHERE hotel_group_id = arg_hotel_group_id;
+	DELETE FROM card_base WHERE hotel_group_id = arg_hotel_group_id;
+
+	DELETE FROM card_account_master WHERE hotel_group_id = arg_hotel_group_id;
+	DELETE FROM card_account WHERE hotel_group_id = arg_hotel_group_id;
+
 	START TRANSACTION;
         -- 补充,将没有档案的卡默认一个档案
         UPDATE aranya_member_data SET card_master = NULL WHERE card_master = '' AND hotel_group_id = arg_hotel_group_id AND hotel_id = arg_hotel_id;
