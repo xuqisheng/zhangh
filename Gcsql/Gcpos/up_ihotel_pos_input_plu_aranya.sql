@@ -158,23 +158,31 @@ BEGIN
 
     -- pos_mode_def 菜项模式定义
     -- 001 业主模式 pos_price1     002 嘉宾模式 pos_price2    003 高尔夫模式 pos_price3
-    insert into pos_mode_def (hotel_group_id,hotel_id,code,descript,pccode,pccode_descript,sort_code,sort_descript,plu_code,
-        plu_descript,type,class1,class2,rate,is_group,group_code,code_type,is_halt,list_order,create_user,create_datetime,modify_user,modify_datetime)
-    SELECT arg_hotel_group_id,arg_hotel_id,'001','业主模式','XXX','XXX',pos_sort,pos_sort_name,pos_plu,pos_plu_name,'4','T',
+
+    INSERT INTO portal_pms.pos_mode_def (hotel_group_id,hotel_id,CODE,descript,pccode,pccode_descript,sort_code,sort_descript,plu_code,
+        plu_descript,TYPE,class1,class2,rate,is_group,group_code,code_type,is_halt,list_order,create_user,create_datetime,modify_user,modify_datetime)
+    SELECT a.hotel_group_id,b.hotel_id,'001','业主模式',c.code,c.descript,pos_sort,pos_sort_name,pos_plu,pos_plu_name,'4','T',
         pos_price,pos_price1,'F','','plu','F','0','ADMIN',NOW(),'ADMIN',NOW()
-        FROM pos_input_table WHERE hotel_group_id = arg_hotel_group_id AND hotel_id = arg_hotel_id;
+    FROM pos_input_table a,portal_pms.pos_pccode_note b,portal_pms.pos_pccode c WHERE a.hotel_group_id=2 AND b.hotel_group_id=2 AND a.hotel_id=b.hotel_id AND a.pos_note=b.note_code
+    AND a.hotel_id=c.hotel_id AND b.pccode=c.code;
 
-    insert into pos_mode_def (hotel_group_id,hotel_id,code,descript,pccode,pccode_descript,sort_code,sort_descript,plu_code,
-        plu_descript,type,class1,class2,rate,is_group,group_code,code_type,is_halt,list_order,create_user,create_datetime,modify_user,modify_datetime)
-    SELECT arg_hotel_group_id,arg_hotel_id,'002','嘉宾模式','XXX','XXX',pos_sort,pos_sort_name,pos_plu,pos_plu_name,'4','T',
+    INSERT INTO portal_pms.pos_mode_def (hotel_group_id,hotel_id,CODE,descript,pccode,pccode_descript,sort_code,sort_descript,plu_code,
+        plu_descript,TYPE,class1,class2,rate,is_group,group_code,code_type,is_halt,list_order,create_user,create_datetime,modify_user,modify_datetime)
+    SELECT a.hotel_group_id,b.hotel_id,'002','嘉宾模式',c.code,c.descript,pos_sort,pos_sort_name,pos_plu,pos_plu_name,'4','T',
         pos_price,pos_price2,'F','','plu','F','0','ADMIN',NOW(),'ADMIN',NOW()
-        FROM pos_input_table WHERE hotel_group_id = arg_hotel_group_id AND hotel_id = arg_hotel_id;
+    FROM pos_input_table a,portal_pms.pos_pccode_note b,portal_pms.pos_pccode c WHERE a.hotel_group_id=2 AND b.hotel_group_id=2 AND a.hotel_id=b.hotel_id AND a.pos_note=b.note_code
+    AND a.hotel_id=c.hotel_id AND b.pccode=c.code;
 
-    insert into pos_mode_def (hotel_group_id,hotel_id,code,descript,pccode,pccode_descript,sort_code,sort_descript,plu_code,
-        plu_descript,type,class1,class2,rate,is_group,group_code,code_type,is_halt,list_order,create_user,create_datetime,modify_user,modify_datetime)
-    SELECT arg_hotel_group_id,arg_hotel_id,'003','高尔夫模式','XXX','XXX',pos_sort,pos_sort_name,pos_plu,pos_plu_name,'4','T',
+    INSERT INTO portal_pms.pos_mode_def (hotel_group_id,hotel_id,CODE,descript,pccode,pccode_descript,sort_code,sort_descript,plu_code,
+        plu_descript,TYPE,class1,class2,rate,is_group,group_code,code_type,is_halt,list_order,create_user,create_datetime,modify_user,modify_datetime)
+    SELECT a.hotel_group_id,b.hotel_id,'003','高尔夫模式',c.code,c.descript,pos_sort,pos_sort_name,pos_plu,pos_plu_name,'4','T',
         pos_price,pos_price3,'F','','plu','F','0','ADMIN',NOW(),'ADMIN',NOW()
-        FROM pos_input_table WHERE hotel_group_id = arg_hotel_group_id AND hotel_id = arg_hotel_id;
+    FROM pos_input_table a,portal_pms.pos_pccode_note b,portal_pms.pos_pccode c WHERE a.hotel_group_id=2 AND b.hotel_group_id=2 AND a.hotel_id=b.hotel_id AND a.pos_note=b.note_code
+    AND a.hotel_id=c.hotel_id AND b.pccode=c.code;
+
+
+
+
 
     -- pos_pccode_note 营业点 关联 菜本
 
