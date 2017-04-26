@@ -23,7 +23,7 @@ BEGIN
 	-- ======================================================
 	SELECT descript,code INTO var_group_name,var_group_code FROM hotel_group WHERE id = arg_hotel_group_id;
 	SELECT client_version,descript,code INTO var_client_version,var_hotel_name,var_hotel_code FROM hotel WHERE hotel_group_id = arg_hotel_group_id AND id = arg_hotel_id;
-	SELECT MIN(biz_date) INTO var_online_date FROM apportion_detail_history WHERE hotel_group_id = arg_hotel_group_id AND hotel_id = arg_hotel_id;
+	SELECT MIN(biz_date) INTO var_online_date FROM rep_dai_history WHERE hotel_group_id = arg_hotel_group_id AND hotel_id = arg_hotel_id;
 
     IF var_client_version = 'IHOTEL' THEN
         SET var_hotel_version = '标准版';
@@ -236,6 +236,27 @@ BEGIN
     		NOT EXISTS(SELECT 1 FROM code_transaction b WHERE b.hotel_group_id = arg_hotel_group_id AND b.hotel_id = arg_hotel_id AND a.code=b.code);
     INSERT INTO tmp_check_base SELECT NULL,'A',CONCAT("餐饮接口配置表营业点代码重复: ",pos_code,' ',descript)
 	 	FROM pos_interface_map WHERE hotel_group_id=arg_hotel_group_id AND hotel_id=arg_hotel_id AND link_type='ta_code' GROUP BY pos_code HAVING COUNT(1)>1;
+
+    -- 云POS部分检查
+    IF EXISTS (SELECT 1 FROM pos_pccode WHERE hotel_group_id = arg_hotel_group_id and hotel_id = arg_hotel_id) THEN     -- 判断是否启用云POS
+        INSERT INTO tmp_check_base SELECT NULL,'A',CONCAT("菜项 pos_plu_all: ",a.code,' ',a.descript,' 【报表数据项】缺失')
+        FROM pos_plu_all a WHERE a.hotel_group_id = arg_hotel_group_id and a.hotel_id = arg_hotel_id AND (a.tocode = '' OR a.tocode IS NULL);
+        INSERT INTO tmp_check_base SELECT NULL,'A',CONCAT("菜项 pos_plu_all: ",a.code,' ',a.descript,' 【报表数据项】错误')
+        FROM pos_plu_all a WHERE a.hotel_group_id = arg_hotel_group_id and a.hotel_id = arg_hotel_id AND
+            NOT EXISTS(SELECT 1 FROM code_base b WHERE b.hotel_group_id = arg_hotel_group_id AND b.hotel_id = arg_hotel_id AND b.parent_code='pos_rep_item' AND a.tocode=b.code);
+
+        INSERT INTO tmp_check_base SELECT NULL,'A',CONCAT("菜类 pos_sort_all: ",a.code,' ',a.descript,' 【报表数据项】缺失')
+        FROM pos_sort_all a WHERE a.hotel_group_id = arg_hotel_group_id and a.hotel_id = arg_hotel_id AND (a.tocode = '' OR a.tocode IS NULL);
+        INSERT INTO tmp_check_base SELECT NULL,'A',CONCAT("菜类 pos_sort_all: ",a.code,' ',a.descript,' 【报表数据项】错误')
+        FROM pos_sort_all a WHERE a.hotel_group_id = arg_hotel_group_id and a.hotel_id = arg_hotel_id AND
+            NOT EXISTS(SELECT 1 FROM code_base b WHERE b.hotel_group_id = arg_hotel_group_id AND b.hotel_id = arg_hotel_id AND b.parent_code='pos_rep_item' AND a.tocode=b.code);
+
+        INSERT INTO tmp_check_base SELECT NULL,'A',CONCAT("菜项 pos_detail: ",a.code,' ',a.descript,' 【报表数据项】缺失')
+        FROM pos_detail a WHERE a.hotel_group_id = arg_hotel_group_id and a.hotel_id = arg_hotel_id AND (a.tocode = '' OR a.tocode IS NULL);
+        INSERT INTO tmp_check_base SELECT NULL,'A',CONCAT("菜项 pos_detail: ",a.code,' ',a.descript,' 【报表数据项】错误')
+        FROM pos_detail a WHERE a.hotel_group_id = arg_hotel_group_id and a.hotel_id = arg_hotel_id AND
+            NOT EXISTS(SELECT 1 FROM code_base b WHERE b.hotel_group_id = arg_hotel_group_id AND b.hotel_id = arg_hotel_id AND b.parent_code='pos_rep_item' AND a.tocode=b.code);
+    END IF;
 
 	INSERT INTO tmp_check_base SELECT NULL,'0',GROUP_CONCAT('\n---------------------------------------------------------------------');	
 	INSERT INTO tmp_check_base SELECT NULL,'0','检查结束...';

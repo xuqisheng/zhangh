@@ -160,7 +160,7 @@ BEGIN
  	START TRANSACTION;
         INSERT INTO card_account_master (hotel_group_id,hotel_id,card_id,member_id,NAME,sta,validate_begin,validate_end,charge,pay,credit,charge_limit,freeze,
                     last_num,freeze_last_num,tag,fee_allow,remark,create_user,create_datetime,modify_user,modify_datetime)
-            SELECT hotel_group_id,0,card_id ,member_id,'主帐户','I',NULL,NULL,charge,pay,0,NULL,0,IF((charge = 0 AND pay = 0),0,1),0,'BASE','',CONCAT('原帐号',araccnt),'ARANYA',NOW(),'ARANYA',NOW()
+            SELECT hotel_group_id,0,card_id ,member_id,'主帐户','I',NULL,NULL,charge,pay,0,NULL,0,IF((charge = 0 AND pay = 0),0,1),0,'BASE','',CONCAT('原帐号',card_no2),'ARANYA',NOW(),'ARANYA',NOW()
             FROM aranya_member_data WHERE araccnt <> '' AND hotel_group_id=arg_hotel_group_id AND hotel_id=arg_hotel_id;
 
         UPDATE aranya_member_data a ,card_account_master b SET a.account_master_id = b.id
@@ -176,6 +176,21 @@ BEGIN
 
         SELECT CONCAT('card_account OK:',COUNT(1),',',SUM(pay),',',SUM(charge),',',SUM(pay-charge)) FROM card_account WHERE hotel_group_id=arg_hotel_group_id AND hotel_id=arg_hotel_id;
 	COMMIT;
+
+	-- 兼容老卡数据
+	START TRANSACTION;
+	    DELETE FROM card_idcard_map;
+        INSERT INTO card_idcard_map(card_id, card_no, card_no2, create_user, create_datetime, modify_user, modify_datetime)
+            SELECT id，crc,card_no,'Aranya',NOW(),'Aranya',NOW()
+                FROM card_base WHERE hotel_group_id = arg_hotel_group_id AND hotel_id = arg_hotel_id AND crc <>'';
+
+        UPDATE portal_group.sys_option  SET set_value = 'PRO' WHERE hotel_group_id = arg_hotel_group_id AND item='provider' AND catalog='member';
+        UPDATE portal_member.sys_option SET set_value = 'PRO' WHERE hotel_group_id = arg_hotel_group_id AND item='provider' AND catalog='member';
+
+        UPDATE card_base SET crc = '' WHERE hotel_group_id=arg_hotel_group_id AND hotel_id=arg_hotel_id;
+
+	COMMIT;
+
 
 	/* *********************************************************************************************************
 	生成card_snapshot数据

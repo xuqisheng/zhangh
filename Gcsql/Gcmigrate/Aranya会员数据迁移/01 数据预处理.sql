@@ -34,7 +34,7 @@ BEGIN
             vch_viplx,'','1',vch_khxm,'','',dat_fkrq,dat_yxrq,'888888','',IFNULL(vch_no,''),IFNULL(vch_bz,''),
             guid,'Aranya',dat_fkrq,'Aranya',dat_fkrq,
             0,0,0,MON_YE,0,
-            vch_zzh,vch_khxm,vch_khxm,vch_khxm,vch_khxm,vch_khxm,concat(vch_khxm,vch_khxm,vch_khxm),IF(vch_xb='男',1,IF(vch_xb='女',2,'')),'C',IFNULL(dat_sr,''),'CN','02',IFNULL(vch_zjbh,''),'',
+            vch_zzh,vch_khxm,vch_khxm,vch_khxm,vch_khxm,vch_khxm,concat(vch_khxm,vch_khxm,vch_khxm),IF(vch_xb='男',1,IF(vch_xb='女',2,'')),'C',dat_sr,'CN','02',IFNULL(vch_zjbh,''),'',
             'Aranya',dat_fkrq,'Aranya',dat_fkrq,IFNULL(VCH_SJHM,''),'','',
             '','','','','','',''
         FROM TV_VIPXX GROUP BY vch_vipkh;
