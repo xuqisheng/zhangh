@@ -4,6 +4,12 @@
 
 import urllib2
 
-res = urllib2.urlopen("http://www.ihotel.cn")
-print type(res)
-# print res.read()
+req = urllib2.Request('http://www.baidu.com')
+try:
+    urllib2.urlopen(req)
+except urllib2.HTTPError, e:
+    print e.code
+except urllib2.URLError, e:
+    print e.reason
+else:
+    print "OK"
