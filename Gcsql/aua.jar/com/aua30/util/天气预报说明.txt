@@ -1,0 +1,12 @@
+天气预报说明
+
+ 抓取的国家气象局网站上的东西
+  
+  com.aua30.util.GetUtil.java
+  com.aua30.util.JsonUtil.java
+  com.aua30.util.WeatherUtil.java
+   
+  weatherUtil.java里个MAIN方法可以测试一下
+
+   
+  天气的所有信息都可以从控制台打出了。  具体应用看个人业务需要，是不是要建表，还是定期刷一下远程，缓存数据到本地等，只是一个策略问题。
