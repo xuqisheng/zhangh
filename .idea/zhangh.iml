@@ -5,6 +5,7 @@
     <orderEntry type="jdk" jdkName="Python 2.7.13 (D:\Python27\python.exe)" jdkType="Python SDK" />
     <orderEntry type="sourceFolder" forTests="false" />
     <orderEntry type="module" module-name="zhangYsDj" />
+    <orderEntry type="module" module-name="GciHotel" />
   </component>
   <component name="TestRunnerService">
     <option name="PROJECT_TEST_RUNNER" value="Unittests" />

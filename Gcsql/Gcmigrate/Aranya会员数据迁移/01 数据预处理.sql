@@ -39,6 +39,8 @@ BEGIN
             '','','','','','',''
         FROM TV_VIPXX GROUP BY vch_vipkh;
 
+        -- 删除经酒店确定的会员卡种
+        DELETE FROM aranya_member_data WHERE hotel_group_id=arg_hotel_group_id AND hotel_id=arg_hotel_id AND card_type IN ('高尔夫50次卡','婚庆卡','九州会会员卡','客房卡','微信会员')
 
         -- 原西软账务系统中，存在多卡共用一账号时，西软系统中一账户多卡没有从属关系，ihotel要求有从属关系
         -- 主卡的card_master字段填null，附卡填主卡的 card_id_temp,
@@ -60,8 +62,6 @@ BEGIN
 
         -- 翻译卡计划和等级 card_type,card_level 请对照,card_type.code 请对照，card_level.code
         UPDATE aranya_member_data SET card_type='ZHANGH',card_level='100' WHERE hotel_group_id=arg_hotel_group_id AND hotel_id=arg_hotel_id AND card_type = '赠送卡业主折扣';
-        UPDATE aranya_member_data SET card_type='ZHANGH',card_level='110' WHERE hotel_group_id=arg_hotel_group_id AND hotel_id=arg_hotel_id AND card_type = '高尔夫50次卡';
-        UPDATE aranya_member_data SET card_type='ZHANGH',card_level='120' WHERE hotel_group_id=arg_hotel_group_id AND hotel_id=arg_hotel_id AND card_type = '婚庆卡';
         UPDATE aranya_member_data SET card_type='ZHANGH',card_level='130' WHERE hotel_group_id=arg_hotel_group_id AND hotel_id=arg_hotel_id AND card_type = '高尔夫会员卡';
         UPDATE aranya_member_data SET card_type='ZHANGH',card_level='140' WHERE hotel_group_id=arg_hotel_group_id AND hotel_id=arg_hotel_id AND card_type = '消费卡';
         UPDATE aranya_member_data SET card_type='ZHANGH',card_level='150' WHERE hotel_group_id=arg_hotel_group_id AND hotel_id=arg_hotel_id AND card_type = '地产员工餐卡';
@@ -74,8 +74,6 @@ BEGIN
         UPDATE aranya_member_data SET card_type='ZHANGH',card_level='220' WHERE hotel_group_id=arg_hotel_group_id AND hotel_id=arg_hotel_id AND card_type = '九州会招待卡';
         UPDATE aranya_member_data SET card_type='ZHANGH',card_level='230' WHERE hotel_group_id=arg_hotel_group_id AND hotel_id=arg_hotel_id AND card_type = '业主卡';
         UPDATE aranya_member_data SET card_type='ZHANGH',card_level='240' WHERE hotel_group_id=arg_hotel_group_id AND hotel_id=arg_hotel_id AND card_type = '合作伙伴消费卡';
-        UPDATE aranya_member_data SET card_type='ZHANGH',card_level='250' WHERE hotel_group_id=arg_hotel_group_id AND hotel_id=arg_hotel_id AND card_type = '九州会会员卡';
-        UPDATE aranya_member_data SET card_type='ZHANGH',card_level='260' WHERE hotel_group_id=arg_hotel_group_id AND hotel_id=arg_hotel_id AND card_type = '客房卡';
         UPDATE aranya_member_data SET card_type='ZHANGH',card_level='270' WHERE hotel_group_id=arg_hotel_group_id AND hotel_id=arg_hotel_id AND card_type = '地产员工消费卡';
         UPDATE aranya_member_data SET card_type='ZHANGH',card_level='280' WHERE hotel_group_id=arg_hotel_group_id AND hotel_id=arg_hotel_id AND card_type = '安澜反租卡';
         UPDATE aranya_member_data SET card_type='ZHANGH',card_level='290' WHERE hotel_group_id=arg_hotel_group_id AND hotel_id=arg_hotel_id AND card_type = '享梦卡';
@@ -84,7 +82,6 @@ BEGIN
         UPDATE aranya_member_data SET card_type='ZHANGH',card_level='320' WHERE hotel_group_id=arg_hotel_group_id AND hotel_id=arg_hotel_id AND card_type = '九州会员工消费卡';
         UPDATE aranya_member_data SET card_type='ZHANGH',card_level='330' WHERE hotel_group_id=arg_hotel_group_id AND hotel_id=arg_hotel_id AND card_type = '合作伙伴餐卡';
         UPDATE aranya_member_data SET card_type='ZHANGH',card_level='340' WHERE hotel_group_id=arg_hotel_group_id AND hotel_id=arg_hotel_id AND card_type = '赠送卡访客折扣';
-        UPDATE aranya_member_data SET card_type='ZHANGH',card_level='350' WHERE hotel_group_id=arg_hotel_group_id AND hotel_id=arg_hotel_id AND card_type = '微信会员';
         UPDATE aranya_member_data SET card_type='ZHANGH',card_level='360' WHERE hotel_group_id=arg_hotel_group_id AND hotel_id=arg_hotel_id AND card_type = '营销员工消费卡';
         UPDATE aranya_member_data SET card_type='ZHANGH',card_level='370' WHERE hotel_group_id=arg_hotel_group_id AND hotel_id=arg_hotel_id AND card_type = '体验卡';
         UPDATE aranya_member_data SET card_type='ZHANGH',card_level='380' WHERE hotel_group_id=arg_hotel_group_id AND hotel_id=arg_hotel_id AND card_type = 'VVIP卡';
