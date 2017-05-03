@@ -10,6 +10,7 @@
 """
 
 class UrlManager(object):
+
     def __init__(self):
         # 用于保存url，通过set方法将url保存在内存中
         # url保存一般有三种方法：1、内存,通过set集合；2、关系型数据库，比如：MySQL；3、缓存型数据库 比如：redis

@@ -8,21 +8,23 @@
 @time   :2017/5/1 21:48
 @remark :解析器
 """
+import re
 import urlparse
 
 from bs4 import BeautifulSoup
 
 class HtmlParser(object):
+    # 解析传入的url
     def _get_new_urls(self, page_url, soup):
         new_urls = set()
         # <a target="_blank" href="/item/%E8%83%B6%E6%B0%B4%E8%AF%AD%E8%A8%80">胶水语言</a>
-        links = soup.find_all('a',href=re.comile(r"/item/.*?"))
+        links = soup.find_all('a',href=re.compile(r"/item/.*?"))
         for link in links:
             new_url = link['href']
             new_full_url = urlparse.urljoin(page_url,new_url)
             new_urls.add(new_full_url)
         return new_urls
-
+    # 取得数据
     def _get_new_data(self, page_url, soup):
         res_data = {}
         res_data['url'] = page_url
