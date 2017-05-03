@@ -61,30 +61,30 @@ BEGIN
         -- 若为西软系统，此句跳过；若其它PMS系统，核查卡状态建立对照表
 
         -- 翻译卡计划和等级 card_type,card_level 请对照,card_type.code 请对照，card_level.code
-        UPDATE aranya_member_data SET card_type='ZHANGH',card_level='100' WHERE hotel_group_id=arg_hotel_group_id AND hotel_id=arg_hotel_id AND card_type = '赠送卡业主折扣';
-        UPDATE aranya_member_data SET card_type='ZHANGH',card_level='130' WHERE hotel_group_id=arg_hotel_group_id AND hotel_id=arg_hotel_id AND card_type = '高尔夫会员卡';
+        UPDATE aranya_member_data SET card_type='XZK',card_level='ZSKYZZK',ratecode = 'OWN',posmode = '001' WHERE hotel_group_id=arg_hotel_group_id AND hotel_id=arg_hotel_id AND card_type = '赠送卡业主折扣';
+        UPDATE aranya_member_data SET card_type='CZK',card_level='GEFHYK',ratecode = 'OWN',posmode = '001' WHERE hotel_group_id=arg_hotel_group_id AND hotel_id=arg_hotel_id AND card_type = '高尔夫会员卡';
         UPDATE aranya_member_data SET card_type='ZHANGH',card_level='140' WHERE hotel_group_id=arg_hotel_group_id AND hotel_id=arg_hotel_id AND card_type = '消费卡';
-        UPDATE aranya_member_data SET card_type='ZHANGH',card_level='150' WHERE hotel_group_id=arg_hotel_group_id AND hotel_id=arg_hotel_id AND card_type = '地产员工餐卡';
-        UPDATE aranya_member_data SET card_type='ZHANGH',card_level='160' WHERE hotel_group_id=arg_hotel_group_id AND hotel_id=arg_hotel_id AND card_type = '3F反租卡';
-        UPDATE aranya_member_data SET card_type='ZHANGH',card_level='170' WHERE hotel_group_id=arg_hotel_group_id AND hotel_id=arg_hotel_id AND card_type = '地产招待卡';
-        UPDATE aranya_member_data SET card_type='ZHANGH',card_level='180' WHERE hotel_group_id=arg_hotel_group_id AND hotel_id=arg_hotel_id AND card_type = 'DO卡';
-        UPDATE aranya_member_data SET card_type='ZHANGH',card_level='190' WHERE hotel_group_id=arg_hotel_group_id AND hotel_id=arg_hotel_id AND card_type = '集团餐卡';
-        UPDATE aranya_member_data SET card_type='ZHANGH',card_level='200' WHERE hotel_group_id=arg_hotel_group_id AND hotel_id=arg_hotel_id AND card_type = '九州会员工餐卡';
-        UPDATE aranya_member_data SET card_type='ZHANGH',card_level='210' WHERE hotel_group_id=arg_hotel_group_id AND hotel_id=arg_hotel_id AND card_type = '员工卡';
-        UPDATE aranya_member_data SET card_type='ZHANGH',card_level='220' WHERE hotel_group_id=arg_hotel_group_id AND hotel_id=arg_hotel_id AND card_type = '九州会招待卡';
-        UPDATE aranya_member_data SET card_type='ZHANGH',card_level='230' WHERE hotel_group_id=arg_hotel_group_id AND hotel_id=arg_hotel_id AND card_type = '业主卡';
-        UPDATE aranya_member_data SET card_type='ZHANGH',card_level='240' WHERE hotel_group_id=arg_hotel_group_id AND hotel_id=arg_hotel_id AND card_type = '合作伙伴消费卡';
-        UPDATE aranya_member_data SET card_type='ZHANGH',card_level='270' WHERE hotel_group_id=arg_hotel_group_id AND hotel_id=arg_hotel_id AND card_type = '地产员工消费卡';
-        UPDATE aranya_member_data SET card_type='ZHANGH',card_level='280' WHERE hotel_group_id=arg_hotel_group_id AND hotel_id=arg_hotel_id AND card_type = '安澜反租卡';
-        UPDATE aranya_member_data SET card_type='ZHANGH',card_level='290' WHERE hotel_group_id=arg_hotel_group_id AND hotel_id=arg_hotel_id AND card_type = '享梦卡';
-        UPDATE aranya_member_data SET card_type='ZHANGH',card_level='300' WHERE hotel_group_id=arg_hotel_group_id AND hotel_id=arg_hotel_id AND card_type = '协议单位';
-        UPDATE aranya_member_data SET card_type='ZHANGH',card_level='310' WHERE hotel_group_id=arg_hotel_group_id AND hotel_id=arg_hotel_id AND card_type = '招待卡';
-        UPDATE aranya_member_data SET card_type='ZHANGH',card_level='320' WHERE hotel_group_id=arg_hotel_group_id AND hotel_id=arg_hotel_id AND card_type = '九州会员工消费卡';
-        UPDATE aranya_member_data SET card_type='ZHANGH',card_level='330' WHERE hotel_group_id=arg_hotel_group_id AND hotel_id=arg_hotel_id AND card_type = '合作伙伴餐卡';
-        UPDATE aranya_member_data SET card_type='ZHANGH',card_level='340' WHERE hotel_group_id=arg_hotel_group_id AND hotel_id=arg_hotel_id AND card_type = '赠送卡访客折扣';
-        UPDATE aranya_member_data SET card_type='ZHANGH',card_level='360' WHERE hotel_group_id=arg_hotel_group_id AND hotel_id=arg_hotel_id AND card_type = '营销员工消费卡';
-        UPDATE aranya_member_data SET card_type='ZHANGH',card_level='370' WHERE hotel_group_id=arg_hotel_group_id AND hotel_id=arg_hotel_id AND card_type = '体验卡';
-        UPDATE aranya_member_data SET card_type='ZHANGH',card_level='380' WHERE hotel_group_id=arg_hotel_group_id AND hotel_id=arg_hotel_id AND card_type = 'VVIP卡';
+        UPDATE aranya_member_data SET card_type='XZK',card_level='DCYGCK',ratecode = '',posmode = '001' WHERE hotel_group_id=arg_hotel_group_id AND hotel_id=arg_hotel_id AND card_type = '地产员工餐卡';
+        UPDATE aranya_member_data SET card_type='XZK',card_level='3FFZK',ratecode = 'OWN',posmode = '001' WHERE hotel_group_id=arg_hotel_group_id AND hotel_id=arg_hotel_id AND card_type = '3F反租卡';
+        UPDATE aranya_member_data SET card_type='XYK',card_level='DCZDK',ratecode = 'OWN',posmode = '001' WHERE hotel_group_id=arg_hotel_group_id AND hotel_id=arg_hotel_id AND card_type = '地产招待卡';
+        UPDATE aranya_member_data SET card_type='XZK',card_level='DOK',ratecode = '',posmode = '001' WHERE hotel_group_id=arg_hotel_group_id AND hotel_id=arg_hotel_id AND card_type = 'DO卡';
+        UPDATE aranya_member_data SET card_type='XZK',card_level='JTCK',ratecode = '',posmode = '001' WHERE hotel_group_id=arg_hotel_group_id AND hotel_id=arg_hotel_id AND card_type = '集团餐卡';
+        UPDATE aranya_member_data SET card_type='XZK',card_level='JZHYGCK',ratecode = '',posmode = '001' WHERE hotel_group_id=arg_hotel_group_id AND hotel_id=arg_hotel_id AND card_type = '九州会员工餐卡';
+        UPDATE aranya_member_data SET card_type='XZK',card_level='LSYGK',ratecode = '',posmode = '001' WHERE hotel_group_id=arg_hotel_group_id AND hotel_id=arg_hotel_id AND card_type = '员工卡';
+        UPDATE aranya_member_data SET card_type='XYK',card_level='JZHZDK',ratecode = 'OWN',posmode = '001' WHERE hotel_group_id=arg_hotel_group_id AND hotel_id=arg_hotel_id AND card_type = '九州会招待卡';
+        UPDATE aranya_member_data SET card_type='CZK',card_level='YZK',ratecode = 'OWN',posmode = '001' WHERE hotel_group_id=arg_hotel_group_id AND hotel_id=arg_hotel_id AND card_type = '业主卡';
+        UPDATE aranya_member_data SET card_type='CZK',card_level='HZHBCZK',ratecode = 'OWN',posmode = '001' WHERE hotel_group_id=arg_hotel_group_id AND hotel_id=arg_hotel_id AND card_type = '合作伙伴消费卡';
+        UPDATE aranya_member_data SET card_type='CZK',card_level='DCYGCZK',ratecode = 'OWN',posmode = '001' WHERE hotel_group_id=arg_hotel_group_id AND hotel_id=arg_hotel_id AND card_type = '地产员工消费卡';
+        UPDATE aranya_member_data SET card_type='XZK',card_level='ALFZK',ratecode = 'OWN',posmode = '001' WHERE hotel_group_id=arg_hotel_group_id AND hotel_id=arg_hotel_id AND card_type = '安澜反租卡';
+        UPDATE aranya_member_data SET card_type='QCK',card_level='XMK',ratecode = 'OWN',posmode = '001' WHERE hotel_group_id=arg_hotel_group_id AND hotel_id=arg_hotel_id AND card_type = '享梦卡';
+        UPDATE aranya_member_data SET card_type='XYK',card_level='XYDWXNK',ratecode = '',posmode = '' WHERE hotel_group_id=arg_hotel_group_id AND hotel_id=arg_hotel_id AND card_type = '协议单位';
+        UPDATE aranya_member_data SET card_type='XYK',card_level='ZDK',ratecode = 'OWN',posmode = '001' WHERE hotel_group_id=arg_hotel_group_id AND hotel_id=arg_hotel_id AND card_type = '招待卡';
+        UPDATE aranya_member_data SET card_type='CZK',card_level='JZHYGCZK',ratecode = 'OWN',posmode = '001' WHERE hotel_group_id=arg_hotel_group_id AND hotel_id=arg_hotel_id AND card_type = '九州会员工消费卡';
+        UPDATE aranya_member_data SET card_type='XZK',card_level='HZHBCK',ratecode = '',posmode = '001' WHERE hotel_group_id=arg_hotel_group_id AND hotel_id=arg_hotel_id AND card_type = '合作伙伴餐卡';
+        UPDATE aranya_member_data SET card_type='XZK',card_level='ZSKFKZK',ratecode = 'IGCOR',posmode = '000' WHERE hotel_group_id=arg_hotel_group_id AND hotel_id=arg_hotel_id AND card_type = '赠送卡访客折扣';
+        UPDATE aranya_member_data SET card_type='CZK',card_level='YXYGCZK',ratecode = 'OWN',posmode = '001' WHERE hotel_group_id=arg_hotel_group_id AND hotel_id=arg_hotel_id AND card_type = '营销员工消费卡';
+        UPDATE aranya_member_data SET card_type='CZK',card_level='TYK',ratecode = 'IGCOR',posmode = '000' WHERE hotel_group_id=arg_hotel_group_id AND hotel_id=arg_hotel_id AND card_type = '体验卡';
+        UPDATE aranya_member_data SET card_type='XZK',card_level='VVIP',ratecode = 'OWN',posmode = '001' WHERE hotel_group_id=arg_hotel_group_id AND hotel_id=arg_hotel_id AND card_type = 'VVIP卡';
 
 
         -- 翻译发卡来源 card_src//请对照，code_base.parent_code = 'card_src'

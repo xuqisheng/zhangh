@@ -37,6 +37,8 @@ BEGIN
 	DELETE FROM card_account_master WHERE hotel_group_id = arg_hotel_group_id;
 	DELETE FROM card_account WHERE hotel_group_id = arg_hotel_group_id;
 
+	DELETE FROM card_idcard_map;
+
 	START TRANSACTION;
         -- 补充,将没有档案的卡默认一个档案
         UPDATE aranya_member_data SET card_master = NULL WHERE card_master = '' AND hotel_group_id = arg_hotel_group_id AND hotel_id = arg_hotel_id;
@@ -179,7 +181,6 @@ BEGIN
 
 	-- 兼容老卡数据
 	START TRANSACTION;
-	    DELETE FROM card_idcard_map;
         INSERT INTO card_idcard_map(card_id, card_no, card_no2, create_user, create_datetime, modify_user, modify_datetime)
             SELECT id,crc,card_no,'Aranya',NOW(),'Aranya',NOW()
                 FROM card_base WHERE hotel_group_id = arg_hotel_group_id AND hotel_id = arg_hotel_id AND crc <>'';
