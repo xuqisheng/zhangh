@@ -22,7 +22,7 @@ class SpiderMain(object):
         self.parser = html_parser.HtmlParser()
         # 初始化下载器
         self.outputer = html_outputer.HtmlOutputer()
-
+    # 开始爬虫
     def craw(self,root_url):
         count = 1
         # 最开始的url
@@ -39,7 +39,7 @@ class SpiderMain(object):
                 self.urls.add_new_urls(new_urls)
                 self.outputer.collect_data(new_data)
 
-                if count == 1000:
+                if count == 10:
                     break
 
                 count = count + 1
