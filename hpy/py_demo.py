@@ -1,10 +1,10 @@
 #!/usr/bin/env python
 #coding=utf-8
 
-import os
-
-fileSize = round(os.path.getsize('E:\Software\Git_2.12_64.exe') / (1024*1024.00),2)
-print fileSize
+# import os
+#
+# fileSize = round(os.path.getsize('E:\Software\Git_2.12_64.exe') / (1024*1024.00),2)
+# print fileSize
 
 
 '''
@@ -65,3 +65,15 @@ filename = 'D:\Python27\zhangh\prob1eip'
 # print os.path.isfile(filename),filepath,'<---->', bool(filepath),'<---->',file
 print os.path.isfile(filename)
 '''
+
+
+import re
+
+strabc = "9Y	SYWH	XYXX酒店"
+
+print strabc
+pattern = re.match('Y',strabc)
+print pattern.groups()
+
+
+
