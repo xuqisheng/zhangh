@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-#coding=utf-8
+# coding=utf-8
 
 # import os
 #
@@ -65,15 +65,20 @@ filename = 'D:\Python27\zhangh\prob1eip'
 # print os.path.isfile(filename),filepath,'<---->', bool(filepath),'<---->',file
 print os.path.isfile(filename)
 '''
+import json
+import sys
+
+reload(sys)
+sys.setdefaultencoding('utf8')
+
+info={}
+info['a'] = u'350'
+info['测试中文'] = u"树园"
+print json.dumps(info,encoding='utf-8',ensure_ascii=False)
 
 
-import re
 
-strabc = "9Y	SYWH	XYXX酒店"
 
-print strabc
-pattern = re.match('Y',strabc)
-print pattern.groups()
 
 
 

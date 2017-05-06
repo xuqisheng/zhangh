@@ -10,6 +10,7 @@
 """
 from hpy.pySpider.baikeSpider import url_manager, html_downloader, html_parser, html_outputer
 
+
 # 创建类
 class SpiderMain(object):
     # 初始化参数
@@ -27,7 +28,7 @@ class SpiderMain(object):
         count = 1
         # 最开始的url
         self.urls.add_new_url(root_url)
-        # 判断url是否已链接
+        # 判断url是否已连接
         while self.urls.has_new_url():
             try:
                 new_url = self.urls.get_new_url()
