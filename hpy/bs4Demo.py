@@ -168,17 +168,17 @@ html ="""
 """
 info = {}
 
-sub_soup = BeautifulSoup(html,'html.parser')
+sub_soup = BeautifulSoup(html,'html.parser',from_encoding="gb18030")
 sub_overview = sub_soup.select(".overview .content .price span")
 # print sub_overview
 info['房屋总价'] = ''.join(list(re.compile('<span class="total">(.*?)</span>').findall(str(sub_overview))))
-# info['平方均价'] = ''.join(list(re.compile('<span class="unitPriceValue">(.*?)<i>').findall(str(sub_overview))))
-#
-# sub_around = sub_soup.select(".overview .content .aroundInfo .communityName a")
-# # print sub_around
-# info['小区名称'] = ''.join(list(re.compile('<a class="info".*?>(.*?)</a>').findall(str(sub_around))))
-# info['所在区域'] = ''.join(list(re.compile('<a href=.*?target="_blank">(.*?)</a>').findall(str(sub_around))))
-#
+info['平方均价'] = ''.join(list(re.compile('<span class="unitPriceValue">(.*?)<i>').findall(str(sub_overview))))
+
+sub_around = sub_soup.select(".overview .content .aroundInfo .communityName a")
+# print sub_around
+info['小区名称'] = ''.join(list(re.compile('<a class="info".*?>(.*?)</a>').findall(str(sub_around))))
+info['所在区域'] = ''.join(list(re.compile('<a href=.*?target="_blank">(.*?)</a>').findall(str(sub_around))))
+
 # sub_intro = sub_soup.select(".introContent .content li")
 # # print sub_intro
 # for sub_label in sub_intro:
@@ -188,8 +188,5 @@ info['房屋总价'] = ''.join(list(re.compile('<span class="total">(.*?)</span>
 #     re_value = ''.join(list(re.compile('<span class="label">.*?</span>(.*?)</li>').findall(str(sub_label))))
 #     info[re_key] = re_value
 
-aaa = sub_soup.select(".baseinform div")
-info['测试']=''.join(list(re.compile('<div class="" style="width:700px;">.*?<h2><div class="title">(.*?)</div></h2>.*?<div class="introContent">').findall(str(aaa))))
-print aaa
 
 print info
