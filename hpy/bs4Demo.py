@@ -168,19 +168,23 @@ html ="""
 """
 info = {}
 
-sub_soup = BeautifulSoup(html,'html.parser',from_encoding="gb18030")
-sub_overview = sub_soup.select(".overview .content .price span")
+# sub_soup = BeautifulSoup(html,'html.parser')
+sub_soup = BeautifulSoup(html,'lxml')
+
+# sub_overview = sub_soup.select(".overview .content .price span")
 # print sub_overview
-info['房屋总价'] = ''.join(list(re.compile('<span class="total">(.*?)</span>').findall(str(sub_overview))))
-info['平方均价'] = ''.join(list(re.compile('<span class="unitPriceValue">(.*?)<i>').findall(str(sub_overview))))
-
-sub_around = sub_soup.select(".overview .content .aroundInfo .communityName a")
+# info['房屋总价'] = ''.join(list(re.compile('<span class="total">(.*?)</span>').findall(str(sub_overview))))
+# info['平方均价'] = ''.join(list(re.compile('<span class="unitPriceValue">(.*?)<i>').findall(str(sub_overview))))
+#
+# sub_around = sub_soup.select(".overview .content .aroundInfo .communityName a")
+#
 # print sub_around
-info['小区名称'] = ''.join(list(re.compile('<a class="info".*?>(.*?)</a>').findall(str(sub_around))))
-info['所在区域'] = ''.join(list(re.compile('<a href=.*?target="_blank">(.*?)</a>').findall(str(sub_around))))
+# info['小区名称'] = ''.join(list(re.compile('<a class="info".*?>(.*?)</a>').findall(str(sub_around))))
+# info['所在区域'] = ''.join(list(re.compile('<a href=.*?target="_blank">(.*?)</a>').findall(str(sub_around))))
+# info['所在区域'] = '小河佳苑'
 
-# sub_intro = sub_soup.select(".introContent .content li")
-# # print sub_intro
+sub_intro = sub_soup.select(".introContent .content li")
+print sub_intro
 # for sub_label in sub_intro:
 #     # 使用正则，取得dict的key
 #     re_key = ''.join(list(re.compile('<span class="label">(.*?)</span>').findall(str(sub_label))))
@@ -189,4 +193,4 @@ info['所在区域'] = ''.join(list(re.compile('<a href=.*?target="_blank">(.*?)
 #     info[re_key] = re_value
 
 
-print info
+# print info
