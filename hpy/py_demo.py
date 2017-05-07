@@ -65,16 +65,45 @@ filename = 'D:\Python27\zhangh\prob1eip'
 # print os.path.isfile(filename),filepath,'<---->', bool(filepath),'<---->',file
 print os.path.isfile(filename)
 '''
+
+
+
+#
+# info={}
+# info['a'] = u'350'
+# info['测试中文'] = u"树园"
+# print json.dumps(info,encoding='utf-8',ensure_ascii=False)
+import re
 import json
 import sys
 
 reload(sys)
-sys.setdefaultencoding('utf8')
+sys.setdefaultencoding('utf-8')
 
 info={}
-info['a'] = u'350'
-info['测试中文'] = u"树园"
-print json.dumps(info,encoding='utf-8',ensure_ascii=False)
+sub_around = '[<a class="info" href="/xiaoqu/1811044013284/" target="_blank">\u5c0f\u6cb3\u4f73\u82d1</a>, <a class="map" href="#around">\u5730\u56fe</a>]'
+# sub_around = '[<a class="info" href="/xiaoqu/1811044013284/" target="_blank">\u5c0f</a>, <a class="map" href="#around">\u5730\u56fe</a>]'
+
+bbb = ''.join(list(re.compile('<a class="info" href=.*? target="_blank">(.*?)</a>').findall(str(sub_around))))
+print bbb
+# info['小区名称'] =
+# info['所在区域'] = ''.join(list(re.compile('<a href=.*? target="_blank">(.*?)</a>').findall(str(sub_around))))
+
+# print json.dumps(info,encoding='utf-8',ensure_ascii=False)
+
+
+aaa = '小河佳苑'
+s2 = unicode('小河佳苑')
+print aaa,s2
+
+
+
+
+
+
+
+
+
 
 
 

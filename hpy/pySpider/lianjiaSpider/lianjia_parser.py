@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# coding:utf8
+# coding:utf-8
 
 """
 @version:
@@ -9,10 +9,8 @@
 @remark :解析器
 """
 import re
-
 from bs4 import BeautifulSoup
 from hpy.pySpider.lianjiaSpider import lianjia_download
-
 
 class LianjiaParser(object):
     # 解析子url，得到明细数据
@@ -27,11 +25,25 @@ class LianjiaParser(object):
         sub_text = self.download.download(sub_url)
         sub_soup = BeautifulSoup(sub_text,'html.parser')
 
-        print j, '<-->', sub_url
         sub_overview = sub_soup.select(".overview .content .price span")
-        print str(sub_overview)
+        # print sub_overview
         info['房屋总价'] = ''.join(list(re.compile('<span class="total">(.*?)</span>').findall(str(sub_overview))))
-        # info['平方均价'] =
+        info['平方均价'] = ''.join(list(re.compile('<span class="unitPriceValue">(.*?)<i>').findall(str(sub_overview))))
+
+        # 为什么一样写法，此处取得结果是乱码
+        # sub_around = sub_soup.select(".overview .content .aroundInfo .communityName a")
+        # print sub_around
+        # info['小区名称'] = ''.join(list(re.compile('<a class="info".*?>(.*?)</a>').findall(str(sub_around))))
+        # info['所在区域'] = ''.join(list(re.compile('<a href=.*?target="_blank">(.*?)</a>').findall(str(sub_around))))
+
+        sub_intro = sub_soup.select(".introContent .content li")
+        # print sub_intro
+        for sub_label in sub_intro:
+            # 使用正则，取得dict的key
+            re_key = ''.join(list(re.compile('<span class="label">(.*?)</span>').findall(str(sub_label))))
+            # 使用正则，取得dict的value
+            re_value = ''.join(list(re.compile('<span class="label">.*?</span>(.*?)</li>').findall(str(sub_label))))
+            info[re_key] = re_value
 
         return info
 
@@ -44,12 +56,9 @@ class LianjiaParser(object):
         housemsg = []
         soup = BeautifulSoup(html_text, 'html.parser')
 
-        # 未尝试成功部分
-        # for url_sub in soup.find('ul',class_="sellListContent").find_all('a'):
-        #     url_domain.append(url_sub.attrs['href'])
-
-        # 通过 CSS 选择器
-        for j in range(0,3):
+        # 目前链家网一页显示30个信息
+        for j in range(0,30):
+            # 通过 CSS 选择器
             sub_url=soup.select(".sellListContent .title a")[j]['href']
             houseinfo = self.get_detail(sub_url,j)
 

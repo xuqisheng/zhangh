@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# coding:utf8
+# coding:utf-8
 
 """
 @version:
@@ -25,9 +25,9 @@ class LianjiaDownload(object):
             return None
         try:
             # 参数是一个字典{'类型':'代理ip:端口号'}
-            proxy_support = urllib2.ProxyHandler({'http':random.choice(self.ip_list)})
-            opener = urllib2.build_opener(proxy_support)
-            urllib2.install_opener(opener)
+            # proxy_support = urllib2.ProxyHandler({'http':random.choice(self.ip_list)})
+            # opener = urllib2.build_opener(proxy_support)
+            # urllib2.install_opener(opener)
             # 构建请求的request
             request = urllib2.Request(url, headers=self.headers)
             # 利用urlopen获取页面代码
@@ -37,7 +37,7 @@ class LianjiaDownload(object):
             # if response.getcode() != 200:
             #     return None
             #
-            pageCode = response.read().decode('utf-8')
+            pageCode = response.read()
             return pageCode
         except urllib2.URLError,e:
             if hasattr(e,"reason"):
