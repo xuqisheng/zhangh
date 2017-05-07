@@ -31,10 +31,10 @@ class LianjiaParser(object):
         info['平方均价'] = ''.join(list(re.compile('<span class="unitPriceValue">(.*?)<i>').findall(str(sub_overview))))
 
         # 为什么一样写法，此处取得结果是乱码
-        # sub_around = sub_soup.select(".overview .content .aroundInfo .communityName a")
+        sub_around = sub_soup.select(".overview .content .aroundInfo .communityName a")
         # print sub_around
-        # info['小区名称'] = ''.join(list(re.compile('<a class="info".*?>(.*?)</a>').findall(str(sub_around))))
-        # info['所在区域'] = ''.join(list(re.compile('<a href=.*?target="_blank">(.*?)</a>').findall(str(sub_around))))
+        info['小区名称'] = ''.join(list(re.compile('<a class="info".*?>(.*?)</a>').findall(str(sub_around))))
+        info['所在区域'] = ''.join(list(re.compile('<a href=.*?target="_blank">(.*?)</a>').findall(str(sub_around))))
 
         sub_intro = sub_soup.select(".introContent .content li")
         # print sub_intro
