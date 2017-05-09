@@ -72,7 +72,7 @@ BEGIN
                                  create_hotel,create_user,create_datetime,modify_hotel,modify_user,modify_datetime)
             SELECT hotel_group_id,0,member_id_temp,NULL,IFNULL(hname,card_name),hlname,hfname,hname2,hname3,hname_combine,
                                  'T',sex,LANGUAGE,'','',(DATE(birth) + INTERVAL 1 HOUR),'','','','',
-                                 nation,id_code,id_no,NULL,NULL,NULL,NULL,NULL,remark,
+                                 nation,id_code,id_no,NULL,NULL,company_name,NULL,NULL,remark,
                                  var_hotel_code,IFNULL(hcreate_user,'ARANYA'),IFNULL(hcreate_datetime,NOW()),'',IFNULL(hmodify_user,'ARANYA'),IFNULL(hmodify_datetime,NOW())
             FROM aranya_member_data WHERE hotel_group_id=arg_hotel_group_id AND hotel_id=arg_hotel_id;
 
@@ -131,7 +131,7 @@ BEGIN
   			point_pay,point_charge,IF((point_pay=0 AND point_charge= 0),0,1),0,charge,pay,IF((charge = 0 AND pay = 0),0,1),0,
   			IFNULL(create_user,'ARANYA'),IFNULL(create_datetime,NOW()),iss_hotel,IFNULL(create_user,'ARANYA'),IFNULL(create_datetime,NOW()),
   			IFNULL(modify_user,'ARANYA'),IFNULL(modify_datetime,NOW()),IFNULL(modify_user,'ARANYA'),IFNULL(modify_datetime,NOW())
-  		FROM aranya_member_data ;
+  		FROM aranya_member_data WHERE hotel_group_id=arg_hotel_group_id AND hotel_id=arg_hotel_id;
   	UPDATE aranya_member_data mc,card_base cb SET mc.card_id = cb.id WHERE  mc.card_id_temp = cb.inner_card_no AND cb.inner_card_no < 0;
   	UPDATE card_base SET inner_card_no = id WHERE inner_card_no < 0 AND hotel_group_id=arg_hotel_group_id AND hotel_id=arg_hotel_id;
 
@@ -154,7 +154,7 @@ BEGIN
                 m.biz_date,m.biz_date,'N',NULL,'AD','',NULL,NULL,
                  'ARANYA',NOW(),'ARANYA',NOW()
             FROM aranya_member_data m,(SELECT hotel_group_id,id AS hotel_id,descript FROM hotel UNION SELECT id AS hotel_group_id,0,descript FROM hotel_group) h
-            WHERE h.hotel_id = m.hotel_id AND (point_pay<>0 OR point_charge<> 0) ;
+            WHERE h.hotel_id = m.hotel_id AND (point_pay<>0 OR point_charge<> 0) AND m.hotel_group_id=arg_hotel_group_id;
 	    SELECT CONCAT('card_point OK:',COUNT(1),',',SUM(produce),',',SUM(apply),',',SUM(produce-apply)) FROM card_point;
 	COMMIT;
  	*/
@@ -194,11 +194,11 @@ BEGIN
 
 
 	/* *********************************************************************************************************
-	生成card_snapshot数据
+	会员卡关联协议单位处理
 	***********************************************************************************************************/
-
-
-
+    UPDATE portal_member.member_base a,portal_group.company_base b SET a.company_id = b.id
+        WHERE a.hotel_group_id=arg_hotel_group_id AND a.hotel_id=arg_hotel_id
+            AND b.hotel_group_id=arg_hotel_group_id AND b.hotel_id=0 AND a.company_name = b.name;
 
 	/* *********************************************************************************************************
 	统一处理完毕

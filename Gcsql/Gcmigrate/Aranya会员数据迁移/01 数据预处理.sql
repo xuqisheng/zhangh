@@ -29,14 +29,14 @@ BEGIN
             point_pay,point_charge,point_last_num,pay,charge,
             hno,hname,hlname,hfname,hname2,hname3,hname_combine,sex,LANGUAGE,birth,nation,id_code,id_no,hremark,
             hcreate_user,hcreate_datetime,hmodify_user,hmodify_datetime,mobile,phone,email,
-            country,state,city,division,street,zipcode,loginpw)
+            country,state,city,division,street,zipcode,loginpw,company_name)
         SELECT arg_hotel_group_id,arg_hotel_id,var_group_code,var_bdate,vch_vipkh,VCH_VIPBH,'I',
             vch_viplx,'','1',vch_khxm,'','',dat_fkrq,dat_yxrq,'888888','',IFNULL(vch_no,''),IFNULL(vch_bz,''),
             guid,'Aranya',dat_fkrq,'Aranya',dat_fkrq,
             0,0,0,MON_YE,0,
             vch_zzh,vch_khxm,vch_khxm,vch_khxm,vch_khxm,vch_khxm,concat(vch_khxm,vch_khxm,vch_khxm),IF(vch_xb='男',1,IF(vch_xb='女',2,'')),'C',dat_sr,'CN','02',IFNULL(vch_zjbh,''),'',
             'Aranya',dat_fkrq,'Aranya',dat_fkrq,IFNULL(VCH_SJHM,''),'','',
-            '','','','','','',''
+            '','','','','','','',vch_dwmc
         FROM TV_VIPXX GROUP BY vch_vipkh;
 
         -- 去除经酒店确定的会员卡种

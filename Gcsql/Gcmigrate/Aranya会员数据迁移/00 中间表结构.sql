@@ -1,4 +1,5 @@
-﻿CREATE TABLE aranya_member_data (
+﻿DROP TABLE IF EXISTS aranya_member_data;
+CREATE TABLE aranya_member_data (
   hotel_group_id 	bigint(16) DEFAULT NULL COMMENT '请对照：hotel_group.id。集团编号，',
   hotel_id 			bigint(16) DEFAULT NULL COMMENT '请对照：hotel.id。酒店编号',
   iss_hotel 		varchar(20) DEFAULT NULL COMMENT '请对照：hotel.code。发卡酒店代码',
@@ -66,6 +67,7 @@
   street 			varchar(512) DEFAULT NULL COMMENT '住址：地址',
   zipcode 			varchar(12) DEFAULT NULL COMMENT '住址：邮编',
   loginpw 			varchar(20) DEFAULT NULL COMMENT '网站登录密码',
+  company_name		varchar(50) DEFAULT NULL COMMENT '协议单位名称',
   PRIMARY KEY (card_id_temp),
   UNIQUE KEY index1(card_no),
   KEY index2 (card_no2),
