@@ -30,7 +30,7 @@ BEGIN
             hno,hname,hlname,hfname,hname2,hname3,hname_combine,sex,LANGUAGE,birth,nation,id_code,id_no,hremark,
             hcreate_user,hcreate_datetime,hmodify_user,hmodify_datetime,mobile,phone,email,
             country,state,city,division,street,zipcode,loginpw,company_name)
-        SELECT arg_hotel_group_id,arg_hotel_id,var_group_code,var_bdate,vch_vipkh,VCH_VIPBH,'I',
+        SELECT arg_hotel_group_id,arg_hotel_id,var_group_code,var_bdate,vch_vipkh,VCH_VIPBH,IF(flo_zk='0','I','L'),
             vch_viplx,'','1',vch_khxm,'','',dat_fkrq,dat_yxrq,'888888','',IFNULL(vch_no,''),IFNULL(vch_bz,''),
             guid,'Aranya',dat_fkrq,'Aranya',dat_fkrq,
             0,0,0,MON_YE,0,
