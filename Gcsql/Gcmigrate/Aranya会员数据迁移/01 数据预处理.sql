@@ -30,7 +30,7 @@ BEGIN
             hno,hname,hlname,hfname,hname2,hname3,hname_combine,sex,LANGUAGE,birth,nation,id_code,id_no,hremark,
             hcreate_user,hcreate_datetime,hmodify_user,hmodify_datetime,mobile,phone,email,
             country,state,city,division,street,zipcode,loginpw,company_name)
-        SELECT arg_hotel_group_id,arg_hotel_id,var_group_code,var_bdate,vch_vipkh,VCH_VIPBH,IF(flo_zk='0','I','L'),
+        SELECT arg_hotel_group_id,arg_hotel_id,var_group_code,var_bdate,vch_vipkh,VCH_VIPBH,IF(bit_sfyx='1','I','L'),
             vch_viplx,'','1',vch_khxm,'','',dat_fkrq,dat_yxrq,'888888','',IFNULL(vch_no,''),IFNULL(vch_bz,''),
             guid,'Aranya',dat_fkrq,'Aranya',dat_fkrq,
             0,0,0,MON_YE,0,
@@ -40,7 +40,7 @@ BEGIN
         FROM TV_VIPXX GROUP BY vch_vipkh;
 
         -- 去除经酒店确定的会员卡种
-        UPDATE aranya_member_data SET hotel_group_id = - arg_hotel_group_id WHERE hotel_group_id=arg_hotel_group_id AND hotel_id=arg_hotel_id AND card_type IN ('高尔夫50次卡','婚庆卡','九州会会员卡','客房卡','微信会员','消费卡');
+        UPDATE aranya_member_data SET hotel_group_id = - arg_hotel_group_id WHERE hotel_group_id=arg_hotel_group_id AND hotel_id=arg_hotel_id AND card_type IN ('高尔夫50次卡','婚庆卡','九州会会员卡','客房卡','微信会员','消费卡','协议单位');
 
         -- 原西软账务系统中，存在多卡共用一账号时，西软系统中一账户多卡没有从属关系，ihotel要求有从属关系
         -- 主卡的card_master字段填null，附卡填主卡的 card_id_temp,
@@ -78,7 +78,7 @@ BEGIN
         UPDATE aranya_member_data SET card_type='CZK',card_level='DCYGCZK',ratecode = 'OWN',posmode = '001' WHERE hotel_group_id=arg_hotel_group_id AND hotel_id=arg_hotel_id AND card_type = '地产员工消费卡';
         UPDATE aranya_member_data SET card_type='XZK',card_level='ALFZK',ratecode = 'OWN',posmode = '001' WHERE hotel_group_id=arg_hotel_group_id AND hotel_id=arg_hotel_id AND card_type = '安澜反租卡';
         UPDATE aranya_member_data SET card_type='QCK',card_level='XMK',ratecode = 'OWN',posmode = '001' WHERE hotel_group_id=arg_hotel_group_id AND hotel_id=arg_hotel_id AND card_type = '享梦卡';
-        UPDATE aranya_member_data SET card_type='XYK',card_level='XYDWXNK',ratecode = '',posmode = '' WHERE hotel_group_id=arg_hotel_group_id AND hotel_id=arg_hotel_id AND card_type = '协议单位';
+        -- UPDATE aranya_member_data SET card_type='XYK',card_level='XYDWXNK',ratecode = '',posmode = '' WHERE hotel_group_id=arg_hotel_group_id AND hotel_id=arg_hotel_id AND card_type = '协议单位';
         UPDATE aranya_member_data SET card_type='XYK',card_level='ZDK',ratecode = 'OWN',posmode = '001' WHERE hotel_group_id=arg_hotel_group_id AND hotel_id=arg_hotel_id AND card_type = '招待卡';
         UPDATE aranya_member_data SET card_type='CZK',card_level='JZHYGCZK',ratecode = 'OWN',posmode = '001' WHERE hotel_group_id=arg_hotel_group_id AND hotel_id=arg_hotel_id AND card_type = '九州会员工消费卡';
         UPDATE aranya_member_data SET card_type='XZK',card_level='HZHBK',ratecode = '',posmode = '001' WHERE hotel_group_id=arg_hotel_group_id AND hotel_id=arg_hotel_id AND card_type = '合作伙伴餐卡';
