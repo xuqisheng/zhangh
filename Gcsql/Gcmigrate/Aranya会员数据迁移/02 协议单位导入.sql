@@ -64,4 +64,4 @@ END$$
 DELIMITER ;
 
 
--- CALL up_ihotel_migrate_company_import(3,0);
+-- CALL portal_group.up_ihotel_migrate_company_import(2,0);

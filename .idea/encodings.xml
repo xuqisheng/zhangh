@@ -1,7 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="Encoding" defaultCharsetForPropertiesFiles="UTF-8">
-    <file url="file://$USER_HOME$/Desktop/04 ihotel_up_company_x5.sql" charset="GBK" />
     <file url="file://$PROJECT_DIR$/Gcsql/Gcmigrate/iHotel-Member" charset="GBK" />
     <file url="file://$PROJECT_DIR$/Gcsql/Gcmigrate/iHotel-Member/02 数据预处理--模板.sql" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/Gcsql/Gcmigrate/iHotel-Member/04 数据验证.sql" charset="UTF-8" />
@@ -44,6 +43,7 @@
     <file url="file://$PROJECT_DIR$/XRsql/p_wms_jiedai_check_v.sql" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/XRsql/p_wms_jiedai_check_x.sql" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/XRsql/p_xym_week_forecast.sql" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/XRsql/smart_mysql.rar" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/XRsql/sql.tar.gz" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/XRsql/删除数据说明.doc" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/XRsql/底表不平处理方法.doc" charset="UTF-8" />

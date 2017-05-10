@@ -216,4 +216,4 @@ END$$
 
 DELIMITER ;
 
--- CALL up_ihotel_migrate_member_import(2,14);
+-- CALL portal_member.up_ihotel_migrate_member_import(2,0);
