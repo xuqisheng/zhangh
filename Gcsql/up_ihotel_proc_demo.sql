@@ -16,8 +16,6 @@ BEGIN
     /*
         存储过程示例
     */
-
-
 	DECLARE done_cursor 	INT DEFAULT 0;
 	DECLARE var_bdate		DATETIME;
 	DECLARE var_bfdate		DATETIME;
