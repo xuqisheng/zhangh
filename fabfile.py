@@ -10,7 +10,7 @@ from fabric.api import *
 # env.port  = 1300
 
 env.user  = 'root'
-env.hosts = ['114.251.134.199']
+env.hosts = ['115.159.118.110','124.31.124.231','218.25.99.195','182.151.196.252']
 env.port  = 3305
 # env.password='deviskaifa'
 # env.key_filename = "/root/.ssh/huiRsa"
@@ -19,22 +19,28 @@ env.key_filename = "D:\Python27\huiRsa"
 def test():
     run('hostname')
 
+def zhexec():
+    file_put()
+    file_exec()
+
 def hello():
     if confirm("Welcome Hello. Continue anyway?"):
         print "^_^ Hello World !!!"
 
 # 上传本地文件到远程主机
-def put_file():
-    put('D:\Python27\zhangh\hpy\pyBase\mntOS.py','/root/')
-
-# 将本地文件上传至Gc61服务器
-def put61():
-    put('D:\Python27\zhangh\hbox\*.tar.gz','/root/zhangh/hbox')
-
-    # 脚本上传时注意格式转化
-    # run('dos2unix /root/zhangh/pyInstBase')
-    # run('chmod u+x /root/zhangh/pyInstBase')
+def file_put():
+    put('D:\Python27\simplejson-2.1.0.tar.gz','/')
+    put('D:\Python27\python-devel-2.4.3-56.el5.x86_64.rpm','/')
 
 # 从远程主机下文件到本地
-def get_file():
+def file_get():
     get('/etc/hosts','D:\Python27')
+
+def file_exec():
+    with cd('/'):
+        run('tar -zxvf simplejson-2.1.0.tar.gz')
+        run('python /simplejson-2.1.0/setup.py install')
+
+def file_del():
+    with cd('/'):
+        run('rm -Rf simplejson*')
