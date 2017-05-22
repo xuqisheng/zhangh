@@ -30,7 +30,6 @@ def hello():
 # 上传本地文件到远程主机
 def file_put():
     put('D:\Python27\simplejson-2.1.0.tar.gz','/')
-    put('D:\Python27\python-devel-2.4.3-56.el5.x86_64.rpm','/')
 
 # 从远程主机下文件到本地
 def file_get():

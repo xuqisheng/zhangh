@@ -9,16 +9,16 @@ from fabric.api import local, settings, abort
 from fabric.api import *
 
 # 单个服务器，通过密码连接
-env.user = 'root'
-env.hosts = ['192.168.0.61']
-env.port = 3305
-env.password='xxx'
+# env.user = 'root'
+# env.hosts = ['192.168.0.61']
+# env.port = 3305
+# env.password='xxx'
 
 # 单个服务器，通过私钥连接
-# env.user = 'root'
-# env.hosts = ['113.200.163.170']
-# env.port = 3305
-# env.key_filename = "D:\Python27\huiRsa"
+env.user = 'root'
+env.hosts = ['211.140.151.129']
+env.port = 3305
+env.key_filename = "D:\Python27\huiRsa"
 
 # 多个服务器，通过密码连接
 # env.user = 'root'
@@ -92,4 +92,32 @@ def exec_mode():
     run('rm -Rf /root/mntOS.py')
 
     print '^_^ Congratulations! Mode deployment is successful!'
+
+
+# 通用函数:上传、解压、执行、删除文件
+def func_com():
+    # 定义文件路径
+    file_dir  = 'D:\Python27\zhangh\hpy\pyOps'
+    # 定义文件名，注意带\
+    file_name = '\pyLinuxBase.py'
+    # 上传文件
+    put(file_dir+file_name,'/')
+
+
+
+
+
+
+
+    #删除文件
+    run('rm /' + file_name)
+
+
+    # put('D:\Python27\zhangh\hpy\pyOps\pyLinuxBase.py','/')
+    # run('python /pyLinuxBase.py')
+    #
+    # put('D:\Python27\zhangh\hbox\simplejson-2.1.0.tar.gz','/')
+    # run('tar -zxvf simplejson-2.1.0.tar.gz')
+    # run('python /simplejson-2.1.0/setup.py install')
+
 
