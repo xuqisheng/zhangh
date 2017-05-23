@@ -16,7 +16,7 @@ from fabric.api import *
 
 # 单个服务器，通过私钥连接
 env.user = 'root'
-env.hosts = ['211.140.151.129']
+env.hosts = ['218.75.13.109']
 env.port = 3305
 env.key_filename = "D:\Python27\huiRsa"
 
@@ -93,21 +93,31 @@ def exec_mode():
 
     print '^_^ Congratulations! Mode deployment is successful!'
 
+def ansible_com():
+    # 定义文件路径
+    file_dir  = 'D:\Python27\zhangh\hpy\pyOps'
+    # 定义文件名，注意带\
+    file_name = '\PyMntOs.py'
+    # 上传文件
+    put(file_dir+file_name,'/')
+
+    # 执行文件
+    run('python /' + file_name)
+
+    #删除文件
+    run('rm /' + file_name)
 
 # 通用函数:上传、解压、执行、删除文件
 def func_com():
     # 定义文件路径
     file_dir  = 'D:\Python27\zhangh\hpy\pyOps'
     # 定义文件名，注意带\
-    file_name = '\pyLinuxBase.py'
+    file_name = '\PyMntOs.py'
     # 上传文件
     put(file_dir+file_name,'/')
 
-
-
-
-
-
+    # 执行文件
+    run('python /' + file_name)
 
     #删除文件
     run('rm /' + file_name)

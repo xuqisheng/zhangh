@@ -95,13 +95,11 @@ import sys
 # aaa = '小河佳苑'
 # s2 = unicode('小河佳苑')
 # print aaa,s2
-file_dir = 'D:\Python27\zhangh\hpy\pyOp'
-file_name = '\pyLinuxBase.py'
 
+import platform
+sysstr = platform.system()
 
-print file_dir + file_name
-
-
+print sysstr
 
 
 
