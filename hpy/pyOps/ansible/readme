@@ -15,6 +15,8 @@ ansible是新出现的自动化运维工具，基于Python开发，集合了众�
 (4)、借助于插件完成记录日志邮件等功能；
 (5)、playbook：剧本执行多个任务时，非必需可以让节点一次性运行多个任务。
 
+ansible的默认路径:/etc/ansible/
+
 2、特性
 (1)、no agents：不需要在被管控主机上安装任何客户端；
 (2)、no server：无服务器端，使用时直接运行命令即可；
@@ -28,6 +30,19 @@ ansible是新出现的自动化运维工具，基于Python开发，集合了众�
 (2)、批量任务执行可以写成脚本，而且不用分发到远程就可以执行；
 (3)、使用python编写，维护更简单；
 (4)、支持sudo。
+
+Playbooks
+Playbooks 是 Ansible的配置,部署,编排语言.他们可以被描述为一个需要希望远程主机执行命令的方案,或者一组IT程序运行的命令集合.
+如果 Ansible 模块你是工作室中的工具,那么 playbooks 就是你设置的方案计划.
+在基础层面, playbooks 可以被用来管理用于部署到远程主机的配置文件.在更高的层面上,playbooks 可以依次对多层式架构上的服务器执行
+上线包括滚动更新在内的操作并可以将操作委托给其他主机包括在此过程中发生的与监视服务器,负载均衡服务器的交互操作在内.
+
+playbooks组成：
+  Target section：   定义将要执行 playbook 的远程主机组
+  Variable section： 定义 playbook 运行时需要使用的变量
+  Task section：     定义将要在远程主机上执行的任务列表
+  Handler section：  定义 task 执行完成以后需要调用的任务
+
 
 
 ansible 执行格式

@@ -1,0 +1,44 @@
+---
+# 针对新装服务器部署mode和packages
+
+
+- hosts: serverdb
+  remote_user: root
+  gather_facts: no
+
+  tasks:
+    - name: download mode
+      get_url: url=http://www.ipms.cn:8090/mode.tar.gz dest=/
+
+    - name: download packages
+      get_url: url=http://www.ipms.cn:8090/packages.tar.gz dest=/
+
+    - name: tar zxvf mode
+      command: tar zxvf /mode.tar.gz
+
+    - name: tar zxvf packages
+      command: tar zxvf /packages.tar.gz
+
+    - name: mode_base
+      copy: src=/root/zhangh/mode_base.py dest=/
+
+    - name: python mode_base.py
+      shell: python /mode_base.py
+
+    - name: python mode_base.py
+      shell: rm -Rf /mode_base.py
+
+    - name: settz
+      shell: /root/mode/settz
+
+    - name: disusb
+      shell: /root/mode/disusb
+
+    - name: install.sh
+      shell: /root/mode/install.sh
+
+    - name: inst_mysql
+      shell: /root/mode/inst_mysql
+
+    - name: config_mem
+      shell: /root/mode/config_mem max

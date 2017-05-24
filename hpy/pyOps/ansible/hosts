@@ -1,0 +1,40 @@
+202.91.248.101
+
+
+[aranya] 
+183.196.207.214
+47.92.84.1
+117.132.147.249 
+
+
+
+[gcdb]
+192.168.0.28
+192.168.0.30
+192.168.0.41
+192.168.1.9
+192.168.0.25
+
+
+[gctx]
+182.254.135.193
+www.gcihotel.com
+182.254.244.164
+115.159.190.22
+182.254.129.77
+
+
+[msjt]
+msjttx ansible_ssh_host=115.159.118.110
+lzmsfd ansible_ssh_host=124.31.124.231
+symsfd ansible_ssh_host=218.25.99.195
+xzmsfd ansible_ssh_host=221.179.227.54
+cdmsfd ansible_ssh_host=182.151.196.252
+bzmsfd ansible_ssh_host=182.254.155.223 ansible_ssh_port=3305
+
+[hdysc]
+hdgxapp ansible_ssh_host=211.140.151.129
+hdlsapp ansible_ssh_host=211.140.151.136
+
+
+
