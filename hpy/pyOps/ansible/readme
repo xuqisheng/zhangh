@@ -1,0 +1,91 @@
+ansible简介
+
+ansible是与puppet、saltstack类似的集群管理工具，其优点是仅需要ssh和Python即可使用，而不像puppet、saltstack那样都需要客户端。
+与puppet类似，ansible也支持丰富的功能：
+批量执行、支持模块化，支持playbook（相比puppet还是弱些）、上手容易（puppet上手有门槛）、权限控制
+安装方法为： yum -y install ansible 或 pip install ansible
+在管理集群时，ansible需要先配置集群hosts列表以方便集群操作
+
+ansible是新出现的自动化运维工具，基于Python开发，集合了众多运维工具（puppet、cfengine、chef、func、fabric）
+的优点，实现了批量系统配置、批量程序部署、批量运行命令等功能。ansible是基于模块工作的，本身没有批量部署的能力。
+真正具有批量部署的是ansible所运行的模块，ansible只是提供一种框架。主要包括：
+(1)、连接插件connection plugins：负责和被监控端实现通信；
+(2)、host inventory：指定操作的主机，是一个配置文件里面定义监控的主机；
+(3)、各种模块核心模块、command模块、自定义模块；
+(4)、借助于插件完成记录日志邮件等功能；
+(5)、playbook：剧本执行多个任务时，非必需可以让节点一次性运行多个任务。
+
+2、特性
+(1)、no agents：不需要在被管控主机上安装任何客户端；
+(2)、no server：无服务器端，使用时直接运行命令即可；
+(3)、modules in any languages：基于模块工作，可使用任意语言开发模块；
+(4)、yaml，not code：使用yaml语言定制剧本playbook；
+(5)、ssh by default：基于SSH工作；
+(6)、strong multi-tier solution：可实现多级指挥。
+
+3、优点
+(1)、轻量级，无需在客户端安装agent，更新时，只需在操作机上进行一次更新即可；
+(2)、批量任务执行可以写成脚本，而且不用分发到远程就可以执行；
+(3)、使用python编写，维护更简单；
+(4)、支持sudo。
+
+
+ansible 执行格式
+    ansible <操作目录> -m <模块名> -a <模块参数>
+    ansible-playbook /root/xxx.yml
+
+ansible-doc -l
+    查看当前ansible支持哪些模块
+ansible-doc -s 模块名
+    查看该模块哪些参数可以使用，比如: ansible -s copy
+
+
+常用模块
+    command
+        目的：在远程主机上执行命令
+    script
+        目的：
+    shell
+        目的：切换到某个shell执行指定的指令，参数与command相同
+    raw
+    ping
+        目的：检查指定节点机器是否还能连通
+        命令：ansible 10.1.1.113 -m ping
+    copy
+        目的：把主控端/root目录下的a.sh文件拷贝到到指定节点上
+        命令：ansible 10.1.1.113 -m copy -a 'src=/root/a.sh dest=/tmp/'
+    cron
+         目的：在指定节点上定义一个计划任务，每隔3分钟到主控端更新一次时间
+         命令：ansible all -m cron -a 'name="job" minute=*/3 hour=* day=* month=* weekday=* job="/usr/sbin/ntpdate 172.16.254.139"'
+    yum
+        目的：在指定节点上安装 lrzsz 服务
+        命令：ansible all -m yum -a "name=httpd state=present"
+    service
+        目的：启动指定节点上的 puppet 服务，并让其开机自启动
+        命令：ansible 10.1.1.113 -m service -a 'name=puppet state=restarted enabled=yes'
+    user
+        目的：在指定节点上创建一个用户名为nolinux，组为nolinux的用户
+        命令：ansible 10.1.1.113 -m user -a 'name=nolinux groups=nolinux state=present'
+    group
+        目的：在所有节点上创建一个组名为nolinux，gid为2014的组
+        命令：ansible all -m group -a 'gid=2014 name=nolinux'
+    file
+        目的：更改指定节点上/tmp/t.sh的权限为755，属主和属组为root
+        命令：ansible all -m file -a "dest=/tmp/t.sh mode=755 owner=root group=root"
+    get_url模块：
+        目的：将 http://10.1.1.116/favicon.ico 文件下载到指定节点的/tmp目录下
+        命令：ansible 10.1.1.113 -m get_url -a 'url=http://10.1.1.116/favicon.ico dest=/tmp'
+    synchronize模块：
+        目的：将主控方/root/a目录推送到指定节点的/tmp目录下
+        命令：ansible 10.1.1.113 -m synchronize -a 'src=/root/a dest=/tmp/ compress=yes'
+
+
+playbook是由一个或多个“play”组成的列表。play的主要功能在于将事先归并为一组的主机装扮成事先通过ansible中的task定义好的角色。
+
+一个简单的playbook配置如下：
+
+- hosts: local
+  remote_user: root
+  tasks:
+  - name: echo hi
+    shell: echo "hi"
