@@ -1,3 +1,4 @@
+#!/bin/bash
 {
 echo "[exec] $1"
 echo "		at `LANG=en_US;date`"

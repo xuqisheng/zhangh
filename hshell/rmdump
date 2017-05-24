@@ -1,4 +1,5 @@
 #!/bin/bash
+
 # ----------------------------------------------------------
 # function:
 #          remove history dumps according to certain rule
