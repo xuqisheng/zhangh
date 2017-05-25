@@ -9,16 +9,16 @@ from fabric.api import local, settings, abort
 from fabric.api import *
 
 # 单个服务器，通过密码连接
-# env.user = 'root'
-# env.hosts = ['192.168.0.61']
-# env.port = 3305
-# env.password='xxx'
+env.user = 'root'
+env.hosts = ['192.168.12.199']
+env.port = 22
+env.password='zhangh'
 
 # 单个服务器，通过私钥连接
-env.user = 'root'
-env.hosts = ['182.254.135.193','www.gcihotel.com','182.254.244.164','115.159.190.22','182.254.129.77']
-env.port = 3305
-env.key_filename = "D:\Python27\huiRsa"
+# env.user = 'root'
+# env.hosts = ['182.254.135.193','www.gcihotel.com','182.254.244.164','115.159.190.22','182.254.129.77']
+# env.port = 3305
+# env.key_filename = "D:\Python27\huiRsa"
 
 # 多个服务器，通过密码连接
 # env.user = 'root'
