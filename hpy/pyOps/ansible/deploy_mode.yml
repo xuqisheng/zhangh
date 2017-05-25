@@ -19,26 +19,11 @@
     - name: tar zxvf packages
       unarchive: copy=no src=/packages.tar.gz dest=/
 
-    - name: mode_base
-      copy: src=/root/zhangh/mode_base.py dest=/
+    - name: inst_mode
+      copy: src=/root/zhangh/inst_mode.py dest=/
 
-    - name: python mode_base.py
-      shell: chdir=/ python mode_base.py
+    - name: python inst_mode.py
+      shell: chdir=/ python inst_mode.py
 
-    - name: rm mode_base.py
-      file: path=/mode_base.py state=absent
-
-    - name: settz
-      shell: /root/mode/settz
-
-    - name: disusb
-      shell: /root/mode/disusb
-
-    - name: install.sh
-      shell: /root/mode/install.sh
-
-    - name: inst_mysql
-      shell: /root/mode/inst_mysql
-
-    - name: config_mem
-      shell: /root/mode/config_mem max
+    - name: rm inst_mode.py
+      file: path=/inst_mode.py state=absent
