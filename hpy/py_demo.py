@@ -75,15 +75,19 @@ print os.path.isfile(filename)
 # print json.dumps(info,encoding='utf-8',ensure_ascii=False)
 
 
-re.search(r'^Port 22',line)
-with open("D:/sshd_config","a") as w:
-    w.write('Port 22')
+def exec_mode(apacheno):
+    # 如何解决install.sh中read交互输入的问题?
+    if apacheno == 0:
+        print "T0"
+    elif apacheno == 1:
+        print "T1"
+    elif apacheno == 2:
+        print "T2"
+    else:
+        pass
 
 
-w.close()
-
-
-
+exec_mode(1)
 
 
 
