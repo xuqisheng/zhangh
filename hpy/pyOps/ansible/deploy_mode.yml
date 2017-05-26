@@ -12,27 +12,22 @@
 #
 #    - name: download packages
 #      get_url: url=http://www.ipms.cn:8090/packages.tar.gz dest=/
-#
-#    - name: tar zxvf mode
-#      unarchive: copy=no src=/mode.tar.gz dest=/
-#
-#    - name: tar zxvf packages
-#      unarchive: copy=no src=/packages.tar.gz dest=/
-# copy 在解压文件之前，是否先将文件复制到远程主机，默认为yes。若为no，则要求目标主机上压缩包必须存在
+
+    # copy 在解压文件之前，是否先将文件复制到远程主机，默认为yes。若为no，则要求目标主机上压缩包必须存在
     - name: tar zxvf mode
       unarchive: copy=yes src=/mode.tar.gz dest=/
 
     - name: tar zxvf packages
       unarchive: copy=yes src=/packages.tar.gz dest=/
-# 将执行文件从主控机传至远程主机根目录(/)
+    # 将执行文件从主控机传至远程主机根目录(/)
     - name: inst_mode
       copy: src=/root/zhangh/inst_mode.py dest=/
-# 执行文件
+    # 执行文件
     - name: python inst_mode.py
       shell: chdir=/ python inst_mode.py
-# 删除执行文件
+    # 删除执行文件
     - name: rm inst_mode.py
       file: path=/inst_mode.py state=absent
-# 执行hry ssh脚本
+    # 执行hry ssh脚本
     - name: ssh config & end
       shell: /root/mode/config_sshd
