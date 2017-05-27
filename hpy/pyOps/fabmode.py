@@ -10,7 +10,7 @@ from fabric.api import *
 
 # 单个服务器，通过密码连接
 env.user = 'root'
-env.hosts = ['192.168.12.199']
+env.hosts = ['192.168.12.197']
 env.port = 22
 env.password='zhangh'
 

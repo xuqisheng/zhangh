@@ -28,6 +28,9 @@
     # 删除执行文件
     - name: rm inst_mode.py
       file: path=/inst_mode.py state=absent
+    # 更换jdk
+    - name: tar zxvf jdk
+      unarchive: copy=yes src=/jdk7u72.x86_64.tar.gz dest=/
     # 执行hry ssh脚本
     - name: ssh config & end
       shell: /root/mode/config_sshd

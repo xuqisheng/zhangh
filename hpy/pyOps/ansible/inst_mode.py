@@ -1,11 +1,13 @@
 #!/etc/bin/env python
 # coding:utf-8
 
-import os,re
+import os
+import re
+
 
 class InstMode(object):
     # 校验centos发行版本号，打补丁
-    def issue_check():
+    def issue_check(self):
         # 打开CentOS发行版本文件 with写法不适用于低版本的python
         # with open('/etc/issue','r') as issue_r:
         issue_r = open('/etc/issue', 'r')
@@ -27,13 +29,13 @@ class InstMode(object):
 
         # 如何解决install.sh中read交互输入的问题?
         if apacheno == 0:
-            os.system('export HBLACKBOX2=1;echo ' + hrypasswd
+            os.system('export HBLACKBOX2=1;echo ' + hrypasswd +
             ' | /root/mode/install.sh')
         elif apacheno == 1:
-            os.system('export HBLACKBOX2=1;echo ' + hrypasswd
+            os.system('export HBLACKBOX2=1;echo ' + hrypasswd +
             ' | /root/mode/install.sh 1')
         elif apacheno == 2:
-            os.system('export HBLACKBOX2=1;echo ' + hrypasswd
+            os.system('export HBLACKBOX2=1;echo ' + hrypasswd +
             ' | /root/mode/install.sh 2')
         else:
             pass
@@ -41,6 +43,9 @@ class InstMode(object):
         # export HBLACKBOX2=1;用于解决确认执行脚本过程中提交是否输入y/n的问题
         os.system('export HBLACKBOX2=1;/root/mode/inst_mysql')
         os.system('export HBLACKBOX2=1;/root/mode/config_mem max')
+        # 删除老的jdk6
+        os.system('/root/mode/gcserver stop')
+        os.system('rm -Rf /usr/local/jdk6')
 
     # 文件中单行替换
     def file_deal(self,filename,oldcontent,newcontent):
