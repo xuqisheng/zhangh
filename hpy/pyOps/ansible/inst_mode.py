@@ -27,7 +27,7 @@ class InstMode(object):
         os.system('/root/mode/settz')
         os.system('/root/mode/disusb')
 
-        # 如何解决install.sh中read交互输入的问题?
+        # 如何解决install.sh中read交互输入的问题? 通过 echo "str" 加管道形式
         if apacheno == 0:
             os.system('export HBLACKBOX2=1;echo ' + hrypasswd +
             ' | /root/mode/install.sh')
@@ -66,6 +66,7 @@ class InstMode(object):
     def main(self):
         # yum remove 可能会将一些依赖包都删除，风险大
         # os.system('yum remove mysql')
+        # 加一个判断，表示mysql是正常在使用的
         os.system('rpm -qa | grep -i mysql | xargs rpm -e --nodeps')
         # 1.校验版本号，打补丁
         self.issue_check()
@@ -73,7 +74,7 @@ class InstMode(object):
         self.file_deal('/etc/ssh/sshd_config','#Port 22','Port 22')
 
         self.exec_mode('dangeR',0)
-        # 4.删除ssh配置文件中添加的信息
+        # 4.还原ssh配置文件信息
         self.file_deal('/etc/ssh/sshd_config','Port 22','#Port 22')
 
 if __name__ == "__main__":

@@ -1,9 +1,0 @@
----
-# yml范例，--- 开头
-#
-- hosts: serverdb
-  remote_user: root
-  gather_facts: no
-  tasks:
-    - name: copy file zhman
-      copy: src=/root/zhangh/zhman dest=/root/
