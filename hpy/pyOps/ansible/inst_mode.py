@@ -15,6 +15,7 @@ class InstMode(object):
         try:
             issue_r = open('/etc/issue', 'r')
             line = issue_r.readline().strip('\n')
+
             # 正则匹配
             m = re.search(r'[0-9].[0-9]', line)
 
@@ -28,6 +29,7 @@ class InstMode(object):
 
     # mode安装的执行步骤
     def exec_mode(self,hrypasswd,apacheno):
+
         os.system('/root/mode/settz')
         os.system('/root/mode/disusb')
 
@@ -44,12 +46,14 @@ class InstMode(object):
         # export HBLACKBOX2=1;用于解决确认执行脚本过程中提交是否输入y/n的问题
         os.system('export HBLACKBOX2=1;/root/mode/inst_mysql')
         os.system('export HBLACKBOX2=1;/root/mode/config_mem max')
+
         # 删除老的jdk6
         os.system('/root/mode/gcserver stop')
         os.system('rm -Rf /usr/local/jdk6')
 
     # 文件中单行替换
     def file_deal(self,filename,oldcontent,newcontent):
+
         if os.path.exists(filename):
             file_read = open(filename,'r')
             file_lines = file_read.readlines()
@@ -65,6 +69,7 @@ class InstMode(object):
 
     # 判断mysql是否需要处理
     def mysql_deal(self,mysql_index):
+
         # yum remove 可能会将一些依赖包都删除，风险大
         # os.system('yum remove mysql')
         # 加一个判断，表示mysql是正常在使用的
@@ -80,6 +85,7 @@ class InstMode(object):
 
     # 主执行函数
     def main(self):
+
         # 1.处理mysql
         self.mysql_deal('/var/lib/mysql/mysql-bin.index')
         # 2.校验版本号，打补丁
@@ -92,7 +98,7 @@ class InstMode(object):
         self.file_deal('/etc/ssh/sshd_config','Port 22','#Port 22')
 
 
-if __name__ == "__main__":
+if __name__ == '__main__':
     instmode = InstMode()
     instmode.main()
 

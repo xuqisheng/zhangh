@@ -36,7 +36,7 @@ class LianjiaMain(object):
         # 输出内容，可以输出到mysql数据库或者execl谁的中
         self.output.collect(housemsg)
 
-if __name__ == "__main__":
+if __name__ == '__main__':
     root_url = "http://hz.lianjia.com/ershoufang/"
     lianjia = LianjiaMain()
     lianjia.craw(root_url,1)
