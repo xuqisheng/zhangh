@@ -101,10 +101,10 @@ metadata.create_all(engine)
 # rp = connection.execute(s)
 # print rp.first()
 
-# s = select([cookies]).where(cookies.c.cookie_name == 'peanut butter')
-# rp = connection.execute(s)
-# record = rp.first()
-# print(record.items())
+s = select([cookies]).where(cookies.c.cookie_name == 'peanut butter')
+rp = connection.execute(s)
+record = rp.first()
+print(record.items())
 
 
 
