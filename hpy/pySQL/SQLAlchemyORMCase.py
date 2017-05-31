@@ -20,90 +20,102 @@ Base = declarative_base()
 class Cookie(Base):
     __tablename__ = 'cookies'
 
-    cookie_id = Column(Integer(), primary_key=True)
-    cookie_name = Column(String(50), index=True)
+    cookie_id = Column(Integer, primary_key=True)
+    cookie_name = Column(String(50))
     cookie_recipe_url = Column(String(255))
     cookie_sku = Column(String(55))
-    quantity = Column(Integer())
+    quantity = Column(Integer)
     unit_cost = Column(Numeric(12, 2))
 
     def __repr__(self):
         return "Cookie(cookie_name='{self.cookie_name}', " \
-               "cookie_recipe_url='{self.cookie_recipe_url}', " \
-               "cookie_sku='{self.cookie_sku}', " \
-               "quantity={self.quantity}, " \
-               "unit_cost={self.unit_cost})".format(self=self)
+            "cookie_recipe_url='{self.cookie_recipe_url}', " \
+            "cookie_sku='{self.cookie_sku}', " \
+            "quantity={self.quantity}, " \
+            "unit_cost={self.unit_cost})".format(self=self)
 
 
-class User(Base):
-    __tablename__ = 'users'
+# 创建到数据库的连接,echo=True 表示用logging输出调试结果(显示每条执行的 SQL 语句),生产环境下建议关闭
+# '数据库类型+数据库驱动名称://用户名:口令@机器地址:端口号/数据库名'
+engine = create_engine('mysql://root:action@127.0.0.1/zhangh', encoding='utf8', echo=False)
+# 执行生成实体表
+Base.metadata.create_all(engine)
 
-    user_id = Column(Integer(), primary_key=True)
-    username = Column(String(15), nullable=False, unique=True)
-    email_address = Column(String(255), nullable=False)
-    phone = Column(String(20), nullable=False)
-    password = Column(String(25), nullable=False)
-    created_on = Column(DateTime(), default=datetime.now)
-    updated_on = Column(DateTime(), default=datetime.now, onupdate=datetime.now)
+Session = sessionmaker(bind=engine)
 
-    def __repr__(self):
-        return "User(username='{self.username}', " \
-               "email_address='{self.email_address}', " \
-               "phone='{self.phone}', " \
-               "password='{self.password}')".format(self=self)
+session = Session()
 
+# # Inserting a single object
+# cc_cookie = Cookie(
+#         cookie_name='chocolate chip',
+#         cookie_recipe_url='http://some.aweso.me/cookie/recipe.html',
+#         cookie_sku='CC01',
+#         quantity='12',
+#         unit_cost='0.5')
 
-class Order(Base):
+# session.add(cc_cookie)
 
-    __tablename__ = 'orders'
+# session.commit()
 
-    order_id = Column(Integer(), primary_key=True)
-    user_id = Column(Integer(), ForeignKey('users.user_id'))
-    user = relationship("User", backref=backref('orders', order_by=order_id))
+# print cc_cookie.cookie_id
 
-    def __repr__(self):
-        return "Order(user_id={self.user_id}, " \
-               "shipped={self.shipped})".format(self=self)
+# # Multiple inserts
+# dcc = Cookie(
+#     cookie_name='dark chocolate chip',
+#     cookie_recipe_url='http://some.aweso.me/cookie/recipe_dark.html',
+#     cookie_sku='CC02',
+#     quantity=1,
+#     unit_cost=0.75)
+# mol = Cookie(
+#     cookie_name='molasses',
+#     cookie_recipe_url='http://some.aweso.me/cookie/recipe_molasses.html',
+#     cookie_sku='MOL01',
+#     quantity=1,
+#     unit_cost=0.80)
+#
+# session.add(dcc)
+# session.add(mol)
 
+# # flush预提交，等于提交到数据库内存，还未写入数据库文件
+# # commit完全提交
+# # session.commit()
+# session.flush()
+#
+# print(dcc.cookie_id)
+# print(mol.cookie_id)
 
-class LineItems(Base):
+# # Bulk inserting multiple records
+# c1 = Cookie(
+#     cookie_name='peanut butter',
+#     cookie_recipe_url='http://some.aweso.me/cookie/peanut.html',
+#     cookie_sku='PB01',
+#     quantity=24,
+#     unit_cost=0.25)
+# c2 = Cookie(
+#     cookie_name='oatmeal raisin',
+#     cookie_recipe_url='http://some.okay.me/cookie/raisin.html',
+#     cookie_sku='EWW01',
+#     quantity=100,
+#     unit_cost=1.00)
+#
+# session.bulk_save_objects([c1, c2])
+# session.commit()
+# print c1.cookie_id
 
-    __tablename__ = 'line_items'
+# query 1
+# cookies = session.query(Cookie).all()
+# print cookies
 
-    line_item_id = Column(Integer(), primary_key=True)
-    order_id = Column(Integer(), ForeignKey('orders.order_id'))
-    cookie_id = Column(Integer(), ForeignKey('cookies.cookie_id'))
-    quantity = Column(Integer())
-    extended_cost = Column(Numeric(12, 2))
-    order = relationship("Order", backref=backref('line_items',order_by=line_item_id))
-    cookie = relationship("Cookie", uselist=False, order_by=id)
+# query 2
+# for cookie in session.query(Cookie):
+#     print cookie
 
-    def __repr__(self):
-        return "LineItems(order_id={self.order_id}, " \
-               "cookie_id={self.cookie_id}, " \
-               "quantity={self.quantity}, " \
-               "extended_cost={self.extended_cost})".format(self=self)
+# first() Returns the first record object if there is one
+# print session.query(Cookie).first()
+# one()   Queries all the rows, and raises an exception if anything other than a single result is returned
+# print session.query(Cookie).one()
+# scalar() Returns the first element of the first result, None if there is no result,
+# or an error if there is more than one result
+# print session.query(Cookie).scalar()
 
-
-if __name__ == '__main__':
-    # 创建到数据库的连接,echo=True 表示用logging输出调试结果(显示每条执行的 SQL 语句),生产环境下建议关闭
-    # '数据库类型+数据库驱动名称://用户名:口令@机器地址:端口号/数据库名'
-    engine = create_engine('mysql://root:action@127.0.0.1/zhangh', encoding='utf8', echo=True)
-    # 执行生成实体表
-    Base.metadata.create_all(engine)
-
-    Session = sessionmaker(bind=engine)
-
-    session = Session()
-
-    # Inserting a single object
-    cc_cookie = Cookie(cookie_name='chocolate chip',
-                       cookie_recipe_url='http://some.aweso.me/cookie/recipe.html',
-                       cookie_sku='CC01',
-                       quantity=12,
-                       unit_cost=0.50)
-
-    session.add(cc_cookie)
-
-    session.commit()
-
+print session.query(Cookie.cookie_name, Cookie.quantity).first()
