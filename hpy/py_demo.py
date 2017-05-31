@@ -75,31 +75,37 @@ print os.path.isfile(filename)
 # print json.dumps(info,encoding='utf-8',ensure_ascii=False)
 
 
-import os,time,datetime
-
-
-# f=open('D:\Python27\huiRsa')
-file_msg = os.stat('D:\Python27\README.txt')
-
-# mtime = time.ctime(os.path.getmtime('D:\Python27\huiRsa'))
-# ltime = time.ctime()
-abc=datetime.datetime.fromtimestamp(time.time())
-a1 = datetime.datetime.now()
-print abc,'###',a1
-# mtime = time.ctime(file_msg.st_mtime)
-a2 = datetime.datetime.fromtimestamp(file_msg.st_mtime)
-a3 = (a1-a2).days
-
-if a3 > 10:
-    print "OK"
-else:
-    print "No"
-
-print a3
+# import os,time,datetime
+#
+#
+# # f=open('D:\Python27\huiRsa')
+# file_msg = os.stat('D:\Python27\README.txt')
+#
+# # mtime = time.ctime(os.path.getmtime('D:\Python27\huiRsa'))
+# # ltime = time.ctime()
+# abc=datetime.datetime.fromtimestamp(time.time())
+# a1 = datetime.datetime.now()
+# print abc,'###',a1
+# # mtime = time.ctime(file_msg.st_mtime)
+# a2 = datetime.datetime.fromtimestamp(file_msg.st_mtime)
+# a3 = (a1-a2).days
+#
+# if a3 > 10:
+#     print "OK"
+# else:
+#     print "No"
+#
+# print a3
 
 
 # filemt= time.localtime(os.stat('D:\Python27\huiRsa').st_mtime)
 # print time.strftime("%Y-%m-%d",filemt)
+
+
+from datetime import *
+
+print datetime.now()
+
 
 
 

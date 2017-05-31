@@ -4,9 +4,9 @@
 """
 @version:
 @author :zhangh
-@file   :SQLALchemyCase.py
+@file   :SQLALchemyCoreCase.py
 @time   :2017/5/29 6:12
-@remark :
+@remark : SQLALchemy Core 事例
 """
 
 from datetime import datetime
