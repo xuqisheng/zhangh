@@ -52,9 +52,9 @@ session = Session()
 #         cookie_sku='CC01',
 #         quantity='12',
 #         unit_cost='0.5')
-
+#
 # session.add(cc_cookie)
-
+#
 # session.commit()
 
 # print cc_cookie.cookie_id
@@ -78,7 +78,7 @@ session = Session()
 
 # # flush预提交，等于提交到数据库内存，还未写入数据库文件
 # # commit完全提交
-# # session.commit()
+# session.commit()
 # session.flush()
 #
 # print(dcc.cookie_id)
@@ -118,4 +118,82 @@ session = Session()
 # or an error if there is more than one result
 # print session.query(Cookie).scalar()
 
-print session.query(Cookie.cookie_name, Cookie.quantity).first()
+# print session.query(Cookie.cookie_name, Cookie.quantity).first()
+
+# Order by quantity ascending
+# for cookie in session.query(Cookie).order_by(Cookie.quantity):
+#     # 填充与格式化 :[填充字符][对齐方式 <^>][宽度]
+#     print('{:5} - {}'.format(cookie.quantity,cookie.cookie_name))
+
+# Limit
+# for cookie in session.query(Cookie).order_by((Cookie.quantity)).limit(2):
+#     print('{:5} - {}'.format(cookie.quantity, cookie.cookie_name))
+
+# Built-In SQL Functions and Labels
+# inv_sum = session.query(func.sum(Cookie.quantity)).first()
+# inv_sum = session.query(func.sum(Cookie.quantity)).one()
+# inv_sum = session.query(func.sum(Cookie.quantity)).scalar()
+# print(inv_sum)
+
+# inv_count = session.query(func.count(Cookie.quantity)).scalar()
+# inv_count = session.query(func.count(Cookie.quantity)).first()
+# print(inv_count)
+
+# rec_count = session.query(func.count(Cookie.cookie_name).label('inventory_count')).first()
+# print(rec_count.keys())
+# print(rec_count.inventory_count)
+
+# Filter
+# record = session.query(Cookie).filter(Cookie.cookie_name == 'chocolate chip').first()
+# print(record)
+
+# query = session.query(Cookie).filter(Cookie.cookie_name.like('%chocolate%'))
+# for record in query:
+#     print record
+#     print(record.cookie_name)
+
+# String concatenation with +
+# results = session.query(Cookie.cookie_name, 'SKU-' + Cookie.cookie_sku).all()
+# for row in results:
+#     print(row)
+
+# query = session.query(Cookie.cookie_name,cast((Cookie.quantity * Cookie.unit_cost),Numeric(12,2)).label('inv_cost'))
+# for result in query:
+#     print('{} - {}'.format(result.cookie_name, result.inv_cost))
+
+
+# Using flter with multiple ClauseElement expressions to perform an AND
+# query = session.query(Cookie).filter(Cookie.quantity > 23,Cookie.unit_cost < 0.40)
+# for result in query:
+#     print(result.cookie_name)
+# and 这两种写法的结果一致
+# query = session.query(Cookie).filter(and_(Cookie.quantity > 23,Cookie.unit_cost < 0.40))
+# for result in query:
+#     print(result.cookie_name)
+# and_,or_,not_
+# query = session.query(Cookie).filter(or_(Cookie.quantity > 23,Cookie.unit_cost < 0.40))
+# for result in query:
+#     print(result.cookie_name)
+
+
+# # Update
+# query = session.query(Cookie).filter(Cookie.cookie_name == "chocolate chip")
+# query.update({Cookie.quantity: Cookie.quantity - 20})
+# cc_cookie = query.first()
+# session.commit()
+# print(cc_cookie.quantity)
+
+# # Delete
+# query = session.query(Cookie)
+# query = query.filter(Cookie.cookie_name == "dark chocolate chip")
+# dcc_cookie = query.one()
+# session.delete(dcc_cookie)
+# session.commit()
+# dcc_cookie = query.first()
+# print(dcc_cookie)
+
+# # Joins
+
+
+
+
