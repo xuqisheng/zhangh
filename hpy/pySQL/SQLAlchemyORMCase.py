@@ -34,6 +34,48 @@ class Cookie(Base):
             "quantity={self.quantity}, " \
             "unit_cost={self.unit_cost})".format(self=self)
 
+class User(Base):
+        __tablename__ = 'users'
+
+    user_id = Column(Integer(), primary_key=True)
+    username = Column(String(15), nullable=False, unique=True)
+    email_address = Column(String(255), nullable=False)
+    phone = Column(String(20), nullable=False)
+    password = Column(String(25), nullable=False)
+    created_on = Column(DateTime(), default=datetime.now)
+    updated_on = Column(DateTime(), default=datetime.now,onupdate=datetime.now)
+
+    def __repr__(self):
+        return "User(username='{self.username}', " \
+            "email_address='{self.email_address}', " \
+            "phone='{self.phone}', " \
+            "password='{self.password}')".format(self=self)
+
+
+class Order(Base):
+    __tablename__ = 'orders'
+    order_id = Column(Integer(), primary_key=True)
+    user_id = Column(Integer())
+
+    def __repr__(self):
+        return "Order(user_id={self.user_id}, " \
+            "shipped={self.shipped})".format(self=self)
+
+
+class LineItem(Base):
+    __tablename__ = 'line_items'
+    line_item_id = Column(Integer(), primary_key=True)
+    order_id = Column(Integer())
+    cookie_id = Column(Integer())
+    quantity = Column(Integer())
+    extended_cost = Column(Numeric(12, 2))
+
+    def __repr__(self):
+        return "LineItems(order_id={self.order_id}, " \
+            "cookie_id={self.cookie_id}, " \
+            "quantity={self.quantity}, " \
+            "extended_cost={self.extended_cost})".format(self=self)
+
 
 # 创建到数据库的连接,echo=True 表示用logging输出调试结果(显示每条执行的 SQL 语句),生产环境下建议关闭
 # '数据库类型+数据库驱动名称://用户名:口令@机器地址:端口号/数据库名'
@@ -193,7 +235,15 @@ session = Session()
 # print(dcc_cookie)
 
 # # Joins
+# Using join to select from multiple tables
+query = session.query(Order.order_id, User.username, User.phone,Cookie.cookie_name, LineItem.quantity,LineItem.extended_cost)
+query = query.join(User).join(LineItem).join(Cookie)
+results = query.filter(User.username == 'cookiemon').all()
+print(results)
 
-
-
+# Using outerjoin to select from multiple tables
+query = session.query(User.username, func.count(Order.order_id))
+query = query.outerjoin(Order).group_by(User.username)
+for row in query:
+    print(row)
 
