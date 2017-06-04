@@ -34,23 +34,6 @@ class Cookie(Base):
             "quantity={self.quantity}, " \
             "unit_cost={self.unit_cost})".format(self=self)
 
-class User(Base):
-        __tablename__ = 'users'
-
-    user_id = Column(Integer(), primary_key=True)
-    username = Column(String(15), nullable=False, unique=True)
-    email_address = Column(String(255), nullable=False)
-    phone = Column(String(20), nullable=False)
-    password = Column(String(25), nullable=False)
-    created_on = Column(DateTime(), default=datetime.now)
-    updated_on = Column(DateTime(), default=datetime.now,onupdate=datetime.now)
-
-    def __repr__(self):
-        return "User(username='{self.username}', " \
-            "email_address='{self.email_address}', " \
-            "phone='{self.phone}', " \
-            "password='{self.password}')".format(self=self)
-
 
 class Order(Base):
     __tablename__ = 'orders'
@@ -246,4 +229,6 @@ query = session.query(User.username, func.count(Order.order_id))
 query = query.outerjoin(Order).group_by(User.username)
 for row in query:
     print(row)
+
+
 

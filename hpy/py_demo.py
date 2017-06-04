@@ -102,13 +102,22 @@ print os.path.isfile(filename)
 # print time.strftime("%Y-%m-%d",filemt)
 
 
-from datetime import *
-
-print datetime.now()
-
-
+# from datetime import *
+#
+# print datetime.now()
 
 
+# import sys
+#
+# a = sys.argv[0]
+# b = sys.argv[1]
+#
+# print a,'<-->',b
 
 
+
+
+
+import win32api,win32con
+win32api.MessageBox(win32con.NULL, u'Python 你好！', u'你好', win32con.MB_OK)
 
