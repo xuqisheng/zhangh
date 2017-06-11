@@ -7,6 +7,7 @@
 # http://doc.scrapy.org/en/latest/topics/items.html
 
 # items：定义我们需要的结构化数据，使用相当于dict
+# 保存爬取到的数据的容器
 
 import scrapy
 
