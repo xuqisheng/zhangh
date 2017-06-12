@@ -25,3 +25,4 @@ def excel_byindex(file='file.xls',colnameindex=0,by_index=0):
     table = data.sheets()[by_index]
     nrows = table.nrows # 行数
     nclos = table.ncols # 列数
+
