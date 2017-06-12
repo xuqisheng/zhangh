@@ -95,7 +95,7 @@ print os.path.isfile(filename)
 # else:
 #     print "No"
 #
-# print a3
+# print a3 in
 
 
 # filemt= time.localtime(os.stat('D:\Python27\huiRsa').st_mtime)
