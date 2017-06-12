@@ -51,8 +51,10 @@ ansible 执行格式
 
 ansible-doc -l
     查看当前ansible支持哪些模块
+ansible-doc 模块名
+    查看该模块详细信息    比如:ansible-doc shell
 ansible-doc -s 模块名
-    查看该模块哪些参数可以使用，比如: ansible -s copy
+    查看该模块哪些参数可以使用，比如: ansible-doc -s copy
 
 
 常用模块

@@ -3,35 +3,35 @@ create proc p_hui_audit_act_bal
 	@bdate		datetime
 as
 -----------------------------------------------------------------------------
---	   Ã¿ÈÕARÕË·¢Éú¶î(·ÖÀàÏÔÊ¾)
---		ĞèARÕËÉóºËºó²ÅÄÜ×¼È·Í³¼Æ
+--	   æ¯æ—¥ARè´¦å‘ç”Ÿé¢(åˆ†ç±»æ˜¾ç¤º)
+--		éœ€ARè´¦å®¡æ ¸åæ‰èƒ½å‡†ç¡®ç»Ÿè®¡
 
 -----------------------------------------------------------------------------
 truncate table act_bal
 /*
-create table #act_bal 
+create table #act_bal
 (
     date       datetime    NOT NULL,
     accnt      char(7)     NOT NULL,
-    name       varchar(50) DEFAULT '' NULL,    
-    rm         money       DEFAULT 0 NOT NULL,	--·¿·Ñ
-    fb         money       DEFAULT 0 NOT NULL,	--²ÍÒû
-    mt         money       DEFAULT 0 NOT NULL,	--»áÒé
-    en         money       DEFAULT 0 NOT NULL,	--¿µÀÖ
-    sp         money       DEFAULT 0 NOT NULL,	--ÉÌ³¡
-    dot        money       DEFAULT 0 NOT NULL,	--ÆäËü
-    dtl        money       DEFAULT 0 NOT NULL,	--×ÜºÍ
-    lastbl     money       DEFAULT 0 NOT NULL,	--ÉÏÈÕÓà¶î
-    tillbl     money       DEFAULT 0 NOT NULL	--±¾ÈÕÓà¶î
+    name       varchar(50) DEFAULT '' NULL,
+    rm         money       DEFAULT 0 NOT NULL,	--æˆ¿è´¹
+    fb         money       DEFAULT 0 NOT NULL,	--é¤é¥®
+    mt         money       DEFAULT 0 NOT NULL,	--ä¼šè®®
+    en         money       DEFAULT 0 NOT NULL,	--åº·ä¹
+    sp         money       DEFAULT 0 NOT NULL,	--å•†åœº
+    dot        money       DEFAULT 0 NOT NULL,	--å…¶å®ƒ
+    dtl        money       DEFAULT 0 NOT NULL,	--æ€»å’Œ
+    lastbl     money       DEFAULT 0 NOT NULL,	--ä¸Šæ—¥ä½™é¢
+    tillbl     money       DEFAULT 0 NOT NULL	--æœ¬æ—¥ä½™é¢
 )
 CREATE UNIQUE NONCLUSTERED INDEX index1 ON #act_bal(accnt)
 */
--- ²åÈëÕÊ»§
+-- æ’å…¥å¸æˆ·
 insert act_bal
 	select date,accnt,name,rm,fb,mt,en,sp,dot,dtl,lastbl,tillbl from ycus_xf
-		where date = @bdate and accnt like 'AR%' 
+		where date = @bdate and accnt like 'AR%'
 
--- ÁÙÊ±ÕÊÎñ±í
+-- ä¸´æ—¶å¸åŠ¡è¡¨
 create table #account(
 	accnt 		char(10)					not null,
 	pccode		char(5)					not null,
@@ -44,7 +44,7 @@ insert #account
 
 update #account set deptno=a.deptno7 from pccode a where #account.pccode=a.pccode
 
--- ²É¼¯Êı¾İ
+-- é‡‡é›†æ•°æ®
 update act_bal set rm = 	isnull((select sum(a.charge) from #account a where act_bal.accnt = a.accnt and a.deptno like 'rm%'),0)
 update act_bal set fb = 	isnull((select sum(a.charge) from #account a where act_bal.accnt = a.accnt and a.deptno = 'fb'),0)
 update act_bal set mt = 	isnull((select sum(a.charge) from #account a where act_bal.accnt = a.accnt and a.deptno = 'mt'),0)
@@ -60,15 +60,10 @@ open c_accnt
 fetch c_accnt into @bdate,@ar_accnt,@charge,@deptno7
 while @@sqlstatus = 0
 	begin
-					
+
 
 		fetch c_accnt into @bdate,@ar_accnt,@charge,@deptno7
 	end
 close c_accnt
 deallocate cursor c_accnt
 */
-
-
-
-
-
