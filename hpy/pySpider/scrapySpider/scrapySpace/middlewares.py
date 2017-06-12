@@ -1,12 +1,9 @@
-#!/usr/bin/env python
-# coding:utf8
+# -*- coding: utf-8 -*-
 
 # Define here the models for your spider middleware
 #
 # See documentation in:
 # http://doc.scrapy.org/en/latest/topics/spider-middleware.html
-
-# middlewares：中间件，相当于钩子，可以对爬取前后做预处理，如修改请求header，url过滤等
 
 from scrapy import signals
 
