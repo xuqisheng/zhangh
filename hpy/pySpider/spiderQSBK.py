@@ -5,8 +5,9 @@
 对糗事百科进行爬虫
 
 """
-import urllib,urllib2
-import re,time
+import urllib2
+import re
+
 
 # 糗事百科爬虫类
 class spiderQSBK:

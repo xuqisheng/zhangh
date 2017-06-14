@@ -2,128 +2,99 @@ DELIMITER $$
 
 DROP PROCEDURE IF EXISTS `up_ihotel_pos_add_auth`$$
 
-CREATE DEFINER=`root`@`%` PROCEDURE `up_ihotel_pos_add_auth`(
-	IN arg_hotel_group_id 	INT,
-	IN arg_hotel_id 		INT
-    )
-	
-	SQL SECURITY INVOKER
+CREATE DEFINER=`root`@`%` PROCEDURE `up_ihotel_pos_add_auth`()
+SQL SECURITY INVOKER
+
 label_0:
 BEGIN
-    /*
-        添加餐饮权限
-    */
 
-    insert into user_pos_auth (hotel_group_id, hotel_id, app_code, code, parent_code, descript, descript_en, auth_flag,
-        is_halt, list_order, create_user, create_datetime, modify_user, modify_datetime)
-    SELECT a.hotel_group_id, arg_hotel_id, a.app_code, a.code, a.parent_code, a.descript, a.descript_en, a.auth_flag,
-        a.is_halt, a.list_order, a.create_user, a.create_datetime, a.modify_user, a.modify_datetime
-        FROM user_pos_auth a WHERE a.hotel_group_id = arg_hotel_group_id AND a.hotel_id <> 0 GROUP BY
+	-- user_pos_auth
+	DELETE FROM user_pos_auth WHERE hotel_group_id = 1 AND hotel_id = -1;
+	INSERT INTO user_pos_auth (hotel_group_id, hotel_id, app_code, CODE, parent_code, descript, descript_en, auth_flag, is_halt, list_order, create_user, create_datetime, modify_user, modify_datetime) VALUES
+		 ('1','-1','pos','pos!posMode!SystemLocal','posMode','7003-本地维护','7003-本地维护',NULL,'F','7003','ADMIN',NOW(),'ADMIN',NOW()),
+		 ('1','-1','pos','pos!posMode!System','posMode','7002-系统维护','7002-系统维护',NULL,'F','7002','ADMIN',NOW(),'ADMIN',NOW()),
+		 ('1','-1','pos','pos!posMode!Cashier','posMode','7001-综合收银','7001-综合收银',NULL,'F','7001','ADMIN',NOW(),'ADMIN',NOW()),
+		 ('1','-1','pos','pos!posSystemGroup!master','posSystemGroup','6006-餐单查询','6006-餐单查询',NULL,'F','6006','ADMIN',NOW(),'ADMIN',NOW()),
+		 ('1','-1','pos','pos!posSystemGroup!report','posSystemGroup','6005-集团报表','6005-集团报表',NULL,'F','6005','ADMIN',NOW(),'ADMIN',NOW()),
+		 ('1','-1','pos','pos!posSystemGroup!sysopt','posSystemGroup','6004-参数设置','6004-参数设置',NULL,'F','6004','ADMIN',NOW(),'ADMIN',NOW()),
+		 ('1','-1','pos','pos!posSystemGroup!condst','posSystemGroup','6003-做法设置','6003-做法设置',NULL,'F','6003','ADMIN',NOW(),'ADMIN',NOW()),
+		 ('1','-1','pos','pos!posSystemGroup!pluE','posSystemGroup','6002-菜谱编辑','6002-菜谱编辑',NULL,'F','6002','ADMIN',NOW(),'ADMIN',NOW()),
+		 ('1','-1','pos','pos!posSystemGroup!code','posSystemGroup','6001-基本代码设置','6001-基本代码设置',NULL,'F','6001','ADMIN',NOW(),'ADMIN',NOW()),
+		 ('1','-1','pos','pos!posSystem!editAuth','posSystem','5007-权限设置','5007-权限设置',NULL,'F','5007','ADMIN',NOW(),'ADMIN',NOW()),
+		 ('1','-1','pos','pos!posSystem!master','posSystem','5006-餐单查询','5006-餐单查询',NULL,'F','5006','ADMIN',NOW(),'ADMIN',NOW()),
+		 ('1','-1','pos','pos!posSystem!report','posSystem','5005-酒店报表','5005-酒店报表',NULL,'F','5005','ADMIN',NOW(),'ADMIN',NOW()),
+		 ('1','-1','pos','pos!posSystem!mode','posSystem','5004-模式设置','5004-模式设置',NULL,'F','5004','ADMIN',NOW(),'ADMIN',NOW()),
+		 ('1','-1','pos','pos!posSystem!pccode','posSystem','5003-营业点设置','5003-营业点设置',NULL,'F','5003','ADMIN',NOW(),'ADMIN',NOW()),
+		 ('1','-1','pos','pos!posSystem!pluE','posSystem','5002-菜谱设置','5002-菜谱设置',NULL,'F','5002','ADMIN',NOW(),'ADMIN',NOW()),
+		 ('1','-1','pos','pos!posSystem!code','posSystem','5001-代码设置','5001-代码设置',NULL,'F','5001','ADMIN',NOW(),'ADMIN',NOW()),
+		 ('1','-1','pos','pos!posSystemLocal!interf','posSystemLocal','4002-接口设置','4002-接口设置',NULL,'F','4002','ADMIN',NOW(),'ADMIN',NOW()),
+		 ('1','-1','pos','pos!posSystemLocal!print','posSystemLocal','4001-厨打设置','4001-厨打设置',NULL,'F','4001','ADMIN',NOW(),'ADMIN',NOW()),
+		 ('1','-1','pos','pos!posCashier!getData','posCashier','3024-数据更新','3024-数据更新',NULL,'F','3024','ADMIN',NOW(),'ADMIN',NOW()),
+		 ('1','-1','pos','pos!posCashier!station','posCashier','3023-站点管理','3023-站点管理',NULL,'F','3023','ADMIN',NOW(),'ADMIN',NOW()),
+		 ('1','-1','pos','pos!posCashier!checkReOth','posCashier','3022-撤销他人结账','3022-撤销他人结账',NULL,'F','3022','ADMIN',NOW(),'ADMIN',NOW()),
+		 ('1','-1','pos','pos!posCashier!SstaChange','posCashier','3021-S状态下修改','3021-S状态下修改',NULL,'F','3021','ADMIN',NOW(),'ADMIN',NOW()),
+		 ('1','-1','pos','pos!posCashier!accessDel','posCashier','3020-沽清取消','3020-沽清取消',NULL,'F','3020','ADMIN',NOW(),'ADMIN',NOW()),
+		 ('1','-1','pos','pos!posCashier!access','posCashier','3019-沽清设置','3019-沽清设置',NULL,'F','3019','ADMIN',NOW(),'ADMIN',NOW()),
+		 ('1','-1','pos','pos!posCashier!audit','posCashier','3018-夜间稽核','3018-夜间稽核',NULL,'F','3018','ADMIN',NOW(),'ADMIN',NOW()),
+		 ('1','-1','pos','pos!posCashier!syncUp','posCashier','3017-云同步','3017-云同步',NULL,'F','3017','ADMIN',NOW(),'ADMIN',NOW()),
+		 ('1','-1','pos','pos!posCashier!checkReC','posCashier','3016-重登','3016-重登',NULL,'F','3016','ADMIN',NOW(),'ADMIN',NOW()),
+		 ('1','-1','pos','pos!posCashier!checkS','posCashier','3015-挂S账','3015-挂S账',NULL,'F','3015','ADMIN',NOW(),'ADMIN',NOW()),
+		 ('1','-1','pos','pos!posCashier!checkRe','posCashier','3014-撤销结账','3014-撤销结账',NULL,'F','3014','ADMIN',NOW(),'ADMIN',NOW()),
+		 ('1','-1','pos','pos!posCashier!report','posCashier','3013-交班报表','3013-交班报表',NULL,'F','3013','ADMIN',NOW(),'ADMIN',NOW()),
+		 ('1','-1','pos','pos!posCashier!resOpen','posCashier','3012-预订转登记','3012-预订转登记',NULL,'F','3012','ADMIN',NOW(),'ADMIN',NOW()),
+		 ('1','-1','pos','pos!posCashier!res','posCashier','3011-预订详情','3011-预订详情',NULL,'F','3011','ADMIN',NOW(),'ADMIN',NOW()),
+		 ('1','-1','pos','pos!posCashier!checkOut','posCashier','3010-结账','3010-结账',NULL,'F','3010','ADMIN',NOW(),'ADMIN',NOW()),
+		 ('1','-1','pos','pos!posCashier!bill','posCashier','3009-账单打印','3009-账单打印',NULL,'F','3009','ADMIN',NOW(),'ADMIN',NOW()),
+		 ('1','-1','pos','pos!posCashier!YJbill','posCashier','3008-预结单打印','3008-预结单打印',NULL,'F','3008','ADMIN',NOW(),'ADMIN',NOW()),
+		 ('1','-1','pos','pos!posCashier!pluEnt','posCashier','3007-单菜赠送','3007-单菜赠送',NULL,'F','3007','ADMIN',NOW(),'ADMIN',NOW()),
+		 ('1','-1','pos','pos!posCashier!pluDsc','posCashier','3006-单菜折扣','3006-单菜折扣',NULL,'F','3006','ADMIN',NOW(),'ADMIN',NOW()),
+		 ('1','-1','pos','pos!posCashier!revoke','posCashier','3005-消单','3005-消单',NULL,'F','3005','ADMIN',NOW(),'ADMIN',NOW()),
+		 ('1','-1','pos','pos!posCashier!merger','posCashier','3004-并桌','3004-并桌',NULL,'F','3004','ADMIN',NOW(),'ADMIN',NOW()),
+		 ('1','-1','pos','pos!posCashier!change','posCashier','3003-换桌','3003-换桌',NULL,'F','3003','ADMIN',NOW(),'ADMIN',NOW()),
+		 ('1','-1','pos','pos!posCashier!link','posCashier','3002-联单','3002-联单',NULL,'F','3002','ADMIN',NOW(),'ADMIN',NOW()),
+		 ('1','-1','pos','pos!posCashier!masterEdit','posCashier','3001-主单信息修改','3001-主单信息修改',NULL,'F','3001','ADMIN',NOW(),'ADMIN',NOW()),
+		 ('1','-1','pos','pos!posOrder!writeOff','posOrder','2005-冲销菜品','2005-冲销菜品',NULL,'F','2005','ADMIN',NOW(),'ADMIN',NOW()),
+		 ('1','-1','pos','pos!posOrder!orderOffline','posOrder','2004-离线点菜','2004-离线点菜',NULL,'F','2004','ADMIN',NOW(),'ADMIN',NOW()),
+		 ('1','-1','pos','pos!posOrder!delete','posOrder','2003-退菜','2003-退菜',NULL,'F','2003','ADMIN',NOW(),'ADMIN',NOW()),
+		 ('1','-1','pos','pos!posOrder!order','posOrder','2002-点菜下单','2002-点菜下单',NULL,'F','2002','ADMIN',NOW(),'ADMIN',NOW()),
+		 ('1','-1','pos','pos!posOrder!create','posOrder','2001-新开单','2001-新开单',NULL,'F','2001','ADMIN',NOW(),'ADMIN',NOW()),
+		 ('1','-1','pos','pos!posRes!resPayList','posRes','1008-定金列表','1008-定金列表',NULL,'F','1008','ADMIN',NOW(),'ADMIN',NOW()),
+		 ('1','-1','pos','pos!posRes!resRe','posRes','1007-预订恢复','1007-预订恢复',NULL,'F','1007','ADMIN',NOW(),'ADMIN',NOW()),
+		 ('1','-1','pos','pos!posRes!resDel','posRes','1006-预订取消','1006-预订取消',NULL,'F','1006','ADMIN',NOW(),'ADMIN',NOW()),
+		 ('1','-1','pos','pos!posRes!resPay','posRes','1005-预定金','1005-预定金',NULL,'F','1005','ADMIN',NOW(),'ADMIN',NOW()),
+		 ('1','-1','pos','pos!posRes!resPlu','posRes','1004-预订菜式','1004-预订菜式',NULL,'F','1004','ADMIN',NOW(),'ADMIN',NOW()),
+		 ('1','-1','pos','pos!posRes!resEdit','posRes','1003-预订主单修改','1003-预订主单修改',NULL,'F','1003','ADMIN',NOW(),'ADMIN',NOW()),
+		 ('1','-1','pos','pos!posRes!res','posRes','1002-新建预订','1002-新建预订',NULL,'F','1002','ADMIN',NOW(),'ADMIN',NOW()),
+		 ('1','-1','pos','pos!posRes!resList','posRes','1001-预订列表查询','1001-预订列表查询',NULL,'F','1001','ADMIN',NOW(),'ADMIN',NOW()),
+		 ('1','-1','pos','posMode','0','70-模块设置','70-模块设置',NULL,'F','0','ADMIN',NOW(),'ADMIN',NOW()),
+		 ('1','-1','pos','posSystemGroup','0','60-集团系统设置','60-集团系统设置',NULL,'F','0','ADMIN',NOW(),'ADMIN',NOW()),
+		 ('1','-1','pos','posSystem','0','50-系统设置','50-系统设置',NULL,'F','0','ADMIN',NOW(),'ADMIN',NOW()),
+		 ('1','-1','pos','posSystemLocal','0','40-本地设置','40-本地设置',NULL,'F','0','ADMIN',NOW(),'ADMIN',NOW()),
+		 ('1','-1','pos','posCashier','0','30-收银设置','30-收银设置',NULL,'F','0','ADMIN',NOW(),'ADMIN',NOW()),
+		 ('1','-1','pos','posOrder','0','20-点菜设置','20-点菜设置',NULL,'F','0','ADMIN',NOW(),'ADMIN',NOW()),
+		 ('1','-1','pos','posRes','0','10-预订设置','10-预订设置',NULL,'F','0','ADMIN',NOW(),'ADMIN',NOW());
+
+	INSERT INTO user_pos_auth (hotel_group_id, hotel_id, app_code, CODE, parent_code, descript, descript_en, auth_flag, is_halt, list_order, create_user, create_datetime, modify_user, modify_datetime)
+			SELECT b.hotel_group_id, b.id, a.app_code, a.code, a.parent_code, a.descript, a.descript_en, a.auth_flag, a.is_halt, a.list_order, a.create_user, a.create_datetime, a.modify_user, a.modify_datetime
+			FROM user_pos_auth a, hotel b WHERE a.hotel_group_id = 1 AND a.hotel_id = -1
+			AND NOT EXISTS (SELECT 1 FROM user_pos_auth c WHERE c.hotel_group_id = b.hotel_group_id AND c.hotel_id = b.id AND c.CODE = a.CODE AND c.parent_code = a.parent_code);
+
+	DELETE FROM user_pos_auth WHERE hotel_group_id = 1 AND hotel_id = -1;
 
 
+	DELETE FROM user_pos_auth_user_auth WHERE hotel_group_id = 1 AND hotel_id = -1;
+	INSERT INTO user_pos_auth_user_auth (hotel_group_id, hotel_id, user_code, role_code, auth_hotel_group_id, auth_hotel_id, auth_code, create_user, create_datetime, modify_user, modify_datetime) VALUES
+		('1','-1','ADMIN',NULL,'182','10214','*','ADMIN','2016-06-29 16:01:49','ADMIN','2016-06-29 16:01:49');
 
+	INSERT INTO user_pos_auth_user_auth (hotel_group_id, hotel_id, user_code, role_code, auth_hotel_group_id, auth_hotel_id, auth_code, create_user, create_datetime, modify_user, modify_datetime)
+		SELECT b.hotel_group_id, b.id, a.user_code, a.role_code, b.hotel_group_id, b.id, a.auth_code, a.create_user, a.create_datetime, a.modify_user, a.modify_datetime
+		FROM user_pos_auth_user_auth a, hotel b WHERE a.hotel_group_id = 1 AND a.hotel_id = -1 AND a.user_code = 'ADMIN'
+		AND NOT EXISTS (SELECT 1 FROM user_pos_auth_user_auth c WHERE c.hotel_group_id = b.hotel_group_id AND c.hotel_id = b.id AND c.user_code = a.user_code AND c.user_code = 'ADMIN');
+	DELETE FROM user_pos_auth_user_auth WHERE hotel_group_id = 1 AND hotel_id = -1;
 
-	DECLARE done_cursor 	INT DEFAULT 0;
-	DECLARE var_bdate		DATETIME;
-	DECLARE var_bfdate		DATETIME;
-	DECLARE var_name		VARCHAR(60);
-	DECLARE var_empno		VARCHAR(10);
-	DECLARE var_index		INT;
-	DECLARE var_oid			INT;
-	DECLARE var_master_id	INT;
-	DECLARE var_biz_date	DATETIME;
-	DECLARE var_sta			CHAR(1);
-	DECLARE var_rmno		VARCHAR(10);
-	DECLARE var_specials	VARCHAR(50);
-	DECLARE var_index_last	INT;
-	
-
-	DECLARE c_cursor CURSOR FOR 	
-	SELECT oid,master_id,biz_date,sta,rmno,specials
-		FROM tmp_template 
-		WHERE hotel_group_id=arg_hotel_group_id AND hotel_id=arg_hotel_id;
-	
-
-	DECLARE CONTINUE HANDLER FOR SQLSTATE '02000' SET done_cursor = 1;
-		
-	SET arg_ret = 1, arg_msg = 'OK';	
-	SELECT biz_date1 INTO var_bdate FROM audit_flag WHERE hotel_group_id=arg_hotel_group_id AND hotel_id=arg_hotel_id ;
-	SET var_bfdate = ADDDATE(var_bdate, -1); 
-	
-
-	DROP TABLE IF EXISTS report_center_copy;
-	CREATE TABLE report_center_copy SELECT * FROM report_center WHERE 1=2;	
-	
-
-	IF arg_hotel_group_id IS NULL THEN 
-		BEGIN
-		SET arg_ret = 0, arg_msg = 'Error'; 
-		LEAVE label_0;
-		END; 
-	END IF;
-	
-
-	DELETE FROM rep_template WHERE hotel_group_id=arg_hotel_group_id AND hotel_id=arg_hotel_id AND biz_date=var_bfdate;
-	
-
-	DROP TEMPORARY TABLE IF EXISTS tmp_template;
-	CREATE TEMPORARY TABLE tmp_template (
-		hotel_group_id 	BIGINT(16) 	NOT NULL,
-		hotel_id 		BIGINT(16) 	NOT NULL,
-		oid				BIGINT(16) 	NOT NULL,
-		biz_date		DATETIME 	NOT NULL,
-		NAME			VARCHAR(60) NOT NULL,
-		sta				CHAR(2) NOT NULL,
-		rmno			VARCHAR(10) NOT NULL,
-		rmtype			VARCHAR(10) NOT NULL,
-		arr				DATETIME 	NOT NULL,
-		dep				DATETIME 	NOT NULL,
-		real_rate		DECIMAL(8,2) NOT NULL,
-		market			VARCHAR(10) NOT NULL,
-		ratecode		VARCHAR(10) NOT NULL,
-		PRIMARY KEY (oid),
-		KEY index1 (hotel_group_id,hotel_id,oid)
-	);
-	
-	INSERT INTO tmp_template(hotel_group_id,hotel_id,oid,master_id,biz_date,rmtype,sta,rmno,arr,dep,real_rate,market,ratecode,specials,NAME)
-		SELECT a.hotel_group_id,a.hotel_id,a.id,a.master_id,a.biz_date,a.rmtype,a.sta,a.rmno,a.arr,a.dep,a.real_rate,a.market,a.ratecode,a.specials,b.name 
-			FROM master_base a,master_guest b
-			WHERE a.hotel_group_id=arg_hotel_group_id AND a.hotel_id=arg_hotel_id AND a.rsv_class='F' AND a.market='WAK' AND a.sta <> 'C' AND a.sta <> 'D'
-			AND a.hotel_group_id=b.hotel_group_id AND a.hotel_id=b.hotel_id AND a.id=b.id AND a.id=a.master_id
-			AND DATE(a.arr)=DATE(var_bfdate);			
-	
-
-	OPEN c_cursor ;
-	SET done_cursor = 0 ;	
-	FETCH c_cursor INTO var_oid,var_master_id,var_biz_date,var_sta,var_rmno,var_specials ; 
-	
-	WHILE done_cursor = 0 DO
-		BEGIN		
-		
-				WHILE var_index_last > 0 DO
-					BEGIN
-						SET var_empno = SUBSTR(var_specials,1,var_index-1);
-						
-						IF var_index = 0 THEN
-							SET var_empno = SUBSTR(var_specials,1,var_sp_len);
-
-						ELSE
-							SET var_index_last = var_sp_len - var_index;
-						
-						END IF;
-						
-					END;
-				END WHILE;			
-								
-		SET done_cursor = 0 ;
-		FETCH c_cursor INTO var_oid,var_master_id,var_biz_date,var_sta,var_rmno,var_specials;  
-		END ;
-	END WHILE ;
-	CLOSE c_cursor ;
-
-	DROP TEMPORARY TABLE IF EXISTS tmp_template;
-	DROP TABLE IF EXISTS report_center_copy;
-	
 END$$
-
 DELIMITER ;
+
+CALL up_ihotel_user_auth_temp();
+
+DROP PROCEDURE IF EXISTS `up_ihotel_user_auth_temp`;

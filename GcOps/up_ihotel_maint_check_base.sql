@@ -190,6 +190,12 @@ BEGIN
 	-- 参数检查
  	INSERT INTO tmp_check_base SELECT NULL,'A',CONCAT('sys_option: ',a.descript,' ',a.set_value,' 不存在') FROM sys_option a WHERE a.hotel_group_id = arg_hotel_group_id AND a.hotel_id = arg_hotel_id AND a.catalog='audit' AND a.item='ta_code_for_room_night'
 		AND NOT EXISTS(SELECT 1 FROM code_transaction b WHERE b.hotel_group_id = arg_hotel_group_id AND b.hotel_id = arg_hotel_id AND a.set_value=b.code);
+
+	INSERT INTO tmp_check_base SELECT NULL,'B',CONCAT('sys_option: ',a.descript,' ',a.set_value,' 不存在') FROM sys_option a WHERE a.hotel_group_id = arg_hotel_group_id AND a.hotel_id = arg_hotel_id AND a.catalog='account' AND a.item='business_accnt'
+			AND NOT EXISTS(SELECT 1 FROM master_base b WHERE b.hotel_group_id = arg_hotel_group_id AND b.hotel_id = arg_hotel_id AND b.rsv_class='H' AND b.id=a.set_value);
+	INSERT INTO tmp_check_base SELECT NULL,'B',CONCAT('sys_option: ',a.descript,' ',a.set_value,' 不存在') FROM sys_option a WHERE a.hotel_group_id = arg_hotel_group_id AND a.hotel_id = arg_hotel_id AND a.catalog='account' AND a.item='roomAccnt_accnt'
+			AND NOT EXISTS(SELECT 1 FROM master_base b WHERE b.hotel_group_id = arg_hotel_group_id AND b.hotel_id = arg_hotel_id AND b.rsv_class='H' AND b.id=a.set_value);
+
  	INSERT INTO tmp_check_base SELECT NULL,'A',CONCAT('sys_option: ',a.descript,' ',a.set_value,' 不存在') FROM sys_option a WHERE a.hotel_group_id = arg_hotel_group_id AND a.hotel_id = arg_hotel_id AND a.catalog='account' AND a.item='day_use_tacode'
 		AND NOT EXISTS(SELECT 1 FROM code_transaction b WHERE b.hotel_group_id = arg_hotel_group_id AND b.hotel_id = arg_hotel_id AND a.set_value=b.code);
  	INSERT INTO tmp_check_base SELECT NULL,'A',CONCAT('sys_option: ',a.descript,' ',a.set_value,' 不存在') FROM sys_option a WHERE a.hotel_group_id = arg_hotel_group_id AND a.hotel_id = arg_hotel_id AND a.catalog='audit' AND (a.item='ta_code_for_day_half' OR a.item='ta_code_for_day_whole' OR a.item='ta_code_for_morning_half' OR a.item='ta_code_for_morning_whole')
