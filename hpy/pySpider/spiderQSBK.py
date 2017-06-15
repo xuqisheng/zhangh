@@ -10,7 +10,7 @@ import re
 
 
 # 糗事百科爬虫类
-class spiderQSBK:
+class SpiderQSBK:
 
     # 初始化
     def __init__(self):
@@ -108,5 +108,5 @@ class spiderQSBK:
                 #输出该页的段子
                 self.getOneStory(pageStories,nowPage)
 
-spiderQSBK = spiderQSBK()
+spiderQSBK = SpiderQSBK()
 spiderQSBK.start()
