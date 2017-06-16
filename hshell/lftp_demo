@@ -1,0 +1,14 @@
+#!/bin/bash
+# ------------------------------------------------------------------
+# function:
+#          lftp 传输示例
+#
+# ------------------------------------------------------------------
+
+lftp -u testuser,1qaz2wsx sftp://192.168.0.28:3305 << EOF
+put /root/zhangh/test.py -o /home/testuser/
+put /root/zhangh.txt -o /home/testuser/
+bye
+EOF
+
+
