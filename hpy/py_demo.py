@@ -121,3 +121,5 @@ print os.path.isfile(filename)
 from ctypes import *
 
 print c_int(0)
+
+print "TEEE"
