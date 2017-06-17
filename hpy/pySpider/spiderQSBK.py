@@ -108,5 +108,6 @@ class SpiderQSBK:
                 #输出该页的段子
                 self.getOneStory(pageStories,nowPage)
 
-spiderQSBK = SpiderQSBK()
-spiderQSBK.start()
+if __name__ == '__main__':
+    spiderQSBK = SpiderQSBK()
+    spiderQSBK.start()
