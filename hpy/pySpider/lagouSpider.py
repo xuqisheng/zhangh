@@ -30,6 +30,7 @@ headers_set = {
 
           }
 
+
 class LagouSpider(scrapy.Spider):
     name = "lagou"
 

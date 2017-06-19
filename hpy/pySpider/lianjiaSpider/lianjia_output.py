@@ -15,6 +15,7 @@ import pandas
 reload(sys)
 sys.setdefaultencoding('utf-8')
 
+
 class LianjiaOutput(object):
     def collect(self, housemsg):
         # print json.dumps(housemsg, encoding='utf-8', ensure_ascii=False)

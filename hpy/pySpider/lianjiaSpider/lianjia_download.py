@@ -11,6 +11,7 @@
 import urllib2
 import random
 
+
 class LianjiaDownload(object):
     def __init__(self):
 

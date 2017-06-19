@@ -118,6 +118,8 @@ print os.path.isfile(filename)
 # import win32api,win32con
 # win32api.MessageBox(win32con.NULL, u'Python 你好！', u'你好', win32con.MB_OK)
 
-from ctypes import *
+a1 = 'abc.111,123.15.bbb'
 
-print c_int(0)
+a2 = a1[2:14]
+print type(a2),a2
+

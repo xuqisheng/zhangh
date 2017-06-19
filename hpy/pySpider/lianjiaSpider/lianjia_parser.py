@@ -12,6 +12,7 @@ import re
 from bs4 import BeautifulSoup
 from hpy.pySpider.lianjiaSpider import lianjia_download
 
+
 class LianjiaParser(object):
     # 解析子url，得到明细数据
     def __init__(self):

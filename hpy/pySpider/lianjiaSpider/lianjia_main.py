@@ -10,6 +10,7 @@
 """
 from hpy.pySpider.lianjiaSpider import lianjia_download, lianjia_parser, lianjia_output, lianjia_url
 
+
 class LianjiaMain(object):
     def __init__(self):
         # url管理器

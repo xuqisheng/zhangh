@@ -56,7 +56,7 @@ class SpiderQSBK:
         # 遍历正则表达式匹配的信息
         for item in items:
             replaceBR = re.compile('<br/>')
-            #替换<br/>为换行符
+            # 替换<br/>为换行符
             text = re.sub(replaceBR,"\n",item[1])
             # item[0]作者,item[1]内容,item[2]点赞数
             pageStories.append([item[0].strip(),text.strip(),item[2].strip()])
@@ -72,18 +72,18 @@ class SpiderQSBK:
                 # 将该页的段子存放到全局list中
                 if pageStories:
                     self.stories.append(pageStories)
-                    #获取完之后页码索引加一，表示下次读取下一页
+                    # 获取完之后页码索引加一，表示下次读取下一页
                     self.pageIndex += 1
 
-    #调用该方法，每次敲回车打印输出一个段子
+    # 调用该方法，每次敲回车打印输出一个段子
     def getOneStory(self,pageStories,page):
-        #遍历一页的段子
+        # 遍历一页的段子
         for story in pageStories:
-            #等待用户输入
+            # 等待用户输入
             input = raw_input()
-            #每当输入回车一次，判断一下是否要加载新页面
+            # 每当输入回车一次，判断一下是否要加载新页面
             self.loadPage()
-            #如果输入大写Q则程序结束
+            # 如果输入大写Q则程序结束
             if input == "Q":
                 self.enable = False
                 return
@@ -93,19 +93,19 @@ class SpiderQSBK:
         print u"正在读取糗事百科,按回车查看新段子，按Q退出"
         # 使变量为True，程序可以正常运行
         self.enable = True
-        #先加载一页内容
+        # 先加载一页内容
         self.loadPage()
-        #局部变量，控制当前读到了第几页
+        # 局部变量，控制当前读到了第几页
         nowPage = 0
         while self.enable:
             if len(self.stories) >0:
-                #从全局list中获取一页的段子
+                # 从全局list中获取一页的段子
                 pageStories = self.stories[0]
-                #当前读到的页数加一
+                # 当前读到的页数加一
                 nowPage += 1
-                #将全局list中第一个元素删除，因为已经取出
+                # 将全局list中第一个元素删除，因为已经取出
                 del self.stories[0]
-                #输出该页的段子
+                # 输出该页的段子
                 self.getOneStory(pageStories,nowPage)
 
 if __name__ == '__main__':
