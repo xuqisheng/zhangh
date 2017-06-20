@@ -98,3 +98,4 @@ DELIMITER ;
 CALL up_ihotel_user_auth_temp();
 
 DROP PROCEDURE IF EXISTS `up_ihotel_user_auth_temp`;
+
