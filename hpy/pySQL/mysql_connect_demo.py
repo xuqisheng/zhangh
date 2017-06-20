@@ -2,6 +2,8 @@
 #coding:utf-8
 
 import mysql.connector
+
+
 config = {
 	'user':'root',
 	'password':'deviskaifa',
