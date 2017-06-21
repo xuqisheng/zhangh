@@ -6,4 +6,5 @@ if [ -z "$Hbinfile" ]; then
    /root/mode/modemsg Inc_pms "Please check if the dump file exists!" more
 fi
 
+
 /root/mode/dumpattr -i $Hbinfile >/root/mode/dump/Inc_pms.sql
