@@ -1,0 +1,26 @@
+#!/bin/bash
+# -------------------------------------------------------------------------------------------
+# function: 
+#          calculate memory allocation for tomcat and mysql server
+#          in minimal or maximal zhangh depending on the global variable HMEMMODE 
+#  m1788.inc.sql 为从日志中恢复的正确增量文件
+# -------------------------------------------------------------------------------------------
+
+# memory allocation zhangh 
+
+#!/bin/bash
+
+
+if [ `/root/mode/traceps "crond"` != 'suc' ]; then
+   exit
+fi
+
+
+export HNoBiNlOg=DaNgEr
+export Hmysql_force=YeS
+export HBLACKBOX2=hrywfl
+
+echo I will do
+# uncomment the following statement when load completed and you want to execute incremental sql
+/root/mode/seecfg localhost  /root/mode/dump/m1788.inc.sql portal_f
+

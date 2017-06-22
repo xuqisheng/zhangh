@@ -176,12 +176,9 @@ print os.path.isfile(filename)
 # app.mainloop()
 
 from Tkinter import *
-from tkFileDialog   import askopenfilename
 
-def callback():
-    name= askopenfilename()
-    print name
+root = Tk()
+for fm in ['red','blue','yellow','green','white','black']:
+    Frame(height=20,width=400,bg=fm).pack()
 
-errmsg = 'Error!'
-Button(text='File Open', command=callback).pack(fill=X)
-mainloop()
+root.mainloop()

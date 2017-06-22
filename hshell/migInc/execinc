@@ -1,5 +1,9 @@
 #!/bin/bash 
 
+if [ `/root/mode/traceps "crond"` != 'suc' ]; then
+   exit
+fi
+
 # confirmation
 if [ -z "/root/mode/dump/$1" ]; then
    /root/mode/modemsg execinc "Please check if the dump name is correct"
