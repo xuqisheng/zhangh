@@ -20,6 +20,7 @@ class GcSpider(scrapy.Spider):
     name = "ihotel"
 
     # 初始urls  爬虫初始爬取的链接列表
+    # 包含了Spider在启动时进行爬取的url列表。 因此，第一个被获取到的页面将是其中之一。 后续的URL则从初始的URL获取到的数据中提取。
     start_urls = ["http://www.ihotel.cn"]
 
     # 默认response处理函数

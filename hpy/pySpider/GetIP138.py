@@ -20,7 +20,7 @@ class GetIP138(object):
         # 设置 字符集
         response.encoding = 'gbk'
         # print response.text
-        print response.json()
+        # print response.json()
         txt = response.text
         # find 返回int ，采用切片方式返回结果
         ip = txt[txt.find("[") + 1:txt.find("]")]

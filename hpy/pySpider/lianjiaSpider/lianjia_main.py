@@ -22,7 +22,7 @@ class LianjiaMain(object):
         # 输出器
         self.output = lianjia_output.LianjiaOutput()
 
-    def craw(self,root_url,pageMax=30):
+    def craw(self, root_url, pageMax=30):
         pageNum = 1
         while pageNum <= pageMax:
             # 循环得到url进行处理
