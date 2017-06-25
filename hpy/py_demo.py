@@ -175,10 +175,44 @@ print os.path.isfile(filename)
 # app = Application(root)
 # app.mainloop()
 
-from Tkinter import *
+# str = u"\n\t\t\t\t\t\t\t单价54308元/平\n\t\t\t\t\t\t"
+#
+# print str.strip('\n').strip('\t')
 
-root = Tk()
-for fm in ['red','blue','yellow','green','white','black']:
-    Frame(height=20,width=400,bg=fm).pack()
+from scrapy import Selector
 
-root.mainloop()
+doc = """
+<div>
+    <ul>
+        <li class="item-0"><a href="link1.html">first item</a></li>
+        <li class="item-1"><a href="link2.html">second item</a></li>
+        <li class="item-inactive"><a href="link3.html">third item</a></li>
+        <li class="item-1"><a href="link4.html">fourth item</a></li>
+        <li class="item-0"><a href="link5.html">fifth item</a></li>
+    </ul>
+</div>
+"""
+# 杭州
+# with open('D:\Python27\zhangh\hpy\lianjiahz.html','r') as f:
+#     htmltext = f.read()
+#     # print type(htmltext)
+#     # sel = Selector(text=doc, type="html")
+#     # content = sel.xpath("//ul/li[@class='item-0']")
+#     # print content.extract()
+#     # abc = content.xpath("//a[@href='link5.html']").extract()
+#     sel = Selector(text=htmltext, type="html")
+#     totalprice = sel.xpath("//body/div[@class='content ']//div[@class='totalPrice']/span/text()").extract()
+#     unitprice = sel.xpath("//body/div[@class='content ']//div[@class='unitPrice']/span/text()").extract()
+#     print totalprice
+#     print unitprice
+
+# 上海
+with open('D:\Python27\zhangh\hpy\lianjiash.html','r') as f:
+    htmltext = f.read()
+    sel = Selector(text=htmltext, type="html")
+    # content = sel.xpath("//body/div[@class='content']//span[@class='total-price strong-num']/text()")
+    content = sel.xpath("//body//div[@class='content']")
+    total_price = content.xpath("//span[@class='total-price strong-num']/text()").extract()
+    unit_price = content.xpath("//span[@class='info-col price-item minor']/text()").extract()
+    print unit_price
+
