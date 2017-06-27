@@ -8,7 +8,7 @@
 @time   :2017/6/22 21:52
 @remark : 上海链家二手房
 """
-from scrapy import Selector
+from scrapy import Selector, settings
 from scrapy.spider import CrawlSpider, Rule
 from scrapy.linkextractors import LinkExtractor
 # ..items 表示上级目录
@@ -20,6 +20,9 @@ class LianjiaHz(CrawlSpider):
     name = "lianjiash"
     # 若未指定其他的url，以start_urls中的链接为入口爬取
     start_urls = ['http://sh.lianjia.com/ershoufang/']
+
+    # 带着cookie向网页请求
+    cookie = settings['COOKIE']
 
     rules = (
         Rule(LinkExtractor(allow='ershoufang/[0-9]*\.html',), callback='parse_lianjia', follow=True),
