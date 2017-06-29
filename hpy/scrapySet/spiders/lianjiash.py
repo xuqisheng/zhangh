@@ -22,11 +22,11 @@ class LianjiaHz(CrawlSpider):
     start_urls = ['http://sh.lianjia.com/ershoufang/']
 
     # 带着cookie向网页请求
-    cookie = settings['COOKIE']
+    # cookie = settings['COOKIE']
 
     rules = (
-        Rule(LinkExtractor(allow='ershoufang/[0-9]*\.html',), callback='parse_lianjia', follow=True),
-        Rule(LinkExtractor(allow='ershoufang',), callback='parse_lianjia', follow=True),
+        Rule(LinkExtractor(allow='ershoufang', ), callback='parse_lianjia', follow=True),
+        Rule(LinkExtractor(allow='ershoufang/.*\.html',), callback='parse_lianjia', follow=True),
     )
 
     # 分析一个具体房源的页面信息
@@ -35,28 +35,47 @@ class LianjiaHz(CrawlSpider):
             new_item = LianjiaItem()
             for key, value in item.items():
                 if isinstance(value, list) and value:
-                    new_item[key] = value[0].strip('\n').strip('\t').strip('\n')
+                    new_item[key] = value[0].strip().strip('\n').strip('\t').strip('\n')
                 else:
-                    new_item[key] = value.strip('\n').strip('\t').strip('\n')
+                    new_item[key] = value
             return new_item
 
         item = LianjiaItem()
         sel = Selector(response)
-        content = sel.xpath("//body//div[@class='content']")
-        item['page_url'] = response._get_url()
-        # item['house_name'] =   # 小区名称
-        item['total_price'] = content.xpath("//span[@class='total-price strong-num']/text()").extract() # 总价
-        item['unti_prcie'] = content.xpath("//span[@class='info-col price-item minor']/text()").extract()  # 单价
-        # item['area_name'] =   # 所在区域
-        # item['house_type'] =   # 房层户型
-        # item['house_layout'] =   # 楼层
-        # item['house_direction'] =   # 朝向
-        # item['house_decorate'] =   # 装修情况
-        # item['house_area'] =   # 建筑面积
-        # item['house_farea'] =   # 实际面积
-        # item['house_begin_sell'] =   # 挂牌时间
-        # item['house_purpose'] =   # 房屋用途
-        # item['house_transacton'] =   # 交易权属
+        content = sel.xpath("//body")
+        # url地址
+        item['page_url'] = response.url
+        # 小区名称
+        item['house_name'] = content.xpath("//aside[@class='content-side']/ul[@class='maininfo-minor maininfo-item']"
+                                           "//span[@class='maininfo-estate-name']"
+                                           "/a[@gahref='ershoufang_gaiyao_xiaoqu_link']/text()").extract()
+        # 总价
+        item['total_price'] = content.xpath("//aside[@class='content-side']/div[@class='maininfo-price maininfo-item']"
+                                            "/div[@class='price-total']/span[@class='price-num']/text()").extract()
+        # 单价
+        item['unit_prcie'] = content.xpath("//aside[@class='content-side']/div[@class='maininfo-price maininfo-item']"
+                                           "/div[@class='price-unit']//span[@class='u-bold']/text()").extract()
+        # 所在地址
+        item['house_address'] = content.xpath("//aside[@class='content-side']/ul[@class='maininfo-minor maininfo-item']"
+                                              "//span[@class='item-cell maininfo-estate-address']/text()").extract()
+        # 房层户型
+        item['house_type'] = content.xpath("//aside[@class='content-side']/ul[@class='maininfo-main maininfo-item']"
+                                           "/li[@class='main-item']/p[@class='u-fz20 u-bold']/text()").extract()
+        # 楼层
+        item['house_layout'] = content.xpath("//aside[@class='content-side']/ul[@class='maininfo-main maininfo-item']"
+                                             "/li[@class='main-item u-tc']//p[@class='u-mt8 u-fz12']/text()").extract()
+        # 朝向
+        item['house_direction']=content.xpath("//aside[@class='content-side']/ul[@class='maininfo-main maininfo-item']"
+                                              "/li[@class='main-item u-tc']//p[@class='u-fz20 u-bold']/text()").extract()
+        # 装修情况
+        item['house_decorate'] = content.xpath("//aside[@class='content-side']/ul[@class='maininfo-main maininfo-item']"
+                                               "/li[@class='main-item']/p[@class='u-mt8 u-fz12']/text()").extract()
+        # 建筑面积
+        item['house_area'] = content.xpath("//aside[@class='content-side']/ul[@class='maininfo-main maininfo-item']"
+                                           "/li[@class='main-item u-tr']/p[@class='u-fz20 u-bold']/text()").extract()
+        # 建筑时间
+        item['house_year'] = content.xpath("//aside[@class='content-side']/ul[@class='maininfo-main maininfo-item']"
+                                           "/li[@class='main-item u-tr']/p[@class='u-mt8 u-fz12']/text()").extract()
 
         return deal_item(item)
 

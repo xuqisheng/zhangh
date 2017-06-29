@@ -15,6 +15,6 @@ from scrapy import cmdline
 # cmdline.execute("scrapy crawl lianjiash".split())
 
 # 输出csv格式
-# cmdline.execute("scrapy crawl lianjiash -o lianjiash.csv".split())
+cmdline.execute("scrapy crawl lianjiash -o lianjiash.csv".split())
 # 输入json格式
-cmdline.execute("scrapy crawl lianjiash -o lianjiash.json".split())
+# cmdline.execute("scrapy crawl lianjiash -o lianjiash.json".split())
