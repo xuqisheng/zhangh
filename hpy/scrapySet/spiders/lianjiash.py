@@ -21,11 +21,8 @@ class LianjiaHz(CrawlSpider):
     # 若未指定其他的url，以start_urls中的链接为入口爬取
     start_urls = ['http://sh.lianjia.com/ershoufang/']
 
-    # 带着cookie向网页请求
-    # cookie = settings['COOKIE']
-
     rules = (
-        Rule(LinkExtractor(allow='ershoufang', ), callback='parse_lianjia', follow=True),
+        Rule(LinkExtractor(allow='ershoufang/d[0-9]*', ), callback='parse_lianjia', follow=True),
         Rule(LinkExtractor(allow='ershoufang/.*\.html',), callback='parse_lianjia', follow=True),
     )
 
@@ -36,15 +33,15 @@ class LianjiaHz(CrawlSpider):
             for key, value in item.items():
                 if isinstance(value, list) and value:
                     new_item[key] = value[0].strip().strip('\n').strip('\t').strip('\n')
-                else:
-                    new_item[key] = value
+                # else:
+                #     new_item[key] = value
             return new_item
 
         item = LianjiaItem()
         sel = Selector(response)
         content = sel.xpath("//body")
         # url地址
-        item['page_url'] = response.url
+        # item['page_url'] = response.url
         # 小区名称
         item['house_name'] = content.xpath("//aside[@class='content-side']/ul[@class='maininfo-minor maininfo-item']"
                                            "//span[@class='maininfo-estate-name']"

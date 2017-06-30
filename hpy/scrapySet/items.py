@@ -14,7 +14,7 @@ import scrapy
 
 class LianjiaItem(scrapy.Item):
     # Field 对象对接受的值没有任何限制
-    page_url = scrapy.Field()           # 爬的url
+    # page_url = scrapy.Field()           # 爬的url
     house_name = scrapy.Field()         # 小区名称
     total_price = scrapy.Field()        # 总价
     unit_prcie = scrapy.Field()         # 单价

@@ -48,7 +48,6 @@
         }
     </script>
 </head>
-
 <body>
 <!--[if lte IE 8]>
 <div class="old-browser-popup" id="old" >
@@ -56,7 +55,6 @@
     <span id="oldclose"></span>
 </div>
 <![endif]-->
-
 <!--begin: header-->
 <header class="m-nav">
     <div class="inner">
@@ -123,7 +121,6 @@
     </div>
 </header>
 <!--end: header-->
-
 <!-- icon -->
 <svg style="display: none" version="1.1" xmlns="http://www.w3.org/2000/svg">
     <symbol id="icon-app-download" viewBox="0 0 20 20">
@@ -159,7 +156,6 @@
     <symbol id="icon-house" viewBox="0 0 16 16">
         <path d="M7.49975,14.9093589 L9.49975,14.9093589 L9.49975,9.90935889 L7.49975,9.90935889 L7.49975,14.9093589 Z M15.74875,7.64535889 L8.77075,1.20835889 C8.45975,0.924358895 7.98175,0.930358895 7.68575,1.22835889 L1.22875,7.66735889 C0.92375,7.97235889 0.92375,8.46635889 1.22875,8.77135889 C1.53475,9.07635889 2.03075,9.07635889 2.33675,8.77135889 L2.49975,8.60835889 L2.49975,14.4093589 C2.49975,14.6853589 2.72375,14.9093589 2.99975,14.9093589 L5.49975,14.9093589 L5.49975,13.4093589 L3.99975,13.4093589 L3.99975,7.11235889 L8.25975,2.86435889 L12.99975,7.23835889 L12.99975,13.4093589 L11.49975,13.4093589 L11.49975,14.9093589 L13.99975,14.9093589 C14.27575,14.9093589 14.49975,14.6853589 14.49975,14.4093589 L14.49975,8.62235889 L14.68475,8.79235889 C14.83475,8.93035889 15.02475,9.00035889 15.21675,9.00035889 C15.42675,9.00035889 15.63675,8.91535889 15.79175,8.75035889 C16.08575,8.43235889 16.06575,7.93835889 15.74875,7.64535889 L15.74875,7.64535889 Z"></path>
     </symbol>
-
     <symbol id="icon-success" viewBox="0 0 60 60">
         <circle fill="#00AE66" cx="30" cy="30" r="30"></circle>
         <polyline stroke="#FFFFFF" stroke-width="5" fill="none" points="14.6854968 29.6880361 25.2460466 40.9135742 46.654347 21.1625977"></polyline>
@@ -177,7 +173,6 @@
         </g>
     </symbol>
 </svg>
-
 
     <section class="top-wrapper">
         <!-- header -->
@@ -204,7 +199,6 @@
             </div>
         </header>
 
-
 		<!--begin: 面包屑-->
         <div class="m-breadcrumb content-wrapper">
             <a href="/">链家网上海站</a>&nbsp;&gt;
@@ -214,14 +208,11 @@
             <span>当前房源</span>
         </div>
 		<!--end: 面包屑-->
-
 		<!--begin:正文-->
         <input type="hidden" id="hidden_saveSearchChannel" value="ershoufang" /><!--初始化“已保存搜索”的频道-->
-
         <div class="m-maininfo content-wrapper u-pb20">
             <div class="content-main">
                 <div class="main-pic" id="js-main-pic">
-
                     <div id="js-pic-area">
                         
                             <a href="javascript:;" gahref="pics_open_no_1">
@@ -237,15 +228,12 @@
                             </div>
                         
                     </div>
-
                     <!-- 播放视频 -->
                     <div id="js-video-area" style="position:absolute; top:0; background-color: #000"></div>
-
 
                     
                     
                 </div>
-
                 <div class="main-slider" id="js-main-slider">
                     
                         <a href="javascript:;" class="slider-btn slider-btn-prev js-btn-prev" gahref="pics_detail_prev">
@@ -355,7 +343,6 @@
                     
                 </div>
             </div>
-
             <div id="albumVue">
                 <property-album :img-type-list="imgTypeList"
                                 :img-list="imgList"
@@ -367,7 +354,6 @@
                                 @on-close="onClose"
                                 v-show="isShowModalAlbum"></property-album>
             </div>
-
             <aside class="content-side">
                 <div class="maininfo-price maininfo-item">
                     <div class="price-total">
@@ -376,9 +362,7 @@
                     </div>
                     <div class="price-unit">
                         <p class="price-unit-num"><span class="u-bold">64960</span>元/平</p>
-
                         
-
                         
                         <div class="price-first-pay" id="firstPayContainer">
                             
@@ -399,7 +383,6 @@
                             
                         </div>
                         
-
                     </div>
                 </div>
                 <ul class="maininfo-main maininfo-item">
@@ -433,7 +416,6 @@
                         </p>
                     </li>
                 </ul>
-
                 <ul class="maininfo-minor maininfo-item">
                     
                         <li>
@@ -445,7 +427,6 @@
                             <span class="item-cell">23113元</span>
                         </li>
                     
-
                     
                     <li>
                         <span class="item-cell item-label">环线信息</span>
@@ -480,7 +461,6 @@
                         </span>
                     </li>
                 </ul>
-
                 <!--非已下架、非已失效时显示-->
                 <div class="prop-agent">
                     <div class="c-link-agent u-fl">
@@ -524,7 +504,6 @@
                 
             </aside>
         </div>
-
         <!-- 内容导航 -->
         <nav class="m-content-nav" id="js-content-nav">
             <div class="nav-inner">
@@ -553,8 +532,6 @@
                 
             </div>
         </nav>
-
-
 
         <!-- 基本信息 -->
         <div class="m-baseinfo content-wrapper js-ershoudetail-module" id="js-baseinfo-header">
@@ -666,17 +643,14 @@
                     </div>
                 </div>
             </div>
-
             <!--非已下架、非已失效时显示-->
             <div class="content-side" id="agentListVue">
                 <link-agent :source-list="list" wechat-degrade="false"></link-agent>
             </div>
             
         </div>
-
         <!-- 业主自评 -->
         
-
 
         <!-- 户型分间  -->
         
@@ -716,7 +690,6 @@
             </div>
         </div>
         
-
 
         <!-- 房源照片 -->
         
@@ -876,18 +849,15 @@
             
         </div>
         
-
         <!-- 看房纪录 -->
         
             <div id="kanfangListVue" class="content-wrapper u-mt50 js-ershoudetail-module  u-pb20">
                 <look-list :source-list="list" page-size="3" count7="6" count90="43" wechat-degrade="false"></look-list>
             </div>
         
-
         <!-- 小区介绍 -->
         <div class="m-estate-intro content-wrapper u-mt50 js-ershoudetail-module" id="js-estate-intro">
             <h2 class="module-header">九州花苑简介</h2>
-
             <div class="content-main content-main-large module-tb">
                 <div class="module-row">
                     <div class="module-col intro-col1">
@@ -974,7 +944,6 @@
                 </div>
             </div>
         </div>
-
         <!-- 地图 -->
         <div class="c-map content-wrapper u-mt50 js-ershoudetail-module  u-pb20" id="aroundApp" longitude="121.5324168" latitude="31.28898195" xiaoqu="九州花苑">
             <h2 class="module-header">周边配套</h2>
@@ -992,7 +961,6 @@
                      :hovered-item-no="hoveredItemNo"
                      location-img="http://image3.lianjia.com/hdic-resblock/eb7defde-4af8-4138-9d35-354ef9f88354.JPG.200x150.jpg">
             </map-box>
-
             <!-- 周边列表展示 -->
             <around-matching @on-change-condition="onChangeCondition"
                              :params="params"
@@ -1004,14 +972,12 @@
                              :hovered-item-no="hoveredItemNo">
             </around-matching>
         </div>
-
         
         <div id="recommendListVue" class="m-recommend content-wrapper u-mt50 js-ershoudetail-module">
             <recommend-property :source-list="list" header-text="为您推荐" page-size="4"></recommend-property>
         </div>
         
 </section>
-
 
     <!--begin: 虚假房源举报弹层-->
     <div class="validate">
@@ -1071,7 +1037,6 @@
         </div>
     </div>
     <!--end: 虚假房源举报弹层-->
-
     <!--begin: 短信分享（立即看）弹层-->
     <div class="validate">
         <div class="validateOverlay" id="smsOverlay"></div>
@@ -1087,7 +1052,6 @@
                         <li><textarea id="smsContent">您好，根据您的需求，为您推荐这套房子。如果您觉得不错，请尽快联系我吧！</textarea></li>
                         <li class="smsPrompt">* 温馨提示：短信中不要出现面积、商铺等房地产名词，以免被移动联通屏蔽哟。</li>
                     </ul>
-
                     <ul class="clear">
                         <li>短信预览：</li>
                         <li id="smsContentPreview"></li>
@@ -1102,12 +1066,10 @@
                 <div id="smsDiv_success">
                     短信已发送
                 </div>
-
             </div>
         </div>
     </div>
     <!--end: 短信分享（立即看）弹层-->
-
 
     <script>
     var nowUrl = "";
@@ -1226,7 +1188,6 @@
             
         ],
         agentListPageNo : 1, //经纪人列表当前页码
-
         kanfangList : [ //看房记录列表
             
             {
@@ -1861,7 +1822,6 @@
             
         ],
         kanfangListPageNo : 1, //看房记录列表当前页码
-
         recommendList : [ //推荐房源列表
             
             {
@@ -2035,7 +1995,6 @@
         ],
         recommendListPageNo : 1, //看房记录列表当前页码
         vid:"591f8f9a0cf23aef46fa456f",
-
         gio : {//GrowingIO页面相关业务参数收集的数据初始化
             "setPageGroup" : "二手房", //页面名称
             "setPS1" : "sh4572379", //房源编号
@@ -2048,22 +2007,16 @@
                 {
                     "total":"305.97",
                     "totalUnit":"万",
-
                     "firstMinPay":"234.5",
                     "firstMinPayUnit":"万",
-
                     "referenceTax":"58.07",
                     "referenceTaxUnit":"万",
-
                     "addedTax":"35.73",
                     "addedTaxUnit":"万",
-
                     "personalIncomeTax":"12.76",
                     "personalIncomeTaxUnit":"万",
-
                     "deedTax":"9.57",
                     "deedTaxUnit":"万",
-
                     "intermediaryServiceCharge":"13.4",
                     "intermediaryServiceChargeUnit":"万"
                 },
@@ -2071,22 +2024,16 @@
                 {
                     "total":"550.04",
                     "totalUnit":"万",
-
                     "firstMinPay":"469.0",
                     "firstMinPayUnit":"万",
-
                     "referenceTax":"67.64",
                     "referenceTaxUnit":"万",
-
                     "addedTax":"35.73",
                     "addedTaxUnit":"万",
-
                     "personalIncomeTax":"12.76",
                     "personalIncomeTaxUnit":"万",
-
                     "deedTax":"19.14",
                     "deedTaxUnit":"万",
-
                     "intermediaryServiceCharge":"13.4",
                     "intermediaryServiceChargeUnit":"万"
                 },
@@ -2094,7 +2041,6 @@
             
         ]
     }
-
 
     //晶赞统计, 老客回访代码
     window.__zp_tag_params = {
@@ -2142,25 +2088,12 @@
 
 
 
-
-
-
-
-
-
 <!--begin: 登录弹层-->
 <div class="loninContainer" id="loninContainer"></div>
 <!--end: 登录弹层-->
-
 <!--begin: footer-->
 
-
     
-
-
-
-
-
 
 
 
@@ -2651,41 +2584,31 @@
 	</div>
 </div>
 
-
-
 <!--end: footer-->
-
 
 <!--begin: fix-right-->
 <div id="side-bar-tools-placeholder"></div>
 <!--end: fix-right-->
-
 <!-- 微聊 -->
 <link rel="stylesheet" href="http://sh.lianjia.com/public/css/weiliao.css?v=1498577000000">
 <div id="ng-app" ng-app="weiliaoApp" style="position: absolute;"> <div weiliao-win></div> </div>
 <!-- 微聊  end-->
-
 <script src="http://sh.lianjia.com/public/js/loginpoplayer.js?v=1498577000000" defer="defer"></script>
 <script src="http://sh.lianjia.com/public/js/jquery/jquery.lazyload.min.js" defer="defer"></script>
 <script src="http://sh.lianjia.com/public/js/passport.js?v=1498577000000" defer="defer"></script>
-
 <script src="http://sh.lianjia.com/public/js/weiliao/AV.realtime.js" defer="defer"></script>
 <script src="http://sh.lianjia.com/public/js/lib/angular.min.js" defer="defer"></script>
 <script src="http://sh.lianjia.com/public/js/jquery/jquery-upload-1.0.js?v=1498577000000" defer="defer"></script>
 <script src="http://sh.lianjia.com/public/js/weiliao/weiliao.min.js?v=1498577000000" defer="defer"></script>
-
 <script src="http://sh.lianjia.com/public/js/footer/bundle.js?v=1498577000000" defer="defer"></script>
 <script src="http://sh.lianjia.com/public/js/user.js?v=1498577000000" defer="defer"></script>
-
 <script src="http://cdn7.dooioo.com/static/js/footerhover.js?v=1498577000000" defer="defer"></script>
-
 
 <!--[if lte IE 8]>
 <style>
     .m-maininfo .main-pic img { left: 0; top: 0; }
 </style>
 <![endif]-->
-
 
 <svg style="display: none" version="1.1" xmlns="http://www.w3.org/2000/svg">
     <symbol id="icon-search" viewBox="0 0 20 20">
@@ -2763,7 +2686,6 @@
             </g>
         </g>
     </symbol>
-
     <!-- 交通 -->
     <symbol id="icon-subway" viewBox="0 0 18 18">
         <g stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
@@ -2787,7 +2709,6 @@
             </g>
         </g>
     </symbol>
-
     <!-- 教育 -->
     <symbol id="icon-edu" viewBox="0 0 18 18">
         <g stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
@@ -2800,7 +2721,6 @@
             </g>
         </g>
     </symbol>
-
     <!-- 医疗 -->
     <symbol id="icon-hospital" viewBox="0 0 18 18">
         <g  stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
@@ -2827,7 +2747,6 @@
         </g>
     </symbol>
 
-
     <!-- 购物 -->
     <symbol id="icon-foodmarkt" viewBox="0 0 18 18">
         <g stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
@@ -2851,7 +2770,6 @@
             </g>
         </g>
     </symbol>
-
 
     <!-- 生活 -->
     <symbol id="icon-atm" viewBox="0 0 18 18">
@@ -2887,7 +2805,6 @@
             </g>
         </g>
     </symbol>
-
     <!-- 娱乐 -->
     <symbol id="icon-gym" viewBox="0 0 18 18">
         <g stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">

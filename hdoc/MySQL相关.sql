@@ -162,8 +162,6 @@ innodb通过此方式来保证事务的完整性。也就意味着磁盘上存�
 14、MySQL中InnoDB引擎的行锁是通过加在什么上完成(或称实现)的？为什么是这样子的？
 	
 	
-	
-	
 《MySQL 性能优化方案》
 
 网上有不少mysql性能优化方案，不过，mysql的优化同sql server相比，更为麻烦与复杂，同样的设置，
@@ -191,7 +189,7 @@ mysql> show global status like ‘%slow%‘;
 | Variable_name　　　　 | Value |
 +-----------------------+----——-+
 | Slow_launch_threads 	| 0　　 |
-| Slow_queries　　　　　| 4148  |
+| Slow_queries　　　　	| 4148  |
 +-----------------------+----——-+
 
 配置中打开了记录慢查询，执行时间超过2秒的即为慢查询，系统显示有4148个慢查询，你可以分析慢查询日志，找出有问题的SQL语句，
@@ -493,7 +491,3 @@ mysql> show global status like ‘com_select‘;
 文中提到一些数字都是参考值，了解基本原理就可以，除了MySQL提供的各种status值外，操作系统的一些性能指标也很重要，比如常用
 的top,iostat等，尤其是iostat，现在的系统瓶颈一般都在磁盘IO上，关于iostat的使用，
 可以参考：http://www.php-oa.com/2009/02/03/iostat.html
-	
-	
-	
-	
