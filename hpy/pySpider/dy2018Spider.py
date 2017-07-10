@@ -10,10 +10,18 @@
 """
 
 import requests
+from bs4 import BeautifulSoup
+
 
 r = requests.get('http://www.dy2018.com')
-print type(r)
-print r.status_code
-print r.encoding
-print r.cookies
-print r.text
+
+def gethtml(url):
+
+
+
+
+
+
+if __name__ == '__main__':
+    get_url = 'http://www.dy2018.com/html/gndy/dyzz/index.html'
+    page = gethtml(get_url)
