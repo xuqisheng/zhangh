@@ -179,7 +179,7 @@ print os.path.isfile(filename)
 #
 # print str.strip('\n').strip('\t')
 
-from scrapy import Selector
+# from scrapy import Selector
 
 # doc = """
 # <div>
@@ -207,21 +207,41 @@ from scrapy import Selector
 #     print unitprice
 
 # 上海
-with open('D:\Python27\zhangh\hpy\lianjiashsub.html','r') as f:
-    htmltext = f.read()
-    sel = Selector(text=htmltext, type="html")
-    # content = sel.xpath("//body/div[@class='content']//span[@class='total-price strong-num']/text()")
-    # content = sel.xpath("//body//div[@class='content']")
-    content = sel.xpath("//body")
-    # total_price = content.xpath("//span[@class='total-price strong-num']/text()").extract()
-    # unit_price = content.xpath("//span[@class='info-col price-item minor']/text()").extract()
-    house_name = content.xpath("//aside[@class='content-side']/ul[@class='maininfo-minor maininfo-item']"
-                                           "//span[@class='maininfo-estate-name']"
-                                           "/a[@gahref='ershoufang_gaiyao_xiaoqu_link']/text()").extract()
-    total_price = content.xpath("//aside[@class='content-side']/div[@class='maininfo-price maininfo-item']"
-                                        "/div[@class='price-total']/span[@class='price-num']/text()").extract()
-    print total_price
+# with open('D:\Python27\zhangh\hpy\lianjiashsub.html','r') as f:
+#     htmltext = f.read()
+#     sel = Selector(text=htmltext, type="html")
+#     # content = sel.xpath("//body/div[@class='content']//span[@class='total-price strong-num']/text()")
+#     # content = sel.xpath("//body//div[@class='content']")
+#     content = sel.xpath("//body")
+#     # total_price = content.xpath("//span[@class='total-price strong-num']/text()").extract()
+#     # unit_price = content.xpath("//span[@class='info-col price-item minor']/text()").extract()
+#     house_name = content.xpath("//aside[@class='content-side']/ul[@class='maininfo-minor maininfo-item']"
+#                                            "//span[@class='maininfo-estate-name']"
+#                                            "/a[@gahref='ershoufang_gaiyao_xiaoqu_link']/text()").extract()
+#     total_price = content.xpath("//aside[@class='content-side']/div[@class='maininfo-price maininfo-item']"
+#                                         "/div[@class='price-total']/span[@class='price-num']/text()").extract()
+#     print total_price
 
+from bs4 import  BeautifulSoup
 
+html_doc = """
+<html>
+<body class="output fluid zh cn win reader-day-mode" data-js-module="recommendation" data-locale="zh-CN">
+<head><title>The Dormouse's story</title></head>
 
+<p class="title"><b>The Dormouse's story</b></p>
 
+<p class="story">Once upon a time there were three little sisters; and their names were
+    <a href="http://example.com/elsie" class="sister" id="link1">Elsie</a>,
+    <a href="http://example.com/lacie" class="sister" id="link2">Lacie</a> and
+    <a href="http://example.com/tillie" class="sister" id="link3">Tillie</a>;
+        and they lived at the bottom of a well.
+</p>
+
+<p class="story">...</p>
+</body>
+"""
+
+soap = BeautifulSoup(html_doc,'html.parser')
+
+print soap.find_all(class_='sister')

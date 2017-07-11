@@ -10,18 +10,32 @@
 """
 
 import requests
+import sys
 from bs4 import BeautifulSoup
 
+reload(sys)
+sys.setdefaultencoding('utf-8')
 
-r = requests.get('http://www.dy2018.com')
+url_init = 'http://www.dy2018.com/html/gndy/dyzz/index.html'
+headers = {'user-agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_8_3) AppleWebKit/536.5 '
+                         '(KHTML, like Gecko) Chrome/19.0.1084.54 Safari/536.5'}
+r = requests.get(url_init, headers=headers)
+r.encoding = 'utf-8'
+content = r.text
 
-def gethtml(url):
+soup = BeautifulSoup(content, 'html.parser')
 
+# items = soup.find_all('div',class_='co_content8')
+items = soup.find_all('a', class_='ulink')
+print items
+ret = []
+for item in items:
+    # title = item.a.get_text()
+    print type(item)
+    # ret.append(title)
 
+print ret
 
-
-
-
-if __name__ == '__main__':
-    get_url = 'http://www.dy2018.com/html/gndy/dyzz/index.html'
-    page = gethtml(get_url)
+# if __name__ == '__main__':
+#     get_url = 'http://www.dy2018.com/html/gndy/dyzz/index.html'
+#     page = gethtml(get_url)
