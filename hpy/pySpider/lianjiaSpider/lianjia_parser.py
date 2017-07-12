@@ -31,13 +31,20 @@ class LianjiaParser(object):
         info['房屋总价'] = ''.join(list(re.compile('<span class="total">(.*?)</span>').findall(str(sub_overview))))
         info['平方均价'] = ''.join(list(re.compile('<span class="unitPriceValue">(.*?)<i>').findall(str(sub_overview))))
 
-        # 为什么一样写法，此处取得结果是乱码
-        sub_around1 = sub_soup.select(".overview .content .aroundInfo .communityName a")
+        # 为什么一样写法，此处取得结果是乱码 ?
+        # sub_around1 = sub_soup.select(".overview .content .aroundInfo .communityName a")
         # print sub_around1
-        info['小区名称'] = ''.join(list(re.compile('<a class="info".*?target="_blank">(.*?)</a>').findall(str(sub_around1))))
-        sub_around2 = sub_soup.select(".overview .content .aroundInfo .areaName a")
+        # info['小区名称'] = ''.join(list(re.compile('<a class="info".*?target="_blank">(.*?)</a>').findall(str(sub_around1))))
+        # sub_around2 = sub_soup.select(".overview .content .aroundInfo .areaName a")
         # print sub_around2
-        info['所在区域'] = ''.join(list(re.compile('<a href=.*?target="_blank">(.*?)</a>').findall(str(sub_around2))))
+        # info['所在区域'] = ''.join(list(re.compile('<a href=.*?target="_blank">(.*?)</a>').findall(str(sub_around2))))
+        sub_around1 = sub_soup.find('a', class_='info')
+        # print sub_around1.contents
+        info['小区名称'] = ''.join(sub_around1.contents)
+        sub_around2 = sub_soup.find('span', class_='info')
+        a1 = ''.join(list(re.compile('<a href=.*?target="_blank">(.*?)</a>').findall(str(sub_around2.contents[0]))))
+        a2 = ''.join(list(re.compile('<a href=.*?target="_blank">(.*?)</a>').findall(str(sub_around2.contents[2]))))
+        info['所在区域'] = a1 + a2
 
         sub_intro = sub_soup.select(".introContent .content li")
         # print sub_intro
