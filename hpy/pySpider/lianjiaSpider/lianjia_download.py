@@ -33,7 +33,7 @@ class LianjiaDownload(object):
             request = urllib2.Request(url, headers=self.headers)
             # 利用urlopen获取页面代码
             response = urllib2.urlopen(request)
-
+            response.encoding = 'utf-8'
             # 判断是否正常返回
             # if response.getcode() != 200:
             #     return None

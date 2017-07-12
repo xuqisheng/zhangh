@@ -30,9 +30,9 @@ ret = []
 for item in items:
     info = {}
     title = item['title']
-    info['titel'] = title.strip()
+    info['title'] = title.strip()
     href = item['href']
-    info['href'] = url_index + href.strip()
+    info['url'] = url_index + href.strip()
     ret.append(info)
 
 if os.path.exists('dy2018.xlsx'):
@@ -40,5 +40,4 @@ if os.path.exists('dy2018.xlsx'):
 
 df = pandas.DataFrame(ret)
 df.to_excel('dy2018.xlsx')
-
 

@@ -24,7 +24,7 @@ class LianjiaParser(object):
 
         # print j,'<-->',sub_url
         sub_text = self.download.download(sub_url)
-        sub_soup = BeautifulSoup(sub_text,'html.parser',from_encoding="gb18030")
+        sub_soup = BeautifulSoup(sub_text, 'html.parser')
 
         sub_overview = sub_soup.select(".overview .content .price span")
         # print sub_overview
@@ -32,10 +32,12 @@ class LianjiaParser(object):
         info['平方均价'] = ''.join(list(re.compile('<span class="unitPriceValue">(.*?)<i>').findall(str(sub_overview))))
 
         # 为什么一样写法，此处取得结果是乱码
-        sub_around = sub_soup.select(".overview .content .aroundInfo .communityName a")
-        # print sub_around
-        info['小区名称'] = ''.join(list(re.compile('<a class="info".*?>(.*?)</a>').findall(str(sub_around))))
-        info['所在区域'] = ''.join(list(re.compile('<a href=.*?target="_blank">(.*?)</a>').findall(str(sub_around))))
+        sub_around1 = sub_soup.select(".overview .content .aroundInfo .communityName a")
+        # print sub_around1
+        info['小区名称'] = ''.join(list(re.compile('<a class="info".*?target="_blank">(.*?)</a>').findall(str(sub_around1))))
+        sub_around2 = sub_soup.select(".overview .content .aroundInfo .areaName a")
+        # print sub_around2
+        info['所在区域'] = ''.join(list(re.compile('<a href=.*?target="_blank">(.*?)</a>').findall(str(sub_around2))))
 
         sub_intro = sub_soup.select(".introContent .content li")
         # print sub_intro
