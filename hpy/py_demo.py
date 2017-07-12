@@ -222,30 +222,26 @@ print os.path.isfile(filename)
 #                                         "/div[@class='price-total']/span[@class='price-num']/text()").extract()
 #     print total_price
 
-# from bs4 import  BeautifulSoup
+from bs4 import  BeautifulSoup
 #
-# html_doc = """
-# <html>
-# <body class="output fluid zh cn win reader-day-mode" data-js-module="recommendation" data-locale="zh-CN">
-# <head><title>The Dormouse's story</title></head>
-#
-# <p class="title"><b>The Dormouse's story</b></p>
-#
-# <p class="story">Once upon a time there were three little sisters; and their names were
-#     <a href="http://example.com/elsie" class="sister" id="link1">Elsie</a>,
-#     <a href="http://example.com/lacie" class="sister" id="link2">Lacie</a> and
-#     <a href="http://example.com/tillie" class="sister" id="link3">Tillie</a>;
-#         and they lived at the bottom of a well.
-# </p>
-#
-# <p class="story">...</p>
-# </body>
-# """
-#
-# soap = BeautifulSoup(html_doc,'html.parser')
-#
-# print soap.find_all(class_='sister')
+html_doc = """
+<html>
+<body class="output fluid zh cn win reader-day-mode" data-js-module="recommendation" data-locale="zh-CN">
+<head><title>The Dormouse's story</title></head>
 
-href='/i/98167.html'
-url_index = 'http://www.dy2018.com'
-print url_index + href
+<p class="title"><b>The Dormouse's story</b></p>
+<p class="title"><b>Gc Test</b></p>
+<p class="story">Once upon a time there were three little sisters; and their names were
+    <a href="http://example.com/elsie" class="sister" id="link1">Elsie</a>,
+    <a href="http://example.com/lacie" class="sister" id="link2">Lacie</a> and
+    <a href="http://example.com/tillie" class="sister" id="link3">Tillie</a>;
+        and they lived at the bottom of a well.
+</p>
+
+<p class="story">...</p>
+</body>
+"""
+
+soap = BeautifulSoup(html_doc,'html.parser')
+
+print soap.find_all('a','b')

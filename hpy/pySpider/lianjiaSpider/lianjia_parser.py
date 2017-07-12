@@ -67,7 +67,7 @@ class LianjiaParser(object):
         soup = BeautifulSoup(html_text, 'html.parser')
 
         # 目前链家网一页显示30个信息
-        for j in range(0,2):
+        for j in range(0,30):
             # 通过 CSS 选择器
             sub_url=soup.select(".sellListContent .title a")[j]['href']
             houseinfo = self.get_detail(sub_url,j)

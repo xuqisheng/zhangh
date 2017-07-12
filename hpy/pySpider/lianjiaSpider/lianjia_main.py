@@ -40,4 +40,4 @@ class LianjiaMain(object):
 if __name__ == '__main__':
     root_url = "http://hz.lianjia.com/ershoufang/"
     lianjia = LianjiaMain()
-    lianjia.craw(root_url,1)
+    lianjia.craw(root_url,30)
