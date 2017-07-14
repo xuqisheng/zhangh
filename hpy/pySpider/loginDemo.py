@@ -9,10 +9,13 @@
 @remark : 模拟登录公司老的JIRA
 """
 import cookielib
+import json
 import urllib
 import urllib2
-
 import requests
+import sys
+reload(sys)
+sys.setdefaultencoding('utf-8')
 
 
 def login_url(website):
@@ -46,14 +49,46 @@ def login_url(website):
 def login_request(website):
     payload = {'os_username': 'zhanghui', 'os_password': '1234560'}
     headers = {"User-agent": "Mozilla/4.0 (compatible; MSIE 6.0; Windows NT 5.1"}
-    reponse = requests.post(website, params=payload, headers=headers)
+    seesion = requests.Session()
+    reponse = seesion.post(website, params=payload, headers=headers)
+    # print reponse.text
     print reponse.status_code
-    # if reponse.status_code == 200:
-    #     print "登录成功"
-    # else:
-    #     print "登录失败"
+
+
+def login_ihotel(webindex, inttype):
+    payload = {'hotelGroupId': 2}
+    website = webindex + inttype
+    # print website
+    seesion = requests.Session()
+    reponse = seesion.post(website, params=payload)
+    result = reponse.json()
+    for item in result['listTypeDto']:
+        print item['code'],item['descript']
+
+
+def register(webindex, inttype):
+    payload = {'hotelGroupId': 2,
+               'name': u'三明',
+               'idType': '02',
+               'sex': 1,
+               'idNo': '31011974',
+               'mobile': '11231831519',
+               'email': '193501466@qq.com',
+               'password': '123456',
+               'cardType': 'CZK',
+               'cardLevel': 'CZK',
+               'cardSrc': 1}
+
+    headers = {'Content-Type': 'application/x-www-form-urlencoded;charset=utf-8'}
+    website = webindex + inttype
+    # reponse = requests.post(website, params=payload, headers=headers)
+    reponse = requests.post(website, data=payload, headers=headers)
+    result = reponse.text
+    print result
 
 if __name__ == '__main__':
-    login_url('http://192.168.0.7:9394/secure/Dashboard.jspa')
+    register('http://192.168.0.28:8102/ipmsmember/membercard/', 'registerMemberCardWithOutVerify')
+    # login_url('http://192.168.0.7:9394/secure/Dashboard.jspa')
     # login_request('http://192.168.0.7:9394/secure/Dashboard.jspa')
+    # login_ihotel('http://192.168.0.28:8102/ipmsmember/membercard/', 'getAllCardType')
 
