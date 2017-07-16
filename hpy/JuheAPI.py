@@ -10,8 +10,8 @@
 """
 
 
-import json, urllib
-from urllib import urlencode
+import json
+import requests
 
 # ----------------------------------
 # 股票数据调用示例代码 － 聚合数据
@@ -23,19 +23,20 @@ from urllib import urlencode
 def request1(appkey, m="GET"):
     url = "http://web.juhe.cn:8080/finance/stock/hs"
     params = {
-        "gid": "sh6000519",  # 股票编号，上海股市以sh开头，深圳股市以sz开头如：sh601009
+        "gid": "sh600519",  # 股票编号，上海股市以sh开头，深圳股市以sz开头如：sh601009
         "key": appkey,  # APP Key
 
     }
-    print params
-    params = urlencode(params)
-    if m == "GET":
-        f = urllib.urlopen("%s?%s" % (url, params))
-    else:
-        f = urllib.urlopen(url, params)
 
-    content = f.read()
+    reponse = requests.get(url, params=params)
+
+    content = reponse.text
     res = json.loads(content)
+
+    result = res.get('result')
+    print result['dapandata']
+
+    """
     if res:
         error_code = res["error_code"]
         if error_code == 0:
@@ -45,7 +46,7 @@ def request1(appkey, m="GET"):
             print "%s:%s" % (res["error_code"], res["reason"])
     else:
         print "request api error"
-
+    """
 
 def main():
     # 配置您申请的APPKey
