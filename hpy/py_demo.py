@@ -246,13 +246,6 @@ print os.path.isfile(filename)
 #
 # print soap.find_all('a','b')
 
-import json
-import requests
-
-
-list1 = [{u'dapandata': {u'traAmount': u'80651', u'nowPic': u'0.250', u'rate': u'0.05', u'traNumber': u'17726', u'dot': u'456.410', u'name': u'\u8d35\u5dde\u8305\u53f0'}, u'data': {u'nowPri': u'456.410', u'sellTwoPri': u'456.490', u'sellFourPri': u'456.530', u'sellTwo': u'100', u'todayStartPri': u'456.250', u'buyFourPri': u'456.200', u'traAmount': u'806510274.000', u'buyOne': u'100', u'increase': u'0.250', u'todayMin': u'453.050', u'buyFour': u'966', u'buyFivePri': u'456.190', u'time': u'15:00:00', u'sellFivePri': u'456.580', u'increPer': u'0.05', u'sellOnePri': u'456.450', u'buyThree': u'3543', u'yestodEndPri': u'456.160', u'buyTwo': u'300', u'buyOnePri': u'456.350', u'sellOne': u'100', u'todayMax': u'458.760', u'date': u'2017-07-14', u'buyTwoPri': u'456.300', u'buyThreePri': u'456.210', u'gid': u'sh600519', u'name': u'\u8d35\u5dde\u8305\u53f0', u'sellFour': u'395', u'competitivePri': u'456.350', u'reservePri': u'456.450', u'sellFive': u'400', u'sellThree': u'1000', u'buyFive': u'1300', u'sellThreePri': u'456.500', u'traNumber': u'17726'}, u'gopicture': {u'weekurl': u'http://image.sinajs.cn/newchart/weekly/n/sh600519.gif', u'minurl': u'http://image.sinajs.cn/newchart/min/n/sh600519.gif', u'monthurl': u'http://image.sinajs.cn/newchart/monthly/n/sh600519.gif', u'dayurl': u'http://image.sinajs.cn/newchart/daily/n/sh600519.gif'}}]
-
-
-for li in list1:
-    if li.get('dapandata'):
-        print li.get('dapandata').get('name')
+import qrcode
+img = qrcode.make("some data here")
+img.save("test.png")
