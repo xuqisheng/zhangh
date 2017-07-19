@@ -12,4 +12,6 @@ from django.http import HttpResponse
 
 
 def index(request):
-    return HttpResponse(u"欢迎光临 自强学堂!")
+    context          = {}
+    context['index'] = 'Hello World Zhangh !!!'
+    return render(request, 'index.html', context)
