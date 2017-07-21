@@ -1,25 +1,55 @@
-{% load staticfiles %}
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
+    {% load staticfiles %}
     <title>Title</title>
-    <!-- Bootstrap core javascript -->
-    <script type="text/javascript" src="{% static 'bootstrap/js/bootstrap.js' %}">
 
-
-    </script>
     <!-- Bootstrap core CSS -->
-    <style type="text/css" src="{% static 'bootstrap/css/bootstrap.css' %}">
-
+    <link href="{% static 'bootstrap/css/bootstrap.min.css' %}" rel="stylesheet">
+    <style type="text/css">
+        body {
+            background-color: #CCC;
+        }
 
     </style>
-
-    <h1>{{ index }}</h1>
-
 </head>
 <body>
+    <nav class="navbar navbar-inverse navbar-fixed-top" role="navigation">
+      <div class="container">
+        <div class="navbar-header">
+          <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar" aria-expanded="false" aria-controls="navbar">
+            <span class="sr-only">Toggle navigation</span>
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+          </button>
+          <a class="navbar-brand" href="#">首页</a>
+          <a class="navbar-brand" href="#">测试</a>
+          <a class="navbar-brand" href="#">开发</a>
+        </div>
+        <div id="navbar" class="navbar-collapse collapse">
+          <form class="navbar-form navbar-right" role="form">
+            <div class="form-group">
+              <input type="text" placeholder="Email" class="form-control">
+            </div>
+            <div class="form-group">
+              <input type="password" placeholder="Password" class="form-control">
+            </div>
+            <button type="submit" class="btn btn-success">Sign in</button>
+          </form>
+        </div><!--/.navbar-collapse -->
+      </div>
+    </nav>
+
+    <div class="jumbotron">
+      <div id='content' class='row-fluid'>
+        <h2>Hello, world!</h2>
+        <p class="blog-post-meta">January 1, 2014 by <a href="#">Mark</a></p>
+        <p>This is a template for a simple marketing or informational website. It includes a large callout called a jumbotron and three supporting pieces of content. Use it as a starting point to create something more unique.</p>
+        <p><a class="btn btn-primary btn-lg" role="button">阅读全文 &raquo;</a></p>
+      </div>
+    </div>
 
 </body>
 </html>
