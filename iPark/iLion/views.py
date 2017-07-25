@@ -12,7 +12,10 @@ from django.http import HttpResponse
 
 
 def index(request):
-    context = {}
-    context['index'] = 'Hello World Index !!!'
-    return render(request, 'index.html', context)
+    data = [1, 2, 3, 4]
+    return render(request, 'index.html', {'data': data})
+
+
+def login(request):
+    return render(request, 'login.html')
 

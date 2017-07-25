@@ -15,4 +15,5 @@ from . import views
 urlpatterns = [
     # ex: /iLion/
     url(r'^$', views.index),
+    url(r'^login',views.login)
 ]
