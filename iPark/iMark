@@ -10,14 +10,12 @@ python manage.py startapp iLion
 # 启动django Start the development server
 python manage.py runserver
 
+# 根据models.py生成创建实体的语句
+python manage.py makemigrations --empty iLion
+python manage.py makemigrations
+
 # 创建实体表
 python manage.py migrate
-
-# 根据models.py生成创建实体的语句，在migrations目录下
-python manage.py makemigrations iLion
-
-# 根据migrations下的0001执行生成SQL脚本并未在数据库中生成实体表，实体表要使用migrate
-python manage.py sqlmigrate iLion 0001
 
 # Run python manage.py makemigrations to create migrations for those changes
 # Run python manage.py migrate to apply those changes to the database.
