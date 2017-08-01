@@ -14,7 +14,7 @@ class User(models.Model):
     sex = models.IntegerField()
     email = models.EmailField()
     mobile = models.CharField(max_length=11, default='')
-    create_datetime = models.DateTimeField(au)
+    create_datetime = models.DateTimeField(auto_now_add=True)
 
     # __str__方法是为了后台管理(admin)和django shell的显示
     def __str__(self):
