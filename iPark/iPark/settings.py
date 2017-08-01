@@ -42,6 +42,7 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
 
     'iLion',    # iPark项目(project)下的iLion该应用(App)
+    'iwolf',
 ]
 
 MIDDLEWARE = [
