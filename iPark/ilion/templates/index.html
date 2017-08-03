@@ -1,27 +1,410 @@
 <!DOCTYPE html>
 <html lang="zh-CN">
 <head>
-    <meta charset="utf-8">
     {% load staticfiles %}
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <title>Dashboard</title>
     <!-- 匹配适用不同设备 -->
     <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" content="Dashboard" />
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <link rel="shortcut icon" href="{% static 'assets/img/favicon.png' %}" type="image/x-icon">
 
-    <title>首页</title>
+    <!-- Bootstrap Styles -->
+    <link href="{% static 'assets/css/bootstrap.min.css' %}" rel="stylesheet">
 
-    <!-- Bootstrap core CSS -->
-    <link href="{% static 'bootstrap/css/bootstrap.min.css' %}" rel="stylesheet">
-    <!-- jQuery (Bootstrap 的 JavaScript 插件需要引入 jQuery) -->
-    <script src="https://cdn.bootcss.com/jquery/2.1.1/jquery.min.js"></script>
-    <!-- Bootstrap core CSS -->
-    <script src="{% static 'bootstrap/js/bootstrap.min.js' %}"></script>
+    <!-- assets Styles -->
+    <link id="bootstrap-rtl-link" href="" rel="stylesheet" />
+    <link href="{% static 'assets/css/font-awesome.min.css' %}" rel="stylesheet" />
+    <link href="{% static 'assets/css/weather-icons.min.css' %}" rel="stylesheet" />
+
+    <!--Fonts-->
+    <link href="http://fonts.useso.com/css?family=Open+Sans:300italic,400italic,600italic,700italic,400,600,700,300" rel="stylesheet" type="text/css">
+
+    <!--Beyond styles-->
+    <link href="{% static 'assets/css/beyond.min.css' %}" rel="stylesheet" />
+    <link href="{% static 'assets/css/demo.min.css' %}" rel="stylesheet" />
+    <link href="{% static 'assets/css/typicons.min.css' %}" rel="stylesheet" />
+    <link href="{% static 'assets/css/animate.min.css' %}" rel="stylesheet" />
+
+    <!--Skin Script: Place this script in head to load scripts for skins and rtl support-->
+    <script src="{% static 'assets/js/skins.min.js' %}"></script>
+
 </head>
 <body>
-      <div>
-          {% for item in data %}
-          <p> {{ item }}</p>
-          {% endfor %}
-      </div>
+    <!-- Navbar -->
+    <div class="navbar">
+        <div class="navbar-inner">
+            <div class="navbar-container">
+                <!-- Navbar Barnd -->
+                <div class="navbar-header pull-left">
+                    <a href="#" class="navbar-brand">
+                        <small>
+                            <img src="{% static 'assets/img/logo.png' %}" alt="" />
+                        </small>
+                    </a>
+                </div>
+                <!-- /Navbar Barnd -->
+
+                <!-- Sidebar Collapse -->
+                <div class="sidebar-collapse" id="sidebar-collapse">
+                    <i class="collapse-icon fa fa-bars"></i>
+                </div>
+                <!-- /Sidebar Collapse -->
+                <!-- Account Area and Settings --->
+                <div class="navbar-header pull-right">
+                    <div class="navbar-account">
+                        <ul class="account-area">
+                            <li>
+                                <a class=" dropdown-toggle" data-toggle="dropdown" title="Help" href="#">
+                                    <i class="icon fa fa-warning"></i>
+                                </a>
+                                <!--Notification Dropdown-->
+                                <ul class="pull-right dropdown-menu dropdown-arrow dropdown-notifications">
+                                    <li>
+                                        <a href="#">
+                                            <div class="clearfix">
+                                                <div class="notification-icon">
+                                                    <i class="fa fa-phone bg-themeprimary white"></i>
+                                                </div>
+                                                <div class="notification-body">
+                                                    <span class="title">Skype meeting with Patty</span>
+                                                    <span class="description">01:00 pm</span>
+                                                </div>
+                                                <div class="notification-extra">
+                                                    <i class="fa fa-clock-o themeprimary"></i>
+                                                    <span class="description">office</span>
+                                                </div>
+                                            </div>
+                                        </a>
+                                    </li>
+                                    <li>
+                                        <a href="#">
+                                            <div class="clearfix">
+                                                <div class="notification-icon">
+                                                    <i class="fa fa-check bg-darkorange white"></i>
+                                                </div>
+                                                <div class="notification-body">
+                                                    <span class="title">Uncharted break</span>
+                                                    <span class="description">03:30 pm - 05:15 pm</span>
+                                                </div>
+                                                <div class="notification-extra">
+                                                    <i class="fa fa-clock-o darkorange"></i>
+                                                </div>
+                                            </div>
+                                        </a>
+                                    </li>
+                                    <li>
+                                        <a href="#">
+                                            <div class="clearfix">
+                                                <div class="notification-icon">
+                                                    <i class="fa fa-gift bg-warning white"></i>
+                                                </div>
+                                                <div class="notification-body">
+                                                    <span class="title">Kate birthday party</span>
+                                                    <span class="description">08:30 pm</span>
+                                                </div>
+                                                <div class="notification-extra">
+                                                    <i class="fa fa-calendar warning"></i>
+                                                    <i class="fa fa-clock-o warning"></i>
+                                                    <span class="description">at home</span>
+                                                </div>
+                                            </div>
+                                        </a>
+                                    </li>
+                                    <li>
+                                        <a href="#">
+                                            <div class="clearfix">
+                                                <div class="notification-icon">
+                                                    <i class="fa fa-glass bg-success white"></i>
+                                                </div>
+                                                <div class="notification-body">
+                                                    <span class="title">Dinner with friends</span>
+                                                    <span class="description">10:30 pm</span>
+                                                </div>
+                                            </div>
+                                        </a>
+                                    </li>
+                                    <li class="dropdown-footer ">
+                                        <span>
+                                            Today, March 28
+                                        </span>
+                                        <span class="pull-right">
+                                            10°c
+                                            <i class="wi wi-cloudy"></i>
+                                        </span>
+                                    </li>
+                                </ul>
+                                <!--/Notification Dropdown-->
+                            </li>
+
+
+
+
+                        </ul>
+
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+    <!-- /Navbar -->
+
+    <!-- Main Container -->
+    <div class="main-container container-fluid">
+        <!-- Page Container -->
+        <div class="page-container">
+            <!-- Page Sidebar -->
+            <div class="page-sidebar" id="sidebar">
+                <!-- Page Sidebar Header-->
+                <div class="sidebar-header-wrapper">
+                    <input type="text" class="searchinput" />
+                    <i class="searchicon fa fa-search"></i>
+                    <div class="searchhelper">Search Reports, Charts, Emails or Notifications</div>
+                </div>
+                <!-- /Page Sidebar Header -->
+                <!-- Sidebar Menu -->
+                <ul class="nav sidebar-menu">
+                    <!--Dashboard-->
+                    <li class="active">
+                        <a href="index.html">
+                            <i class="menu-icon glyphicon glyphicon-home"></i>
+                            <span class="menu-text"> Dashboard </span>
+                        </a>
+                    </li>
+                    <!--Databoxes-->
+                    <li>
+                        <a href="databoxes.html">
+                            <i class="menu-icon glyphicon glyphicon-tasks"></i>
+                            <span class="menu-text"> Data Boxes </span>
+                        </a>
+                    </li>
+                    <!--Widgets-->
+                    <li>
+                        <a href="widgets.html">
+                            <i class="menu-icon fa fa-th"></i>
+                            <span class="menu-text"> Widgets </span>
+                        </a>
+                    </li>
+                    <!--UI Elements-->
+                    <li>
+                        <a href="#" class="menu-dropdown">
+                            <i class="menu-icon fa fa-desktop"></i>
+                            <span class="menu-text"> Elements </span>
+                            <i class="menu-expand"></i>
+                        </a>
+
+                        <ul class="submenu">
+                            <li>
+                                <a href="elements.html">
+                                    <span class="menu-text">Basic Elements</span>
+                                </a>
+                            </li>
+                            <li>
+                                <a href="#" class="menu-dropdown">
+                                    <span class="menu-text">
+                                        Icons
+                                    </span>
+                                    <i class="menu-expand"></i>
+                                </a>
+
+                                <ul class="submenu">
+                                    <li>
+                                        <a href="font-awesome.html">
+                                            <i class="menu-icon fa fa-rocket"></i>
+                                            <span class="menu-text">Font Awesome</span>
+                                        </a>
+                                    </li>
+                                    <li>
+                                        <a href="glyph-icons.html">
+                                            <i class="menu-icon glyphicon glyphicon-stats"></i>
+                                            <span class="menu-text">Glyph Icons</span>
+                                        </a>
+                                    </li>
+                                    <li>
+                                        <a href="typicon.html">
+                                            <i class="menu-icon typcn typcn-location-outline"></i>
+                                            <span class="menu-text"> Typicons</span>
+                                        </a>
+                                    </li>
+                                    <li>
+                                        <a href="weather-icons.html">
+                                            <i class="menu-icon wi-day-snow"></i>
+                                            <span class="menu-text">Weather Icons</span>
+                                        </a>
+                                    </li>
+                                </ul>
+                            </li>
+                            <li>
+                                <a href="tabs.html">
+                                    <span class="menu-text">Tabs & Accordions</span>
+                                </a>
+                            </li>
+                            <li>
+                                <a href="alerts.html">
+                                    <span class="menu-text">Alerts & Tooltips</span>
+                                </a>
+                            </li>
+                            <li>
+                                <a href="modals.html">
+                                    <span class="menu-text">Modals & Wells</span>
+                                </a>
+                            </li>
+                            <li>
+                                <a href="buttons.html">
+                                    <span class="menu-text">Buttons</span>
+                                </a>
+                            </li>
+                            <li>
+                                <a href="nestable-list.html">
+                                    <span class="menu-text"> Nestable List</span>
+                                </a>
+                            </li>
+                            <li>
+                                <a href="treeview.html">
+                                    <span class="menu-text">Treeview</span>
+                                </a>
+                            </li>
+                        </ul>
+                    </li>
+                    <!--Tables-->
+                    <li>
+                        <a href="#" class="menu-dropdown">
+                            <i class="menu-icon fa fa-table"></i>
+                            <span class="menu-text"> Tables </span>
+
+                            <i class="menu-expand"></i>
+                        </a>
+
+                        <ul class="submenu">
+                            <li>
+                                <a href="tables-simple.html">
+                                    <span class="menu-text">Simple & Responsive</span>
+                                </a>
+                            </li>
+                            <li>
+                                <a href="tables-data.html">
+                                    <span class="menu-text">Data Tables</span>
+                                </a>
+                            </li>
+                        </ul>
+                    </li>
+                    <!--Forms-->
+                    <li>
+                        <a href="#" class="menu-dropdown">
+                            <i class="menu-icon fa fa-pencil-square-o"></i>
+                            <span class="menu-text"> Forms </span>
+
+                            <i class="menu-expand"></i>
+                        </a>
+
+                        <ul class="submenu">
+                            <li>
+                                <a href="form-layouts.html">
+                                    <span class="menu-text">Form Layouts</span>
+                                </a>
+                            </li>
+
+                            <li>
+                                <a href="form-inputs.html">
+                                    <span class="menu-text">Form Inputs</span>
+                                </a>
+                            </li>
+
+                            <li>
+                                <a href="form-pickers.html">
+                                    <span class="menu-text">Data Pickers</span>
+                                </a>
+                            </li>
+                            <li>
+                                <a href="form-wizard.html">
+                                    <span class="menu-text">Wizard</span>
+                                </a>
+                            </li>
+                            <li>
+                                <a href="form-validation.html">
+                                    <span class="menu-text">Validation</span>
+                                </a>
+                            </li>
+                            <li>
+                                <a href="form-editors.html">
+                                    <span class="menu-text">Editors</span>
+                                </a>
+                            </li>
+                        </ul>
+                    </li>
+                    <!--Charts-->
+                    <li>
+                        <a href="#" class="menu-dropdown">
+                            <i class="menu-icon fa fa-bar-chart-o"></i>
+                            <span class="menu-text"> Charts </span>
+
+                            <i class="menu-expand"></i>
+                        </a>
+
+                        <ul class="submenu">
+                            <li>
+                                <a href="flot.html">
+                                    <span class="menu-text">Flot Charts</span>
+                                </a>
+                            </li>
+
+                            <li>
+                                <a href="morris.html">
+                                    <span class="menu-text"> Morris Charts</span>
+                                </a>
+                            </li>
+                            <li>
+                                <a href="sparkline.html">
+                                    <span class="menu-text">Sparkline Charts</span>
+                                </a>
+                            </li>
+                            <li>
+                                <a href="easypiecharts.html">
+                                    <span class="menu-text">Easy Pie Charts</span>
+                                </a>
+                            </li>
+                            <li>
+                                <a href="chartjs.html">
+                                    <span class="menu-text"> ChartJS</span>
+                                </a>
+                            </li>
+                        </ul>
+                    </li>
+                </ul>
+            </div>
+
+        </div>
+
+    </div>
+
+    <!--Basic Scripts-->
+    <script src="{% static 'assets/js/jquery-2.0.3.min.js' %}"></script>
+    <script src="{% static 'assets/js/bootstrap.min.js' %}"></script>
+
+    <script src="{% static 'assets/js/bootstrap.min.js' %}"></script>
+
+    <!--Beyond Scripts-->
+    <script src="{% static 'assets/js/beyond.min.js' %}"></script>
+
+
+    <!--Page Related Scripts-->
+    <!--Sparkline Charts Needed Scripts-->
+    <script src="{% static 'assets/js/charts/sparkline/jquery.sparkline.js' %}"></script>
+    <script src="{% static 'assets/js/charts/sparkline/sparkline-init.js' %}"></script>
+
+    <!--Easy Pie Charts Needed Scripts-->
+    <script src="{% static 'assets/js/charts/easypiechart/jquery.easypiechart.js' %}"></script>
+    <script src="{% static 'assets/js/charts/easypiechart/easypiechart-init.js' %}"></script>
+
+    <!--Flot Charts Needed Scripts-->
+    <script src="{% static 'assets/js/charts/flot/jquery.flot.js' %}"></script>
+    <script src="{% static 'assets/js/charts/flot/jquery.flot.resize.js' %}"></script>
+    <script src="{% static 'assets/js/charts/flot/jquery.flot.pie.js' %}"></script>
+    <script src="{% static 'assets/js/charts/flot/jquery.flot.tooltip.js' %}"></script>
+    <script src="{% static 'assets/js/charts/flot/jquery.flot.orderBars.js' %}"></script>
 
 </body>
 </html>
