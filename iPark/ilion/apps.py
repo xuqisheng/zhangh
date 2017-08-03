@@ -6,4 +6,4 @@ from django.apps import AppConfig
 
 
 class IlionConfig(AppConfig):
-    name = 'iLion'
+    name = 'ilion'

@@ -41,8 +41,8 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
 
-    'iLion',    # iPark项目(project)下的iLion该应用(App)
-    'iwolf',
+    'ilion',    # 服务器监控应用
+    'iwolf',    # 类似hao123作直播视频导流链接应用
 ]
 
 MIDDLEWARE = [

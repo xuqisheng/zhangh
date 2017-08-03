@@ -20,6 +20,6 @@ from django.conf.urls import url, include
 from django.contrib import admin
 
 urlpatterns = [
-    url(r'^iLion/', include('iLion.urls')),
-    url(r'^admin/', admin.site.urls),
+    url(r'^ilion/', include('ilion.urls')),
+    url(r'^admin/', admin.site.urls),   # Django的后台用户管理
 ]

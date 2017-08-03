@@ -13,7 +13,7 @@ from django.conf.urls import url
 from . import views
 
 urlpatterns = [
-    # ex: /iLion/
+    # ex: /ilion/
     url(r'^$', views.index),
     url(r'^login',views.login)
 ]
