@@ -11,7 +11,7 @@ python manage.py startapp iLion
 python manage.py runserver
 
 # 根据models.py生成创建实体的语句
-python manage.py makemigrations --empty iLion
+python manage.py makemigrations --empty ilion
 python manage.py makemigrations
 
 # 创建实体表

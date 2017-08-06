@@ -7,7 +7,7 @@ from django.db import models
 
 
 # 用户表
-class User(models.Model):
+class UserTable(models.Model):
     code = models.CharField(max_length=10)
     name = models.CharField(max_length=50, default='')
     password = models.CharField(max_length=20, default='')
@@ -17,11 +17,11 @@ class User(models.Model):
     create_datetime = models.DateTimeField(auto_now_add=True)
 
     # __str__方法是为了后台管理(admin)和django shell的显示
-    def __str__(self):
+    def __unicode__(self):
         return self.name
 
     class Meta:
-        db_table = 'user'
+        db_table = 'user_table'
         indexes = [
             models.Index(fields=['code'], name='user1'),
             models.Index(fields=['mobile'], name='user2')
@@ -35,7 +35,7 @@ class Group(models.Model):
     area = models.CharField(max_length=10, default='')
     create_datetime = models.DateTimeField(auto_now_add=True)
 
-    def __str__(self):
+    def __unicode__(self):
         return self.name
 
     class Meta:
@@ -45,14 +45,15 @@ class Group(models.Model):
 
 # 酒店信息
 class Hotel(models.Model):
+    group_code = models.CharField(max_length=20)
     code = models.CharField(max_length=20)
     name = models.CharField(max_length=50, default='')
     area = models.CharField(max_length=10, default='')
     city = models.CharField(max_length=20, default='')
-    address = models.CharField(max_length=100, default='')
+    address = models.CharField(max_length=100, default='', null=True, blank=True)
     create_datetime = models.DateTimeField(auto_now_add=True)
 
-    def __str__(self):
+    def __unicode__(self):
         return self.name
 
     class Meta:
@@ -65,7 +66,7 @@ class GroupUrl(models.Model):
     code = models.CharField(max_length=20)
     url  = models.CharField(max_length=200, default='')
 
-    def __str__(self):
+    def __unicode__(self):
         return self.code
 
     class Meta:
@@ -78,7 +79,7 @@ class HotelUrl(models.Model):
     code = models.CharField(max_length=20)
     url  = models.CharField(max_length=200, default='')
 
-    def __str__(self):
+    def __unicode__(self):
         return self.code
 
     class Meta:
