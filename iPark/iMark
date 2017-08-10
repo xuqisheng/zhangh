@@ -3,6 +3,7 @@ python -m django --version
 
 # 创建django项目
 django startproject iPark
+django-admin.py startproject iPark # 老版本用法
 
 # 创建项目下面的应用app
 python manage.py startapp iLion
@@ -10,12 +11,16 @@ python manage.py startapp iLion
 # 启动django Start the development server
 python manage.py runserver
 
+python manage.py runserver 192.168.0.61:8000 # 指定IP地址和端口运行，此例子为Linux机子
+
 # 根据models.py生成创建实体的语句
 python manage.py makemigrations --empty ilion
 python manage.py makemigrations
 
 # 创建实体表
 python manage.py migrate
+
+python manage.py syncdb # 老版本用法
 
 # Run python manage.py makemigrations to create migrations for those changes
 # Run python manage.py migrate to apply those changes to the database.
