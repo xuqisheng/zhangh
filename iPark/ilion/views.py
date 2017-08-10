@@ -4,6 +4,7 @@
 from __future__ import unicode_literals
 
 from django.shortcuts import render
+from .models import *
 
 
 # 登录页
@@ -33,4 +34,12 @@ def health(request):
 
 # 测试
 def zhangh(request):
-    return render(request, 'zhangh.html')
+    content = {}
+
+    hotels = Hotel.objects.all()
+    groups = Group.objects.all()
+
+    content['hotel'] = hotels
+    content['group'] = groups
+
+    return render(request, 'zhangh.html', content)
