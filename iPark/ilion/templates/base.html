@@ -11,7 +11,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="description" content="Dashboard" />
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-    <link rel="shortcut icon" href="{% static 'assets/img/favicon.png' %}" type="image/x-icon">
+    <link rel="shortcut icon" href="{% static 'assets/img/gcicon.png' %}" type="image/x-icon">
 
     <!-- Bootstrap Styles -->
     <link href="{% static 'assets/css/bootstrap.min.css' %}" rel="stylesheet">
@@ -19,8 +19,6 @@
     <!--Beyond styles-->
     <link href="{% static 'assets/css/beyond.min.css' %}" rel="stylesheet" />
     <link href="{% static 'assets/css/font-awesome.min.css' %}" rel="stylesheet" />
-
-    <!--Skin Script: Place this script in head to load scripts for skins and rtl support-->
     <script src="{% static 'assets/js/skins.min.js' %}"></script>
 
     <!-- css 钩子 -->
@@ -60,7 +58,7 @@
                 <div class="navbar-header pull-left">
                     <a href="#" class="navbar-brand">
                         <small>
-                            <img src="{% static 'assets/img/logo.png' %}" alt="" />
+                            <img src="{% static 'assets/img/gclogo.png' %}" alt="" />
                         </small>
                     </a>
                 </div>
@@ -173,11 +171,8 @@
     <!--Basic Scripts-->
     <script src="{% static 'assets/js/jquery-2.0.3.min.js' %}"></script>
     <script src="{% static 'assets/js/bootstrap.min.js' %}"></script>
-
-    <script src="{% static 'assets/js/bootstrap.min.js' %}"></script>
-
-    <!--Beyond Scripts-->
     <script src="{% static 'assets/js/beyond.min.js' %}"></script>
+
 
     <!-- js 钩子 -->
     {% block js %}{% endblock %}

@@ -37,6 +37,11 @@ def config_code(request):
     return render(request, 'config_code.html')
 
 
+# 系统配置 --> 参数配置
+def config_params(request):
+    return render(request, 'config_params.html')
+
+
 # 测试
 def zhangh(request):
     content = {}
