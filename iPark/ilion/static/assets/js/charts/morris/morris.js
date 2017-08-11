@@ -1,20 +1,41 @@
-(function() {
+(function () {
   var $, Morris, minutesSpecHelper, secondsSpecHelper,
     __slice = [].slice,
     __hasProp = {}.hasOwnProperty,
-    __extends = function(child, parent) { for (var key in parent) { if (__hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor(); child.__super__ = parent.prototype; return child; },
-    __bind = function(fn, me){ return function(){ return fn.apply(me, arguments); }; },
-    __indexOf = [].indexOf || function(item) { for (var i = 0, l = this.length; i < l; i++) { if (i in this && this[i] === item) return i; } return -1; };
+    __extends = function (child, parent) {
+      for (var key in parent) {
+        if (__hasProp.call(parent, key)) child[key] = parent[key];
+      }
+
+      function ctor() {
+        this.constructor = child;
+      }
+      ctor.prototype = parent.prototype;
+      child.prototype = new ctor();
+      child.__super__ = parent.prototype;
+      return child;
+    },
+    __bind = function (fn, me) {
+      return function () {
+        return fn.apply(me, arguments);
+      };
+    },
+    __indexOf = [].indexOf || function (item) {
+      for (var i = 0, l = this.length; i < l; i++) {
+        if (i in this && this[i] === item) return i;
+      }
+      return -1;
+    };
 
   Morris = window.Morris = {};
 
   $ = jQuery;
 
-  Morris.EventEmitter = (function() {
+  Morris.EventEmitter = (function () {
 
     function EventEmitter() {}
 
-    EventEmitter.prototype.on = function(name, handler) {
+    EventEmitter.prototype.on = function (name, handler) {
       if (this.handlers == null) {
         this.handlers = {};
       }
@@ -25,7 +46,7 @@
       return this;
     };
 
-    EventEmitter.prototype.fire = function() {
+    EventEmitter.prototype.fire = function () {
       var args, handler, name, _i, _len, _ref, _results;
       name = arguments[0], args = 2 <= arguments.length ? __slice.call(arguments, 1) : [];
       if ((this.handlers != null) && (this.handlers[name] != null)) {
@@ -43,7 +64,7 @@
 
   })();
 
-  Morris.commas = function(num) {
+  Morris.commas = function (num) {
     var absnum, intnum, ret, strabsnum;
     if (num != null) {
       ret = num < 0 ? "-" : "";
@@ -60,11 +81,11 @@
     }
   };
 
-  Morris.pad2 = function(number) {
+  Morris.pad2 = function (number) {
     return (number < 10 ? '0' : '') + number;
   };
 
-  Morris.Grid = (function(_super) {
+  Morris.Grid = (function (_super) {
 
     __extends(Grid, _super);
 
@@ -93,22 +114,22 @@
         this.init();
       }
       this.setData(this.options.data);
-      this.el.bind('mousemove', function(evt) {
+      this.el.bind('mousemove', function (evt) {
         var offset;
         offset = _this.el.offset();
         return _this.fire('hovermove', evt.pageX - offset.left, evt.pageY - offset.top);
       });
-      this.el.bind('mouseout', function(evt) {
+      this.el.bind('mouseout', function (evt) {
         return _this.fire('hoverout');
       });
-      this.el.bind('touchstart touchmove touchend', function(evt) {
+      this.el.bind('touchstart touchmove touchend', function (evt) {
         var offset, touch;
         touch = evt.originalEvent.touches[0] || evt.originalEvent.changedTouches[0];
         offset = _this.el.offset();
         _this.fire('hover', touch.pageX - offset.left, touch.pageY - offset.top);
         return touch;
       });
-      this.el.bind('click', function(evt) {
+      this.el.bind('click', function (evt) {
         var offset;
         offset = _this.el.offset();
         return _this.fire('gridclick', evt.pageX - offset.left, evt.pageY - offset.top);
@@ -146,7 +167,7 @@
       eventLineColors: ['#005a04', '#ccffbb', '#3a5f0b', '#005502']
     };
 
-    Grid.prototype.setData = function(data, redraw) {
+    Grid.prototype.setData = function (data, redraw) {
       var e, idx, index, maxGoal, minGoal, ret, row, step, total, y, ykey, ymax, ymin, yval;
       if (redraw == null) {
         redraw = true;
@@ -168,7 +189,7 @@
         ymin = ymin != null ? Math.min(ymin, minGoal) : minGoal;
         ymax = ymax != null ? Math.max(ymax, maxGoal) : maxGoal;
       }
-      this.data = (function() {
+      this.data = (function () {
         var _i, _len, _results;
         _results = [];
         for (index = _i = 0, _len = data.length; _i < _len; index = ++_i) {
@@ -189,7 +210,7 @@
             }
           }
           total = 0;
-          ret.y = (function() {
+          ret.y = (function () {
             var _j, _len1, _ref, _results1;
             _ref = this.options.ykeys;
             _results1 = [];
@@ -227,7 +248,7 @@
         return _results;
       }).call(this);
       if (this.options.parseTime) {
-        this.data = this.data.sort(function(a, b) {
+        this.data = this.data.sort(function (a, b) {
           return (a.x > b.x) - (b.x > a.x);
         });
       }
@@ -235,7 +256,7 @@
       this.xmax = this.data[this.data.length - 1].x;
       this.events = [];
       if (this.options.parseTime && this.options.events.length > 0) {
-        this.events = (function() {
+        this.events = (function () {
           var _i, _len, _ref, _results;
           _ref = this.options.events;
           _results = [];
@@ -267,7 +288,7 @@
           this.ymax = Math.max(this.ymax, this.grid[this.grid.length - 1]);
         } else {
           step = (this.ymax - this.ymin) / (this.options.numLines - 1);
-          this.grid = (function() {
+          this.grid = (function () {
             var _i, _ref, _ref1, _results;
             _results = [];
             for (y = _i = _ref = this.ymin, _ref1 = this.ymax; _ref <= _ref1 ? _i <= _ref1 : _i >= _ref1; y = _i += step) {
@@ -283,7 +304,7 @@
       }
     };
 
-    Grid.prototype.yboundary = function(boundaryType, currentValue) {
+    Grid.prototype.yboundary = function (boundaryType, currentValue) {
       var boundaryOption, suggestedValue;
       boundaryOption = this.options["y" + boundaryType];
       if (typeof boundaryOption === 'string') {
@@ -309,7 +330,7 @@
       }
     };
 
-    Grid.prototype.autoGridLines = function(ymin, ymax, nlines) {
+    Grid.prototype.autoGridLines = function (ymin, ymax, nlines) {
       var gmax, gmin, grid, smag, span, step, unit, y, ymag;
       span = ymax - ymin;
       ymag = Math.floor(Math.log(span) / Math.log(10));
@@ -327,7 +348,7 @@
       }
       if (step < 1) {
         smag = Math.floor(Math.log(step) / Math.log(10));
-        grid = (function() {
+        grid = (function () {
           var _i, _results;
           _results = [];
           for (y = _i = gmin; gmin <= gmax ? _i <= gmax : _i >= gmax; y = _i += step) {
@@ -336,7 +357,7 @@
           return _results;
         })();
       } else {
-        grid = (function() {
+        grid = (function () {
           var _i, _results;
           _results = [];
           for (y = _i = gmin; gmin <= gmax ? _i <= gmax : _i >= gmax; y = _i += step) {
@@ -348,7 +369,7 @@
       return grid;
     };
 
-    Grid.prototype._calc = function() {
+    Grid.prototype._calc = function () {
       var bottomOffsets, gridLine, h, i, w, yLabelWidths;
       w = this.el.width();
       h = this.el.height();
@@ -361,7 +382,7 @@
         this.top = this.options.padding;
         this.bottom = this.elementHeight - this.options.padding;
         if (this.options.axes) {
-          yLabelWidths = (function() {
+          yLabelWidths = (function () {
             var _i, _len, _ref, _results;
             _ref = this.grid;
             _results = [];
@@ -372,7 +393,7 @@
             return _results;
           }).call(this);
           this.left += Math.max.apply(Math, yLabelWidths);
-          bottomOffsets = (function() {
+          bottomOffsets = (function () {
             var _i, _ref, _results;
             _results = [];
             for (i = _i = 0, _ref = this.data.length; 0 <= _ref ? _i < _ref : _i > _ref; i = 0 <= _ref ? ++_i : --_i) {
@@ -392,11 +413,11 @@
       }
     };
 
-    Grid.prototype.transY = function(y) {
+    Grid.prototype.transY = function (y) {
       return this.bottom - (y - this.ymin) * this.dy;
     };
 
-    Grid.prototype.transX = function(x) {
+    Grid.prototype.transX = function (x) {
       if (this.data.length === 1) {
         return (this.left + this.right) / 2;
       } else {
@@ -404,7 +425,7 @@
       }
     };
 
-    Grid.prototype.redraw = function() {
+    Grid.prototype.redraw = function () {
       this.raphael.clear();
       this._calc();
       this.drawGrid();
@@ -415,7 +436,7 @@
       }
     };
 
-    Grid.prototype.measureText = function(text, angle) {
+    Grid.prototype.measureText = function (text, angle) {
       var ret, tt;
       if (angle == null) {
         angle = 0;
@@ -426,11 +447,11 @@
       return ret;
     };
 
-    Grid.prototype.yAxisFormat = function(label) {
+    Grid.prototype.yAxisFormat = function (label) {
       return this.yLabelFormat(label);
     };
 
-    Grid.prototype.yLabelFormat = function(label) {
+    Grid.prototype.yLabelFormat = function (label) {
       if (typeof this.options.yLabelFormat === 'function') {
         return this.options.yLabelFormat(label);
       } else {
@@ -438,7 +459,7 @@
       }
     };
 
-    Grid.prototype.updateHover = function(x, y) {
+    Grid.prototype.updateHover = function (x, y) {
       var hit, _ref;
       hit = this.hitTest(x, y);
       if (hit != null) {
@@ -446,7 +467,7 @@
       }
     };
 
-    Grid.prototype.drawGrid = function() {
+    Grid.prototype.drawGrid = function () {
       var lineY, y, _i, _len, _ref, _results;
       if (this.options.grid === false && this.options.axes === false) {
         return;
@@ -468,7 +489,7 @@
       return _results;
     };
 
-    Grid.prototype.drawGoals = function() {
+    Grid.prototype.drawGoals = function () {
       var color, goal, i, _i, _len, _ref, _results;
       _ref = this.options.goals;
       _results = [];
@@ -480,7 +501,7 @@
       return _results;
     };
 
-    Grid.prototype.drawEvents = function() {
+    Grid.prototype.drawEvents = function () {
       var color, event, i, _i, _len, _ref, _results;
       _ref = this.events;
       _results = [];
@@ -492,19 +513,19 @@
       return _results;
     };
 
-    Grid.prototype.drawGoal = function(goal, color) {
+    Grid.prototype.drawGoal = function (goal, color) {
       return this.raphael.path("M" + this.left + "," + (this.transY(goal)) + "H" + this.right).attr('stroke', color).attr('stroke-width', this.options.goalStrokeWidth);
     };
 
-    Grid.prototype.drawEvent = function(event, color) {
+    Grid.prototype.drawEvent = function (event, color) {
       return this.raphael.path("M" + (this.transX(event)) + "," + this.bottom + "V" + this.top).attr('stroke', color).attr('stroke-width', this.options.eventStrokeWidth);
     };
 
-    Grid.prototype.drawYAxisLabel = function(xPos, yPos, text) {
+    Grid.prototype.drawYAxisLabel = function (xPos, yPos, text) {
       return this.raphael.text(xPos, yPos, text).attr('font-size', this.options.gridTextSize).attr('font-family', this.options.gridTextFamily).attr('font-weight', this.options.gridTextWeight).attr('fill', this.options.gridTextColor).attr('text-anchor', 'end');
     };
 
-    Grid.prototype.drawGridLine = function(path) {
+    Grid.prototype.drawGridLine = function (path) {
       return this.raphael.path(path).attr('stroke', this.options.gridLineColor).attr('stroke-width', this.options.gridStrokeWidth);
     };
 
@@ -512,7 +533,7 @@
 
   })(Morris.EventEmitter);
 
-  Morris.parseDate = function(date) {
+  Morris.parseDate = function (date) {
     var isecs, m, msecs, n, o, offsetmins, p, q, r, ret, secs;
     if (typeof date === 'number') {
       return date;
@@ -569,7 +590,7 @@
     }
   };
 
-  Morris.Hover = (function() {
+  Morris.Hover = (function () {
 
     Hover.defaults = {
       "class": 'morris-hover morris-default-style'
@@ -585,17 +606,17 @@
       this.options.parent.append(this.el);
     }
 
-    Hover.prototype.update = function(html, x, y) {
+    Hover.prototype.update = function (html, x, y) {
       this.html(html);
       this.show();
       return this.moveTo(x, y);
     };
 
-    Hover.prototype.html = function(content) {
+    Hover.prototype.html = function (content) {
       return this.el.html(content);
     };
 
-    Hover.prototype.moveTo = function(x, y) {
+    Hover.prototype.moveTo = function (x, y) {
       var hoverHeight, hoverWidth, left, parentHeight, parentWidth, top;
       parentWidth = this.options.parent.innerWidth();
       parentHeight = this.options.parent.innerHeight();
@@ -619,11 +640,11 @@
       });
     };
 
-    Hover.prototype.show = function() {
+    Hover.prototype.show = function () {
       return this.el.show();
     };
 
-    Hover.prototype.hide = function() {
+    Hover.prototype.hide = function () {
       return this.el.hide();
     };
 
@@ -631,7 +652,7 @@
 
   })();
 
-  Morris.Line = (function(_super) {
+  Morris.Line = (function (_super) {
 
     __extends(Line, _super);
 
@@ -649,7 +670,7 @@
       Line.__super__.constructor.call(this, options);
     }
 
-    Line.prototype.init = function() {
+    Line.prototype.init = function () {
       this.pointGrow = Raphael.animation({
         r: this.options.pointSize + 3
       }, 25, 'linear');
@@ -681,19 +702,19 @@
       hideHover: false
     };
 
-    Line.prototype.calc = function() {
+    Line.prototype.calc = function () {
       this.calcPoints();
       return this.generatePaths();
     };
 
-    Line.prototype.calcPoints = function() {
+    Line.prototype.calcPoints = function () {
       var row, y, _i, _len, _ref, _results;
       _ref = this.data;
       _results = [];
       for (_i = 0, _len = _ref.length; _i < _len; _i++) {
         row = _ref[_i];
         row._x = this.transX(row.x);
-        row._y = (function() {
+        row._y = (function () {
           var _j, _len1, _ref1, _results1;
           _ref1 = row.y;
           _results1 = [];
@@ -707,7 +728,7 @@
           }
           return _results1;
         }).call(this);
-        _results.push(row._ymax = Math.min.apply(null, [this.bottom].concat((function() {
+        _results.push(row._ymax = Math.min.apply(null, [this.bottom].concat((function () {
           var _j, _len1, _ref1, _results1;
           _ref1 = row._y;
           _results1 = [];
@@ -723,7 +744,7 @@
       return _results;
     };
 
-    Line.prototype.hitTest = function(x, y) {
+    Line.prototype.hitTest = function (x, y) {
       var index, r, _i, _len, _ref;
       if (this.data.length === 0) {
         return null;
@@ -738,25 +759,25 @@
       return index;
     };
 
-    Line.prototype.onGridClick = function(x, y) {
+    Line.prototype.onGridClick = function (x, y) {
       var index;
       index = this.hitTest(x, y);
       return this.fire('click', index, this.options.data[index], x, y);
     };
 
-    Line.prototype.onHoverMove = function(x, y) {
+    Line.prototype.onHoverMove = function (x, y) {
       var index;
       index = this.hitTest(x, y);
       return this.displayHoverForRow(index);
     };
 
-    Line.prototype.onHoverOut = function() {
+    Line.prototype.onHoverOut = function () {
       if (this.options.hideHover !== false) {
         return this.displayHoverForRow(null);
       }
     };
 
-    Line.prototype.displayHoverForRow = function(index) {
+    Line.prototype.displayHoverForRow = function (index) {
       var _ref;
       if (index != null) {
         (_ref = this.hover).update.apply(_ref, this.hoverContentForRow(index));
@@ -767,7 +788,7 @@
       }
     };
 
-    Line.prototype.hoverContentForRow = function(index) {
+    Line.prototype.hoverContentForRow = function (index) {
       var content, j, row, y, _i, _len, _ref;
       row = this.data[index];
       content = "<div class='morris-hover-row-label'>" + row.label + "</div>";
@@ -782,14 +803,14 @@
       return [content, row._x, row._ymax];
     };
 
-    Line.prototype.generatePaths = function() {
+    Line.prototype.generatePaths = function () {
       var c, coords, i, r, smooth;
-      return this.paths = (function() {
+      return this.paths = (function () {
         var _i, _ref, _ref1, _results;
         _results = [];
         for (i = _i = 0, _ref = this.options.ykeys.length; 0 <= _ref ? _i < _ref : _i > _ref; i = 0 <= _ref ? ++_i : --_i) {
           smooth = this.options.smooth === true || (_ref1 = this.options.ykeys[i], __indexOf.call(this.options.smooth, _ref1) >= 0);
-          coords = (function() {
+          coords = (function () {
             var _j, _len, _ref2, _results1;
             _ref2 = this.data;
             _results1 = [];
@@ -805,7 +826,7 @@
             return _results1;
           }).call(this);
           if (this.options.continuousLine) {
-            coords = (function() {
+            coords = (function () {
               var _j, _len, _results1;
               _results1 = [];
               for (_j = 0, _len = coords.length; _j < _len; _j++) {
@@ -827,7 +848,7 @@
       }).call(this);
     };
 
-    Line.prototype.draw = function() {
+    Line.prototype.draw = function () {
       if (this.options.axes) {
         this.drawXAxis();
       }
@@ -837,13 +858,13 @@
       }
     };
 
-    Line.prototype.drawXAxis = function() {
+    Line.prototype.drawXAxis = function () {
       var drawLabel, l, labels, prevAngleMargin, prevLabelMargin, row, ypos, _i, _len, _results,
         _this = this;
       ypos = this.bottom + this.options.padding / 2;
       prevLabelMargin = null;
       prevAngleMargin = null;
-      drawLabel = function(labelText, xpos) {
+      drawLabel = function (labelText, xpos) {
         var label, labelBox, margin, offset, textBox;
         label = _this.drawXAxisLabel(_this.transX(xpos), ypos, labelText);
         textBox = label.getBBox();
@@ -867,12 +888,14 @@
       };
       if (this.options.parseTime) {
         if (this.data.length === 1 && this.options.xLabels === 'auto') {
-          labels = [[this.data[0].label, this.data[0].x]];
+          labels = [
+            [this.data[0].label, this.data[0].x]
+          ];
         } else {
           labels = Morris.labelSeries(this.xmin, this.xmax, this.width, this.options.xLabels, this.options.xLabelFormat);
         }
       } else {
-        labels = (function() {
+        labels = (function () {
           var _i, _len, _ref, _results;
           _ref = this.data;
           _results = [];
@@ -892,7 +915,7 @@
       return _results;
     };
 
-    Line.prototype.drawSeries = function() {
+    Line.prototype.drawSeries = function () {
       var i, _i, _j, _ref, _ref1, _results;
       this.seriesPoints = [];
       for (i = _i = _ref = this.options.ykeys.length - 1; _ref <= 0 ? _i <= 0 : _i >= 0; i = _ref <= 0 ? ++_i : --_i) {
@@ -905,7 +928,7 @@
       return _results;
     };
 
-    Line.prototype._drawPointFor = function(index) {
+    Line.prototype._drawPointFor = function (index) {
       var circle, row, _i, _len, _ref, _results;
       this.seriesPoints[index] = [];
       _ref = this.data;
@@ -921,7 +944,7 @@
       return _results;
     };
 
-    Line.prototype._drawLineFor = function(index) {
+    Line.prototype._drawLineFor = function (index) {
       var path;
       path = this.paths[index];
       if (path !== null) {
@@ -929,7 +952,7 @@
       }
     };
 
-    Line.createPath = function(coords, smooth, bottom) {
+    Line.createPath = function (coords, smooth, bottom) {
       var coord, g, grads, i, ix, lg, path, prevCoord, x1, x2, y1, y2, _i, _len;
       path = "";
       if (smooth) {
@@ -965,9 +988,9 @@
       return path;
     };
 
-    Line.gradients = function(coords) {
+    Line.gradients = function (coords) {
       var coord, grad, i, nextCoord, prevCoord, _i, _len, _results;
-      grad = function(a, b) {
+      grad = function (a, b) {
         return (a.y - b.y) / (a.x - b.x);
       };
       _results = [];
@@ -996,7 +1019,7 @@
       return _results;
     };
 
-    Line.prototype.hilight = function(index) {
+    Line.prototype.hilight = function (index) {
       var i, _i, _j, _ref, _ref1;
       if (this.prevHilight !== null && this.prevHilight !== index) {
         for (i = _i = 0, _ref = this.seriesPoints.length - 1; 0 <= _ref ? _i <= _ref : _i >= _ref; i = 0 <= _ref ? ++_i : --_i) {
@@ -1015,7 +1038,7 @@
       return this.prevHilight = index;
     };
 
-    Line.prototype.colorFor = function(row, sidx, type) {
+    Line.prototype.colorFor = function (row, sidx, type) {
       if (typeof this.options.lineColors === 'function') {
         return this.options.lineColors.call(this, row, sidx, type);
       } else if (type === 'point') {
@@ -1025,23 +1048,23 @@
       }
     };
 
-    Line.prototype.drawXAxisLabel = function(xPos, yPos, text) {
+    Line.prototype.drawXAxisLabel = function (xPos, yPos, text) {
       return this.raphael.text(xPos, yPos, text).attr('font-size', this.options.gridTextSize).attr('font-family', this.options.gridTextFamily).attr('font-weight', this.options.gridTextWeight).attr('fill', this.options.gridTextColor);
     };
 
-    Line.prototype.drawLinePath = function(path, lineColor) {
+    Line.prototype.drawLinePath = function (path, lineColor) {
       return this.raphael.path(path).attr('stroke', lineColor).attr('stroke-width', this.options.lineWidth);
     };
 
-    Line.prototype.drawLinePoint = function(xPos, yPos, size, pointColor, lineIndex) {
+    Line.prototype.drawLinePoint = function (xPos, yPos, size, pointColor, lineIndex) {
       return this.raphael.circle(xPos, yPos, size).attr('fill', pointColor).attr('stroke-width', this.strokeWidthForSeries(lineIndex)).attr('stroke', this.strokeForSeries(lineIndex));
     };
 
-    Line.prototype.strokeWidthForSeries = function(index) {
+    Line.prototype.strokeWidthForSeries = function (index) {
       return this.options.pointWidths[index % this.options.pointWidths.length];
     };
 
-    Line.prototype.strokeForSeries = function(index) {
+    Line.prototype.strokeForSeries = function (index) {
       return this.options.pointStrokeColors[index % this.options.pointStrokeColors.length];
     };
 
@@ -1049,7 +1072,7 @@
 
   })(Morris.Grid);
 
-  Morris.labelSeries = function(dmin, dmax, pxwidth, specName, xLabelFormat) {
+  Morris.labelSeries = function (dmin, dmax, pxwidth, specName, xLabelFormat) {
     var d, d0, ddensity, name, ret, s, spec, t, _i, _len, _ref;
     ddensity = 200 * (dmax - dmin) / pxwidth;
     d0 = new Date(dmin);
@@ -1084,31 +1107,31 @@
     return ret;
   };
 
-  minutesSpecHelper = function(interval) {
+  minutesSpecHelper = function (interval) {
     return {
       span: interval * 60 * 1000,
-      start: function(d) {
+      start: function (d) {
         return new Date(d.getFullYear(), d.getMonth(), d.getDate(), d.getHours());
       },
-      fmt: function(d) {
+      fmt: function (d) {
         return "" + (Morris.pad2(d.getHours())) + ":" + (Morris.pad2(d.getMinutes()));
       },
-      incr: function(d) {
+      incr: function (d) {
         return d.setUTCMinutes(d.getUTCMinutes() + interval);
       }
     };
   };
 
-  secondsSpecHelper = function(interval) {
+  secondsSpecHelper = function (interval) {
     return {
       span: interval * 1000,
-      start: function(d) {
+      start: function (d) {
         return new Date(d.getFullYear(), d.getMonth(), d.getDate(), d.getHours(), d.getMinutes());
       },
-      fmt: function(d) {
+      fmt: function (d) {
         return "" + (Morris.pad2(d.getHours())) + ":" + (Morris.pad2(d.getMinutes())) + ":" + (Morris.pad2(d.getSeconds()));
       },
-      incr: function(d) {
+      incr: function (d) {
         return d.setUTCSeconds(d.getUTCSeconds() + interval);
       }
     };
@@ -1117,49 +1140,49 @@
   Morris.LABEL_SPECS = {
     "decade": {
       span: 172800000000,
-      start: function(d) {
+      start: function (d) {
         return new Date(d.getFullYear() - d.getFullYear() % 10, 0, 1);
       },
-      fmt: function(d) {
+      fmt: function (d) {
         return "" + (d.getFullYear());
       },
-      incr: function(d) {
+      incr: function (d) {
         return d.setFullYear(d.getFullYear() + 10);
       }
     },
     "year": {
       span: 17280000000,
-      start: function(d) {
+      start: function (d) {
         return new Date(d.getFullYear(), 0, 1);
       },
-      fmt: function(d) {
+      fmt: function (d) {
         return "" + (d.getFullYear());
       },
-      incr: function(d) {
+      incr: function (d) {
         return d.setFullYear(d.getFullYear() + 1);
       }
     },
     "month": {
       span: 2419200000,
-      start: function(d) {
+      start: function (d) {
         return new Date(d.getFullYear(), d.getMonth(), 1);
       },
-      fmt: function(d) {
+      fmt: function (d) {
         return "" + (d.getFullYear()) + "-" + (Morris.pad2(d.getMonth() + 1));
       },
-      incr: function(d) {
+      incr: function (d) {
         return d.setMonth(d.getMonth() + 1);
       }
     },
     "day": {
       span: 86400000,
-      start: function(d) {
+      start: function (d) {
         return new Date(d.getFullYear(), d.getMonth(), d.getDate());
       },
-      fmt: function(d) {
+      fmt: function (d) {
         return "" + (d.getFullYear()) + "-" + (Morris.pad2(d.getMonth() + 1)) + "-" + (Morris.pad2(d.getDate()));
       },
-      incr: function(d) {
+      incr: function (d) {
         return d.setDate(d.getDate() + 1);
       }
     },
@@ -1178,7 +1201,7 @@
 
   Morris.AUTO_LABEL_ORDER = ["decade", "year", "month", "day", "hour", "30min", "15min", "10min", "5min", "minute", "30sec", "15sec", "10sec", "5sec", "second"];
 
-  Morris.Area = (function(_super) {
+  Morris.Area = (function (_super) {
     var areaDefaults;
 
     __extends(Area, _super);
@@ -1201,7 +1224,7 @@
       Area.__super__.constructor.call(this, areaOptions);
     }
 
-    Area.prototype.calcPoints = function() {
+    Area.prototype.calcPoints = function () {
       var row, total, y, _i, _len, _ref, _results;
       _ref = this.data;
       _results = [];
@@ -1209,7 +1232,7 @@
         row = _ref[_i];
         row._x = this.transX(row.x);
         total = 0;
-        row._y = (function() {
+        row._y = (function () {
           var _j, _len1, _ref1, _results1;
           _ref1 = row.y;
           _results1 = [];
@@ -1229,19 +1252,23 @@
       return _results;
     };
 
-    Area.prototype.drawSeries = function() {
+    Area.prototype.drawSeries = function () {
       var i, range, _i, _j, _k, _len, _ref, _ref1, _results, _results1, _results2;
       this.seriesPoints = [];
       if (this.options.behaveLikeLine) {
-        range = (function() {
+        range = (function () {
           _results = [];
-          for (var _i = 0, _ref = this.options.ykeys.length - 1; 0 <= _ref ? _i <= _ref : _i >= _ref; 0 <= _ref ? _i++ : _i--){ _results.push(_i); }
+          for (var _i = 0, _ref = this.options.ykeys.length - 1; 0 <= _ref ? _i <= _ref : _i >= _ref; 0 <= _ref ? _i++ : _i--) {
+            _results.push(_i);
+          }
           return _results;
         }).apply(this);
       } else {
-        range = (function() {
+        range = (function () {
           _results1 = [];
-          for (var _j = _ref1 = this.options.ykeys.length - 1; _ref1 <= 0 ? _j <= 0 : _j >= 0; _ref1 <= 0 ? _j++ : _j--){ _results1.push(_j); }
+          for (var _j = _ref1 = this.options.ykeys.length - 1; _ref1 <= 0 ? _j <= 0 : _j >= 0; _ref1 <= 0 ? _j++ : _j--) {
+            _results1.push(_j);
+          }
           return _results1;
         }).apply(this);
       }
@@ -1255,7 +1282,7 @@
       return _results2;
     };
 
-    Area.prototype._drawFillFor = function(index) {
+    Area.prototype._drawFillFor = function (index) {
       var path;
       path = this.paths[index];
       if (path !== null) {
@@ -1264,13 +1291,13 @@
       }
     };
 
-    Area.prototype.fillForSeries = function(i) {
+    Area.prototype.fillForSeries = function (i) {
       var color;
       color = Raphael.rgb2hsl(this.colorFor(this.data[i], i, 'line'));
       return Raphael.hsl(color.h, this.options.behaveLikeLine ? color.s * 0.9 : color.s * 0.75, Math.min(0.98, this.options.behaveLikeLine ? color.l * 1.2 : color.l * 1.25));
     };
 
-    Area.prototype.drawFilledPath = function(path, fill) {
+    Area.prototype.drawFilledPath = function (path, fill) {
       return this.raphael.path(path).attr('fill', fill).attr('fill-opacity', this.options.fillOpacity).attr('stroke-width', 0);
     };
 
@@ -1278,7 +1305,7 @@
 
   })(Morris.Line);
 
-  Morris.Bar = (function(_super) {
+  Morris.Bar = (function (_super) {
 
     __extends(Bar, _super);
 
@@ -1296,7 +1323,7 @@
       }));
     }
 
-    Bar.prototype.init = function() {
+    Bar.prototype.init = function () {
       this.cumulative = this.options.stacked;
       if (this.options.hideHover !== 'always') {
         this.hover = new Morris.Hover({
@@ -1315,7 +1342,7 @@
       xLabelMargin: 50
     };
 
-    Bar.prototype.calc = function() {
+    Bar.prototype.calc = function () {
       var _ref;
       this.calcBars();
       if (this.options.hideHover === false) {
@@ -1323,14 +1350,14 @@
       }
     };
 
-    Bar.prototype.calcBars = function() {
+    Bar.prototype.calcBars = function () {
       var idx, row, y, _i, _len, _ref, _results;
       _ref = this.data;
       _results = [];
       for (idx = _i = 0, _len = _ref.length; _i < _len; idx = ++_i) {
         row = _ref[idx];
         row._x = this.left + this.width * (idx + 0.5) / this.data.length;
-        _results.push(row._y = (function() {
+        _results.push(row._y = (function () {
           var _j, _len1, _ref1, _results1;
           _ref1 = row.y;
           _results1 = [];
@@ -1348,14 +1375,14 @@
       return _results;
     };
 
-    Bar.prototype.draw = function() {
+    Bar.prototype.draw = function () {
       if (this.options.axes) {
         this.drawXAxis();
       }
       return this.drawSeries();
     };
 
-    Bar.prototype.drawXAxis = function() {
+    Bar.prototype.drawXAxis = function () {
       var i, label, labelBox, margin, offset, prevAngleMargin, prevLabelMargin, row, textBox, ypos, _i, _ref, _results;
       ypos = this.bottom + this.options.padding / 2;
       prevLabelMargin = null;
@@ -1385,21 +1412,21 @@
       return _results;
     };
 
-    Bar.prototype.drawSeries = function() {
+    Bar.prototype.drawSeries = function () {
       var barWidth, bottom, groupWidth, idx, lastTop, left, leftPadding, numBars, row, sidx, size, top, ypos, zeroPos;
       groupWidth = this.width / this.options.data.length;
       numBars = this.options.stacked != null ? 1 : this.options.ykeys.length;
       barWidth = (groupWidth * this.options.barSizeRatio - this.options.barGap * (numBars - 1)) / numBars;
       leftPadding = groupWidth * (1 - this.options.barSizeRatio) / 2;
       zeroPos = this.ymin <= 0 && this.ymax >= 0 ? this.transY(0) : null;
-      return this.bars = (function() {
+      return this.bars = (function () {
         var _i, _len, _ref, _results;
         _ref = this.data;
         _results = [];
         for (idx = _i = 0, _len = _ref.length; _i < _len; idx = ++_i) {
           row = _ref[idx];
           lastTop = 0;
-          _results.push((function() {
+          _results.push((function () {
             var _j, _len1, _ref1, _results1;
             _ref1 = row._y;
             _results1 = [];
@@ -1434,7 +1461,7 @@
       }).call(this);
     };
 
-    Bar.prototype.colorFor = function(row, sidx, type) {
+    Bar.prototype.colorFor = function (row, sidx, type) {
       var r, s;
       if (typeof this.options.barColors === 'function') {
         r = {
@@ -1453,7 +1480,7 @@
       }
     };
 
-    Bar.prototype.hitTest = function(x, y) {
+    Bar.prototype.hitTest = function (x, y) {
       if (this.data.length === 0) {
         return null;
       }
@@ -1461,25 +1488,25 @@
       return Math.min(this.data.length - 1, Math.floor((x - this.left) / (this.width / this.data.length)));
     };
 
-    Bar.prototype.onGridClick = function(x, y) {
+    Bar.prototype.onGridClick = function (x, y) {
       var index;
       index = this.hitTest(x, y);
       return this.fire('click', index, this.options.data[index], x, y);
     };
 
-    Bar.prototype.onHoverMove = function(x, y) {
+    Bar.prototype.onHoverMove = function (x, y) {
       var index, _ref;
       index = this.hitTest(x, y);
       return (_ref = this.hover).update.apply(_ref, this.hoverContentForRow(index));
     };
 
-    Bar.prototype.onHoverOut = function() {
+    Bar.prototype.onHoverOut = function () {
       if (this.options.hideHover !== false) {
         return this.hover.hide();
       }
     };
 
-    Bar.prototype.hoverContentForRow = function(index) {
+    Bar.prototype.hoverContentForRow = function (index) {
       var content, j, row, x, y, _i, _len, _ref;
       row = this.data[index];
       content = "<div class='morris-hover-row-label'>" + row.label + "</div>";
@@ -1495,12 +1522,12 @@
       return [content, x];
     };
 
-    Bar.prototype.drawXAxisLabel = function(xPos, yPos, text) {
+    Bar.prototype.drawXAxisLabel = function (xPos, yPos, text) {
       var label;
       return label = this.raphael.text(xPos, yPos, text).attr('font-size', this.options.gridTextSize).attr('font-family', this.options.gridTextFamily).attr('font-weight', this.options.gridTextWeight).attr('fill', this.options.gridTextColor);
     };
 
-    Bar.prototype.drawBar = function(xPos, yPos, width, height, barColor) {
+    Bar.prototype.drawBar = function (xPos, yPos, width, height, barColor) {
       return this.raphael.rect(xPos, yPos, width, height).attr('fill', barColor).attr('stroke-width', 0);
     };
 
@@ -1508,7 +1535,7 @@
 
   })(Morris.Grid);
 
-  Morris.Donut = (function(_super) {
+  Morris.Donut = (function (_super) {
 
     __extends(Donut, _super);
 
@@ -1541,7 +1568,7 @@
         return;
       }
       this.data = options.data;
-      this.values = (function() {
+      this.values = (function () {
         var _i, _len, _ref, _results;
         _ref = this.data;
         _results = [];
@@ -1554,7 +1581,7 @@
       this.redraw();
     }
 
-    Donut.prototype.redraw = function() {
+    Donut.prototype.redraw = function () {
       var C, cx, cy, i, idx, last, max_value, min, next, seg, total, value, w, _i, _j, _k, _len, _len1, _len2, _ref, _ref1, _ref2, _results;
       this.el.empty();
       this.raphael = new Raphael(this.el[0]);
@@ -1586,7 +1613,7 @@
       }
       this.text1 = this.drawEmptyDonutLabel(cx, cy - 10, this.options.labelColor, 15, 800);
       this.text2 = this.drawEmptyDonutLabel(cx, cy + 10, this.options.labelColor, 14);
-      max_value = Math.max.apply(null, (function() {
+      max_value = Math.max.apply(null, (function () {
         var _k, _len2, _ref2, _results;
         _ref2 = this.values;
         _results = [];
@@ -1610,11 +1637,11 @@
       return _results;
     };
 
-    Donut.prototype.click = function(idx) {
+    Donut.prototype.click = function (idx) {
       return this.fire('click', idx, this.data[idx]);
     };
 
-    Donut.prototype.select = function(idx) {
+    Donut.prototype.select = function (idx) {
       var row, s, segment, _i, _len, _ref;
       _ref = this.segments;
       for (_i = 0, _len = _ref.length; _i < _len; _i++) {
@@ -1627,7 +1654,7 @@
       return this.setLabels(row.label, this.options.formatter(row.value, row));
     };
 
-    Donut.prototype.setLabels = function(label1, label2) {
+    Donut.prototype.setLabels = function (label1, label2) {
       var inner, maxHeightBottom, maxHeightTop, maxWidth, text1bbox, text1scale, text2bbox, text2scale;
       inner = (Math.min(this.el.width() / 2, this.el.height() / 2) - 10) * 2 / 3;
       maxWidth = 1.8 * inner;
@@ -1653,7 +1680,7 @@
       });
     };
 
-    Donut.prototype.drawEmptyDonutLabel = function(xPos, yPos, color, fontSize, fontWeight) {
+    Donut.prototype.drawEmptyDonutLabel = function (xPos, yPos, color, fontSize, fontWeight) {
       var text;
       text = this.raphael.text(xPos, yPos, '').attr('font-size', fontSize).attr('fill', color);
       if (fontWeight != null) {
@@ -1666,7 +1693,7 @@
 
   })(Morris.EventEmitter);
 
-  Morris.DonutSegment = (function(_super) {
+  Morris.DonutSegment = (function (_super) {
 
     __extends(DonutSegment, _super);
 
@@ -1693,34 +1720,34 @@
       this.hilight = this.calcArc(this.inner);
     }
 
-    DonutSegment.prototype.calcArcPoints = function(r) {
+    DonutSegment.prototype.calcArcPoints = function (r) {
       return [this.cx + r * this.sin_p0, this.cy + r * this.cos_p0, this.cx + r * this.sin_p1, this.cy + r * this.cos_p1];
     };
 
-    DonutSegment.prototype.calcSegment = function(r1, r2) {
+    DonutSegment.prototype.calcSegment = function (r1, r2) {
       var ix0, ix1, iy0, iy1, ox0, ox1, oy0, oy1, _ref, _ref1;
       _ref = this.calcArcPoints(r1), ix0 = _ref[0], iy0 = _ref[1], ix1 = _ref[2], iy1 = _ref[3];
       _ref1 = this.calcArcPoints(r2), ox0 = _ref1[0], oy0 = _ref1[1], ox1 = _ref1[2], oy1 = _ref1[3];
       return ("M" + ix0 + "," + iy0) + ("A" + r1 + "," + r1 + ",0," + this.is_long + ",0," + ix1 + "," + iy1) + ("L" + ox1 + "," + oy1) + ("A" + r2 + "," + r2 + ",0," + this.is_long + ",1," + ox0 + "," + oy0) + "Z";
     };
 
-    DonutSegment.prototype.calcArc = function(r) {
+    DonutSegment.prototype.calcArc = function (r) {
       var ix0, ix1, iy0, iy1, _ref;
       _ref = this.calcArcPoints(r), ix0 = _ref[0], iy0 = _ref[1], ix1 = _ref[2], iy1 = _ref[3];
       return ("M" + ix0 + "," + iy0) + ("A" + r + "," + r + ",0," + this.is_long + ",0," + ix1 + "," + iy1);
     };
 
-    DonutSegment.prototype.render = function() {
+    DonutSegment.prototype.render = function () {
       var _this = this;
       this.arc = this.drawDonutArc(this.hilight, this.color);
-      return this.seg = this.drawDonutSegment(this.path, this.color, this.backgroundColor, function() {
+      return this.seg = this.drawDonutSegment(this.path, this.color, this.backgroundColor, function () {
         return _this.fire('hover', _this.index);
-      }, function() {
+      }, function () {
         return _this.fire('click', _this.index);
       });
     };
 
-    DonutSegment.prototype.drawDonutArc = function(path, color) {
+    DonutSegment.prototype.drawDonutArc = function (path, color) {
       return this.raphael.path(path).attr({
         stroke: color,
         'stroke-width': 2,
@@ -1728,7 +1755,7 @@
       });
     };
 
-    DonutSegment.prototype.drawDonutSegment = function(path, fillColor, strokeColor, hoverFunction, clickFunction) {
+    DonutSegment.prototype.drawDonutSegment = function (path, fillColor, strokeColor, hoverFunction, clickFunction) {
       return this.raphael.path(path).attr({
         fill: fillColor,
         stroke: strokeColor,
@@ -1736,7 +1763,7 @@
       }).hover(hoverFunction).click(clickFunction);
     };
 
-    DonutSegment.prototype.select = function() {
+    DonutSegment.prototype.select = function () {
       if (!this.selected) {
         this.seg.animate({
           path: this.selectedPath
@@ -1748,7 +1775,7 @@
       }
     };
 
-    DonutSegment.prototype.deselect = function() {
+    DonutSegment.prototype.deselect = function () {
       if (this.selected) {
         this.seg.animate({
           path: this.path

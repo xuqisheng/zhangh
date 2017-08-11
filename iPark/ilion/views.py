@@ -32,6 +32,11 @@ def health(request):
     return render(request, 'health.html')
 
 
+# 系统配置 --> 代码配置
+def config_code(request):
+    return render(request, 'config_code.html')
+
+
 # 测试
 def zhangh(request):
     content = {}

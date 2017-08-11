@@ -26,5 +26,6 @@ urlpatterns = [
     url(r'^system', views.system),
     url(r'^process', views.process),
     url(r'^health', views.health),
+    url(r'^config_code', views.config_code),
     url(r'^zhangh', views.zhangh),
 ]
