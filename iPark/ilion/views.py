@@ -42,6 +42,13 @@ def config_params(request):
     return render(request, 'config_params.html')
 
 
+# 列出sysoption数据
+def list_params(request):
+    sysoptions = SysOption.objects.all()
+    return render(request, 'listparams.html', {'sys_option': sysoptions})
+    # return render(request, 'listparams.html')
+
+
 # 测试
 def zhangh(request):
     content = {}

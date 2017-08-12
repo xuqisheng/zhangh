@@ -134,7 +134,7 @@ class SysOption(models.Model):
     item = models.CharField(max_length=20)
     set_value = models.CharField(max_length=100)
     def_value = models.CharField(max_length=100)
-    descript = models.CharField(max_length=50)
+    descript = models.CharField(max_length=100)
     create_user = models.CharField(max_length=20)
     create_datetime = models.DateTimeField(auto_now_add=True)
 
