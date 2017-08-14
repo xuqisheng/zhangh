@@ -17,9 +17,32 @@
         </div>
         <!-- /Page Breadcrumb -->
 
-        <a href="listparams.html" onclick="">
-            <span> 参数list </span>
-        </a>
+        <table class="table table-bordered">
+            <thead>
+                <tr>
+                    <th>类别</th>
+                    <th>项目</th>
+                    <th>设置值</th>
+                    <th>默认值</th>
+                    <th>描述</th>
+                    <th>工号</th>
+                </tr>
+
+            </thead>
+
+            <tbody>
+            {% for sys in sys_option %}
+                <tr>
+                    <th>{{ sys.catalog }}</th>
+                    <th>{{ sys.item }}</th>
+                    <th>{{ sys.set_value }}</th>
+                    <th>{{ sys.def_value }}</th>
+                    <th>{{ sys.descript }}</th>
+                    <th>{{ sys.create_user }}</th>
+                </tr>
+            {% endfor %}
+            </tbody>
+        </table>
 
     </div>
 {% endblock %}

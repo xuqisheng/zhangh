@@ -39,7 +39,8 @@ def config_code(request):
 
 # 系统配置 --> 参数配置
 def config_params(request):
-    return render(request, 'config_params.html')
+    sysoptions = SysOption.objects.all()
+    return render(request, 'config_params.html', {'sys_option': sysoptions})
 
 
 # 列出sysoption数据
