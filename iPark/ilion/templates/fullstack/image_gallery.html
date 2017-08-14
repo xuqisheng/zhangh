@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title>测试</title>
+
+    <link href="bootstrap.min.css" rel="stylesheet">
+
+    <style>
+        body {
+            font-family: "Helvetica","Arial",serif;
+            color: #333333;
+            background-color: #ccc;
+            margin: 1em 10%;
+        }
+        h1{
+            color: #333;
+            background-color: transparent;
+        }
+        a{
+            color: #c60;
+            background-color: transparent;
+            font-weight: bold;
+            text-decoration: none;
+        }
+        ul{
+            padding: 0;
+        }
+        li{
+            float: left;
+            padding: 1em;
+            list-style: none;
+        }
+        #imagegallery{
+            list-style: none;
+        }
+        #imagegallery li{
+            display: inline;
+        }   
+        #imagegallery li a img{
+            border: 0;
+        }              
+    
+    </style>
+
+    <script src="jquery-2.0.3.min.js"></script>
+    <script src="bootstrap.min.js"></script>    
+
+    <script src="bootbox.min.js"></script>
+
+    <script>
+        // bootbox.alert({
+        //     message: "This is the small alert!",
+        //     size: 'small'
+        // });
+        function addLoadEvent(func){
+            var oldonload = window.onload;
+            if (typeof window.onload != 'function'){
+                window.onload = func;
+            }else{
+                window.onload = function(){
+                    oldonload();
+                    func();
+                }
+            }
+        }
+
+        function prepareGallery(){
+            if (!document.getElementsByTagName) return false;
+            if (!document.getElementById) return false;
+            if (!document.getElementById("imagegallery")) return false;
+            var gallery = document.getElementById("imagegallery");
+            var links = gallery.getElementsByTagName("a");
+            for (var i=0;i < links.length;i++){
+                links[i].onclick=function(){
+                    return showPic(this);
+                }
+            }
+        }        
+        function showPic(whickpic){
+            if (!document.getElementById("placeholder")) return true;
+            var source = whickpic.getAttribute("href");
+            var placeholder = document.getElementById("placeholder");
+            if (placeholder.nodeName != "IMG") return true;
+            placeholder.setAttribute("src",source);
+            if (!document.getElementById("description")) return false;
+            var text = whickpic.getAttribute("title") ? whickpic.getAttribute("title"):"";                              
+            var description = document.getElementById("description");
+            if (description.firstChild.nodeType == 3){
+                description.firstChild.nodeValue = text;
+            }
+            return false;
+        }
+        addLoadEvent(prepareGallery);
+    </script>
+
+</head>
+<body>
+    <h1>Snapshots</h1>
+
+    <ul id="imagegallery">
+        <li>
+            <a href="img/attach-blue.png" title="attach-blue display">
+                <img src="img/attach-blue.png" alt="attach-blue">
+            </a>
+        </li>
+        <li>
+            <a href="img/attach-green.png" title="attach-green display">
+                <img src="img/attach-green.png" alt="attach-green">
+            </a>
+        </li>
+        <li>
+            <a href="img/attach-red.png" title="attach-red display">
+                <img src="img/attach-red.png" alt="attach-red">
+            </a>
+        </li>
+        <li>
+            <a href="img/attach-yellow.png" title="attach-yellow display">
+                <img src="img/attach-yellow.png" alt="attach-yellow">
+            </a>
+        </li>
+                                      
+    </ul>
+
+    <img id="placeholder" src="img/bing.png" alt="image gallery">
+    <p id="description">choose an image.</p>
+  
+</body>
+</html>
