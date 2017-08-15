@@ -1,26 +1,18 @@
 <!DOCTYPE html>
-<html lang="zh-CN">
+<html>
+
 <head>
-    {% load staticfiles %}
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
 
-    <!-- 标题 钩子 -->
-    <title>{% block title %}{% endblock %}</title>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-    <!-- 匹配适用不同设备 -->
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <meta name="description" content="Dashboard" />
-    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-    <link rel="shortcut icon" href="{% static 'img/gcicon.png' %}" type="image/x-icon">
+    <title>Dashboard</title>
 
-    <link href="{% static 'css/bootstrap.min.css' %}" rel="stylesheet">
-    <link href="{% static 'css/font-awesome.min.css' %}" rel="stylesheet">
+    <link href="css/bootstrap.min.css" rel="stylesheet">
+    <link href="font-awesome/css/font-awesome.min.css" rel="stylesheet">
 
-    <link href="{% static 'css/animate.css' %}" rel="stylesheet">
-    <link href="{% static 'css/style.css' %}" rel="stylesheet">
-
-    <!-- css 钩子 -->
-    {% block css %}{% endblock %}
+    <link href="css/animate.css" rel="stylesheet">
+    <link href="css/style.min.css" rel="stylesheet">
 
 </head>
 
@@ -31,7 +23,7 @@
                 <ul class="nav metismenu" id="side-menu">
                     <li class="nav-header">
                         <div class="dropdown profile-element"> <span>
-                            <img alt="image" class="img-circle" src="{% static 'img/profile_small.jpg' %}" />
+                            <img alt="image" class="img-circle" src="img/profile_small.jpg" />
                              </span>
                             <a data-toggle="dropdown" class="dropdown-toggle" href="#">
                             <span class="clear"> <span class="block m-t-xs"> <strong class="font-bold">David Williams</strong>
@@ -80,7 +72,7 @@
 
         <div id="page-wrapper" class="gray-bg dashbard-1">
         <div class="row border-bottom">
-
+        
         <nav class="navbar navbar-static-top" role="navigation" style="margin-bottom: 0">
         <div class="navbar-header">
             <a class="navbar-minimalize minimalize-styl-2 btn btn-primary " href="#"><i class="fa fa-bars"></i> </a>
@@ -102,7 +94,7 @@
                         <li>
                             <div class="dropdown-messages-box">
                                 <a href="profile.html" class="pull-left">
-                                    <img alt="image" class="img-circle" src="{% static 'img/a7.jpg' %}">
+                                    <img alt="image" class="img-circle" src="img/a7.jpg">
                                 </a>
                                 <div class="media-body">
                                     <small class="pull-right">46h ago</small>
@@ -115,7 +107,7 @@
                         <li>
                             <div class="dropdown-messages-box">
                                 <a href="profile.html" class="pull-left">
-                                    <img alt="image" class="img-circle" src="{% static 'img/a4.jpg' %}">
+                                    <img alt="image" class="img-circle" src="img/a4.jpg">
                                 </a>
                                 <div class="media-body ">
                                     <small class="pull-right text-navy">5h ago</small>
@@ -128,7 +120,7 @@
                         <li>
                             <div class="dropdown-messages-box">
                                 <a href="profile.html" class="pull-left">
-                                    <img alt="image" class="img-circle" src="{% static 'img/profile_small.jpg' %}">
+                                    <img alt="image" class="img-circle" src="img/profile.jpg">
                                 </a>
                                 <div class="media-body ">
                                     <small class="pull-right">23h ago</small>
@@ -203,22 +195,18 @@
                 </li>
             </ul>
         </nav>
-
-        <!-- 正文 钩子 -->
-        {% block content %}{% endblock %}
-
+       
     </div>
+                
 
     <!-- Mainly scripts -->
-    <script src="{% static 'js/jquery-2.1.1.js' %}"></script>
-    <script src="{% static 'js/bootstrap.min.js' %}"></script>
-    <script src="{% static 'js/jquery.metisMenu.js' %}"></script>
+    <script src="js/jquery-2.1.1.js"></script>
+    <script src="js/bootstrap.min.js"></script>
+    <script src="js/plugins/metisMenu/jquery.metisMenu.js"></script>
 
     <!-- Custom and plugin javascript -->
-    <script src="{% static 'js/inspinia.js' %}"></script>
+    <script src="js/inspinia.js"></script>
 
-    <!-- js 钩子 -->
-    {% block js %}{% endblock %}
 
 
 </body>
