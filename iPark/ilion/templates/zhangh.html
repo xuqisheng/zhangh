@@ -1,47 +1,30 @@
 {% extends "base.html" %}
 {% load staticfiles %}
 {% block title %} Test {% endblock %}
+{% block active5 %} class="active" {% endblock %}
 
 {% block content %}
-    <!-- Page Content 页面内容 -->
-    <div class="page-content">
-        <!-- Page Header -->
-        <div class="page-header position-relative">
-            <div class="header-title">
-                <h1>
-                    测试
-                </h1>
-            </div>
+    <div class="row wrapper border-bottom white-bg page-heading">
+        <div class="col-lg-10">
+            <h2>zhangh</h2>
+            <ol class="breadcrumb">
+                <li>
+                    <a href="index.html">Home</a>
+                </li>
+                <li class="active">
+                    <strong>Demo</strong>
+                </li>
+            </ol>
         </div>
-        <!-- /Page Header -->
+    </div>
 
-     <div class="page-body">
-         <!--<form action="" method="post">-->
-             <!--<label >集团</label>-->
-             <!--<input type="text" name="groupcode">-->
-             <!--<label >酒店</label>-->
-             <!--<input type="text" name="hotelcode">-->
-             <!--<input type="submit" name="queryhotel" value="查询">-->
-         <!--</form>-->
-         {% for htl in hotel %}
-         <tr>
-             <td>{{ htl.group_code }}</td>
-             <td>{{ htl.code }}</td>
-             <td>{{ htl.name }}</td>
-
-         </tr>
-         {% endfor %}
-         <br />
-         {% for grp in group %}
-         <tr>
-             <td>{{ grp.code }}</td>
-             <td>{{ grp.name }}</td>
-             <td>{{ grp.area }}</td>
-
-         </tr>
-         {% endfor %}
-     </div>
-
+    <div class="footer">
+        <div class="pull-right">
+            10GB of <strong>250GB</strong> Free.
+        </div>
+        <div>
+            <strong>Copyright</strong> Example Company &copy; 2014-2015
+        </div>
     </div>
 {% endblock %}
 
