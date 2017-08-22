@@ -4,35 +4,53 @@
 {% block active4 %} class="active" {% endblock %}
 {% block active41 %} class="active" {% endblock %}
 {% block content %}
-    <!-- Page Content 页面内容 -->
-    <div class="page-content">
+    <div class="row wrapper border-bottom white-bg page-heading">
+        <ol class="breadcrumb">
+            <li>
+                <a href="index.html">Home</a>
+            </li>
+            <li>
+                <a>配置</a>
+            </li>
+            <li class="active">
+                <strong>参数</strong>
+            </li>
+        </ol>
+    </div>
 
-        <table class="table table-bordered">
-            <thead>
-                <tr>
-                    <th>类别</th>
-                    <th>项目</th>
-                    <th>设置值</th>
-                    <th>默认值</th>
-                    <th>描述</th>
-                    <th>工号</th>
-                </tr>
+    <table class="table table-bordered">
+        <thead>
+            <tr>
+                <th>类别</th>
+                <th>项目</th>
+                <th>设置值</th>
+                <th>默认值</th>
+                <th>描述</th>
+                <th>工号</th>
+            </tr>
 
-            </thead>
+        </thead>
 
-            <tbody>
-            {% for sys in sys_option %}
-                <tr>
-                    <th>{{ sys.catalog }}</th>
-                    <th>{{ sys.item }}</th>
-                    <th>{{ sys.set_value }}</th>
-                    <th>{{ sys.def_value }}</th>
-                    <th>{{ sys.descript }}</th>
-                    <th>{{ sys.create_user }}</th>
-                </tr>
-            {% endfor %}
-            </tbody>
-        </table>
+        <tbody>
+        {% for sys in sys_option %}
+            <tr>
+                <th>{{ sys.catalog }}</th>
+                <th>{{ sys.item }}</th>
+                <th>{{ sys.set_value }}</th>
+                <th>{{ sys.def_value }}</th>
+                <th>{{ sys.descript }}</th>
+                <th>{{ sys.create_user }}</th>
+            </tr>
+        {% endfor %}
+        </tbody>
+    </table>
 
+    <div class="footer">
+        <div class="pull-right">
+            10GB of <strong>250GB</strong> Free.
+        </div>
+        <div>
+            <strong>Copyright</strong> GreenCloud Company &copy; 2017-2018
+        </div>
     </div>
 {% endblock %}
