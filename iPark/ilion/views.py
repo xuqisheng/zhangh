@@ -3,6 +3,7 @@
 
 from __future__ import unicode_literals
 
+from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 from django.shortcuts import render
 from .models import *
 
@@ -40,14 +41,17 @@ def config_code(request):
 # 系统配置 --> 参数配置
 def config_params(request):
     sysoptions = SysOption.objects.all()
-    return render(request, 'config_params.html', {'sys_option': sysoptions})
+    paginator = Paginator(sysoptions, 30)
 
+    page = request.GET.get('page')
+    try:
+        syslist = paginator.page(page)
+    except PageNotAnInteger:
+        syslist = paginator.page(1)
+    except EmptyPage:
+        syslist = paginator.page(paginator.num_pages)
 
-# 列出sysoption数据
-def list_params(request):
-    sysoptions = SysOption.objects.all()
-    return render(request, 'listparams.html', {'sys_option': sysoptions})
-    # return render(request, 'listparams.html')
+    return render(request, 'config_params.html', {'syslists': syslist})
 
 
 # 测试
