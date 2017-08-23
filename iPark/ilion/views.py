@@ -41,7 +41,7 @@ def config_code(request):
 # 系统配置 --> 参数配置
 def config_params(request):
     sysoptions = SysOption.objects.all()
-    paginator = Paginator(sysoptions, 30)
+    paginator = Paginator(sysoptions, 20)
 
     page = request.GET.get('page')
     try:

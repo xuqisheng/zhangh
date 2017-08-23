@@ -20,7 +20,7 @@
 
 
     <div class="wrapper wrapper-content">
-        <table class="table table-bordered">
+        <table class="table table-bordered table-hover">
             <thead>
                 <tr>
                     <th>类别</th>
@@ -52,11 +52,11 @@
                 {% if syslists.has_previous %}
                 <a href="?page={{ syslists.previous_page_number }}">上一页</a>
                 {% endif %}
-            <span class="current">
-                Page {{ syslists.number }} of {{ syslists.paginator.num_pages }}.
-            </span>
+                <span class="current">
+                    Page {{ syslists.number }} of {{ syslists.paginator.num_pages }}.
+                </span>
                 {% if syslists.has_next %}
-            <a href="?page={{ syslists.next_page_number }}">下一页</a>
+                <a href="?page={{ syslists.next_page_number }}">下一页</a>
                 {% endif %}
             </span>
         </div>
