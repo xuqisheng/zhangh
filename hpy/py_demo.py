@@ -245,7 +245,12 @@ print os.path.isfile(filename)
 # soap = BeautifulSoup(html_doc,'html.parser')
 #
 # print soap.find_all('a','b')
+import os
 
-import qrcode
-img = qrcode.make("some data here")
-img.save("test.png")
+path = "E:\\abc"
+
+
+for (path, dirs, files) in os.walk(path):
+    for filename in files:
+        print charset()
+        # print filename.decode('GB2312')
