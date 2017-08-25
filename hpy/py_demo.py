@@ -245,12 +245,12 @@ print os.path.isfile(filename)
 # soap = BeautifulSoup(html_doc,'html.parser')
 #
 # print soap.find_all('a','b')
-import os
+import os,chardet
 
 path = "E:\\abc"
 
 
 for (path, dirs, files) in os.walk(path):
     for filename in files:
-        print charset()
+        print chardet.detect(filename)
         # print filename.decode('GB2312')
