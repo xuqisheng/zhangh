@@ -1,0 +1,77 @@
+#!/bin/bash
+#
+# seafile
+
+#
+# chkconfig: - 68 32
+# description: seafile
+
+# Source function library.
+. /etc/init.d/functions
+
+# Source networking configuration.
+. /etc/sysconfig/network
+
+# Change the value of "user" to your linux user name
+user=root
+
+# Change the value of "seafile_dir" to your path of seafile installation
+# usually the home directory of $user
+seafile_dir=/root/seafile
+script_path=${seafile_dir}/seafile-server-latest
+seafile_init_log=${seafile_dir}/logs/seafile.init.log
+seahub_init_log=${seafile_dir}/logs/seahub.init.log
+
+# Change the value of fastcgi to true if fastcgi is to be used
+fastcgi=true
+
+# Set the port of fastcgi, default is 8000. Change it if you need different.
+fastcgi_port=8000
+
+
+RETVAL=0
+
+start() {
+        # Start daemons.
+        echo -n $"Starting seafile: "
+        ulimit -n 30000
+        su - ${user} -c"${script_path}/seafile.sh start >> ${seafile_init_log} 2>&1"
+        RETVAL=$?
+        echo
+        [ $RETVAL -eq 0 ] && touch /var/lock/subsys/seafile
+        return $RETVAL
+}
+
+stop() {
+        echo -n $"Shutting down seafile: "
+        su - ${user} -c"${script_path}/seafile.sh stop >> ${seafile_init_log} 2>&1"
+        RETVAL=$?
+        echo
+        [ $RETVAL -eq 0 ] && rm -f /var/lock/subsys/seafile
+        return $RETVAL
+}
+
+#
+# Write a polite log message with date and time
+#
+echo -e "\n \n About to perform $1 for seafile at `date -Iseconds` \n " >> ${seafile_init_log}
+
+# See how we were called.
+case "$1" in
+  start)
+        start
+        ;;
+  stop)
+        stop
+        ;;
+  restart|reload)
+        stop
+        start
+        RETVAL=$?
+        ;;
+  *)
+        echo $"Usage: $0 {start|stop|restart}"
+        RETVAL=3
+esac
+
+exit $RETVAL

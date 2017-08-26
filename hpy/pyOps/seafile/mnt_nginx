@@ -1,4 +1,4 @@
-#!/bin/sh 
+#!/bin/bash
 # 
 # nginx - this script starts and stops the nginx daemon 
 # 
@@ -9,15 +9,19 @@
 # config: /etc/nginx/nginx.conf 
 # config: /etc/sysconfig/nginx 
 # pidfile: /var/run/nginx.pid 
-# Source function library. 
-. /etc/rc.d/init.d/functions 
-# Source networking configuration. 
-. /etc/sysconfig/network 
+# Source function library.
+
+. /etc/rc.d/init.d/functions
+
+# Source networking configuration.
+. /etc/sysconfig/network
+
 # Check that networking is up. 
 [ "$NETWORKING" = "no" ] && exit 0 
     nginx="/usr/local/nginx/sbin/nginx" 
     prog=$(basename $nginx) 
-    NGINX_CONF_FILE="/usr/local/nginx/conf/nginx.conf" 
+    NGINX_CONF_FILE="/usr/local/nginx/conf/nginx.conf"
+
 [ -f /etc/sysconfig/nginx ] && . /etc/sysconfig/nginx 
     lockfile=/var/lock/subsys/nginx 
  
