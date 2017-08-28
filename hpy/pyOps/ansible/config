@@ -1,0 +1,9 @@
+StrictHostKeyChecking no
+UserKnownHostsFile /dev/null
+ServerAliveCountMax 5
+ServerAliveInterval 40
+TCPKeepAlive yes
+ForwardAgent yes
+
+host *
+   port 3305
