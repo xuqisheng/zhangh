@@ -47,14 +47,15 @@ while [ 1 ]; do
    # 
 
    Hsss=`/usr/sbin/ss -s 2>/dev/null | grep -E "^TCP: +[0-9]+" | sed -re "s/^TCP: +([0-9]+).*/\1/"`
-   if [ $Hsss -gt 2000 ]; then
-      Hntlp=`/usr/sbin/ss -ntlp 2>/dev/null`
-      # if [ `echo "$Hntlp" | grep -Ev " users:\(\(" | wc -l` -gt 1 ]; then
-      if [ `echo "$Hntlp" | sed -re '1 d' | grep -Ev "users:\(\(" | grep -E "(:[489][0-9]{3} |:8[0-9] )" | wc -l` -gt 0 ]; then
-         Hntlp=`netstat -ntlp 2>/dev/null`
-      fi
-   else
+   if [ $Hsss -le 2000 ]; then
       Hntlp=`netstat -ntlp 2>/dev/null`
+   else
+      Hntlp=`/usr/sbin/ss -ntlp 2>/dev/null`
+      if ! cat /etc/redhat-release 2>/dev/null | grep -E " release 6\..*" > /dev/null; then
+         if [ `echo "$Hntlp" | sed -re '1 d' | grep -Ev "(:9998 |users:\(\()" | grep -E "(:[489][0-9]{3} |:8[0-9] )" | wc -l` -gt 0 ]; then
+            Hntlp=`netstat -ntlp 2>/dev/null`
+         fi
+      fi
    fi
       
    #

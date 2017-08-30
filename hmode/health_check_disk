@@ -6,17 +6,20 @@
 #          /root/mode/health_check_disk
 # ----------------------------------------------------
 
-Hdisks=`(LANG=C;df) | grep -Ev "^((dev)?tmpfs|Filesystem)" | grep -Ev "(/media|/boot)" | sed -re "s/$/HrYeNd/" | tr -d '\n' | sed -re "s/(\/dev\/[^ ]+)HrYeNd/\1/g" | sed -re "s/HrYeNd/\n/g"`
+
+# 1.echo disks with disk stress 
+
+Hdisks=`(LANG=C;/bin/df) | grep -Ev "^((dev)?tmpfs|Filesystem)" | grep -Ev "(/mnt/|/media|/boot|iso)" | sed -re "s/$/HrYeNd/" | tr -d '\n' | sed -re "s/(\/dev\/[^ ]+)HrYeNd/\1/g" | sed -re "s/HrYeNd/\n/g"`
+echo "$Hdisks" | grep -E ".* (100|[9][56789])% /[^ ]*$" | sed -re "s/^([^ ]+).* ([^ ]+) +([^ ]+)$/disk#ModeD#disk space warning - \1 used \2 of space/"
 Hdiskcnt=`echo "$Hdisks" | wc -l`
 
-# --------------------------------------------------------------
-# 1.echo disks with disk stress 
-# --------------------------------------------------------------
+# 2.echo disks with inode stress 
 
-echo "$Hdisks" | grep -E ".* (100|[9][56789])% /[^ ]*$" | sed -re "s/^([^ ]+).* ([^ ]+) +([^ ]+)$/disk#ModeD#disk space warning - \1 used \2 of space/"
+Hdisks=`(LANG=C;/bin/df -i) | grep -Ev "^((dev)?tmpfs|Filesystem)" | grep -Ev "(/mnt/|/media|/boot|iso)" | sed -re "s/$/HrYeNd/" | tr -d '\n' | sed -re "s/(\/dev\/[^ ]+)HrYeNd/\1/g" | sed -re "s/HrYeNd/\n/g"`
+echo "$Hdisks" | grep -E ".* (100|[9][56789])% /[^ ]*$" | sed -re "s/^([^ ]+).* ([^ ]+) +([^ ]+)$/disk#ModeD#disk inode warning - \1 used \2 of inodes/"
 
 # --------------------------------------------------------------
-# 2.echo disks not defined in /etc/fstab
+# 3.echo disks not defined in /etc/fstab
 # --------------------------------------------------------------
 
 while read -r H1 H2 H3 H4 H5 H6;do
@@ -31,18 +34,22 @@ while read -r H1 H2 H3 H4 H5 H6;do
 done <<< "$Hdisks"
 
 # --------------------------------------------------------------
-# 3.echo directories with no symbolic links.For cloud linux only
+# 4.echo directories with no symbolic links.For cloud linux only
 # --------------------------------------------------------------
 
-if hostname | grep -E '^(AY|iZ|VM)' >/dev/null && [ $Hdiskcnt -gt 1 ]; then
+if hostname | grep -E '^(AY[0-9a-zA-Z]{19}$|iZ[0-9a-zA-Z]{10}$|iZ[0-9a-zA-Z]{21}$|VM)' >/dev/null && [ $Hdiskcnt -gt 1 ]; then
    # MySQL installation check
    if [ -x /usr/sbin/mysqld ]; then
-      if [ ! -h /var/lib/mysql ]; then
+      if [ ! -d /var/lib/mysql ]; then
+         echo "disk#ModeD#cloud linux - directory /var/lib/mysql doesn't exist"
+      elif [ ! -h /var/lib/mysql ]; then
          echo "disk#ModeD#cloud linux - /var/lib/mysql is not a symbolic link"
       fi
    fi
    # /root/mode/dump check
-   if [ ! -h /root/mode/dump ]; then
+   if [ ! -d /root/mode/dump ]; then
+      echo "disk#ModeD#cloud linux - directory /root/mode/dump doesn't exist"
+   elif [ ! -h /root/mode/dump ]; then
       echo "disk#ModeD#cloud linux - /root/mode/dump is not a symbolic link"
    fi
    cd /usr/local

@@ -73,14 +73,12 @@ if [ "$HTOMMODE" = "c" ]; then
 else
    Hntomno=$[`/root/mode/ctomno -n`+`/root/mode/ctomno -N`]
 
-   # limit to 5 for the moment 
- 
-   [ $Hntomno -ge 8 ] && exit 1
-
    # confirm 
 
    if [ $Hntomno -gt 0 ]; then
-      if [ $Hntomno -gt 1 ]; then
+      if [ $Hntomno -ge 8 ]; then
+         /root/mode/modemsg inst_tomcat "Wow,$Hntomno noncluster tomcats have been installed!"
+      elif [ $Hntomno -gt 1 ]; then
          /root/mode/modemsg inst_tomcat "$Hntomno noncluster tomcats have been installed!"
       else
          /root/mode/modemsg inst_tomcat "$Hntomno noncluster tomcat has been installed!"
@@ -167,6 +165,7 @@ rm -fR *
 tar xzvf /root/packages/tomcat6.tar.gz
 mv `ls` tomcat$Htomtail
 cp -fR tomcat$Htomtail /usr/local
+/root/mode/.opt_tomcat tomcat$Htomtail
 
 #
 
@@ -241,6 +240,13 @@ if [ "$HTOMMODE" = "c" ]; then
    cat $Hhrytmpfi2 > /usr/local/tomcat$Htomtail/conf/server.xml 
    }
 else
+   # -----------------------------------------------------------------
+   # configure jvmRoute for non-cluster tomcat according to zjp
+   # -----------------------------------------------------------------
+   cat /usr/local/tomcat$Htomtail/conf/server.xml |
+   sed -re "s/<(Engine name=\"Catalina\" defaultHost=\"localhost\")>/<\1 jvmRoute=\"tomcat$Htomtail\">/" > $Hhrytmpfi2
+   cat $Hhrytmpfi2 > /usr/local/tomcat$Htomtail/conf/server.xml
+
    # utf8 setting
    if [ "$Htom_utf8" = "1" ]; then
       cat /usr/local/tomcat$Htomtail/conf/server.xml |

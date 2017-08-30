@@ -45,7 +45,7 @@ if [ `cat "$Hconfigfile" | grep -P "^${HC1}([ \t=]|$)" | wc -l` -gt 1 ]; then
 fi
 
 Hc2=`echo "$Hconfigitem" | sed -re "s/^$HC1(.*)/\1/" -e "s/^([ \t]*)(=?)([ \t]*)(.*)/\2\4/" -e "s/[ \t]*$//"`
-HC2=$(echo "$Hc2" | sed -re "s/\//\\\\\//g")
+HC2=$(echo "$Hc2" | sed -r -e 's/\\/\\\\/g' -e "s/\//\\\\\//g")
 
 # adjust $Hc2
 
@@ -60,6 +60,9 @@ fi
 
 if [ "$Hafteritem" = "#Get#"   ]; then
    HC1=$(echo "$HC1" | sed -re 's/\./\\./g')
+   if ! cat "$Hconfigfile" | grep -E "^$HC1 *=" >/dev/null; then
+      exit 1
+   fi
    cat "$Hconfigfile" | sed -nre "s/^$HC1 *= *(.*)/\1/ p"
    exit
 fi

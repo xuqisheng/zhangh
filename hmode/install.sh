@@ -87,7 +87,7 @@ export Hinst_Ctom=1
 
 [ -d /usr/local/apache$HAPACHENO -a -z "$HAPACHE_OVERRIDE" ] || 
 {
-Hhttp_package=`ls -1 /root/packages/httpd-2.*.tar.bz2 | sed -n "$ p"`
+Hhttp_package=`ls -1 /root/packages/httpd-2.*.tar.bz2 | tail -n 1`
 if echo $Hhttp_package | grep -E 'httpd-2\.2' >/dev/null; then 
    tar xvf $Hhttp_package
    cd `ls -d httpd-2.*`
@@ -126,7 +126,17 @@ elif echo $Hhttp_package | grep -E 'httpd-2\.4' >/dev/null; then
    /root/mode/rep_config ./server/mpm/worker/worker.c   "#define DEFAULT_THREAD_LIMIT" 128
    /root/mode/rep_config ./server/mpm/event/event.c     "#define DEFAULT_THREAD_LIMIT" 128
    #
-   ./configure --prefix=/usr/local/apache$HAPACHENO --enable-so --with-included-apr --with-pcre=/usr/local/pcre --enable-mods-shared=all --enable-mpms-shared=all --with-mpm=event
+   if ! rpm -qa | grep -E openssl-devel >/dev/null; then
+      if /root/mode/.netok; then
+         yum -y install openssl-devel
+      fi
+   fi
+   #
+   if rpm -qa | grep -E openssl-devel >/dev/null; then
+      ./configure --prefix=/usr/local/apache$HAPACHENO --enable-so --enable-ssl --with-included-apr --with-pcre=/usr/local/pcre --enable-mods-shared=all --enable-mpms-shared=all --with-mpm=event
+   else
+      ./configure --prefix=/usr/local/apache$HAPACHENO --enable-so --with-included-apr --with-pcre=/usr/local/pcre --enable-mods-shared=all --enable-mpms-shared=all --with-mpm=event
+   fi
    make
    make install
    HAPACHEIND=${HAPACHENO:-0}
@@ -142,7 +152,7 @@ rm -fR *
 
 [ -f /usr/local/apache$HAPACHENO/modules/mod_jk.so -a -z "$HAPACHE_OVERRIDE" ] ||
 {
-tar xzvf `ls -1 /root/packages/tomcat-connectors-1.2.* | sed -n "$ p"`
+tar xzvf `ls -1 /root/packages/tomcat-connectors-1.2.* | tail -n 1`
 cd `ls -d tom*src`/native
 ./configure -with-apxs=/usr/local/apache$HAPACHENO/bin/apxs
 make

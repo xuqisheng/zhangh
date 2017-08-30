@@ -28,6 +28,7 @@ done
 #
 
 HDB="$1"
+HDB=`echo "$HDB" | tr "A-Z" "a-z"`
 HTAB="$2"
 
 # database name

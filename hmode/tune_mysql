@@ -109,6 +109,13 @@ else
    /root/mode/seecfg localhost "set global innodb_thread_concurrency=$Hthread"
 fi
 /root/mode/seecfg localhost "set global innodb_concurrency_tickets=$Hticket"
+
+#
+
+/root/mode/qcache_adj localhost
+
+#
+
 [ "$1" = "-l" ] && /root/mode/modemsg tune_mysql "$Hmsg" more
 
 #
@@ -120,11 +127,11 @@ fi
    
 # optimize tables with 'Got error -1 ' in MySQL server error log
 
-Hmerrlog=`ls -1t /var/lib/mysql/*.err 2>/dev/null | sed -n '1 p'`
+Hmerrlog=`ls -1t /var/lib/mysql/*.err 2>/dev/null | head -n 1`
 [ -z "$Hmerrlog" ] && exit 
 
 # mark '[to be fixed by mode]' and save the marked file to /root/mode/tmp/Hoptimize$$.tmp
-cat $Hmerrlog 2>/dev/null | sed -re "s/(.*Got error -1 when reading table .*')$/\1 [to be fixed by mode]/" > /root/mode/tmp/Hoptimize$$.tmp
+cat $Hmerrlog 2>/dev/null | sed -re "s/^(.*Got error -1 when reading table .*')$/\1 [to be fixed by mode]/" > /root/mode/tmp/Hoptimize$$.tmp
 
 if [ -f "$Hmerrlog" ]; then 
    if ! cmp /root/mode/tmp/Hoptimize$$.tmp  $Hmerrlog &>/dev/null; then

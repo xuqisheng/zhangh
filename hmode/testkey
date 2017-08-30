@@ -16,17 +16,14 @@
 HTAB="$1"
 HIND="$2"
 HDB="$3"
+HDB=`echo "$HDB" | tr "A-Z" "a-z"`
 HIND=`echo "$HIND" | tr 'A-Z' 'a-z'`
 
 # table index information
 
 Hindex=$(/root/mode/seecfg -s $HMYSQLDIP "show create table \`$HTAB\`" $HDB | sed -re "s/\\\\n/\n/g" | 
 sed -nre "/^ *(PRIMARY|UNIQUE)? *KEY/ p" |
-sed -re "s/PRIMARY KEY/primarykey \`primary\`/" |
-sed -re "s/UNIQUE KEY/uniquekey/" |
-sed -re "s/KEY/key/" |
-sed -re "s/^ *(primarykey|uniquekey|key) \`([^\`]+)\` \((.*)\)( +[a-zA-Z]+)*[,]?$/\1:\2:\3/" |
-sed -re "s/\`//g")
+sed -r -e "s/PRIMARY KEY/primarykey \`primary\`/" -e "s/UNIQUE KEY/uniquekey/" -e "s/KEY/key/" -e "s/^ *(primarykey|uniquekey|key) \`([^\`]+)\` \((.*)\)( +[a-zA-Z]+)*[,]?$/\1:\2:\3/" -e "s/\`//g")
 
 # test according to index expression to check
 
@@ -71,7 +68,7 @@ else
    # Change interpretation of [tablename:indexexpression]
    # ------------------------------------------------------------------------
    # since 2016-07-21 
-   # there exists an index with prefix of indexexpression
+   # there exists an index with indexexpression as prefix
    # ------------------------------------------------------------------------
    # before 2016-07-21
    # there exists an index of indexexpression

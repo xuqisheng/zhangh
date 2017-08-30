@@ -18,7 +18,7 @@ fi
 
 # detect UCS-2 by BOM
 
-if cat "$1" | sed -n "1 p" | (LANG=C;grep -P "^(\xff\xfe|\xfe\xff)" >/dev/null); then
+if head -n 1 "$1" | (LANG=C;grep -P "^(\xff\xfe|\xfe\xff)" >/dev/null); then
    echo "UCS-2"
    exit
 fi

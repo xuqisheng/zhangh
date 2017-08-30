@@ -163,6 +163,20 @@ chown -R mysql:mysql "$Hmysql_data_dir"
 
 /root/mode/mysql start
 
+#
+
+Hold_mver=`/root/mode/mod_config "$Hxbdmp_dir/base/xtrabackup_info" "server_version" "#Get#"`
+Hold_mver=`echo "$Hold_mver" | sed -re "s/^([^-]+).*$/\1/"`
+Hnew_mver=`/usr/sbin/mysqld -V 2>/dev/null| sed -re "s/^.*mysqld  Ver ([0-9.]+).*$/\1/"`
+
+if [ "$Hold_mver" != "$Hnew_mver" ]; then
+   . /root/mode/mysqldip localhost
+   mysql_upgrade -uroot $Hmodepass -h$HMYSQLDIP
+   /root/mode/mysql restart
+else
+   echo "$Hnew_mver" | tr -d "\n" > "$Hmysql_data_dir/mysql_upgrade_info"
+fi
+
 # end of restore
 
 

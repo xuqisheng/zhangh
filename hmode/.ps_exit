@@ -1,0 +1,25 @@
+#!/bin/bash 
+
+#
+
+Hmark="$1"
+if [ ! -f "/etc/$Hmark" ]; then
+   Hpss="(mdump|sdump)"
+else
+   Hpss=`cat "/etc/$Hmark" 2>/dev/null`
+   Hpss=`echo $Hpss | tr " " "|" | sed -re "s/^(.*)$/\(\1\)/"`
+   if [ "$Hpss" = "()" ]; then
+      Hpss="(mdump|sdump)"
+   fi
+fi
+
+#
+
+if ! ps -ef | grep -E "/$Hpss( |$)" >/dev/null; then
+   exit 1
+fi
+exit
+
+
+# end 
+

@@ -34,7 +34,7 @@ if [ -z "$HMYSQLDIP" ]; then
    fi
 fi
 if [ "$HMYSQLDIP" = "localhost" -o "$HMYSQLDIP" = "127.0.0.1" ]; then
-   HMYSQLDIP1=`/root/mode/getips | sed -n "1 p"`
+   HMYSQLDIP1=`/root/mode/getips | head -n 1`
    HMYSQLDIP2="$HMYSQLDIP($HMYSQLDIP1)"
 else
    HMYSQLDIP1=$HMYSQLDIP
@@ -45,7 +45,7 @@ fi
 
 if [ -f /etc/.modepass ]; then
    if cat /etc/.modepass | grep -E "^$HMYSQLDIP(\([0-9]+\)\([^:\)]+\))?:" > /dev/null; then
-      Hmpline=`cat /etc/.modepass | grep -E "^$HMYSQLDIP(\([0-9]+\)\([^:\)]+\))?:" | sed -n "$ p"`
+      Hmpline=`cat /etc/.modepass | grep -E "^$HMYSQLDIP(\([0-9]+\)\([^:\)]+\))?:" | tail -n 1`
       Hfp=`echo $Hmpline | sed -re "s/^([^:]*):(.*)/\2/"`
       Hmp1=`echo $Hmpline | sed -re "s/^([^:]*):(.*)/\1/"`
       if echo $Hmp1 | grep -E "\(" >/dev/null; then

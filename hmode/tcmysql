@@ -41,11 +41,11 @@ Hmportp=`echo "$Hmport" | sed -re "s/.* +([0-9]+)\/mysqld *$/\1/"`
 
 # processes mysqld_safe mysqld information
 
-Hmysqld_safe=$(ps -ef | grep -E " /usr/bin/mysqld_safe " | grep -v grep | sed -n "$ p")
+Hmysqld_safe=$(ps -ef | grep -E " /usr/bin/mysqld_safe " | grep -v grep | tail -n 1)
 Hmysqld_safep=`echo "$Hmysqld_safe" | awk '{print $2}'`
 Hmysqld_safepp=`echo "$Hmysqld_safe" | awk '{print $3}'`
 
-Hmysqld=$(ps -ef | grep -E " /usr/sbin/mysqld " | grep -v grep | sed -n "$ p")
+Hmysqld=$(ps -ef | grep -E " /usr/sbin/mysqld " | grep -v grep | tail -n 1)
 Hmysqldp=`echo "$Hmysqld" | awk '{print $2}'`
 Hmysqldpp=`echo "$Hmysqld" | awk '{print $3}'`
                 

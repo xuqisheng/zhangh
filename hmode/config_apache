@@ -43,7 +43,7 @@ fi
 
 HSCTOMS=`cat $Hctomstmp`
 if [ "$Hapachemode" = "apache" ]; then
-   HSCTOMS=`echo "$HSCTOMS" | sed -r -e "s/^(.*)$/\1,\1/" -e "s/,tomcat6$/,tomcat601/" -e "s/(,tomcat)60*(.*)$/\1\2/"`
+   HSCTOMS=`echo "$HSCTOMS" | sed -re "s/^(.*)$/\1,\1/" | sed -re "s/,tomcat6$/,tomcat601/" | sed -re "s/(,tomcat)60*(.*)$/\1\2/"`
 else
    HSCTOMS=`echo "$HSCTOMS" | grep -n "" | sed -re "s/(.*):(.*)/\2,tomcat\1/"`
 fi

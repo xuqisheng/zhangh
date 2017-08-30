@@ -1,0 +1,18 @@
+#!/bin/bash 
+
+Htomcat="$1"
+if /root/mode/check_tomcat "$Htomcat" &>/dev/null; then
+   # clear tomcat garbages
+   rm -fR /usr/local/$Htomcat/conf/Catalina/*
+   rm -fR /usr/local/$Htomcat/work/Catalina/*
+   rm -fR /usr/local/$Htomcat/webapps/{docs,examples,host-manager,manager,ROOT}
+   rm -fR /usr/local/$Htomcat/temp/*
+   #
+   mkdir -p /usr/local/$Htomcat/lib/org/apache/catalina/util
+   if ! cat /usr/local/$Htomcat/lib/org/apache/catalina/util/ServerInfo.properties 2>/dev/null | grep -E '^server\.info=Apache Tomcat$' >/dev/null; then
+      echo 'server.info=Apache Tomcat' > /usr/local/$Htomcat/lib/org/apache/catalina/util/ServerInfo.properties
+   fi
+fi
+
+#
+

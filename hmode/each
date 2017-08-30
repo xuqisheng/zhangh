@@ -34,6 +34,7 @@ done
 # Default database to check is portal
 
 HDBNAME=${1:-portal}
+HDBNAME=`echo "$HDBNAME" | tr "A-Z" "a-z"`
 
 # $HDBNAME must exist 
 
@@ -119,10 +120,10 @@ while read -r i; do
 
     cat "$HSQLFILE" | sed -e "s/\/\//-- /g" |
     grep -v -E  "^----each----:" | 
-    sed -re "s/##gh#/\(hotel_group_id=#group_id# and hotel_id=#hotel_id#\)/g" |  
-    sed -re "s/#([a-z])#gh#/\(\1.hotel_group_id=#group_id# and \1.hotel_id=#hotel_id#\)/g" |  
-    sed -re "s/#([a-z])([a-z])#gh#/\(\1\.hotel_group_id=\2\.hotel_group_id and \1\.hotel_id=\2\.hotel_id\)/g" |  
-    sed -re "s/#group_id#/$HGROUP_ID/g"  |  
+    sed -re "s/##gh#/\(hotel_group_id=#group_id# and hotel_id=#hotel_id#\)/g" |
+    sed -re "s/#([a-z])#gh#/\(\1.hotel_group_id=#group_id# and \1.hotel_id=#hotel_id#\)/g" |
+    sed -re "s/#([a-z])([a-z])#gh#/\(\1\.hotel_group_id=\2\.hotel_group_id and \1\.hotel_id=\2\.hotel_id\)/g" |
+    sed -re "s/#group_id#/$HGROUP_ID/g" \
     sed -re "s/#hotel_id#/$HHOTEL_ID/g" > $MYSQLF 
 
     if /root/mode/testobjects $HMYSQLDIP "$HOBJECTS" "$HDBNAME"; then

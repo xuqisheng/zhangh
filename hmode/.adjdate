@@ -8,7 +8,6 @@
 #          /root/mode/.adjdate +28800    # add  8 hours to system date
 #          /root/mode/.adjdate  28800    # add  8 hours to system date
 #          /root/mode/.adjdate -28800    # add -8 hours to system date
-# 调整Linux时间 + 加 - 减  秒
 # ------------------------------------------------------------------------------------------
 
 if echo $1 | grep -E  "^(\+|-)?[0-9]+$" >/dev/null; then

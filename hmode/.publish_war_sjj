@@ -1,0 +1,171 @@
+#!/bin/bash
+# -------------------------------------------------------------------------------------------------------------------------------
+# function:
+#          This is a release script for sjj specially used in website and wechat deployment
+# usages  :
+#          ./.publish_war <tomcat>[/<special-dir>] <XXX.war>
+# e.g.    :
+#          ./.publish_war_sjj tomcat1        /website.war  # equivalent to ./.publish_war_sjj tomcat1/webapps  /website.war
+#          ./.publish_war_sjj tomcat1/name1  /website.war
+# -------------------------------------------------------------------------------------------------------------------------------
+
+#
+
+export LANG=zh_CN.UTF-8
+
+# get tomcat name 
+
+Htompar=$1
+if [ -z "$Htompar" ]; then
+   /root/mode/modemsg publish_war_sjj "Please designate an existing noncluster tomcat!" more
+   exit 1
+fi
+
+if echo $Htompar | grep -P "^tomcat[^/ \t]*(/([a-zA-Z0-9_-]+))?$" >/dev/null; then
+   Htomcat=`echo $Htompar | sed -re "s/^(tomcat[^\/ \t]*)(\/([a-zA-Z0-9_-]+))?$/\1/"`
+   Htomadi=`echo $Htompar | sed -re "s/^(tomcat[^\/ \t]*)(\/([a-zA-Z0-9_-]+))?$/\3/"`
+   # check if valid tomcat
+   /root/mode/check_tomcat $Htomcat || exit 1
+   # check if cluster tomcat
+   if /root/mode/isctom $Htomcat; then
+      /root/mode/modemsg publish_war_sjj "You must designate a noncluster tomcat" more
+      exit 1
+   fi
+   if [ -z "$Htomadi" ]; then
+      Htomadi=webapps
+   fi
+else
+   /root/mode/modemsg publish_war_sjj "Invalid tomcat parameter" more
+   exit 1
+fi
+
+# get war package 
+
+Hwarname="$2"
+if [ -z "$Hwarname" ]; then
+   /root/mode/modemsg publish_war_sjj "Please designate a war file" more
+   exit 1
+elif echo "$Hwarname" | grep "\.war$" >/dev/null; then
+   if [ ! -f "$Hwarname" ]; then
+      /root/mode/modemsg publish_war_sjj "File $Hwarname doesn't exist!" more && exit 1
+   fi
+else
+   /root/mode/modemsg publish_war_sjj "Please provide a war file ended with '.war'" more
+   exit 1
+fi
+
+# get warname
+
+Hwarname1=`echo $Hwarname  | sed -r -e "s/^.*\///"  -e "s/(.*)\.war/\1/"`
+
+# 
+
+if [ "$Hwarname1" = "update" ]; then
+   /root/mode/modemsg publish_war_sjj "You can't use 'update' as war name" more
+   exit 1 
+fi
+
+# confirmation
+
+if ! /root/mode/confirm "Are you sure to release '$Hwarname' to '$Htomcat/$Htomadi'" more; then
+   exit 1
+fi
+
+#  unzip the war
+
+mkdir -p /root/mode/tmp/hwar$$
+rm -fR   /root/mode/tmp/hwar$$/*
+unzip -o $Hwarname -d /root/mode/tmp/hwar$$ &>/dev/null
+
+# stop tomcat
+
+/root/mode/stop_tomcat $Htomcat
+
+#
+
+if /root/mode/tctomcat $Htomcat 2>/dev/null | grep -E '^at unknown' >/dev/null; then
+   /root/mode/modemsg publish_war_sjj "Current user '$USER' has no authoriry to stop $Htomcat!"
+   /root/mode/modemsg publish_war_sjj "Aborting ..." more
+   exit 1
+fi
+
+
+# java 
+
+/root/mode/modemsg publish_war_sjj "Deploying Java ......" more
+rm -fR    /usr/local/$Htomcat/$Htomadi/$Hwarname1
+rm -fR    /usr/local/$Htomcat/$Htomadi/$Hwarname1.war
+rm -fR    /usr/local/$Htomcat/$Htomadi/ROOT
+mkdir -p  /usr/local/$Htomcat/$Htomadi/$Hwarname1 
+cp -fR /root/mode/tmp/hwar$$/*  /usr/local/$Htomcat/$Htomadi/$Hwarname1
+
+# get the property file 
+
+if [ -f /root/antDep/$Htomcat.$Htomadi.$Hwarname1.properties ]; then
+   Hpropfile=/root/antDep/$Htomcat.$Htomadi.$Hwarname1.properties
+elif [ -f /root/antDep/$Htomcat.$Htomadi.properties ]; then
+   Hpropfile=/root/antDep/$Htomcat.$Htomadi.properties
+elif [ -f /root/antDep/$Htomcat.properties ]; then
+   Hpropfile=/root/antDep/$Htomcat.properties
+fi
+
+# do replacement 
+
+if [ -n "$Hpropfile" ]; then
+   #
+   # jdbc.mysql.properties
+   #
+   Hjdbcfile=`find -L /usr/local/$Htomcat/$Htomadi/$Hwarname1/ -name "jdbc.mysql.properties" | head -n 1`
+   if [ -n "$Hjdbcfile" ]; then
+      #
+      Hdbroot=`/root/mode/mod_config   $Hpropfile "db.root" "#Get#"`
+      Hdbport=`/root/mode/mod_config   $Hpropfile "db.port" "#Get#"`
+      Hurl=$Hdbroot:$Hdbport
+      Hdb=`/root/mode/mod_config       $Hpropfile "db.name" "#Get#"`
+      Husr=`/root/mode/mod_config      $Hpropfile "db.usr"  "#Get#"`
+      Hpwd=`/root/mode/mod_config      $Hpropfile "db.pwd"  "#Get#"`
+      #
+      cat $Hjdbcfile |
+      sed -re "s/^(jdbc\.url.*\/\/)(.*)(\/)(.*)/\1$Hurl\3$Hdb/" |
+      sed -re "s/^(jdbc\.username=)(.*)/\1$Husr/" |
+      sed -re "s/^(jdbc\.password=)(.*)/\1$Hpwd/" |
+      tr -d "\r" > /root/mode/tmp/f$$.tmp
+      cp -f  /root/mode/tmp/f$$.tmp $Hjdbcfile
+   fi
+   #
+   # spring-interface-address.xml
+   #
+   Hinterfacefile=`find -L /usr/local/$Htomcat/$Htomadi/$Hwarname1/ -name "spring-interface-address.xml" | head -n 1`
+   if [ -n "$Hinterfacefile" ]; then
+      HhttpUtilset=`cat "$Hpropfile" | grep -E "^httpUtil" 2>/dev/null`
+      echo "$HhttpUtilset" |
+      while read -r Hhttp;do
+          Hidprop=`echo "$Hhttp" | sed -re "s/^(.*)=(.*)/\1/"`
+          Hid=`echo "$Hidprop" | sed -re "s/^(.*)\.(.*)/\1/"`
+          Hprop=`echo "$Hidprop" | sed -re "s/^(.*)\.(.*)/\2/"`
+          Hvl=`echo "$Hhttp" | sed -re "s/^(.*)=(.*)/\2/"`
+          /root/mode/sxmlrep "$Hinterfacefile" "$Hid" "$Hprop" "$Hvl"
+      done
+   fi
+   rm -f /root/mode/tmp/f$$.tmp
+fi
+
+# config.properties
+
+Hconfigfile=`find -L /usr/local/$Htomcat/$Htomadi/$Hwarname1/ -name "config.properties" | head -n 1`
+if [ -n "$Hconfigfile" ]; then
+   cat $Hconfigfile | sed -re "s/(\/usr\/local\/)(tomcat.*)(\/.*)/\1$Htomcat\3/" > /root/mode/tmp/f$$.tmp
+   cp -f  /root/mode/tmp/f$$.tmp "$Hconfigfile"
+   rm -f /root/mode/tmp/f$$.tmp
+fi
+
+# start tomcat
+
+/root/mode/start_tomcat $Htomcat
+
+#
+
+rm -fR /root/mode/tmp/hwar$$
+
+# end
+

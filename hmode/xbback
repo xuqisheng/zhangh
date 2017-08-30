@@ -97,14 +97,14 @@ else
       Hlastdir=base
       Hthisdir=inc001
    else
-      Hlastinc=`echo "$Hinclist" | sort | sed -n -re "$ p" | sed -re "s/.*\/inc([0-9]{3})\/$/\1/"`
+      Hlastinc=`echo "$Hinclist" | sort | tail -n 1 | sed -re "s/.*\/inc([0-9]{3})\/$/\1/"`
       Hthisinc=$[1001+$[10#$Hlastinc]]
       Hthisinc=${Hthisinc:(-3)}
       Hlastdir=inc$Hlastinc
       Hthisdir=inc$Hthisinc
    fi
    # get lsn
-   Hlsn=`ssh $Hsshrmt "cat \"$Hrmtdir/$Hlastdir/xtrabackup_checkpoints\"" | grep last_lsn | sed -re "s/.*= *(.*)/\1/"`
+   Hlsn=`ssh $Hsshrmt "cat \"$Hrmtdir/$Hlastdir/xtrabackup_checkpoints\"" | grep to_lsn | sed -re "s/.*= *(.*)/\1/"`
    if [ -z "$Hlsn" ]; then
       /root/mode/modemsg xbback "Last backup has not been completed!" more 
       exit 1

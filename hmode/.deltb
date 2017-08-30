@@ -6,7 +6,6 @@
 # ./.deltb [<mysql-server-ip>] <dbname> <tbname>
 # e.g.:
 #       ./deltb 6.13 portal
-# 删除指定表的记录数，至少保留1000000条记录，默认针对log_info表进行删除
 # -------------------------------------------------------------------------------------
 
 #
@@ -29,6 +28,7 @@ done
 # default database is portal
 
 HDBNAME=${1:-portal}
+HDBNAME=`echo "$HDBNAME" | tr "A-Z" "a-z"`
 
 # tbname is temporary log_info only
 

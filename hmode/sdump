@@ -79,6 +79,7 @@ if [ -z "$1" ]; then
    /root/mode/modemsg sdump "You must privide database name to dump!" && exit 1
 fi
 HDBNAME="$1"
+HDBNAME=`echo "$HDBNAME" | tr "A-Z" "a-z"`
 if [ -z `/root/mode/seecfg -s $HMYSQLDIP "show databases like '$HDBNAME'"|grep -i "^$HDBNAME"` ]; then
    /root/mode/modemsg sdump "Database $HDBNAME doesn't exist at $HMYSQLDIP2!" more && exit 1
 fi

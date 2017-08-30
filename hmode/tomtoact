@@ -5,15 +5,15 @@ Htsta=$2
 
 # 
 
-if ! echo $Htsta | grep -E '^up' >/dev/null; then
+if ! echo "$Htsta" | grep -E '^up' >/dev/null; then
    exit 1
-elif echo $Htsta | grep -E '^up$' >/dev/null; then
+elif echo "$Htsta" | grep -E '^up$' >/dev/null; then
    exit 0
 fi
 
 #
 
-Happs=`echo $Htsta | sed -re "s/.*\[(.*)\].*/\1/"`
+Happs=`echo "$Htsta" | sed -re "s/.*\[(.*)\].*/\1/"`
 if echo "$Happs" | grep -E "Java2MysqlConnectionPoolFull" >/dev/null; then
    exit 1
 elif echo "$Happs" | grep -E "OutOfMemoryError" >/dev/null; then

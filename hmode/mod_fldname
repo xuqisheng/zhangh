@@ -9,6 +9,7 @@
 . /root/mode/mysqldip
 
 HDB="$1"
+HDB=`echo "$HDB" | tr "A-Z" "a-z"`
 HTAB="$2"
 HCOL="$3"
 HNCOL="${4-${HCOL}_}"

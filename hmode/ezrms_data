@@ -54,9 +54,9 @@ fi
 # htlcode filter
 
 if [ -z "$3" ]; then
-   Hhtlcodecond="1=1"
+   Hhtlcodecond="sta='I'"
 else
-   Hhtlcodecond="code='$3'"
+   Hhtlcodecond="sta='I' and code='$3'"
 fi
 
 # biz_date 
@@ -123,16 +123,13 @@ while read -r Hgid Hgcode Hhid Hhcode Hbdate21; do
       # column heads
       
       Hmycols=`cat "$i" |
-               grep -P "^[ \t]*----cols----:"     |
-               sed -re "s/^[ \t]*----cols----://" |  
-               tr -d "[]"           |
-               sed -re 's/$/,/'     |
-               sed -re '$ s/,$//'   |
-               tr -d "\r\n\t "      |
-               tr "a-z" "A-Z"       |
-               sed -re 's/^/"/'     |
-               sed -re 's/$/"/'     |
-               sed -re 's/,/","/g'`
+               grep -P "^[ \t]*----cols----:"                |
+               sed -re "s/^[ \t]*----cols----://"            |  
+               tr -d "[]"                                    |
+               sed -r -e 's/$/,/' -e '$ s/,$//'              |
+               tr -d "\r\n\t "                               |
+               tr "a-z" "A-Z"                                |
+               sed -r -e 's/^/"/' -e 's/$/"/' -e 's/,/","/g'`
       echo $Hmycols  >> $Holdir/$J.txt
 
       #
@@ -141,14 +138,14 @@ while read -r Hgid Hgcode Hhid Hhcode Hbdate21; do
       mv -f $Holdir/$J$$.txt $Holdir/$J.txt
 
       cat "$i" | 
-      sed -re "s/##gh#/\(hotel_group_id=#group_id# and hotel_id=#hotel_id#\)/g" |
-      sed -re "s/#([a-z])#gh#/\(\1.hotel_group_id=#group_id# and \1.hotel_id=#hotel_id#\)/g" |
-      sed -re "s/#([a-z])([a-z])#gh#/\(\1\.hotel_group_id=\2\.hotel_group_id and \1\.hotel_id=\2\.hotel_id\)/g" |
-      sed -re "s/#hotel_group_id#/$Hgid/g"        |
-      sed -re "s/#group_id#/$Hgid/g"              |
-      sed -re "s/#hotel_id#/$Hhid/g"              | 
-      sed -re "s/#bdate#/'$Hbdate31'/g"           | 
-      sed -re "s/#biz_date#/'$Hbdate31'/g"        > $Holsql
+      sed -r -e "s/##gh#/\(hotel_group_id=#group_id# and hotel_id=#hotel_id#\)/g" \
+             -e "s/#([a-z])#gh#/\(\1.hotel_group_id=#group_id# and \1.hotel_id=#hotel_id#\)/g" \
+             -e "s/#([a-z])([a-z])#gh#/\(\1\.hotel_group_id=\2\.hotel_group_id and \1\.hotel_id=\2\.hotel_id\)/g" \
+             -e "s/#hotel_group_id#/$Hgid/g"      \
+             -e "s/#group_id#/$Hgid/g"            \
+             -e "s/#hotel_id#/$Hhid/g"            \
+             -e "s/#bdate#/'$Hbdate31'/g"         \
+             -e "s/#biz_date#/'$Hbdate31'/g"      > $Holsql
       echo "$i"
       /root/mode/seecfg -z $HmydbR $Holsql $HmydbN >> $Holdir/$J.txt
    done

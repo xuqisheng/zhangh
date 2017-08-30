@@ -58,7 +58,9 @@ while [ $Hhloop -lt 600 ];do
       # set stop status 
       /root/mode/setwsta $Hhrytomcat 2 >/dev/null 2>&1
       #
-      echo "$Hhrytomcat has already been stopped!!" && exit 0
+      echo "$Hhrytomcat has already been stopped!!"
+      /root/mode/modelog "$0 $Hhrytomcat"
+      exit 0
    elif echo "$Htsta" | grep -E '^up' >/dev/null; then
       break
    fi
@@ -190,7 +192,7 @@ while [ 1 ]; do
  
    # case 2: process exists and no ports open.zombie tomcat 
 
-   Htprocess=`echo "$Htcmdline" | sed -re "s/^[^ ]+ +([0-9]+).*/\1/" | sed -n '1 p'`
+   Htprocess=`echo "$Htcmdline" | sed -re "s/^[^ ]+ +([0-9]+).*/\1/" | head -n 1`
 
    Hpcnt_1=`netstat -ntlp 2>/dev/null | grep -E " $Htprocess/java" | wc -l`
    Hpcnt_2=`netstat -ntlp 2>/dev/null | grep -E " $Htprocess/java" | grep -E ":[0-9]{5}" | wc -l`
@@ -236,6 +238,9 @@ while [ 1 ]; do
    fi
    sleep 3
 done
+#
+/root/mode/.opt_tomcat $Hhrytomcat
+#
 echo
 echo "$Hhrytomcat stopped successfully!!" && exit 0
 

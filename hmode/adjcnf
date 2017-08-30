@@ -22,7 +22,7 @@
 /root/mode/mod_config "/etc/my.cnf" "innodb_rollback_on_timeout=1" "innodb_lock_wait_timeout"
 /root/mode/mod_config "/etc/my.cnf" "innodb_autoinc_lock_mode=2"   "innodb_rollback_on_timeout"
 /root/mode/mod_config "/etc/my.cnf" "wait_timeout=600"             "innodb_autoinc_lock_mode"
-/root/mode/mod_config "/etc/my.cnf" "max_connect_errors=1000000"   "[mysqld]"
+/root/mode/mod_config "/etc/my.cnf" "max_connect_errors=999999999" "[mysqld]"
 /root/mode/mod_config "/etc/my.cnf" "back_log=4096"                "[mysqld]"
 
 # innodb_flush_log_at_trx_commit
@@ -98,9 +98,10 @@ fi
 
 # buffers for innodb tables(per thread basic)
 
-/root/mode/mod_config "/etc/my.cnf" "read_buffer_size=4M"
+/root/mode/mod_config "/etc/my.cnf" "read_buffer_size=3M"
 /root/mode/mod_config "/etc/my.cnf" "sort_buffer_size=16M"
 /root/mode/mod_config "/etc/my.cnf" "read_rnd_buffer_size=16M"
+/root/mode/mod_config "/etc/my.cnf" "join_buffer_size=1M"       "read_rnd_buffer_size"
 
 # 
 
@@ -120,10 +121,32 @@ if rpm -qa | grep -E '^MySQL-server-community-5\.1\.57' >/dev/null || [ -n "$Hus
       rm -f /root/mode/tmp/Hmy.cnf.ext$$.tmp
    fi
 else
-   if cat /etc/my.cnf | grep -E "^(ignore_builtin_innodb|plugin-load=|innodb_file_format=)" >/dev/null; then
-      cat /etc/my.cnf | grep -Ev "^(ignore_builtin_innodb|plugin-load=|innodb_file_format=)" > /root/mode/tmp/Hmy.cnf.ext$$.tmp
+   if cat /etc/my.cnf | grep -E "^(ignore_builtin_innodb|plugin-load=)" >/dev/null; then
+      cat /etc/my.cnf | grep -Ev "^(ignore_builtin_innodb|plugin-load=)" > /root/mode/tmp/Hmy.cnf.ext$$.tmp
       cp -f /root/mode/tmp/Hmy.cnf.ext$$.tmp /etc/my.cnf
       rm -f /root/mode/tmp/Hmy.cnf.ext$$.tmp
+   fi
+fi
+
+# -----------------------------------------------------------------------------------------------
+# gc standard template:
+#             innodb_file_per_table=0
+#             innodb_file_format=barracuda
+# -----------------------------------------------------------------------------------------------
+# To create a new table with (barracuda - Antelope) row_format,three conditions must be satisfied
+#             1.innodb_file_per_table=1
+#             2.innodb_file_format=barracuda
+#             3.designate table option row_format=compressed(or row_format=dynamic)
+# -----------------------------------------------------------------------------------------------
+
+if  [ "`cat /etc/.modesid 2>/dev/null`" != "534787cb-00bb-40d9-8fa6-bf23953993c7" ]; then
+   if ! cat /etc/my.cnf | grep -E '^innodb_file_format=' >/dev/null; then
+      # set innodb_file_format to barracuda 
+      /root/mode/mod_config "/etc/my.cnf"  "innodb_file_format=Barracuda"     "datadir="
+   fi
+   if ! cat /etc/my.cnf | grep -E '^innodb_file_per_table=' >/dev/null; then
+      # set innodb_file_per_table to 0 
+      /root/mode/mod_config "/etc/my.cnf"  "innodb_file_per_table=0"     "datadir="
    fi
 fi
 
@@ -138,6 +161,14 @@ if rpm -qa | grep -E '^MySQL-server-(5\.[56])' >/dev/null || [ -n "$Huse_secure_
 else
    /root/mode/rep_config "/etc/my.cnf"  "secure-file-priv=.*"   "comment"
    /root/mode/rep_config "/etc/my.cnf"  "secure-file-priv="     "D-commented"
+fi
+
+# binlog_checksum
+
+if rpm -qa | grep -E '^MySQL-server-(5\.[6])' >/dev/null || [ -n "$Hdisable_binlog_checksum_in_56" ]; then
+   /root/mode/mod_config "/etc/my.cnf"  "binlog_checksum=NONE"   "binlog_format="
+else
+   sed -ci -re "/^binlog_checksum/ d" "/etc/my.cnf"
 fi
 
 # end

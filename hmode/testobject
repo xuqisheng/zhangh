@@ -11,6 +11,7 @@
 #
 
 HDBNAME=${2:-foxhis}
+HDBNAME=`echo "$HDBNAME" | tr "A-Z" "a-z"`
 HOBJECT="$1"
 HOBJECTSRC="$1"
 

@@ -8,6 +8,7 @@ else
    HDBNAME=`cat /root/antDep/build.properties 2>/dev/null | tr -d "\r" | grep -E "^db\.name=" | sed -re "s/.*=(.*)/\1/"`
    [ -z "$HDBNAME" ] && exit 1
 fi
+HDBNAME=`echo "$HDBNAME" | tr "A-Z" "a-z"`
 
 #
 

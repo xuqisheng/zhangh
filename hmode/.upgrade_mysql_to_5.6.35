@@ -87,6 +87,13 @@ export HmUpGrAdE=1
 
 . /root/mode/mysqldip localhost
 mysql_upgrade -uroot $Hmodepass -h$HMYSQLDIP
+
+#
+
+/root/mode/mysql restart
+
+#
+
 /root/mode/tune_mysql
 
 #

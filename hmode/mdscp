@@ -49,7 +49,7 @@ if echo "$2" | grep "\.sql$" >/dev/null; then
 else
    # database name
    Hsqlparm=0
-   Hdname=`ssh $1 "ls -1 /root/mode/dump/$2-[0-9][0-9][0-9][0-9]-[0-9][0-9]-[0-9][0-9]_[0-9][0-9][0-9].sql 2>/dev/null | sed -n '$ p'"`
+   Hdname=`ssh $1 "ls -1 /root/mode/dump/$2-[0-9][0-9][0-9][0-9]-[0-9][0-9]-[0-9][0-9]_[0-9][0-9][0-9].sql 2>/dev/null | tail -n 1"`
    if [ -z "$Hdname" ]; then
       /root/mode/modemsg mdscp "No standard dump of '$2' exists in remote server '$1'!" more
       exit 

@@ -14,10 +14,10 @@
 
 Hxbdmp_dir="$1"
 if [ -z "$Hxbdmp_dir" ]; then
-   /root/mode/modemsg xbrestore "xbback dump directory must be provided as the first parm!" more
+   /root/mode/modemsg xbrmhis "xbback dump directory must be provided as the first parm!" more
    exit 1
 elif [ ! -d "$Hxbdmp_dir" ]; then
-   /root/mode/modemsg xbrestore "xbback dump directory '$Hxbdmp_dir' doesn't exist!" more
+   /root/mode/modemsg xbrmhis "xbback dump directory '$Hxbdmp_dir' doesn't exist!" more
    exit 1
 fi
 

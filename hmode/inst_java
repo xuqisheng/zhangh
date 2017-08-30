@@ -10,5 +10,5 @@
 [ -d /usr/local/jdk6 ] ||
 {
 cd /
-tar xzvf `ls -1 /root/packages/jdk?.tar.gz | sed -n "$ p"`
+tar xzvf `ls -1 /root/packages/jdk?.tar.gz | tail -n 1`
 }

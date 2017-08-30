@@ -50,35 +50,20 @@ fi
 # -------------------------------------------------------------------------------------------------
 
 if /root/mode/modegate tomcat_elasticmem_max; then
-   # elatic memory allocaltion
+   # max elatic memory allocaltion
+   HTOMMIXMODE=yES
    if [ $HCTOMMEM -lt 1600 ]; then
       HCTOMMEM=1600
    fi
+elif [ $HCTOMMEM -lt 1800 ]; then
+   # elatic memory allocaltion
    HTOMMIXMODE=yES
-   HTOMXmsMODE=no
-else
-   # normal allocation 
-   if [ $HCTOMMEM -ge 1500 ]; then
-      if /root/mode/modegate force_tomcat_mixmode; then
-         HTOMMIXMODE=yES
-         if [ "$Hjvcvm" != "yes" ]; then
-            # -Xms mode is triggered
-            HTOMXmsMODE=yES
-         fi
-      fi
-   else 
-      HTOMMIXMODE=yES
-      if [ $HCTOMMEM -ge 1000 ]; then
-         # keep HCTOMMEM
-         if [ "$Hjvcvm" != "yes" ]; then
-            # -Xms mode is triggered
-            HTOMXmsMODE=yES
-         fi
-      else
-         # set memory at least 1000M 
-         HCTOMMEM=1000
-      fi
+   if [ $HCTOMMEM -lt 1200 ]; then
+      HCTOMMEM=1200
    fi
+else
+   # traditional allocation
+   HTOMMIXMODE=no
 fi
 
 #
@@ -88,17 +73,14 @@ for i in `ls -d tomcat*/ 2>/dev/null | sed -re "s/\/$//" `;do
     /root/mode/check_tomcat $i || continue
     if /root/mode/isctom $i || /root/mode/isNtom $i; then
        if [ "$HTOMMIXMODE" = "yES" ]; then
-          Htconfig="-Xmx${HCTOMMEM}m -XX:MaxPermSize=${HPERMMAX}m"
-          if [ "$HTOMXmsMODE" = "yES" ]; then
-             Htconfig="-Xms${HCTOMMEM}m $Htconfig"
-          fi
+          Htconfig="-Xms120m -Xmx${HCTOMMEM}m -XX:MaxPermSize=${HPERMMAX}m"
        else
           HMAXNEW=1000
           Hnewsize=$[($HCTOMMEM-1000)*($HMAXNEW-500)/1500+500]
           Htconfig="-Xms${HCTOMMEM}m -Xmx${HCTOMMEM}m -Xmn${Hnewsize}m -XX:MaxPermSize=${HPERMMAX}m"
        fi
     else
-       Htconfig="-Xmx1000m -XX:MaxPermSize=200m"
+       Htconfig="-Xms120m -Xmx1000m -XX:MaxPermSize=200m"
     fi
 
     # --------------------------------------------------------------------------
@@ -126,7 +108,7 @@ for i in `ls -d tomcat*/ 2>/dev/null | sed -re "s/\/$//" `;do
 
     #
 
-    if cat /usr/local/$i/bin/catalina.sh | grep -E "^JAVA_OPTS" > /dev/null; then
+    if cat /usr/local/$i/bin/catalina.sh | grep -E "^JAVA_OPTS" | grep -v JSSE_OPTS > /dev/null; then
        cat /usr/local/$i/bin/catalina.sh |
        sed -re "s/^JAVA_OPTS=.*(MaxPermSize=[0-9]+m)( +-XX:\+UseParallelOldGC)?( +-Duser\.timezone=GMT\+08)?( +-XX:ReservedCodeCacheSize=[0-9]+m)?( +-XX:\+UseCodeCacheFlushing)?(.*)\"/JAVA_OPTS=\"-server $Htconfig\6\"/" > $Hhrytmpfile
     else

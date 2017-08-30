@@ -1,0 +1,41 @@
+#/!bin/bash 
+
+#
+
+. /root/mode/mysqldip
+
+#
+
+if /root/mode/seecfg $HMYSQLDIP &>/dev/null; then
+   Hparms=`/root/mode/seecfg -s $HMYSQLDIP 'show global status' | grep -E '(Qcache_hits|Qcache_inserts|Qcache_lowmem_prunes)'`
+   Hins=`echo "$Hparms" | grep -E Qcache_inserts | awk '{print $2}'`
+   Hhit=`echo "$Hparms" | grep -E Qcache_hits    | awk '{print $2}'`
+   Hpru=`echo "$Hparms" | grep -E Qcache_lowmem_prunes | awk '{print $2}'`
+   if [ $Hins -ge 500000 ]; then
+      Hperc1=`echo "$Hpru*100/$Hins" | bc -l`
+      Hperc2=`echo "$Hhit*100/$Hins" | bc -l`
+      if [ $(echo "$Hperc2 >= 150.00" | bc) -eq 1 ]; then
+         if [ $(echo "$Hperc1 >= 50.00" | bc) -eq 1 ]; then
+            # It seems the query cache is not big enough 
+            # We do nothing for the present
+            :
+         fi
+      else
+         # --------------------------------------------------------------------------
+         # 1.prohibit cache use by setting query_cache_limit to very small value
+         # 2.lower query cache size to very small value
+         # 3.reset query cache
+         # --------------------------------------------------------------------------
+         /root/mode/seecfg $HMYSQLDIP "set global query_cache_limit=512"
+         /root/mode/seecfg $HMYSQLDIP "set global query_cache_size=1024*1024"
+         /root/mode/seecfg $HMYSQLDIP "reset query cache"
+         # --------------------------------------------------------------------------
+         # apps with persistent connections must be restarted for the following setting to be effective
+         # --------------------------------------------------------------------------
+         #/root/mode/seecfg $HMYSQLDIP "set global query_cache_type=0"
+      fi
+   fi
+fi
+
+# end 
+

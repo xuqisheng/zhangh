@@ -12,26 +12,41 @@ Hcheckdate=`LANG=en_US;date`
 cd /usr/local
 for i in `ls -d tomcat*/ 2>/dev/null | sed -re "s/\/$//"`;do
     /root/mode/check_tomcat $i || continue
-    Hact_stat=`/root/mode/setwsta $i`
     Htom_stat=`/root/mode/tctomcat $i 2>/dev/null`
-    if [ -n "$Hact_stat" ]; then
-       if [ "$Hact_stat" = "ACT" -a "$Htom_stat" = "down" ]; then
-          # tomcat suicide or tomcat was killed 
+    if [ "$Htom_stat" != "down" ]; then
+       continue
+    fi
+    if ! cat /root/mode/logs/modelog 2>/dev/null | grep -E " $i$" >/dev/null; then
+       continue
+    fi
+    #
+    if ! /root/mode/isctom $i; then
+       #
+       if cat /root/mode/logs/modelog 2>/dev/null | grep -E " $i$" | tail -n 1 | grep -E "/stop_tomcat +$i$" >/dev/null; then
+          continue
+       fi
+       #
+       echo "Warning: $i $Htom_stat"
+       if [ "$Hmode" = "fix" ]; then
+          echo "Execute: /root/mode/start_tomcat $i"
+          /root/mode/start_tomcat $i
+       fi
+    else
+       Hact_stat=`/root/mode/setwsta $i`
+       if [ "$Hact_stat" = "ACT" ]; then
           echo "Warning: $i $Hact_stat $Htom_stat"
           if [ "$Hmode" = "fix" ]; then
-             echo "Execute: /root/mode/start_tomcat $i"
-             /root/mode/start_tomcat $i
-          fi
-       fi
-    elif ! /root/mode/isctom $i; then
-       if [ "$Htom_stat" = "down" ]; then
-          if cat /root/mode/logs/modelog 2>/dev/null | grep -E " $i$" >/dev/null; then
-             if ! cat /root/mode/logs/modelog 2>/dev/null | grep -E " $i$" | tail -n 1 | grep -E "/stop_tomcat +$i$" >/dev/null; then
-                echo "Warning: $i $Htom_stat"
-                if [ "$Hmode" = "fix" ]; then
-                   echo "Execute: /root/mode/start_tomcat $i"
-                   /root/mode/start_tomcat $i
-                fi
+             if cat /root/mode/logs/modelog 2>/dev/null | grep -E " $i$" | tail -n 1 | grep -E "/stop_tomcat +$i$" >/dev/null; then
+                # apache is started with no fixat while tomcat is normallly down
+                /root/mode/setwsta $i 2 >/dev/null 2>&1
+                echo "Execute: /root/mode/setwsta $i 2"
+             else
+                # tomcat suicide or tomcat was killed when apache is on
+                /root/mode/setwsta $i 2 >/dev/null 2>&1
+                sleep 2
+                #
+                echo "Execute: /root/mode/start_tomcat $i"
+                /root/mode/start_tomcat $i
              fi
           fi
        fi

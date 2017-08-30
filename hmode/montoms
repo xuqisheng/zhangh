@@ -42,6 +42,7 @@ fi
 #
 
 Hper=95
+Hper1=99.5
 Hhost=`hostname`
 Hgettomps=
 Htoms=`/root/mode/jvstat 2>/dev/null`
@@ -61,39 +62,32 @@ while read -r Hp Ht Ho; do
                echo "$Ht($Hp) at '$Hhost':single tomcat is up with key context not working.$Hrestart_message" >> /root/mode/tmp/Hdotom$$.tmp
             fi
          fi
-      elif echo $Hgettomp | grep -E 'Java2MysqlConnectionPoolFull ' >/dev/null; then
+      elif echo "$Hgettomp" | grep -E 'Java2MysqlConnectionPoolFull ' >/dev/null; then
          # Java2MysqlConnectionPoolFull
          # restart this tomcat no matter what Htomcat_restart and Hapache_full_test are
          echo "$Ht($Hp) at '$Hhost':Java to MySQL connection pool is full.$Hrestart_message" >> /root/mode/tmp/Hdotom$$.tmp
-      elif echo $Hgettomp | grep -E 'OutOfMemoryError ' >/dev/null; then
+      elif echo "$Hgettomp" | grep -E 'OutOfMemoryError ' >/dev/null; then
          # OutOfMemoryError 
          # restart this tomcat no matter what Htomcat_restart and Hapache_full_test are
          echo "$Ht($Hp) at '$Hhost':Out Of Memory Error.$Hrestart_message" >> /root/mode/tmp/Hdotom$$.tmp
-      elif [ $(echo "$Holdcur/$Holdmax*100 > $Hper" | bc -l) -eq 1 -a $(echo "$Holdmax > 300" | bc -l) -eq 1 ]; then
+      elif [ $(echo "$Holdcur/$Holdmax*100 > $Hper" | bc -l) -eq 1 -a $(echo "$Holdmax > 533" | bc -l) -eq 1 ]; then
          # memory condition was satisfied 
          if [ $Htomcat_restart -eq 0 ]; then
             # warning 
             echo "$Ht($Hp) at '$Hhost':tomcat memory stress.$Htom_warning" >> /root/mode/tmp/Hdotom$$.tmp
          else
-            if [ $Hapache_full_test -eq 0 ]; then
-               # tomcat restart is needed
-               echo "$Ht($Hp) at '$Hhost':tomcat memory stress.$Hrestart_message" >> /root/mode/tmp/Hdotom$$.tmp
-            else
-               Hgettomp1=`echo $Hgettomp | sed -re "s/^([^ ]+).*/\1/"`
-               if ! echo $Hgettomp1 | grep -E '^apache' >/dev/null; then
-                  # non cluster tomcat.No need to test apache
+            Hgettomp1=`echo "$Hgettomp" | sed -re "s/^([^ ]+).*/\1/"`
+            if echo "$Hgettomp1" | grep -E '^apache' >/dev/null; then
+               # cluster tomcat
+               if [ $Hapache_full_test -eq 0 ]; then
                   echo "$Ht($Hp) at '$Hhost':tomcat memory stress.$Hrestart_message" >> /root/mode/tmp/Hdotom$$.tmp
-               else
-                  # cluster tomcat.Need to test apache
-                  if /root/mode/apcfull $Hgettomp1; then
-                     echo "$Ht($Hp) at '$Hhost':tomcat memory stress and apache connections are huge.$Hrestart_message" >> /root/mode/tmp/Hdotom$$.tmp
-                  else
-                     # Htomcat_restart=1 and Hapache_full_test=1 and apache is not full
-                     # DO NOT send mails out
-                     :
-                     # commented temporarily
-                     #echo "$Ht($Hp) at '$Hhost':tomcat memory stress.$Htom_warning" >> /root/mode/tmp/Hdotom$$.tmp
-                  fi
+               elif /root/mode/apcfull "$Hgettomp1"; then
+                  echo "$Ht($Hp) at '$Hhost':tomcat memory stress and apache connections are huge.$Hrestart_message" >> /root/mode/tmp/Hdotom$$.tmp
+               fi
+            else
+               # noncluster tomcat
+               if [ $(echo "$Holdcur/$Holdmax*100 > $Hper1" | bc -l) -eq 1 ]; then
+                  echo "$Ht($Hp) at '$Hhost':tomcat memory stress.$Hrestart_message" >> /root/mode/tmp/Hdotom$$.tmp
                fi
             fi
          fi

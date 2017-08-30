@@ -10,6 +10,6 @@ if [ ! -f /etc/modegate ]; then
 elif ! cat /etc/modegate | grep -E "^apachemethod=" >/dev/null; then
    echo T
 else
-   echo `cat /etc/modegate | sed -re "s/^(apachemethod=)(.*)/\2/" | sed -n "$ p"`
+   echo `cat /etc/modegate | sed -re "s/^(apachemethod=)(.*)/\2/" | tail -n 1`
 fi
 

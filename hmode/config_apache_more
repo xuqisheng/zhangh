@@ -70,8 +70,46 @@ fi
 ###### httpd-info.conf ######
 
 if /root/mode/apachectl $Hapachemode -v | grep -E 'Apache/2.2' >/dev/null; then
+   if ! cat /usr/local/$Hapachemode/conf/extra/httpd-info.conf | grep -E '/wflhry12700l' >/dev/null; then
+      {
+       echo "#"
+       echo "<Location /wflhry12700l>"
+       echo "    Order deny,allow"
+       echo "    Deny from all"
+       echo "    Allow from 183.129.215.114 192.168.2.61 127.0.0.1"
+       echo "</Location>"
+      } >> /usr/local/$Hapachemode/conf/extra/httpd-info.conf
+   fi
+   if ! cat /usr/local/$Hapachemode/conf/extra/httpd-info.conf | grep -E '/hrywfll27001' >/dev/null; then
+      {
+       echo "#"
+       echo "<Location /hrywfll27001>"
+       echo "    Order deny,allow"
+       echo "    Deny from all"
+       echo "    Allow from 183.129.215.114 192.168.2.61 127.0.0.1"
+       echo "</Location>"
+      } >> /usr/local/$Hapachemode/conf/extra/httpd-info.conf
+   fi
    /root/mode/rep_config "/usr/local/$Hapachemode/conf/extra/httpd-info.conf" "Allow from" "183.129.215.114 192.168.2.61 127.0.0.1"
 else
+   if ! cat /usr/local/$Hapachemode/conf/extra/httpd-info.conf | grep -E '/wflhry12700l' >/dev/null; then
+      {
+       echo "#"
+       echo "<Location /wflhry12700l>"
+       echo "    Require host localhost"
+       echo "    Require ip 183.129.215.114 192.168.2.61 127.0.0.1"
+       echo "</Location>"
+      } >> /usr/local/$Hapachemode/conf/extra/httpd-info.conf
+   fi
+   if ! cat /usr/local/$Hapachemode/conf/extra/httpd-info.conf | grep -E '/hrywfll27001' >/dev/null; then
+      {
+       echo "#"
+       echo "<Location /hrywfll27001>"
+       echo "    Require host localhost"
+       echo "    Require ip 183.129.215.114 192.168.2.61 127.0.0.1"
+       echo "</Location>"
+      } >> /usr/local/$Hapachemode/conf/extra/httpd-info.conf
+   fi
    /root/mode/rep_config "/usr/local/$Hapachemode/conf/extra/httpd-info.conf" "Require host .example.com"  "uncomment"
    /root/mode/rep_config "/usr/local/$Hapachemode/conf/extra/httpd-info.conf" "Require host"               "localhost"
    /root/mode/rep_config "/usr/local/$Hapachemode/conf/extra/httpd-info.conf" "Require ip"                 "183.129.215.114 192.168.2.61 127.0.0.1"
@@ -86,5 +124,14 @@ fi
 /root/mode/rep_config "/usr/local/$Hapachemode/conf/httpd.conf" "LoadModule info_module modules/mod_info.so"     "uncomment"
 /root/mode/rep_config "/usr/local/$Hapachemode/conf/httpd.conf" "LoadModule status_module modules/mod_status.so" "uncomment"
 
-#
+# rewrite ...
+
+if ! /root/mode/apachectl $Hapachemode -v | grep -E 'Apache/2.2' >/dev/null; then
+   #
+   /root/mode/rep_config "/usr/local/$Hapachemode/conf/httpd.conf" "LoadModule rewrite_module modules/mod_rewrite.so" "uncomment"
+   /root/mode/rep_config "/usr/local/$Hapachemode/conf/httpd.conf" "AllowOverride" "All" "t2"
+   #
+   [ -f /usr/local/$Hapachemode/htdocs/.htaccess ] || cp -f /root/mode/impfile/apache/ht.txt /usr/local/$Hapachemode/htdocs/.htaccess
+fi
+
 

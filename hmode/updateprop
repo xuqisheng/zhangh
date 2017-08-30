@@ -1,0 +1,35 @@
+#!/bin/bash 
+# -----------------------------------------------------------------------------------------------------------------------------------
+# function:
+#          update targetfile's "key=value" pairs with the ones in sourcefile
+# usages  :
+#          ./updateprop <targetfile> <sourcefile>
+# e.g.    :
+#          ./updateprop /usr/local/tomcat2/webapps/ipmsmember/WEB-INF/classes/config/mode.properties /root/antDep/tomcat2.properties
+# -----------------------------------------------------------------------------------------------------------------------------------
+
+#
+
+Ht="$1"
+Hs="$2"
+if [ -z "$Ht" -o -z "$Hs" ]; then
+   exit
+fi
+if [ ! -f "$Ht" -o ! -f "$Hs" ]; then
+   exit
+fi
+
+#
+
+cat "$Ht" 2>/dev/null | grep "=" | 
+while read -r Hkey_value; do
+   Hkey=`echo "$Hkey_value" | sed -re "s/^([^=]+)=(.*)/\1/"`
+   if ! /root/mode/mod_config "$Hs" "$Hkey" "#Get#" &>/dev/null; then
+      continue
+   fi
+   Hvalue=`/root/mode/mod_config "$Hs" "$Hkey" "#Get#"`
+   /root/mode/mod_config "$Ht" "$Hkey=$Hvalue"
+done
+
+#
+

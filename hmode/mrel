@@ -5,10 +5,8 @@
 
 #
 
-cp -fp /mode.tar.gz /root/mode/tmp  
 for i in `cat /root/servers.txt | grep -v "^#" | grep -E "^${1:-.*}$"`; do
    echo $i
-   scp -p /root/mode/tmp/mode.tar.gz $i:/
+   scp -p /mode.tar.gz $i:/
    ssh -q $i "cd /;tar xzvf mode.tar.gz >/dev/null 2>&1"
 done
-rm -f /root/mode/tmp/mode.tar.gz

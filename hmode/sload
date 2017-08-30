@@ -31,6 +31,7 @@ if [ -z "$1" ]; then
    /root/mode/modemsg sload "You must privide database name to dump!" && exit 1
 fi
 HDBNAME="$1"
+HDBNAME=`echo "$HDBNAME" | tr "A-Z" "a-z"`
 if [ -z `/root/mode/seecfg -s $HMYSQLDIP "show databases like '$HDBNAME'"|grep -i "^$HDBNAME"` ]; then
    /root/mode/modemsg sload "Database $HDBNAME doesn't exist at $HMYSQLDIP2!" more && exit 1
 fi
@@ -206,7 +207,7 @@ echo "sload $HOPTIONS $HMYSQLDIP2 $Hrestparms"
       # table structure 
       if echo "$HOPTIONS" | grep -E -e "(-m)(-|$)" >/dev/null; then
          # delete keys and constraints
-         cat "$Hi" | sed -re "/^  (KEY|UNIQUE|CONSTRAINT)/ d" | sed -re "s/$/HrYhRy3M/" | tr -d "\n" | sed -re "s/,(HrYhRy3M\) ENGINE)/\1/" | sed -re "s/HrYhRy3M/\n/g" > /root/mode/tmp/Hfkey$$.sql
+         cat "$Hi" | sed -r -e "/^  (KEY|UNIQUE|CONSTRAINT)/ d" -e "s/$/HrYhRy3M/" | tr -d "\n" | sed -r -e "s/,(HrYhRy3M\) ENGINE)/\1/" -e "s/HrYhRy3M/\n/g" > /root/mode/tmp/Hfkey$$.sql
          /root/mode/seecfg -s $HMYSQLDIP /root/mode/tmp/Hfkey$$.sql $HDBNAME
          rm -f /root/mode/tmp/Hfkey$$.sql
          # drop indexes for myisam

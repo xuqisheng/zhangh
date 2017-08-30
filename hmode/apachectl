@@ -54,8 +54,7 @@ if [ ! -f /usr/local/$Hapachemode/logs/httpd.pid ]; then
    Hapfile=/root/mode/tmp/hapache_$$.tmp
    ps -ef > $Hapfile
    if cat $Hapfile | grep -E "^[^ ]+ +[0-9]+ +1 +.*/usr/local/$Hapachemode/bin/httpd -k (graceful|(re)?start)$" >/dev/null; then
-      Hpid=`cat $Hapfile |  grep -E "^[^ ]+ +[0-9]+ +1 +.*/usr/local/$Hapachemode/bin/httpd -k (graceful|(re)?start)$" | sed -re "s/^[^ ]+ +([0-9]+).*/\1/" |
-            sed -n "1 p"`
+      Hpid=`cat $Hapfile |  grep -E "^[^ ]+ +[0-9]+ +1 +.*/usr/local/$Hapachemode/bin/httpd -k (graceful|(re)?start)$" | sed -re "s/^[^ ]+ +([0-9]+).*/\1/" | head -n 1`
       if [ ! -d /usr/local/$Hapachemode/logs ]; then
          mkdir -p /usr/local/$Hapachemode/logs
       fi

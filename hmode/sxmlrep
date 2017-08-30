@@ -1,0 +1,53 @@
+#!/bin/bash 
+# ------------------------------------------------------------------------
+# function:
+#          simplified and limited xml bean replacer
+# usages  :
+#          ./sxmlrep <xmlfile> <bean-id> <property> <value>
+# e.g.    :
+#          ./sxmlrep /1.xml httpUtil host2 "http://gds.ipms.cn/product"
+# ------------------------------------------------------------------------
+
+#
+
+Hxmlfile="$1"
+Hbeanid="$2"
+Hprop="$3"
+Hvalue="$4"
+
+#
+
+if [ ! -f "$Hxmlfile" ]; then
+   /root/mode/modemsg sxmlrep "File '$Hxmlfile' doesn't exist!" more
+   exit 1
+fi
+
+#
+
+Hbean_line=`cat "$Hxmlfile" | sed -nre "/^[ \t]*<bean +id=\"$Hbeanid\"/ =" | head -n 1`
+if [ -z "$Hbean_line" ]; then
+   exit 1
+fi
+
+#
+
+Hprop_line=`cat "$Hxmlfile" | sed -nre "$Hbean_line,/^[ \t]*<property +name=\"$Hprop\"/ =" | tail -n 1`
+if [ -z "$Hprop_line" ]; then
+   exit 1
+fi
+
+#
+
+Hvalue=$(echo "$Hvalue" | sed -re 's/\//\\\//g')
+
+# do replacement
+
+cat "$Hxmlfile" | sed -re "$Hprop_line s/value=\"([^\"]+)\"/value=\"$Hvalue\"/" > /root/mode/tmp/Hsxmlrep$$.tmp
+cp -f /root/mode/tmp/Hsxmlrep$$.tmp "$Hxmlfile"
+
+#
+
+rm -f /root/mode/tmp/Hsxmlrep$$.tmp
+
+# end
+

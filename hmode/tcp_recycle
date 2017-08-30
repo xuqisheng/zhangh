@@ -14,7 +14,7 @@
 
 if [ -f /etc/modegate ]; then
    if cat /etc/modegate | grep -E "^tcp_tw_recycle=" >/dev/null; then
-      Htw=`cat /etc/modegate | sed -re "s/^tcp_tw_recycle=(.*)/\1/" | sed -n "$ p"`
+      Htw=`cat /etc/modegate | sed -re "s/^tcp_tw_recycle=(.*)/\1/" | tail -n 1`
    fi
 fi
 if [ "$Htw" != "0" -a "$Htw" != "1" ]; then

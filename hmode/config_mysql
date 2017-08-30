@@ -66,12 +66,12 @@ cat $HTMPCNF |
 tr -d "\r" | 
 sed -re "s/^#(innodb_)/\1/" |
 sed -re "s/^#skip-locking/skip-external-locking/" |
-sed -re "s/^skip-locking/skip-external-locking/" |
+sed -re "s/^skip-locking/skip-external-locking/"  |
 sed -re "s/^external-locking/skip-external-locking/" |
 sed -re "s/^(default-storage-engine) *=.*$/\1=INNODB/" |
-sed -re "s/^(transaction_isolation) *=.*$/\1=read-committed/" |
-sed -re "s/^#(log-bin=)/\1/" | 
-sed -re "`cat $HTMPCNF | sed -nre '/\[mysqld\]/ ='`,$ s/^default-character-set.*/character-set-server=utf8/" |
+sed -re "s/^#(log-bin=)/\1/" |
+sed -re "`cat $HTMPCNF | 
+sed -nre '/\[mysqld\]/ ='`,$ s/^default-character-set.*/character-set-server=utf8/" |
 sed -re "s/^(innodb_buffer_pool_size *)=(.*)/\1=${HPOOLSIZE}M/"  > /etc/my.cnf 
 rm -f $HTMPCNF
 

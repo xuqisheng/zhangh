@@ -49,25 +49,25 @@ while read -r Hc1 Hc2 Hcother;do
    # -------------------------------------------------------------------------------------------
    # war information (installed products information)
    # -------------------------------------------------------------------------------------------
-   if   echo "$Hcother" | grep -E "[\( ]ipmsgroup[\) ].* H [0-9]" >/dev/null; then
+   if   echo "$Hcother" | grep -E "[( ]ipmsgroup[) ].* H [0-9]" >/dev/null; then
       Hwar1=ipmsgroup
-   elif echo "$Hcother" | grep -E "[\( ]ipmsmember[\) ].* H [0-9]" >/dev/null; then
+   elif echo "$Hcother" | grep -E "[( ]ipmsmember[) ].* H [0-9]" >/dev/null; then
       Hwar1=ipmsmember
-   elif echo "$Hcother" | grep -E "[\( ]ipms[\) ].* H [0-9]" >/dev/null; then
-      if ! echo "$Hcother" | grep -E "[\( ]ipms1[\) ].* H [0-9]" >/dev/null; then
+   elif echo "$Hcother" | grep -E "[( ]ipms[) ].* H [0-9]" >/dev/null; then
+      if ! echo "$Hcother" | grep -E "[( ]ipms1[) ].* H [0-9]" >/dev/null; then
          Hwar1=ipms
       else
          Hwar1=
       fi
-   elif echo "$Hcother" | grep -E "[\( ]ipmsthef[\) ].* H [0-9]" >/dev/null; then
+   elif echo "$Hcother" | grep -E "[( ]ipmsthef[) ].* H [0-9]" >/dev/null; then
       Hwar1=ipmsthef
-   elif echo "$Hcother" | grep -E "[\( ]ipmsthek[\) ].* H [0-9]" >/dev/null; then
+   elif echo "$Hcother" | grep -E "[( ]ipmsthek[) ].* H [0-9]" >/dev/null; then
       Hwar1=ipmsthek
-   elif echo "$Hcother" | grep -E "[\( ]ipmssync[\) ].* H [0-9]" >/dev/null; then
+   elif echo "$Hcother" | grep -E "[( ]ipmssync[) ].* H [0-9]" >/dev/null; then
       Hwar1=ipmssync
-   elif echo "$Hcother" | grep -E "[\( ]mobilepms[\) ].* H [0-9]" >/dev/null; then
+   elif echo "$Hcother" | grep -E "[( ]mobilepms[) ].* H [0-9]" >/dev/null; then
       Hwar1=mobilepms
-   elif echo "$Hcother" | grep -E "[\( ]pos[\) ].* H [0-9]" >/dev/null; then
+   elif echo "$Hcother" | grep -E "[( ]pos[) ].* H [0-9]" >/dev/null; then
       Hwar1=pos
    else
       # Other apps will not be deployed for the present

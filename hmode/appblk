@@ -13,7 +13,7 @@
 if [ `cat /usr/local/$Hapachemode/conf/httpd.conf | grep "^Listen" | wc -l` -eq 1 ]; then
    Hport=`cat /usr/local/$Hapachemode/conf/httpd.conf | grep "^Listen" | sed -re "s/Listen *([0-9]+).*/\1/"`
 else
-   /root/mode/modemsg update_apache "abnormal 'Listen port' defination"
+   /root/mode/modemsg appblk "abnormal 'Listen port' defination"
    exit 1
 fi
 

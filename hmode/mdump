@@ -32,6 +32,7 @@ if [ -z "$1" ]; then
    fi
 else
    HDBNAME="$1"
+   HDBNAME=`echo "$HDBNAME" | tr "A-Z" "a-z"`
    if [ -z `/root/mode/seecfg -s $HMYSQLDIP "show databases like '$HDBNAME'"|grep -i "^$HDBNAME"` ]; then
        echo "Database $HDBNAME doesn't exist at $HMYSQLDIP2!" && exit 1
    fi

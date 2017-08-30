@@ -26,7 +26,7 @@ if /root/mode/isctom $1; then
       Hapctom=apache
       echo -n "apache "
    else
-      Hapctom=`cat server.xml | grep -E "<!-- apache[1-7]? -->" | sed -re "s/.*<!-- (apache[1-7]?) -->.*/\1/" | sed -n "1 p"`
+      Hapctom=`cat server.xml | grep -E "<!-- apache[1-7]? -->" | sed -re "s/.*<!-- (apache[1-7]?) -->.*/\1/" | head -n 1`
       echo -n $Hapctom
    fi
    Hapctom=`echo $Hapctom | sed -re "s/apache/build/"`
@@ -45,18 +45,22 @@ if [ ${#1} -le 10 ]; then
 else
    Htom="$1"
 fi
+
 # get the apps 
-Htomapps=`ls -1d  /usr/local/$1/webapps/*/ 2>/dev/null | grep -Ev "(/ROOT/|/docs/|/examples/|/host-manager/|/manager/)$" | sed -re "s/.*\/(.*)\//\1/"`
+
+Htomapps=`ls -1d  /usr/local/$1/*/*/WEB-INF/ 2>/dev/null | grep -Ev "/(ROOT|docs|examples|host-manager|manager)/WEB-INF/$" | 
+          sed -re "s/\/WEB-INF\/$//" | sort | sed -r -e "s/^\/usr\/local\/$1\///" -e "s/^webapps\///" -e "s/\//./"`
 Htomsapps=`echo \($Htomapps\)`
 if echo $Htomsapps | grep -E ipmsthef >/dev/null; then
    if /root/mode/mod_config /root/antDep/$Hapctom.properties "thekmark" "#Get#" | grep -E "^[yYtT]" >/dev/null; then
       Htomsapps=`echo $Htomsapps | sed -re "s/thef/thek/g"`
    fi
 fi
-if [ ${#Htomsapps} -le 27 ]; then
-   Htomsapps="$Htomsapps........................."
-   Htomsapps=${Htomsapps:0:27}
+if [ ${#Htomsapps} -le 47 ]; then
+   Htomsapps="$Htomsapps............................................."
+   Htomsapps=${Htomsapps:0:47}
 fi
 #
 echo " $Htom $Htomsapps ${Hports}...... `/root/mode/tctomcat $1 2>/dev/null`"
+
 

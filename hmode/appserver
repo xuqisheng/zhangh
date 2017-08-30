@@ -132,7 +132,12 @@ if [ -f /usr/local/apache$Hservert/bin/apachectl ]; then
    if /root/mode/apcfull apache$Hservert; then 
       /root/mode/apachectl apache$Hservert -k restart
    else
+      Hreftime=`date -d '-15 minutes' '+%Y-%m-%d %H:%M:%S'`
       /root/mode/apachectl apache$Hservert -k graceful
+      Hfirst=`/root/mode/seeapc apache$Hservert | head -n 1`
+      if [ "$Hfirst" \< "$Hreftime" ]; then
+         /root/mode/apachectl apache$Hservert -k restart
+      fi
    fi
 fi
 fixat

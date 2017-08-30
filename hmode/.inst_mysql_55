@@ -37,7 +37,22 @@ else
       fi
    fi
 fi
-
+#
+if /usr/bin/mysqldump -V 2>/dev/null | grep -E "Distrib 5\.1" >/dev/null; then
+   if cat /usr/bin/mysqldump 2>/dev/null | grep -E "SET OPTION" >/dev/null; then
+      sed -ci -re "s/SET OPTION/SET       /g" /usr/bin/mysqldump
+   fi
+else
+   if uname -a | grep "x86_64" >/dev/null; then
+      if [ -e /root/packages/.mysqldump64 ]; then
+         cp -p /root/packages/.mysqldump64 /usr/bin/mysqldump
+      fi
+   else
+      if [ -e /root/packages/.mysqldump32 ]; then
+         cp -p /root/packages/.mysqldump32 /usr/bin/mysqldump
+      fi
+   fi
+fi
 # prepare to install mysql server
 
 if rpm -qa | grep "^MySQL-server-" > /dev/null; then

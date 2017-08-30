@@ -1,12 +1,14 @@
 #!/bin/bash
 # -----------------------------------------------------------------
 # function:
-#          get the resired records according to hotel_id's 
+#          get the desired records according to hotel_id's 
 # usages:
 #          ./filter_dump [-x] <inputfile> <outputfile> <[hotel_ids]>
 # e.g.:
 #          ./filter_dump dump/dump0607.sql dump/hotel2_3  "2|3"
 # -----------------------------------------------------------------
+
+exit
 
 # get options
 
@@ -47,7 +49,7 @@ while read -r Hbuffer; do
       echo "$Hbuffer" |
       sed -re "s/(\) values )(\()/\1\n\2/" | 
       sed -re "s/(\),)(\()/\1\n\2/g" > $Hdump1       
-      cat $Hdump1 | sed -n "1 p" > $Hdump2
+      cat $Hdump1 | head -n 1 > $Hdump2
       cat $Hdump1 | sed -e "1 d" | 
       if [ "$HFILTERMODE" != "x" ]; then
          grep  -E "^\(([^,]+,){$Hnum}(${Hhotelid})[,\)]"  

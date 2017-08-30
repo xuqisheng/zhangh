@@ -48,6 +48,7 @@ fi
 # check if duplicate dbnames exist
 
 HDBS="$*"
+HDBS=`echo "$HDBS" | tr "A-Z" "a-z"`
 
 if [ `echo $HDBS | tr " " "\n" | wc -l` -ne `echo $HDBS | tr " " "\n" | sort | uniq -u | wc -l` ]; then
    echo "Duplicate databases are not allowed!!" && exit 1

@@ -25,6 +25,7 @@ done
 # database name
 
 HDBNAME="$1"
+HDBNAME=`echo "$HDBNAME" | tr "A-Z" "a-z"`
 if [ -z "$HDBNAME" ]; then
    /root/mode/modemsg muldmp_grpdata "Database name must be provided!" more
    exit 1

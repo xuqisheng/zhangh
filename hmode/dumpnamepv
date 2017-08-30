@@ -16,11 +16,12 @@ fi
 # now,I'm the only one
 
 HDBNAME="$1"
+HDBNAME=`echo "$HDBNAME" | tr "A-Z" "a-z"`
 HCDATE="$2"
 
 cd /root/mode/dump
 if [ `ls -1 $HDBNAME-${HCDATE}_[0-9][0-9][0-9].sql 2>/dev/null| wc -l` -gt 0 ]; then
-   HINDEX=`ls -1 $HDBNAME-${HCDATE}_[0-9][0-9][0-9].sql 2>/dev/null|sort -r|sed -n "1 p"|sed -re "s/^.*([0-9]{3}).sql$/\1/"`
+   HINDEX=`ls -1 $HDBNAME-${HCDATE}_[0-9][0-9][0-9].sql 2>/dev/null|sort -r|head -n 1|sed -re "s/^.*([0-9]{3}).sql$/\1/"`
    HINDEX=$[1001+$[10#$HINDEX]]
    HINDEX=${HINDEX:(-3)}
    if [ $HINDEX -eq 0 ]; then

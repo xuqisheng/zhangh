@@ -87,74 +87,66 @@ while read -r ni nj nk; do
    while [ $Hwloop -lt $Hwlimit ];do
       cat /root/mode/tmp/Hjvstat_$i_$$.tmp | tr -d '\0' > $Htfile
       #
-      if cat $Htfile 2>/dev/null | grep -Pi -A 4 'Perm Generation' | grep -Pi '% +used' >/dev/null; then
-         # -------------------------------------------------------------
-         # case 1
-         # -------------------------------------------------------------
-         if /usr/local/jdk6/bin/java -version 2>&1 | grep -Pi "java version \"1\.7\." >/dev/null; then
-            if ps -ef | grep -E "^[^ ]+ +$Hjmap_p +.*/usr/local/jdk6/bin/jmap -heap $i$" | grep -v grep >/dev/null; then
-               kill $Hjmap_p &>/dev/null 
-            fi
-         fi
+      if ! ps -ef | grep -E "^[^ ]+ +$i +[0-9]+ +.*\-Djava\.io\.tmpdir=$nk/temp org\.apache\.catalina\.startup\.Bootstrap start" | grep -v grep >/dev/null; then
+         # -----------------------------------------
+         # No such process
+         # -----------------------------------------
+         # 1.might be just stopped by others
+         # 2.might be killed by oom-killer
+         # 3.might be killed by somebody
+         # -----------------------------------------
          Hpnormal=0
          Hend_by_break=1
          break
+      elif cat $Htfile 2>/dev/null | grep -E "There is insufficient memory for the Java Runtime Environment to continue" >/dev/null; then
+         # memory stress for jmap to work
+         Hpnormal=1
+         Hend_by_break=1
+         break 
+      elif ! cat $Htfile 2>/dev/null | grep -Pi "Attaching to process ID $i,.*please wait" >/dev/null; then
+         # wait 
+         Hpnormal=2
+      elif [ `cat $Htfile 2>/dev/null | wc -l` -eq 1 ]; then
+         # wait 
+         Hpnormal=3
+      elif cat $Htfile 2>/dev/null | grep -Pi "Debugger attached successfully" >/dev/null; then
+         Hpnormal=4
+         if cat $Htfile 2>/dev/null | grep -Pi -A 4 'Perm Generation' | grep -Pi '% +used' >/dev/null; then
+            if /usr/local/jdk6/bin/java -version 2>&1 | grep -Pi "java version \"1\.7\." >/dev/null; then
+               if ps -ef | grep -E "^[^ ]+ +$Hjmap_p +.*/usr/local/jdk6/bin/jmap -heap $i$" | grep -v grep >/dev/null; then
+                  kill $Hjmap_p &>/dev/null 
+               fi
+            fi
+            Hpnormal=5
+            Hend_by_break=1
+            break
+         fi
       elif cat $Htfile 2>/dev/null | grep -Pi 'Error attaching to process' >/dev/null; then
-         # -------------------------------------------------------------
-         # case 2
-         # -------------------------------------------------------------
-         # two sub cases for 'Error attaching to process'
-         # 1.No such java process
-         # 2.This java processs is being monitored by jmap
-         # -------------------------------------------------------------
          if ! ps -ef | grep -E "^[^ ]+ +$i +[0-9]+ +.*\-Djava\.io\.tmpdir=$nk/temp org\.apache\.catalina\.startup\.Bootstrap start" | grep -v grep >/dev/null; then
-            # case 2.1: No such process (maybe just stopped by others)
-            Hpnormal=1
+            # No such process (maybe just stopped by others)
+            Hpnormal=6
          else
-            # case 2.2: This process is already jmapped by other process(es)
-            #           (probably dead jmap process(es) or our previous uncompleted jmap process)
-            Hpnormal=2
+            # This process is already jmapped by other process(es)
+            # (probably dead jmap process(es) or our previous uncompleted jmap process)
+            Hpnormal=7
          fi
          Hend_by_break=1
          break
-      elif cat $Htfile 2>/dev/null | grep -Pi "Attaching to process ID $i,.*please wait" >/dev/null; then
-         if [ `cat $Htfile 2>/dev/null | wc -l` -eq 1 ]; then
-            # ----------------------------------------------------------------------
-            # case 3: connection timeout caused by 
-            #                                      too high cpu load,
-            #                                      too high memory load,
-            #                                      exhausted disk space,
-            #                                      unhealthy tomcat or other cases
-            # ----------------------------------------------------------------------
-            # set to 3 temporarily
-            # Hpnormal may be changed to other value during wait time
-            # ----------------------------------------------------
-            Hpnormal=3
-         else
-            if ! cat $Htfile 2>/dev/null | grep -Pi "Debugger attached successfully" >/dev/null; then
-               # state between 'Debugger attached successfully' and 'Error attaching to process'
-               if cat $Htfile 2>/dev/null | grep -Pi "can't determine target's VM version" >/dev/null; then
-                  # -----------------------------------------
-                  # case 4
-                  # tomcat may be just starting
-                  # -----------------------------------------
-                  Hpnormal=4
-                  Hend_by_break=1
-                  break 
-               else
-                 # case 5
-                 # interesting case
-                 Hpnormal=5
-               fi
-            else
-               # case 6
-               # rare case
-               Hpnormal=6
-            fi
-         fi
       else
-         # other cases
-         Hpnormal=100
+         # state between 'Debugger attached successfully' and 'Error attaching to process'
+         if cat $Htfile 2>/dev/null | grep -E "A fatal error has been detected by the Java Runtime Environment" >/dev/null; then
+            # fatal error during jmap
+            Hpnormal=8
+            Hend_by_break=1
+            break 
+         elif cat $Htfile 2>/dev/null | grep -Pi "can't determine target's VM version" >/dev/null; then
+            # tomcat may be just starting
+            Hpnormal=9
+            Hend_by_break=1
+            break 
+         else
+            Hpnormal=10
+         fi
       fi
       #
       sleep 1
@@ -162,6 +154,7 @@ while read -r ni nj nk; do
    done
    Hjv_tom_trace2="$Htom jmap ended at `LANG=en_US;date` Hpnormal=$Hpnormal"
    if [ $Hend_by_break -eq 0 ]; then
+      # timeout
       echo $Hwlimit >/etc/.mode_jv_tom_wlimit
       {
       echo 
@@ -173,11 +166,27 @@ while read -r ni nj nk; do
    fi
    #
    rm -f /root/mode/tmp/Hjvstat_$i_$$.tmp
-   #
-   if [ $Hpnormal -eq 1 ]; then
-      echo "$Hpid$Htom ... " "This tomcat has just been stopped or killed!" 
+   #-------------------------------------------------------
+   # 0 6         no such process
+   # 1           insufficicent memory for jmap
+   # 5           ok
+   # 7           Error attaching to process
+   # 8 9         various problems
+   # 2 3 4 10    various timeouts
+   #-------------------------------------------------------
+   if [ $Hpnormal -eq 5 ]; then
+      :
+   elif [ $Hpnormal -eq 0 -o $Hpnormal -eq 6 ]; then
+      echo "$Hpid$Htom ... " "This tomcat may be killed by oom-killer or someone,or may have just been stopped!" 
       continue 
-   elif [ $Hpnormal -eq 2 ]; then
+   elif [ $Hpnormal -eq 1 ]; then
+      echo "$Hpid$Htom ... " "Insufficient memory for jmap to work!"
+      if ps -ef | grep -E "^[^ ]+ +$Hjmap_p +.*/usr/local/jdk6/bin/jmap -heap $i$" | grep -v grep >/dev/null; then
+         # kill my own jmap with signal '-9' if it still exists
+         kill -9 $Hjmap_p &>/dev/null
+      fi
+      continue 
+   elif [ $Hpnormal -eq 7 ]; then
       echo "$Hpid$Htom ... " "This tomcat is being monitored by other jmap process(es)!" 
       # ----------------------------------------------------------------------------------------------------------------
       # If the other jmap process(es) are dead and called by /root/mode/jvstat,they will be killed by their own jvstats.
@@ -186,22 +195,27 @@ while read -r ni nj nk; do
       # Dead jmap not called by jvstat will not be killed here.Manual interference is needed
       # ------------------------------------------------------------------------------------------------------------ 
       continue 
-   elif [ $Hpnormal -eq 3 ]; then
-      echo "$Hpid$Htom ... " "Timeout caused by unhealthy tomcat or too high cpu/memory/disk load.Suggest restarting tomcat!" 
+   elif [ $Hpnormal -eq 8 ]; then
+      echo "$Hpid$Htom ... " "Fatal error occurred when executing jmap.This unhealthy tomcat should be restarted!"
       if ps -ef | grep -E "^[^ ]+ +$Hjmap_p +.*/usr/local/jdk6/bin/jmap -heap $i$" | grep -v grep >/dev/null; then
          # kill my own jmap with signal '-9' if it still exists
          kill -9 $Hjmap_p &>/dev/null
       fi
       continue 
-   elif [ $Hpnormal -eq 4 ]; then
+   elif [ $Hpnormal -eq 9 ]; then
       echo "$Hpid$Htom ... " "Can't determine tomcat's VM version.This tomcat may be just starting or almost stopped!" 
       if ps -ef | grep -E "^[^ ]+ +$Hjmap_p +.*/usr/local/jdk6/bin/jmap -heap $i$" | grep -v grep >/dev/null; then
          # kill my own jmap with signal '-9' if it still exists
          kill -9 $Hjmap_p &>/dev/null
       fi
       continue 
-   elif [ $Hpnormal -ge 5 ]; then
-      echo "$Hpid$Htom ... " "Poor server performance,often caused by cpu/memory/disk stress.This tomcat will be skipped for the moment!" 
+   else
+      # various timeout
+      if hostname | grep -E '^VM' >/dev/null && ps -ef | grep -E "/rmdump( |$)" | grep -v grep > /dev/null; then
+         echo "$Hpid$Htom ... " "Timeout caused by unhealthy tomcat or too high cpu/memory/disk load." 
+      else
+         echo "$Hpid$Htom ... " "Timeout caused by unhealthy tomcat or too high cpu/memory/disk load.Suggest restarting tomcat!" 
+      fi
       if ps -ef | grep -E "^[^ ]+ +$Hjmap_p +.*/usr/local/jdk6/bin/jmap -heap $i$" | grep -v grep >/dev/null; then
          # kill my own jmap with signal '-9' if it still exists
          kill -9 $Hjmap_p &>/dev/null
@@ -216,7 +230,10 @@ while read -r ni nj nk; do
    #
    Hgc=`/usr/local/jdk6/bin/jstat -gcutil $Hpid 1s 1 2>/dev/null | sed -n "2 p"`
    Hgcmajor_av= 
-   if [ "$Hgc" = "" ]; then
+   if echo "$Hgc" | grep -E '#' >/dev/null; then
+      Hgcminor="insufficient memory to run jstat"
+      Hgcmajor=
+   elif [ "$Hgc" = "" ]; then
       Hgcminor=-1
       Hgcmajor=-1
    else
@@ -224,7 +241,7 @@ while read -r ni nj nk; do
       Hgcmajor=`echo "$Hgc" | sed -re "s/^ *([^ ]+ +){7}([^ ]+).*/\2/"`
       Hgcmajort=`echo "$Hgc" | sed -re "s/^ *([^ ]+ +){8}([^ ]+).*/\2/"`
       if [ $Hgcmajor -gt 0 ]; then
-         Hgcmajor_av=[fgcat]\ `echo "scale=3;$Hgcmajort/$Hgcmajor" | bc -l` 
+         Hgcmajor_av='[fgcat]'\ `echo "scale=3;$Hgcmajort/$Hgcmajor" | bc -l` 
       fi
    fi
    Hwarn=" ^_^ "
@@ -233,7 +250,9 @@ while read -r ni nj nk; do
       Hwarn="     "
    elif [ $(echo "$Holdused > 1000" | bc) -eq 1 ]; then
       Hwarn="     "
-   elif [ $Hgcminor -eq -1 ]; then
+   elif [ "$Hgcminor" = "insufficient memory to run jstat" ]; then
+      Hwarn=" !!! "
+   elif [ "$Hgcminor" = "-1" ]; then
       Hwarn=" !!! "
    else
       if [ $Hgcminor -le $Hgcmajor ]; then
@@ -244,7 +263,7 @@ while read -r ni nj nk; do
          fi
       fi
    fi
-   echo "$Hpid$Htom$Hwarn" [perm] $Hpermmax $Hpermused [old] $Hold $Holdused [gc] $Hgcminor $Hgcmajor $Hgcmajor_av
+   echo "$Hpid$Htom$Hwarn" '[perm]' $Hpermmax $Hpermused '[old]' $Hold $Holdused '[gc]' $Hgcminor $Hgcmajor "$Hgcmajor_av"
 done
 
 #

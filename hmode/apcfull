@@ -23,9 +23,9 @@ Hapccnt=`/root/mode/seeapc $Hapachemode | wc -l`
 
 if [ "$Hmpm" = "prefork" ]; then
    if /root/mode/apachectl $Hapachemode -v | grep -E 'Apache/2.2' >/dev/null; then
-      Hapcmax=`cat /usr/local/$Hapachemode/conf/extra/httpd-mpm.conf 2>/dev/null | grep 'MaxClients ' | sed -n "1 p" | sed -re "s/.*MaxClients[ \t]+(0*)([0-9]+).*/\2/"`
+      Hapcmax=`cat /usr/local/$Hapachemode/conf/extra/httpd-mpm.conf 2>/dev/null | grep 'MaxClients ' | head -n 1 | sed -re "s/.*MaxClients[ \t]+(0*)([0-9]+).*/\2/"`
    else
-      Hapcmax=`cat /usr/local/$Hapachemode/conf/extra/httpd-mpm.conf 2>/dev/null | grep 'MaxRequestWorkers ' | sed -n "1 p" | sed -re "s/.*MaxRequestWorkers[ \t]+(0*)([0-9]+).*/\2/"`
+      Hapcmax=`cat /usr/local/$Hapachemode/conf/extra/httpd-mpm.conf 2>/dev/null | grep 'MaxRequestWorkers ' | head -n 1 | sed -re "s/.*MaxRequestWorkers[ \t]+(0*)([0-9]+).*/\2/"`
    fi
 elif [ "$Hmpm" = "worker" -o "$Hmpm" = "event" ]; then
    if [ "$Hmpm" = "worker" ]; then
@@ -52,8 +52,18 @@ Hapcmax=$[10#$Hapcmax]
 if [ $Hapccnt -ge $[$Hapcmax*7/10] ]; then
    exit 0
 fi
+
+#  
+
+if [ $Hapccnt -gt 0 ]; then
+   Hreftime=`date -d '-5 days' '+%Y-%m-%d %H:%M:%S'`
+   Hfirst=`/root/mode/seeapc $Hapachemode | head -n 1`
+   if [ "$Hfirst" \< "$Hreftime" ]; then
+      # probably with dead apache connections
+      exit 0
+   fi
+fi
 exit 1
 
 #
-
 

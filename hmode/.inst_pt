@@ -69,7 +69,8 @@ fi
 
 if cat /etc/redhat-release | grep -E " release 6\..*" > /dev/null; then
    yum -y install perl-ExtUtils-CBuilder perl-ExtUtils-MakeMaker perl-Time-HiRes
-   yum -y install perl-IO-Socket-SSL perl-TermReadKey libssl.so.6
+   yum -y install perl-IO-Socket-SSL perl-TermReadKey
+   yum -y install libssl.so.6
    if uname -a | grep "_64 " >/dev/null; then
       ln -sf /usr/lib64/libssl.so.10 /usr/lib64/libssl.so.6
       ln -sf /usr/lib64/libcrypto.so.10 /usr/lib64/libcrypto.so.6

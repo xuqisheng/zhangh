@@ -1,0 +1,59 @@
+#!/bin/bash 
+# ------------------------------------------------------------------------------------------------------------------------------
+# function:
+#          dump table content in text format which can be loaded using 'load data local infile 'xxx' into table yyy 
+# usages  :
+#          ./.dump_tabdata [<mysqldip>" <dbname> <tabname> [<wherepart>]
+# e.g.    :
+#          ./.dump_tabdata              portal master_base "(hotel_group_id=1 and hotel_id=2)"
+#          ./.dump_tabdata              portal master_base "(hotel_group_id=1 and hotel_id=2) order by hotel_group_id,hotel_id"
+#          ./.dump_tabdata 192.168.0.82 portal master_base "(hotel_group_id=1 and hotel_id=2) order by hotel_group_id,hotel_id"
+# ------------------------------------------------------------------------------------------------------------------------------
+
+
+# get mysql server ip
+
+. /root/mode/mysqldip
+
+# check database name 
+
+HDBNAME="$1"
+HDBNAME=`echo "$HDBNAME" | tr "A-Z" "a-z"`
+if [ -z "$HDBNAME" ]; then
+   /root/mode/modemsg dump_tabdata "Database name was not provided!" more
+   exit 1
+elif [ -z `/root/mode/seecfg -s $HMYSQLDIP "show databases like '$HDBNAME'"|grep -i "^$HDBNAME"` ]; then
+   /root/mode/modemsg dump_tabdata "Database '$HDBNAME' doesn't exist at $HMYSQLDIP2!" more
+   exit 1
+fi
+
+# check tablename
+
+HTBNAME="$2"
+
+if [ -z "$HTBNAME" ]; then
+   /root/mode/modemsg dump_tabdata "Table name was not provided!" more
+   exit 1
+elif ! /root/mode/testobjects $HMYSQLDIP "[$HTBNAME]" "$HDBNAME"; then
+   /root/mode/modemsg dump_tabdata "Table '$HTBNAME' doesn't exist in database '$HDBNAME' at $HMYSQLDIP2!" more
+   exit 1
+fi
+
+# optional where part
+
+HWHERE="$3"
+if [ -z "$HWHERE" ] || echo "$HWHERE" | grep -P "^[ \t]*$" >/dev/null; then
+   HWHERECD=""
+else
+   HWHERECD="where $HWHERE"
+fi
+
+# do main part
+
+Hfields=`/root/mode/tabprop $HMYSQLDIP "$HDBNAME" "$HTBNAME" null`
+HstrSTR="HrYhScQhF$RANDOM"
+Hfields=`echo $Hfields | sed -re "s/##/$HstrSTR/g"`
+/root/mode/seecfg -s $HMYSQLDIP "select /*!40001 SQL_NO_CACHE */ $Hfields from \`$HTBNAME\` $HWHERECD" $HDBNAME | sed -re "s/$HstrSTR/\\\\N/g"
+
+# end
+

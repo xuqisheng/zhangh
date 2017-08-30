@@ -17,7 +17,7 @@ for i in `ls -d tomcat*/ 2>/dev/null | sed -re "s/\/$//" `;do
       if ! cat /usr/local/$i/conf/server.xml | grep -E "<!-- apache[1-7] -->" >/dev/null; then
          Hamode=apache
       else
-         Hamode=`cat /usr/local/$i/conf/server.xml | grep -E "<!-- apache[1-7]? -->" | sed -re "s/.*<!-- (apache[1-7]?) -->.*/\1/" | sed -n "1 p"`
+         Hamode=`cat /usr/local/$i/conf/server.xml | grep -E "<!-- apache[1-7]? -->" | sed -re "s/.*<!-- (apache[1-7]?) -->.*/\1/" | head -n 1`
       fi
       # calculate standard mcast
       Hmcasttomcat=$i

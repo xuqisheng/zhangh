@@ -14,14 +14,14 @@ else
       Hsetsta=$2
    fi
    if cat /usr/local/$Htomcat/conf/server.xml | grep -E "<!-- apache[1-7]? -->" >/dev/null; then
-      Hapachemode=`cat /usr/local/$Htomcat/conf/server.xml | grep -E "<!-- apache[1-7]? -->" | sed -re "s/.*<!-- (apache[1-7]?) -->.*/\1/" | sed -n "1 p"`
+      Hapachemode=`cat /usr/local/$Htomcat/conf/server.xml | grep -E "<!-- apache[1-7]? -->" | sed -re "s/.*<!-- (apache[1-7]?) -->.*/\1/" | head -n 1`
    else
       Hapachemode=apache
    fi
 fi
-Hline=`cat /usr/local/$Htomcat/conf/server.xml | grep "jvmRoute" | sed -n "$ p"`
+Hline=`cat /usr/local/$Htomcat/conf/server.xml | grep "jvmRoute" | tail -n 1`
 Hworker=`echo "$Hline" | sed -re "s/.*jvmRoute=\"(.*)\">.*/\1/"`
-Hhport=`cat /usr/local/$Hapachemode/conf/httpd.conf 2>/dev/null | grep -E "^Listen" | sed -n "$ p" | awk '{print $2}'`
+Hhport=`cat /usr/local/$Hapachemode/conf/httpd.conf 2>/dev/null | grep -E "^Listen" | tail -n 1 | awk '{print $2}'`
 #  
 if [ -z "$HNoAPCfullCHK" ]; then
    if /root/mode/apcfull $Hapachemode; then

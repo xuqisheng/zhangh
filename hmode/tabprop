@@ -13,6 +13,7 @@
 # 
 
 HDBNAME=${1:-targetdb2}
+HDBNAME=`echo "$HDBNAME" | tr "A-Z" "a-z"`
 HTABNAME=${2:-pccode}
 
 # $HDBNAME must exist 
@@ -35,17 +36,17 @@ sed -re "s/^([^\t]+).*/\1/g" |
 if [ "$3" = "null" ]; then
    sed -re "s/(.*)/ifnull\(\`\1\`,'##'\),/"
 elif   [ "$3" = "1" ]; then
-   sed -re "s/^/\[$HTABNAME\./g" | sed -re "s/$/\]/g"
+   sed -r -e "s/^/\[$HTABNAME\./g" -e "s/$/\]/g"
 elif [ "$3" = "0" ]; then
    sed -re "s/$/\\+/g"
 elif [ "$3" = "2" ]; then
    sed -re "s/$/\,/g"
 elif [ "$3" = "2a" ]; then
-   sed -re "s/^/a\./g" | sed -re "s/$/\,/g"
+   sed -r -e "s/^/a\./g" -e "s/$/\,/g"
 elif [ "$3" = "2b" ]; then
-   sed -re "s/^/b\./g" | sed -re "s/$/\,/g"
+   sed -r -e "s/^/b\./g" -e "s/$/\,/g"
 else
-   sed -re "s/^/\[$HDBNAME\.$HTABNAME\./g" | sed -re "s/$/\]/g"
+   sed -r -e "s/^/\[$HDBNAME\.$HTABNAME\./g" -e "s/$/\]/g"
 fi |  
 sed -e "$ s/,$//" | tr -d "\n"
 

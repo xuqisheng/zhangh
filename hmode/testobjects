@@ -20,6 +20,7 @@
 
 HOBJECTS=`echo "$1" | tr -d "\r\n"`
 HDBNAME=${2:-foxhis}
+HDBNAME=`echo "$HDBNAME" | tr "A-Z" "a-z"`
 
 # strip off first possible 'o'
 

@@ -11,15 +11,16 @@ for i in `ls -d tomcat*/ 2>/dev/null | sed -re "s/\/$//"`;do
     /root/mode/check_tomcat $i || continue
     /root/mode/gettomp $i
 done | 
-sed -re "s/apache /apache0/"     |
-sed -re "s/tomcat6  /tomcat601/" |
-sed -re "s/tomcat([1-9])  /tomcat0\1 /" |
-sed -re "s/^([s|S]ingle *(tomcat[^ ]+))/1 \2 \1/" |
-sed -re "s/^apache/2 apache apache/"    |
-sort | sed -re "s/^([^ ]+ *[^ ]+) //"  |
-sed -re "s/apache0/apache /"     |
-sed -re "s/tomcat601/tomcat6  /" |
-sed -re "s/tomcat0([0-9]) /tomcat\1  /" 
+sed -r -e "s/apache /apache0/"     \
+       -e "s/tomcat6  /tomcat601/" \
+       -e "s/tomcat([1-9])  /tomcat0\1 /" \
+       -e "s/^([s|S]ingle *(tomcat[^ ]+))/1 \2 \1/" \
+       -e "s/^apache/2 apache apache/"    |
+sort | 
+sed -r -e "s/^([^ ]+ *[^ ]+) //"  \
+       -e "s/apache0/apache /"    \
+       -e "s/tomcat601/tomcat6  /" \
+       -e "s/tomcat0([0-9]) /tomcat\1  /"
 
 #
 

@@ -20,6 +20,7 @@
 # 
 
 HDBNAME="$1"
+HDBNAME=`echo "$HDBNAME" | tr "A-Z" "a-z"`
 HMODE=$2
 if [ "$HMODE" = "1" ]; then
    HMODE="11"

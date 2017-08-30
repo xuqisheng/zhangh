@@ -35,7 +35,7 @@ if [ ! -d /usr/local/xtrabackup ]; then
    # install  
    cd /usr/local
    tar xzvf /root/packages/xtrabackup-2.3.6.${Hos}.tar.gz
-   mv `ls -1d xtrabackup*/ | sed -n "1 p"` xtrabackup
+   mv `ls -1d xtrabackup*/ | head -n 1` xtrabackup
    Hxtra_cmark=1
 fi
 

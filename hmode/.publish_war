@@ -207,6 +207,9 @@ if [ "$Htamode" = "a" ]; then
             cp -f /root/mode/tmp/f$$.tmp /usr/local/$i/webapps/$Hwarname1/WEB-INF/classes/config/remoteip.properties
          done
       fi
+      #
+      /root/mode/updateprop "/usr/local/$i/webapps/$Hwarname1/WEB-INF/classes/config/mode.properties" "$Hpropfile"
+      #
       /root/mode/start_tomcat $i
    done
 
@@ -285,7 +288,9 @@ else
          cp -f /root/mode/tmp/f$$.tmp /usr/local/$Htomapache/webapps/$Hwarname1/WEB-INF/classes/config/remoteip.properties
       done
    fi
-   
+   #
+   /root/mode/updateprop "/usr/local/$Htomapache/webapps/$Hwarname1/WEB-INF/classes/config/mode.properties" "$Hpropfile"
+
    # flex
 
    if [ -n "$Hcl_mode" ]; then

@@ -37,6 +37,7 @@ done
 # Default database to check is portal
 
 HDBNAME=${1:-portal}
+HDBNAME=`echo "$HDBNAME" | tr "A-Z" "a-z"`
 HCDPATT=${2:-'.*'}
 
 # $HDBNAME must exist 

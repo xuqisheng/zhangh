@@ -15,6 +15,7 @@
 # database name
 
 HDBNAME="$1"
+HDBNAME=`echo "$HDBNAME" | tr "A-Z" "a-z"`
 if [ -z "$HDBNAME" ]; then
    echo "database name must be provided!" && exit 1
 fi

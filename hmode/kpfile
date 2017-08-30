@@ -17,14 +17,14 @@ elif [ ! -f "$TMPFILE" ]; then
 fi
 if /root/mode/tfile "$TMPFILE" | grep -E "ASCII" >/dev/null; then
    # don't display ascii encoding
-   #[ -n "$HMODEDEBUG" ] && /root/mode/modemsg tutf8 "ASCII encoding detected"
+   #[ -n "$HMODEDEBUG" ] && /root/mode/modemsg kpfile "ASCII encoding detected"
    exit 0
 elif /root/mode/tfile "$TMPFILE" | grep -E "UTF-8" >/dev/null; then
    if [ -n "$HMODEDEBUG" ]; then
       if cat "$TMPFILE" | xxd -l 3 | grep -E "^0000000: efbb bf" >/dev/null; then
-         /root/mode/modemsg tutf8 "UTF-8+BOM encoding detected"
+         /root/mode/modemsg kpfile "UTF-8+BOM encoding detected"
       else
-         /root/mode/modemsg tutf8 "UTF-8 encoding detected"
+         /root/mode/modemsg kpfile "UTF-8 encoding detected"
       fi
    fi
    exit 0

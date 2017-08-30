@@ -17,16 +17,18 @@ if /root/mode/isdump "$2"; then
 fi
 
 HDBNAME="$1"
+HDBNAME=`echo "$HDBNAME" | tr "A-Z" "a-z"`
 HSQLFILE="$2"
 HOBJECTS=`cat "$HSQLFILE" | 
           sed -nre "s/^[ \t]*----each----:// p" | 
-          sed -re  "s/%/HrYqHfHbYhSc/g" | 
-          sed -re  "s/('\]\]|'\]\[)/%\1/g" | 
-          sed -re "s/\[[ \t]*default[ \t]*=('[^%]*%')\]/\[\ndefault=\1\n\]/g" | 
-          sed -re "/^default=/ s/ /HrYhSc/g" | 
-          tr -d "\r\n\t " | sed -r -e "s/HrYhSc/ /g" | 
-          sed -re "s/(\[type=[^]]+)unsigned/\1 unsigned/g" | 
-          sed -re "s/(\[type=[^]]+)zerofill/\1 zerofill/g"` 
+          sed -re  "s/%/HrYqHfHbYhSc/g" |
+          sed -re  "s/('\]\]|'\]\[)/%\1/g" |
+          sed -re  "s/\[[ \t]*default[ \t]*=('[^%]*%')\]/\[\ndefault=\1\n\]/g" |
+          sed -re  "/^default=/ s/ /HrYhSc/g" | 
+          tr -d "\r\n\t " | 
+          sed -re "s/HrYhSc/ /g" |
+          sed -re "s/(\[type=[^]]+)unsigned/\1 unsigned/g" |
+          sed -re "s/(\[type=[^]]+)zerofill/\1 zerofill/g"`
 if [ -n "$HOBJECTS" ]; then
    /root/mode/testobjects $HMYSQLDIP "$HOBJECTS" "$HDBNAME"
 fi

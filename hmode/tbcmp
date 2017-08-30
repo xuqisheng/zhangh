@@ -43,6 +43,7 @@ done
 # default database is portal
 
 HDBNAME=${1:-portal}
+HDBNAME=`echo "$HDBNAME" | tr "A-Z" "a-z"`
 
 # testdb 
 
@@ -131,8 +132,7 @@ for i in `cat $HTBLIST`;do
                                                           replace(column_default,'''',''''''),''''),'null'),']]')
                                   from information_schema.columns
                           where table_schema='$HDBNAME'
-                                and table_name in (`cat $HTBLISTSUB | sed -re \"s/^/'/\" | 
-                                                    sed -re \"s/$/',/\" | sed -re \"$ s/,$//\"`)" |
+                                and table_name in (`cat $HTBLISTSUB | sed -r -e \"s/^/'/\" -e \"s/$/',/\" -e \"$ s/,$//\"`)" |
     tr "A-Z" "a-z" |
     sed -re "s/(.*\[nullable=no\])(\[null\])\]$/\1\]/" > $HALLCOLDEF
 
@@ -140,8 +140,7 @@ for i in `cat $HTBLIST`;do
 
     /root/mode/seecfg -s $HMYSQLDIP "select distinct column_name from information_schema.columns
                           where table_schema='$HDBNAME'
-                                and table_name in (`cat $HTBLISTSUB | sed -re \"s/^/'/\" | 
-                                                    sed -re \"s/$/',/\" | sed -re \"$ s/,$//\"`)" |
+                                and table_name in (`cat $HTBLISTSUB | sed -r -e \"s/^/'/\" -e \"s/$/',/\" -e \"$ s/,$//\"`)" |
     tr "A-Z" "a-z" > $HCLLIST
 
     # get definations of certain column in table order 

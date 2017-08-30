@@ -36,15 +36,15 @@ drop procedure if exists p_hry_tspeed$$ hryhby
 create procedure p_hry_tspeed$$()
 begin
 declare hloop int; 
-create table tspeed$$(
+create temporary table tspeed(
 tvar bigint(20) default 0
 );
 set hloop = 0; 
 while hloop < $Hrecno do
-   insert into tspeed$$ select hloop;
+   insert into tspeed select hloop;
    set hloop = hloop + 1; 
 end while; 
-drop table tspeed$$;
+drop temporary table tspeed;
 endhryhby
 delimiter ;
 call p_hry_tspeed$$();

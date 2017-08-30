@@ -40,11 +40,27 @@ fi
 
 cd /usr/local
 for i in `ls -d apache*/ 2>/dev/null | sed -re "s/\/$//"`; do
-    if [ -f /usr/local/$i/logs/mod_jk.log ]; then
+    if [ -f /usr/local/$i/logs/error_log ]; then
        cd /usr/local/$i/logs
        for j in `echo access_log error_log mod_jk.log`;do
            /root/mode/trun_log $j
        done
+       #
+       /root/mode/cstdlogs "/usr/local/$i/logs" "$HDAYS"
+    fi
+done
+
+# nginx logs
+
+cd /usr/local
+for i in `ls -d nginx*/ 2>/dev/null | sed -re "s/\/$//"`; do
+    if [ -f /usr/local/$i/logs/error.log ]; then
+       cd /usr/local/$i/logs
+       for j in `echo access.log error.log`;do
+           /root/mode/trun_log $j
+       done
+       #
+       /root/mode/cstdlogs "/usr/local/$i/logs" "$HDAYS"
     fi
 done
 
@@ -53,19 +69,10 @@ done
 cd /usr/local
 for i in `ls -d tomcat*/ 2>/dev/null | sed -re "s/\/$//" `;do
     /root/mode/check_tomcat $i || continue
+    #
+    /root/mode/cstdlogs "/usr/local/$i/logs" "$HDAYS"
+    #
     cd /usr/local/$i/logs
-    # 
-    Htestvars=`ls -1|grep -E '[0-9]{4}-[0-9]{2}-[0-9]{2}'|sed -re "s/^/b/" -e "s/$/e/"`
-    while read -r k; do 
-       j=`echo "$k" | sed -re "s/b(.*)e/\1/"`
-       if [ -d "$j" ]; then
-          continue
-       fi
-       Hjdate=`echo "$j" | sed -re "s/.*([0-9]{4}-[0-9]{2}-[0-9]{2}).*/\1/"`
-       if [ "$Hjdate" \< "$HDDATE" -o "$Hjdate" = "$HDDATE" ]; then
-          rm -f "$j"
-       fi
-    done <<<"$Htestvars" 
     # catalina.out
     /root/mode/trun_log catalina.out
     # files_

@@ -1,11 +1,10 @@
 #!/bin/bash
 # --------------------------------------------------------------------------------
 # function:
-#           clear linux caches 
+#           clear linux caches etc. 
 # e.g.    :
-#          ./clrcache       # enter clear cache mode according to certain criteria  
-#          ./clrcache 1     # enter clear cache mode forcibly
-#          ./clrcache 2     # enter clear cache mode and do clear forcibly
+#          ./clrcache       # conventional call  
+#          ./clrcache 1     # might do more thing than conventional call
 # --------------------------------------------------------------------------------
 
 # check authority 
@@ -30,58 +29,117 @@ fi
 
 # collect data 
 
-HTTLMEM=`free  | grep "Mem:" | sed -e "s/^Mem: *\([0-9]\{1,\}\).*/\1/"`
-HUSED1=`free   | grep "Mem:" | sed -re "s/^Mem: *([0-9]+) *([0-9]+).*/\2/"`
-HUSED2=`free   | grep "buffers/cache:" | sed -re "s/.*buffers\/cache: *([0-9]+).*/\1/"`
-HUSED3=`free   | grep "Swap:" | sed -re "s/^Swap: *([0-9]+) *([0-9]+).*/\2/"`
+HFREE=`free`
+HTTLMEM=`echo "$HFREE"  | grep "Mem:"  | sed -e "s/^Mem: *\([0-9]\{1,\}\).*/\1/"`
+HTTLSWP=`echo "$HFREE"  | grep "Swap:" | awk '{print $2}'`
+HUSED1=`echo "$HFREE"   | grep "Mem:"  | sed -re "s/^Mem: *([0-9]+) *([0-9]+).*/\2/"`
+HUSED2=`echo "$HFREE"   | grep "buffers/cache:" | sed -re "s/.*buffers\/cache: *([0-9]+).*/\1/"`
+HUSED3=`echo "$HFREE"   | grep "Swap:" | sed -re "s/^Swap: *([0-9]+) *([0-9]+).*/\2/"`
 HUSED1PT=`echo "$HUSED1 * 100 / $HTTLMEM" | bc`
 HUSED2PT=`echo "$HUSED2 * 100 / $HTTLMEM" | bc`
 HUSED3PT=`echo "($HUSED2+$HUSED3) * 100 / $HTTLMEM" | bc`
 HUSED4PT=`echo "($HUSED1-$HUSED2) * 100 / $HTTLMEM" | bc`
 
-# check data   
+#
 
-if [ "$1" = "1" -o "$1" = "2" ]; then
-   :
-elif [ $HUSED1PT -ge 88 -o $HUSED3 -gt 0 ]; then
-   :
-elif ps -ef | grep -E "/(s|m)(load|dump)( |$)" | grep -v grep > /dev/null; then
-   :
+sysctl -w vm.dirty_writeback_centisecs=300 &>/dev/null
+sysctl -w vm.dirty_expire_centisecs=1000   &>/dev/null
+sysctl -w vm.dirty_background_ratio=5      &>/dev/null 
+sysctl -w vm.dirty_ratio=95                &>/dev/null
+if [ $HTTLSWP -gt 0 ]; then
+   Hmin_free=20480
 else
-   exit
+   Hmin_free=10240
 fi
+if [ $HUSED2PT -lt 92 ]; then
+   Hmin_free=$[$HTTLMEM*1/100]
+fi
+if [ $Hmin_free -ge 102400 ]; then
+   Hmin_free=102400
+fi
+sysctl -w vm.min_free_kbytes=$Hmin_free    &>/dev/null
+sysctl -w vm.vfs_cache_pressure=200        &>/dev/null
 
 # 
 
 if [ $HUSED3 -le 0 ]; then
-   # ------------------------------
-   # swap has not been used 
-   # ------------------------------
-   if [ "$1" = "2" ]; then
-      # forcible clear
-      echo 3 > /proc/sys/vm/drop_caches
+
+   # swap has not been used or no swap partitions 
+
+   if [ $HTTLSWP -eq 0 -a $HUSED2PT -ge 95 ]; then
+      # display warning 
+      if [ $HUSED2PT -ge 97 ]; then
+         /root/mode/modemsg clrcache "No sufficient memory for the workload!!!extremely high memory load!!!"
+         /root/mode/modemsg clrcache "Please add system memory as soon as possible!!!" more
+      else
+         /root/mode/modemsg clrcache "No sufficient memory for the workload!!!extra high memory load!!!" more
+      fi
+   fi
+   #
+   if /root/mode/.ps_exit .mc1_pschk; then
+      # .ps_exit has priority over "$1" check
+      exit
+   elif [ -n "$1" ]; then
+      # "$1" has priority over $HUSED1PT check 
+      if [ -f /etc/.mc1_pschk ]; then
+         /root/mode/modemsg clrcache "pforce:drop_cache task began at `LANG=en_US;date`"
+         echo 3 > /proc/sys/vm/drop_caches
+         /root/mode/modemsg clrcache "pforce:drop_cache task ended at `LANG=en_US;date`" more
+      else
+         echo 3 > /proc/sys/vm/drop_caches
+      fi
+   elif [ $HUSED2PT -ge 95 ]; then
+      # -----------------------------------------------------------
+      # extra high usage of memory,always drop buffers/caches
+      # -----------------------------------------------------------
+      # importent:we use $HUSED2PT instead of $HUSED1PT
+      # -----------------------------------------------------------
+      if [ -f /etc/.mc1_pschk ]; then
+         /root/mode/modemsg clrcache "pb$HUSED2PT:drop_cache task began at `LANG=en_US;date`"
+         echo 3 > /proc/sys/vm/drop_caches
+         /root/mode/modemsg clrcache "pb$HUSED2PT:drop_cache task ended at `LANG=en_US;date`" more
+      else
+         echo 3 > /proc/sys/vm/drop_caches
+      fi
    elif [ $HUSED1PT -ge 92 ]; then
       # -----------------------------------------------------------
       # rather high usage of memory,drop buffers/caches more often
       # -----------------------------------------------------------
       if [ $HUSED4PT -ge 1 ]; then
-         echo 3 > /proc/sys/vm/drop_caches
+         if [ -f /etc/.mc1_pschk ]; then
+            /root/mode/modemsg clrcache "p$HUSED1PT:drop_cache task began at `LANG=en_US;date`"
+            echo 3 > /proc/sys/vm/drop_caches
+            /root/mode/modemsg clrcache "p$HUSED1PT:drop_cache task ended at `LANG=en_US;date`" more
+         else
+            echo 3 > /proc/sys/vm/drop_caches
+         fi
       fi
    elif [ $HUSED1PT -ge 88 ]; then
       # ------------------------------------------
       # drop buffers/caches at large scale 
       # ------------------------------------------
       if [ $HUSED4PT -ge 3 ]; then
-         echo 3 > /proc/sys/vm/drop_caches
+         if [ -f /etc/.mc1_pschk ]; then
+            /root/mode/modemsg clrcache "p$HUSED1PT:drop_cache task began at `LANG=en_US;date`"
+            echo 3 > /proc/sys/vm/drop_caches
+            /root/mode/modemsg clrcache "p$HUSED1PT:drop_cache task ended at `LANG=en_US;date`" more
+         else
+            echo 3 > /proc/sys/vm/drop_caches
+         fi
       fi
    else
-      :
+      exit
    fi
 else
+   if /root/mode/.ps_exit .mc2_pschk; then
+      exit 
+   fi
+   /root/mode/modemsg clrcache "s:drop_cache task began at `LANG=en_US;date`"
    echo 3 > /proc/sys/vm/drop_caches
+   /root/mode/modemsg clrcache "s:drop_cache task ended at `LANG=en_US;date`"
    if [ $HUSED3PT -le 96 ]; then
       # clear caches & buffers
-      /root/mode/modemsg clrcache "le96 task began at `LANG=en_US;date`"
+      /root/mode/modemsg clrcache "le$HUSED3PT task began at `LANG=en_US;date`"
       if sync; then
          /root/mode/modemsg clrcache "sync part ended at `LANG=en_US;date`"
          echo 3 > /proc/sys/vm/drop_caches

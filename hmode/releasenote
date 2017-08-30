@@ -1,5 +1,5 @@
 #!/bin/bash
-echo "mode4.0(2017.02.23 release)"
+echo "mode4.0(2017.08.14 release)"
 
 # add /root/mode/setmisc  ---- 2012.01.04 ----
 
@@ -1308,10 +1308,134 @@ echo "mode4.0(2017.02.23 release)"
 
 # enhance seecfg & tfile (grep 2.20 compatible enhancement)                      -- 2017-02-23 --
 
+# modify adjcnf                                                                  -- 2017-02-28 --
 
+# modify stop_tomcat (log 'stop' to modelog when tomcat is already stopped)      -- 2017-03-15 --
 
+# add qcache_adj and modify tune_mysql                                           -- 2017-03-18 --
 
+# enhance gcserver (with apache dead connection detecting)                       -- 2017-03-20 --
+# enhance apcfull (with estimation of apache dead connection existency)          -- 2017-03-20 --
 
+# enhance kmproc (with 'Sorting result' state of select included)                -- 2017-03-31 --
+# modify tune_mysql (avoid 'sed' defect)                                         -- 2017-04-01 --
+# enhance kmproc (with 'Writing to net' state of select included)                -- 2017-04-05 --
+                       
+# enhance config_tomcat (with more elastic memory allocation)                    -- 2017-04-06 --
+# enhance ol_data (with more macros support)                                     -- 2017-04-06 --
+# enhance config_apache_more                                                     -- 2017-04-06 --
 
+# enhance .stt_tom (with insufficent memory check)                               -- 2017-04-08 --
+# enhance apc_tom                                                                -- 2017-04-08 --
 
+# add sxmlrep                                                                    -- 2017-04-12 --
+
+# add ...sjj                                                                     -- 2017-04-13 --
+# enhance apc_tom                                                                -- 2017-04-13 --
+
+# enhance gettomp                                                                -- 2017-04-14 --
+# modify mrel                                                                    -- 2017-04-14 --
+
+# modify .inst_pt                                                                -- 2017-04-17 --
+# enhance jvstat & montoms                                                       -- 2017-04-17 --
+
+# enhance montoms                                                                -- 2017-04-18 --
+
+# enhance jvstat                                                                 -- 2017-04-21 --
+
+# enhance jvstat                                                                 -- 2017-04-25 --
+# modify install.sh (--enable-ssl)                                               -- 2017-04-25 --
+
+# modify ...sjj                                                                  -- 2017-04-26 --
+
+# modify config_apache_more & install.sh                                         -- 2017-04-27 --
+# modify .update_apache                                                          -- 2017-04-27 --
+
+# enhance apc_tom                                                                -- 2017-05-02 --
+
+# modify .inst_pt                                                                -- 2017-05-11 --
+
+# enhance sxmlrep                                                                -- 2017-05-17 --
+
+# modify inst_tomcat                                                             -- 2017-05-24 --        
+# enhance jvstat                                                                 -- 2017-05-24 --        
+# enhance montoms                                                                -- 2017-05-24 --        
+
+# enhance tomtoact                                                               -- 2017-05-26 --
+# enhance ...autop...                                                            -- 2017-05-26 --
+
+# massive optimization ('sed -re' commands -> sed -r -e ... -e ... command)      -- 2017-05-26 --
+# (testkey,tbcmp,tabprop,sload,seetom,badsql_query_time,badsql_rows_sent)
+# (config_mysql,dupndx1,each,ezrms_data,ideas_data,sbadsql,seecfg,dlsql,.jseetom)
+
+# enhance tctomcat                                                               -- 2017-05-27 --
+
+# enhance jvstat                                                                 -- 2017-06-02 --        
+# enhance jvstat                                                                 -- 2017-06-03 --        
+
+# add script cstdlogs and modify clrlogs                                         -- 2017-06-06 --
+
+# massive optimization (sed -n '1 p' -> head -n 1,sed -n '$ p' -> tail -n 1)     -- 2017-06-07 --
+
+# modify kmproc                                                                  -- 2017-06-08 --
+# modify chkmhis,xbrestore,.upgrade_mysql_to_5.5.50 and .upgrade_mysql_to_5.6.35 -- 2017-06-08 --
+
+# enhance xbrestore                                                              -- 2017-06-09 --
+# modify  xbback                                                                 -- 2017-06-09 --
+
+# modify clrlogs (fix a bug of 2017-06-06 modification)                          -- 2017-06-11 --
+
+# modify appblk,xbrmhis and kpfile (correct the wrong input parms for modemsg)   -- 2017-06-16 --
+# modify ol_data (with more precise comments)                                    -- 2017-06-16 --
+# enhance .update_apache (select a relatively safer direcory for backups)        -- 2017-06-16 --
+
+# modify .inst_mysql_56 and adjcnf(make MySQL 5.6 compatible with 5.1 & 5.5)     -- 2017-06-19 --
+# modify seecfg (filter out The MySQL 5.6 ... warning)                           -- 2017-06-19 --
+
+# modify health_check_disk (AY...)                                               -- 2017-06-20 --
+
+# modify .inst_mysql_56 & xbrestore                                              -- 2017-06-21 --
+
+# modify .update_apache and add .dump_tabdata                                    -- 2017-06-29 --
+# enhance config_tomcat                                                          -- 2017-06-29 --
+
+# enhance health_check_disk                                                      -- 2017-06-30 --
+# modify inst_tomcat(config jvmRoute for single tomcat according to zpj)         -- 2017-06-30 --
+# modify config_tomcat(config minimal memory when at elastic memory mode)        -- 2017-06-30 --
+# modify stop_tomcat(clear garbages)                                             -- 2017-06-30 --
+
+# enhance seecfg(filter out '...pass...' warning during connectivity check)      -- 2017-07-05 --
+# add .opt_tomcat                                                                -- 2017-07-05 --
+# modify inst_tomcat and stop_tomcat                                             -- 2017-07-05 --
+
+# enhance adjcnf                                                                 -- 2017-07-14 --
+
+# modify inst_mysql,.inst_mysql_55 and .inst_mysql_56                            -- 2017-07-17 --
+
+# modify adjcnf and .inst_mysql_56(disable binlog_checksum in MySQL server 5.6)  -- 2017-07-20 --
+
+# modify mload (with connection check)                                           -- 2017-07-22 --
+
+# modify mondump and monload                                                     -- 2017-07-24 --
+# massive modifications(dbname -> lower case)                                    -- 2017-07-24 --
+
+# modify .inst_mysql_56                                                          -- 2017-07-25 --
+# modify .opt_tomcat                                                             -- 2017-07-26 --
  
+# check and modify scripts related with sed ...                                  -- 2017-07-28 --
+
+# modify health_check_disk                                                       -- 2017-07-31 --
+# modify sbadsql and add sbadsql_rows_sent                                       -- 2017-07-31 --
+
+# add .ps_exit                                                                   -- 2017-08-03 --
+# modify clrcache (new version of clrcache)                                      -- 2017-08-03 --
+
+# modify clrcache                                                                -- 2017-08-04 --
+# modify tspeed                                                                  -- 2017-08-08 --
+
+# modify mod_config                                                              -- 2017-08-14 --
+# add updateprop                                                                 -- 2017-08-14 --
+# modify script ....publish_war....                                              -- 2017-08-14 --
+
+# modify ol_data,ideas_data and ezrms_data                                       -- 2017-08-14 --
+

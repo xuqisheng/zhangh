@@ -14,9 +14,9 @@ fi
 # get basic information 
 
 Hori_apache=`/usr/local/$Hapachemode/bin/apachectl -v | grep -E "Apache" | sed -re "s/.*Apache\/([^ ]+).*/\1/"`
-Hnew_apache=`ls -1 /root/packages/httpd-2* 2>/dev/null | sed -nre "$ p" | sed -re "s/.*httpd-(.*)\.tar\.bz2/\1/"`
+Hnew_apache=`ls -1 /root/packages/httpd-2* 2>/dev/null | tail -n 1 | sed -re "s/.*httpd-(.*)\.tar\.bz2/\1/"`
 Hori_mod_jk=`strings /usr/local/$Hapachemode/modules/mod_jk.so 2>/dev/null | grep 'mod_jk/' | sed -re "s/mod_jk\/(.*)/\1/"`
-Hnew_mod_jk=`ls -1 /root/packages/tomcat-connectors-* | sed -re "s/.*connectors-(.*)-src.*/\1/"`
+Hnew_mod_jk=`ls -1 /root/packages/tomcat-connectors-* | tail -n 1 | sed -re "s/^.*connectors-(.*)-src.*$/\1/"`
 
 # check new apache packages
 
@@ -50,6 +50,7 @@ fi
 
 # check apache installation directory
 
+Hbkroot=/usr/local/
 Hapachedio=/usr/local/$Hapachemode
 if [ -h "$Hapachedio" ]; then
    ls=`ls -ld "$Hapachedio"`
@@ -69,6 +70,7 @@ if [ -n "$Hapachetgt" ]; then
       /root/mode/modemsg update_apache "apache link target must be a directory!!!" more
       exit 1
    fi
+   Hbkroot=`echo "$Hapachetgt" | sed -re "s/^(.*\/).*/\1/"`
 fi
 
 # check htdocs installation directory
@@ -94,6 +96,16 @@ if [ -n "$Hhtdocstgt" ]; then
    fi
 fi
 
+# save Listen port
+
+if [ `cat /usr/local/$Hapachemode/conf/httpd.conf | grep "^Listen" | wc -l` -eq 1 ]; then
+   Hlistenport=`cat /usr/local/$Hapachemode/conf/httpd.conf | grep "^Listen"`
+   echo $Hlistenport >> /etc/modeupdateapache2
+else
+   /root/mode/modemsg update_apache "abnormal 'Listen port' defination"
+   exit 1
+fi
+
 # preview upgrade information
 
 {
@@ -113,6 +125,8 @@ fi
    echo "apache  tgt: $Hapachetgt"
    echo "htdocs  dio: $Hhtdocsdio"
    echo "htdocs  tgt: $Hhtdocstgt"
+   echo
+   echo "backup  dir: $Hbkroot"
 }
 
 # confirmation
@@ -155,6 +169,8 @@ fi
    echo "apache  tgt: $Hapachetgt"
    echo "htdocs  dio: $Hhtdocsdio"
    echo "htdocs  tgt: $Hhtdocstgt"
+   echo
+   echo "backup  dir: $Hbkroot"
 } | tee -a /root/mode/logs/update_apache.log
 
 #  do apache backup if neccessary
@@ -171,10 +187,10 @@ if [ -z "$Hapachetgt" ]; then
    # do whole backup
    {
       echo "no apache link -----> do whole backup of the current directory '$Hapachedio'"
-      echo "command: tar czvf /l$Hapachemode.tar.gz $Hapachedio"
+      echo "command: tar czvf ${Hbkroot}l$Hapachemode.tar.gz $Hapachedio"
       echo
    } | tee -a /root/mode/logs/update_apache.log
-   tar czvf /l$Hapachemode.tar.gz $Hapachedio
+   tar czvf "${Hbkroot}l$Hapachemode.tar.gz" $Hapachedio
    Hexitstat=$?
    [ $Hexitstat -ne 0 ] && exit 1
 elif [ -z "$Hwholenewup" ]; then
@@ -182,10 +198,10 @@ elif [ -z "$Hwholenewup" ]; then
    # override upgade 
    {
       echo "with apache link && override upgrade ------> do whole backup of link-target directory '$Hapachetgt'"
-      echo "command: tar czvf /l$Hapachemode.tar.gz $Hapachetgt"
+      echo "command: tar czvf ${Hbkroot}l$Hapachemode.tar.gz $Hapachetgt"
       echo
    } | tee -a /root/mode/logs/update_apache.log
-   tar czvf /l$Hapachemode.tar.gz $Hapachetgt
+   tar czvf "${Hbkroot}l$Hapachemode.tar.gz" $Hapachetgt
    Hexitstat=$?
    [ $Hexitstat -ne 0 ] && exit 1
 else
@@ -194,10 +210,10 @@ else
    {
    echo "with apache link && wholy new upgrade ------> apache backup of '$Hapachetgt' is not needed"
    echo "but we still do backup for safety"
-   echo "command: tar czvf /l$Hapachemode.tar.gz $Hapachetgt"
+   echo "command: tar czvf ${Hbkroot}l$Hapachemode.tar.gz $Hapachetgt"
    echo 
    } | tee -a /root/mode/logs/update_apache.log
-   tar czvf /l$Hapachemode.tar.gz $Hapachetgt
+   tar czvf "${Hbkroot}l$Hapachemode.tar.gz" $Hapachetgt
 fi
 
 # do htdocs backup
@@ -212,10 +228,10 @@ if [ -z "$Hhtdocstgt" ]; then
    # do whole backup of htdocs 
    {
       echo "no htdocs link -----> do whole backup of the current directory '$Hhtdocsdio'"
-      echo "command: tar czvf /lhtdocs$Hapachetail.tar.gz $Hhtdocsdio"
+      echo "command: tar czvf ${Hbkroot}lhtdocs$Hapachetail.tar.gz $Hhtdocsdio"
       echo
    } | tee -a /root/mode/logs/update_apache.log
-   tar czvf /lhtdocs$Hapachetail.tar.gz $Hhtdocsdio 
+   tar czvf "${Hbkroot}lhtdocs$Hapachetail.tar.gz" $Hhtdocsdio 
    Hexitstat=$?
    [ $Hexitstat -ne 0 ] && exit 1
 else
@@ -223,10 +239,10 @@ else
    # do whole backup 
    {
       echo "with htdocs link -----> do whole backup of link-target directory '$Hhtdocstgt'"
-      echo "command: tar czvf /lhtdocs$Hapachetail.tar.gz $Hhtdocstgt"
+      echo "command: tar czvf ${Hbkroot}lhtdocs$Hapachetail.tar.gz $Hhtdocstgt"
       echo
    } | tee -a /root/mode/logs/update_apache.log
-   tar czvf /lhtdocs$Hapachetail.tar.gz $Hhtdocstgt 
+   tar czvf "${Hbkroot}lhtdocs$Hapachetail.tar.gz" $Hhtdocstgt 
    Hexitstat=$?
    [ $Hexitstat -ne 0 ] && exit 1
 fi
@@ -289,9 +305,9 @@ if ! /root/mode/install.sh $Hapachetail; then
       # no link
       {
          echo "no link --> restore entire backup"
-         echo "command: cd /;tar xzvf /l$Hapachemode.tar.gz"
+         echo "command: cd /;tar xzvf ${Hbkroot}l$Hapachemode.tar.gz"
       } | tee -a /root/mode/logs/update_apache.log
-      tar xzvf /l$Hapachemode.tar.gz
+      tar xzvf "${Hbkroot}l$Hapachemode.tar.gz"
    elif [ -z "$Hwholenewup" ]; then
       # with link
       # override upgrade  
@@ -301,8 +317,8 @@ if ! /root/mode/install.sh $Hapachetail; then
       rm -fR $Hapachetgt
 
       echo "restore link-target backup to '$Hapachetgt'"  | tee -a /root/mode/logs/update_apache.log
-      echo "command: cd /;tar xzvf /l$Hapachemode.tar.gz"  | tee -a /root/mode/logs/update_apache.log
-      tar xzvf /l$Hapachemode.tar.gz
+      echo "command: cd /;tar xzvf ${Hbkroot}l$Hapachemode.tar.gz"  | tee -a /root/mode/logs/update_apache.log
+      tar xzvf "${Hbkroot}l$Hapachemode.tar.gz"
 
       echo "relink to $Hapachetgt"  | tee -a /root/mode/logs/update_apache.log
       echo "command: ln -s $Hapachetgt $Hapachedio"  | tee -a /root/mode/logs/update_apache.log
@@ -359,8 +375,8 @@ else
       rm -fR "$Hhtdocsdio"
 
       echo "restore htdocs backup to htdocs target '$Hhtdocstgt'"  | tee -a /root/mode/logs/update_apache.log
-      echo "command: cd /;tar xzvf /lhtdocs$Hapachetail.tar.gz"  | tee -a /root/mode/logs/update_apache.log
-      cd /;tar xzvf /lhtdocs$Hapachetail.tar.gz
+      echo "command: cd /;tar xzvf ${Hbkroot}lhtdocs$Hapachetail.tar.gz"  | tee -a /root/mode/logs/update_apache.log
+      cd /;tar xzvf "${Hbkroot}lhtdocs$Hapachetail.tar.gz"
 
       echo "do link again"  | tee -a /root/mode/logs/update_apache.log
       echo "command: ln -s $Hhtdocstgt $Hhtdocsdio" | tee -a /root/mode/logs/update_apache.log
@@ -369,8 +385,8 @@ else
    else
       # the htdocs is not a symbololic link
       echo "restore htdocs backup to $Hhtdocsdio"  | tee -a /root/mode/logs/update_apache.log
-      echo "command: cd /;tar xzvf /lhtdocs$Hapachetail.tar.gz" | tee -a /root/mode/logs/update_apache.log
-      cd /;tar xzvf /lhtdocs$Hapachetail.tar.gz
+      echo "command: cd /;tar xzvf ${Hbkroot}lhtdocs$Hapachetail.tar.gz" | tee -a /root/mode/logs/update_apache.log
+      cd /;tar xzvf "${Hbkroot}lhtdocs$Hapachetail.tar.gz"
    fi
 fi
 
@@ -386,7 +402,7 @@ echo "End of log ......"  | tee -a /root/mode/logs/update_apache.log
 
 # start apache
 
-/root/mode/apachectl $Hapachemode -k start
+/root/mode/gcserver$Hapachetail apachestart
 
 # congratulations
 

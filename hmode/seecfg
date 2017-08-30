@@ -41,10 +41,11 @@ fi
 
 HDBNAME=mysql
 [ -n "$2" ] && HDBNAME="$2"
+HDBNAME=`echo "$HDBNAME" | tr "A-Z" "a-z"`
 
 # test connectivity and database existence
 
-HTESTERR=`echo | mysql -uroot $Hmodepass -h$HMYSQLDIP --default-character-set=utf8 $HMODE "$HDBNAME"  2>&1`
+HTESTERR=`echo | mysql -uroot $Hmodepass -h$HMYSQLDIP --default-character-set=utf8 $HMODE "$HDBNAME"  2>&1|grep -v 'Warning: Using a password on the command'`
 if [ -n "$HTESTERR" ]; then
    if echo $HTESTERR | grep -E  "mysql: command not found" > /dev/null; then
       /root/mode/modemsg seecfg "MySQL client has not been installed at this machine!" more
@@ -307,18 +308,12 @@ else
       # deal with double quotes
       # tabs and newlines in content are already backslashed
       # tabs which are not backslashed are column separators
-      sed -re 's/"/""/g'    |
-      sed -re 's/\t/"\t"/g' |
-      sed -re 's/^/"/g'     |
-      sed -re 's/$/"/g'     |
-      sed -re 's/\t/,/g'    | 
-      # recover backslashed tabs to real tabs
-      sed -re 's/\\t/\t/g'  | 
+      sed -r -e 's/"/""/g'  -e 's/\t/"\t"/g' -e 's/^/"/g' -e 's/$/"/g' -e 's/\t/,/g' -e 's/\\t/\t/g' |
+      # The last '-e' in line above:recover backslashed tabs to real tabs
       # newline -> carriage+newline
-      tr -d '\r'            |
-      sed -re 's/$/\r/g'    | 
-      # recover backslashed newlines
-      sed -re 's/\\n/\n/g'  | 
+      tr -d '\r'                             |
+      sed -r -e 's/$/\r/g'  -e 's/\\n/\n/g'  | 
+      # The last '-e' in line above:recover backslashed newlines
       # add utf8 BOM if neccessary 
       sed -re '1 s/^/\xef\xbb\xbf/' 
    else
@@ -327,22 +322,22 @@ else
       # deal with double quotes
       # tabs and newlines in content are already backslashed
       # tabs which are not backslashed are column separators
-      sed -re 's/~/HrYQhF/g'             |
-      sed -re 's/"/""/g'                 |
-      sed -re 's/\t/~\t~/g'              |
-      sed -re 's/^/~/g'                  |
-      sed -re 's/$/~/g'                  |
-      sed -re 's/\t/,/g'                 |
-      sed -re 's/~@@~,~([^~]*)~/"\1"/g'  | 
-      sed -re 's/~//g'                   | 
-      sed -re 's/HrYQhF/~/g'             |
-      # recover backslashed tabs to real tabs
-      sed -re 's/\\t/\t/g'  | 
+      sed -r -e 's/~/HrYQhF/g'             \
+             -e 's/"/""/g'                 \
+             -e 's/\t/~\t~/g'              \
+             -e 's/^/~/g'                  \
+             -e 's/$/~/g'                  \
+             -e 's/\t/,/g'                 \
+             -e 's/~@@~,~([^~]*)~/"\1"/g'  \
+             -e 's/~//g'                   \
+             -e 's/HrYQhF/~/g'             \
+             -e 's/\\t/\t/g'               | 
+      # the line above:recover backslashed tabs to real tabs
       # newline -> carriage+newline
-      tr -d '\r'            |
-      sed -re 's/$/\r/g'    | 
-      # recover backslashed newlines
-      sed -re 's/\\n/\n/g'  | 
+      tr -d '\r'                           |
+      sed -r -e 's/$/\r/g'                 \
+             -e 's/\\n/\n/g'               | 
+      # the line above:recover backslashed newlines
       # add utf8 BOM if neccessary 
       iconv -f utf-8 -t gb18030 
    fi
@@ -350,6 +345,7 @@ fi
 Hreturnstatus=$?
 set +o pipefail
 if [ $Hreturnstatus -gt 0 ]; then
+   sed -ci -re "/^.*Using a password on the command line interface can be insecure.*/ d" "$Hseecfgmysql"
    if [ -n "$jloop" ]; then
       Herrline=`cat $Hseecfgmysql | sed -re "s/^ERROR [0-9]+ \([^)]+\) at line ([0-9]+):.*/\1/"`
       Hsegbeg=`echo $jloop | sed -re "s/(.*),.*/\1/"`
