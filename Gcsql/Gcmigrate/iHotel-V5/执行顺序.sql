@@ -32,6 +32,9 @@
 		SELECT * FROM master_base WHERE id IN (?,?);
 		
 
+注：这个迁移脚本对于V5的同住账务处理有问题，需完善
+
+
 二、管道迁移后，数据迁移前工作
 	1、检查相关管道是否迁移完全(hgstinf,hgstinf_xh,cusinf,master,guest..);
 	2、为相关表建立索引：
