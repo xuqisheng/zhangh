@@ -1,8 +1,0 @@
-SELECT *  FROM company_base WHERE hotel_group_id=2224 AND id IN (SELECT accnt_new FROM `portal_group`.up_map_accnt WHERE hotel_group_id=2224 AND hotel_id=11465 AND accnt_type='COMPANY');
-
-SELECT * FROM company_type WHERE hotel_group_id=2224 AND company_id IN (SELECT accnt_new FROM `portal_group`.up_map_accnt WHERE hotel_group_id=2224 AND hotel_id=11465 AND accnt_type='COMPANY');
-
-
-DELETE FROM company_base WHERE hotel_group_id=2224 AND id IN (SELECT accnt_new FROM `portal_group`.up_map_accnt WHERE hotel_group_id=2224 AND hotel_id=11465 AND accnt_type='COMPANY');
-
-DELETE FROM company_type WHERE hotel_group_id=2224 AND company_id IN (SELECT accnt_new FROM `portal_group`.up_map_accnt WHERE hotel_group_id=2224 AND hotel_id=11465 AND accnt_type='COMPANY');

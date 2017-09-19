@@ -1,9 +1,0 @@
--- 修复信用
-INSERT INTO accredit (hotel_group_id, hotel_id, accnt, accnt_type, number, ta_code, card_no, expiry_date, cur_exchg_no, auth_no, amount, amount_foreign, amount_use, tag, create_user, create_biz_date, create_cashier, create_datetime, use_user, use_biz_date, use_cashier, use_datetime, partout_flag, close_id, modify_user, modify_datetime, is_online, remark)
-SELECT a.hotel_group_id,a.hotel_id,id,'A','0',9100,'*',DATE(NOW()),'','',b.credit,'0.00','0.00','R','ADMIN_QY','2017-07-12 00:00:00','1','2017-07-12 19:01:10','ADMIN_QY','2017-07-12 00:00:00','1',NULL,NULL,NULL,'ADMIN','2017-07-12 19:01:10','F','余额导入'
-FROM ar_master a,migrate_db.armst b WHERE a.hotel_group_id = 2 AND a.hotel_id = 9 AND a.arno = b.accnt AND b.credit <> 0;
-
-UPDATE ar_master a,migrate_db.armst b SET a.credit = b.credit WHERE a.hotel_group_id = 2 AND a.hotel_id = 9 AND a.arno = b.accnt AND b.credit <> 0;
-
-UPDATE ar_master SET extra_flag = '001000000000000000010000000000' WHERE hotel_group_id = 2 AND hotel_id = 9 AND credit <> 0;
-
