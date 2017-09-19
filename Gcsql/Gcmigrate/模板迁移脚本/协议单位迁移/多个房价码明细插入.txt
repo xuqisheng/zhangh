@@ -1,0 +1,16 @@
+
+
+INSERT INTO profile_extra(hotel_group_id,hotel_id,extra_item,master_type,master_id,extra_value,date_begin,date_end,is_halt,list_order,create_user,create_datetime,modify_user,modify_datetime)
+SELECT 82,92,'RATECODE','COMPANY',a.company_id,SUBSTR(a.code1,6,5),a.valid_begin,a.valid_end,'F','0','ADMIN',NOW(),'ADMIN',NOW()
+FROM  company_type a WHERE a.hotel_group_id = 82 AND a.hotel_id = 92 AND sys_cat = 'C' AND code1 <>'';
+
+
+INSERT INTO profile_extra(hotel_group_id,hotel_id,extra_item,master_type,master_id,extra_value,date_begin,date_end,is_halt,list_order,create_user,create_datetime,modify_user,modify_datetime)
+SELECT 82,92,'RATECODE','COMPANY',a.company_id,SUBSTR(a.code1,6,4),a.valid_begin,a.valid_end,'F','0','ADMIN',NOW(),'ADMIN',NOW()
+FROM  company_type a WHERE a.hotel_group_id = 82 AND a.hotel_id = 92 AND sys_cat <> 'C' AND code1 <>'';
+
+
+
+INSERT INTO profile_extra(hotel_group_id,hotel_id,extra_item,master_type,master_id,extra_value,date_begin,date_end,is_halt,list_order,create_user,create_datetime,modify_user,modify_datetime)
+SELECT 82,92,'RATECODE','COMPANY',a.company_id,SUBSTR(a.code1,11,4) code1,a.valid_begin,a.valid_end,'F','0','ADMIN',NOW(),'ADMIN',NOW()
+FROM  company_type a WHERE a.hotel_group_id = 82 AND a.hotel_id = 92 AND sys_cat <> 'C' AND code1 <>'';
