@@ -44,19 +44,28 @@ BEGIN
 	SELECT descript,descript_en INTO var_feecode_descript,var_feecode_descript_en FROM code_transaction 
 		WHERE hotel_group_id = arg_hotel_group_id AND hotel_id = arg_hotel_id AND code = var_feecode;
 
-	-- 注意下面几句为集团某家店时才能执行
-	/*
-	DELETE FROM member_base WHERE hotel_group_id = arg_hotel_group_id;
-	DELETE FROM member_link_base WHERE hotel_group_id = arg_hotel_group_id;
-	DELETE FROM member_link_addr WHERE hotel_group_id = arg_hotel_group_id;
-	DELETE FROM member_type WHERE hotel_group_id = arg_hotel_group_id;
-	DELETE FROM member_prefer WHERE hotel_group_id = arg_hotel_group_id;
-	DELETE FROM member_web WHERE hotel_group_id = arg_hotel_group_id;
-	DELETE FROM card_base WHERE hotel_group_id = arg_hotel_group_id;
-	DELETE FROM card_account_master WHERE hotel_group_id = arg_hotel_group_id;
-	DELETE FROM card_account WHERE hotel_group_id = arg_hotel_group_id;
-	DELETE FROM card_idcard_map;
-	*/
+	-- 删除本酒店的会员相关数据
+    DELETE FROM member_base WHERE hotel_group_id=arg_hotel_group_id AND hotel_id = 0 AND
+        id IN (SELECT member_id FROM card_base WHERE hotel_group_id=arg_hotel_group_id AND hotel_id=arg_hotel_id);
+    DELETE FROM member_link_addr WHERE hotel_group_id=arg_hotel_group_id AND
+        member_id IN (SELECT member_id FROM card_base WHERE hotel_group_id=arg_hotel_group_id AND hotel_id=arg_hotel_id);
+    DELETE FROM member_type WHERE hotel_group_id=arg_hotel_group_id AND
+        member_id IN (SELECT member_id FROM card_base WHERE hotel_group_id=arg_hotel_group_id AND hotel_id=arg_hotel_id);
+    DELETE FROM member_prefer WHERE hotel_group_id=arg_hotel_group_id AND
+        member_id IN (SELECT member_id FROM card_base WHERE hotel_group_id=arg_hotel_group_id AND hotel_id=arg_hotel_id);
+    DELETE FROM member_web WHERE hotel_group_id=arg_hotel_group_id AND
+        member_id IN (SELECT member_id FROM card_base WHERE hotel_group_id=arg_hotel_group_id AND hotel_id=arg_hotel_id);
+    DELETE FROM member_link_base WHERE hotel_group_id=arg_hotel_group_id AND
+        id IN (SELECT member_id FROM card_base WHERE hotel_group_id=arg_hotel_group_id AND hotel_id=arg_hotel_id);
+    DELETE FROM card_account WHERE hotel_group_id=arg_hotel_group_id AND
+        member_id IN (SELECT member_id FROM card_base WHERE hotel_group_id=arg_hotel_group_id AND hotel_id=arg_hotel_id);
+    DELETE FROM card_account_master WHERE hotel_group_id=arg_hotel_group_id AND
+        member_id IN (SELECT member_id FROM card_base WHERE hotel_group_id=arg_hotel_group_id AND hotel_id=arg_hotel_id);
+
+    -- SELECT * FROM card_point WHERE hotel_group_id=arg_hotel_group_id  AND
+    --    card_no IN (SELECT card_no FROM card_base WHERE hotel_group_id=arg_hotel_group_id AND hotel_id=arg_hotel_id);
+    DELETE FROM card_base WHERE hotel_group_id=arg_hotel_group_id AND hotel_id=arg_hotel_id;
+
   	-- 补充,将没有档案的卡默认一个档案
   	UPDATE migrate_db.membercard SET card_master = NULL WHERE card_master = '' AND hotel_group_id = arg_hotel_group_id AND hotel_id = arg_hotel_id;
   	UPDATE migrate_db.membercard SET card_name = card_no WHERE card_name IS NULL OR card_name = '' AND hotel_group_id = arg_hotel_group_id AND hotel_id = arg_hotel_id;
