@@ -54,13 +54,13 @@ BEGIN
 	-- INSERT INTO tmp_check_base SELECT NULL,'B',CONCAT('sys_option: ',' 请检查房费费用代码合集是否完整',a.set_value) FROM sys_option a WHERE a.hotel_group_id = arg_hotel_group_id AND a.hotel_id = arg_hotel_id AND a.catalog='audit' AND a.item='ta_code_for_room_night_count';
 
 	IF NOT EXISTS(SELECT 1 FROM code_base WHERE hotel_group_id = arg_hotel_group_id AND hotel_id = arg_hotel_id AND parent_code='market_code' AND flag='HSE') THEN
-		INSERT INTO tmp_check_base SELECT NULL,'A','没有定义自用房市场码';
+		INSERT INTO tmp_check_base SELECT NULL,'B','没有定义自用房市场码';
 	END IF;
 	IF NOT EXISTS(SELECT 1 FROM code_base WHERE hotel_group_id = arg_hotel_group_id AND hotel_id = arg_hotel_id AND parent_code='market_code' AND flag='COM') THEN
-		INSERT INTO tmp_check_base SELECT NULL,'A','没有定义免费房市场码';
+		INSERT INTO tmp_check_base SELECT NULL,'B','没有定义免费房市场码';
 	END IF;
 	IF NOT EXISTS(SELECT 1 FROM code_base WHERE hotel_group_id = arg_hotel_group_id AND hotel_id = arg_hotel_id AND parent_code='market_code' AND flag='LON') THEN
-		INSERT INTO tmp_check_base SELECT NULL,'A','没有定义长包房市场码';
+		INSERT INTO tmp_check_base SELECT NULL,'B','没有定义长包房市场码';
 	END IF;
 
 	INSERT INTO tmp_check_base SELECT NULL,'A',CONCAT('code_transaction:','  无效的arrange_code =  ',CONCAT(arrange_code,descript)) FROM code_transaction a WHERE a.hotel_group_id = arg_hotel_group_id AND a.hotel_id = arg_hotel_id AND a.is_halt = 'F' AND NOT EXISTS(SELECT 1 FROM code_base b WHERE  b.hotel_id = arg_hotel_id AND b.hotel_group_id = arg_hotel_group_id AND b.parent_code='arrangement_bill' AND a.arrange_code=b.code);
