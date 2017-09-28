@@ -60,6 +60,9 @@ ansible-doc -s 模块名
 常用模块
     command
         目的：在远程主机上执行命令
+        ansible instdb -m command -a "shutdown -h now"
+        ansible instdb -m command -a "reboot"
+        ansible instdb -m command -a "free"
     script
         目的：
     shell
