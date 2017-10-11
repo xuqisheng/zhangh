@@ -5,18 +5,28 @@
 操作腾讯云存储
 '''
 import os
-import threading
+import threading, configparser
 from qcloud_cos import CosClient
 from qcloud_cos import UploadFileRequest
 from qcloud_cos import DelFileRequest
 from qcloud_cos import CreateFolderRequest
 from qcloud_cos import DelFolderRequest
 from qcloud_cos import ListFolderRequest
-from qcloudcfg  import *
+
 
 class Qcdump(object):
     def __init__(self,dumpfile):
         self._dumpfile   = dumpfile
+
+        # 获取config配置文件基本信息
+        config = configparser.ConfigParser()
+        config.read('pycfg/qcloudcfg.ini')
+        appid = config.get('qcloud', 'appid')
+        secret_id = config.get('qcloud', 'secret_id')
+        secret_key = config.get('qcloud', 'secret_key')
+        region_info = config.get('qcloud', 'region_info')
+        bucket = config.get('qcloud', 'bucket')
+
         self._cos_client = CosClient(appid, secret_id, secret_key, region_info)
 
         # 判断是否为文件
@@ -33,6 +43,7 @@ class Qcdump(object):
                 self._filename = self._dumpfile[len(os.path.dirname(self._dumpfile)):]
         else:
             self._filename = self._dumpfile
+
 
     # 定义上传进度条
     def processBar(self,file_size,file_speed):

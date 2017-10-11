@@ -245,12 +245,21 @@ print os.path.isfile(filename)
 # soap = BeautifulSoup(html_doc,'html.parser')
 #
 # print soap.find_all('a','b')
-import os,chardet
-
-path = "E:\\abc"
-
-
-for (path, dirs, files) in os.walk(path):
-    for filename in files:
-        print chardet.detect(filename)
+# import os,chardet
+#
+# path = "E:\\abc"
+#
+#
+# for (path, dirs, files) in os.walk(path):
+#     for filename in files:
+#         print chardet.detect(filename)
         # print filename.decode('GB2312')
+
+import configparser
+
+config = configparser.ConfigParser()
+config.read('pycfg/qcloudcfg.ini')
+
+print(config.sections())
+secret_id = config.get('qcloud', 'secret_id')
+print(secret_id)
