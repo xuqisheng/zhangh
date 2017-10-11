@@ -34,7 +34,8 @@ def request1(appkey, m="GET"):
     res = json.loads(content)
 
     result = res.get('result')
-    print result['dapandata']
+
+    print(result[0]['data'])
 
     """
     if res:
