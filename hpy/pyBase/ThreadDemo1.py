@@ -20,7 +20,7 @@ class run_cmd(threading.Thread):
         s.set_missing_host_key_policy(paramiko.AutoAddPolicy())
         s.connect(hostname=self.hostname, username=self.username, password=self.password)
         stdin, stdout, stderr = s.exec_command(self.echo_cmd)
-        print stdout.read()
+        print(stdout.read())
         s.close()
 
     def stop(self):
@@ -43,7 +43,7 @@ class upload_thread(threading.Thread):
             t = paramiko.Transport((self.hostname, self.port))
             t.connect(username=self.username, password=self.password)
             sftp = paramiko.SFTPClient.from_transport(t)
-            print 'upload file start %s ' % datetime.datetime.now()
+            print('upload file start %s ' % datetime.datetime.now())
             for root, dirs, files in os.walk(self.local_dir):
                 for filespath in files:
                     local_file = os.path.join(root, filespath)
@@ -54,22 +54,21 @@ class upload_thread(threading.Thread):
                     except Exception, e:
                         sftp.mkdir(os.path.split(remote_file)[0])
                         sftp.put(local_file, remote_file)
-                    print "upload %s to remote %s" % (local_file, remote_file)
+                    print("upload %s to remote %s" % (local_file, remote_file))
                 for name in dirs:
                     local_path = os.path.join(root, name)
                     a = local_path.replace(self.local_dir, remote_dir)
                     remote_path = os.path.join(self.remote_dir, a)
-        try:
-            sftp.mkdir(remote_path)
-            print "mkdir path %s" % remote_path
+            try:
+                sftp.mkdir(remote_path)
+                print("mkdir path %s" % remote_path)
+            except Exception, e:
+                print(e)
+            print('upload file success %s ' % datetime.datetime.now())
+            t.close()
+
         except Exception, e:
-            print e
-        print 'upload file success %s ' % datetime.datetime.now()
-        t.close()
-
-    except Exception, e:
-    print e
-
+            print(e)
 
 def stop(self):
     self.thread_stop = True
@@ -91,7 +90,7 @@ class get_thread(threading.Thread):
             t = paramiko.Transport((self.hostname, self.port))
             t.connect(username=self.username, password=self.password)
             sftp = paramiko.SFTPClient.from_transport(t)
-            print 'get file start %s ' % datetime.datetime.now()
+            print('get file start %s ' % datetime.datetime.now())
             for root, dirs, files in os.walk(self.remote_dir):
                 for name in dirs:
                     remote_path = os.path.join(root, name)
@@ -99,9 +98,9 @@ class get_thread(threading.Thread):
                     local_path = os.path.join(self.local_dir, a)
                     try:
                         sftp.mkdir(local_path)
-                        print "mkdir path %s" % local_path
+                        print("mkdir path %s" % local_path)
                     except Exception, e:
-                        print e
+                        print(e)
                 for filespath in files:
                     remote_file = os.path.join(root, filespath)
                     a = remote_file.replace(self.remote_dir, self.local_dir)
@@ -111,29 +110,29 @@ class get_thread(threading.Thread):
                     except Exception, e:
                         sftp.mkdir(os.path.split(local_file)[0])
                         sftp.get(remote_file, local_file)
-                    print "get %s to remote %s" % (remote_file, local_file)
-            print 'get file success %s ' % datetime.datetime.now()
+                    print("get %s to remote %s" % (remote_file, local_file))
+            print('get file success %s ' % datetime.datetime.now())
             t.close()
         except Exception, e:
-            print e
+            print (e)
 
     def stop(self):
         self.thread_stop = True
 
 
 while runing:
-    print  "1 执行cmd命令"
-    print  "2 上传文件"
-    print  "3 下载文件"
-    print  "* quit"
+    print("1 执行cmd命令")
+    print("2 上传文件")
+    print("3 下载文件")
+    print("* quit")
     ten = int(raw_input('Enter a number:'))
     if type(ten) is not int:
         break
     else:
         if ten == 1:
             while runing:
-                print "1 手动输入命令"
-                print "*(任意输入) 返回上级目录"
+                print("1 手动输入命令")
+                print("*(任意输入) 返回上级目录")
                 cmd_number = int(raw_input('Enter a number(命令):'))
                 if cmd_number == 1:
                     username = 'root'
@@ -144,7 +143,7 @@ while runing:
                     host = ip.split(' ')
                     for hostname in host:
                         cmd_thread = run_cmd(hostname, password, username, port, echo_cmd)
-                        print hostname
+                        print(hostname)
                         cmd_thread.start()
                         cmd_thread.stop()
                         if (cmd_thread.isAlive()):
@@ -153,8 +152,8 @@ while runing:
                     break
         elif ten == 2:
             while runing:
-                print "1 上传文件"
-                print "*(任意输入) 返回上级目录"
+                print("1 上传文件")
+                print("*(任意输入) 返回上级目录")
                 file_put = int(raw_input('Enter a number(上传文件):'))
                 if file_put == 1:
                     local_dir = raw_input('enter 源路径 :')
@@ -166,7 +165,7 @@ while runing:
                     password = 'redhat'
                     port = 22
                     for hostname in host:
-                        print hostname
+                        print(hostname)
             uploadthread = upload_thread(hostname, password, username, port, local_dir, remote_dir)
             uploadthread.start()
             uploadthread.stop()
@@ -178,8 +177,8 @@ while runing:
                 break
         elif ten == 3:
             while runing:
-                print "1 下载文件"
-                print "*(任意输入) 返回上级目录"
+                print("1 下载文件")
+                print("*(任意输入) 返回上级目录")
                 file_get = int(raw_input('Enter a number(下载文件):'))
                 if file_get == 1:
                     username = 'root'
