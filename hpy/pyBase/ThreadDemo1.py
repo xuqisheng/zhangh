@@ -125,7 +125,7 @@ while runing:
     print("2 上传文件")
     print("3 下载文件")
     print("* quit")
-    ten = int(raw_input('Enter a number:'))
+    ten = int(input('Enter a number:'))
     if type(ten) is not int:
         break
     else:
@@ -133,13 +133,13 @@ while runing:
             while runing:
                 print("1 手动输入命令")
                 print("*(任意输入) 返回上级目录")
-                cmd_number = int(raw_input('Enter a number(命令):'))
+                cmd_number = int(input('Enter a number(命令):'))
                 if cmd_number == 1:
                     username = 'root'
                     password = 'redhat'
                     port = 22
-                    echo_cmd = raw_input('Enter echo cmd:')
-                    ip = raw_input('enter hostname:')
+                    echo_cmd = input('Enter echo cmd:')
+                    ip = input('enter hostname:')
                     host = ip.split(' ')
                     for hostname in host:
                         cmd_thread = run_cmd(hostname, password, username, port, echo_cmd)
@@ -154,12 +154,12 @@ while runing:
             while runing:
                 print("1 上传文件")
                 print("*(任意输入) 返回上级目录")
-                file_put = int(raw_input('Enter a number(上传文件):'))
+                file_put = int(input('Enter a number(上传文件):'))
                 if file_put == 1:
-                    local_dir = raw_input('enter 源路径 :')
-                    remote_dir = raw_input('enter 目录路径:')
+                    local_dir = input('enter 源路径 :')
+                    remote_dir = input('enter 目录路径:')
                     host = []
-                    ip = raw_input('enter hostname:')
+                    ip = input('enter hostname:')
                     host = ip.split(' ')
                     username = 'root'
                     password = 'redhat'
@@ -179,14 +179,14 @@ while runing:
             while runing:
                 print("1 下载文件")
                 print("*(任意输入) 返回上级目录")
-                file_get = int(raw_input('Enter a number(下载文件):'))
+                file_get = int(input('Enter a number(下载文件):'))
                 if file_get == 1:
                     username = 'root'
                     password = 'redhat'
                     port = 22
-                    remote_dir = raw_input('enter 服务器的路径 :')
-                    local_dir = raw_input('enter 本地的路径:')
-                    hostname = raw_input('enter请输入其中一台服务器地址即可:')
+                    remote_dir = input('enter 服务器的路径 :')
+                    local_dir = input('enter 本地的路径:')
+                    hostname = input('enter请输入其中一台服务器地址即可:')
                     getthread = get_thread(hostname, password, username, port, local_dir, remote_dir)
                     getthread.start()
                     getthread.stop()
