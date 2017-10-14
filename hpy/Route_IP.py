@@ -4,6 +4,7 @@ import threading
 routers = []
 lock = threading.Lock()
 
+
 def search_routers():
     routers = []
     local_ips = socket.gethostbyname_ex(socket.gethostname())[2]  # get local IP
@@ -27,10 +28,10 @@ def check_ip(new_ip):
     s.close()
     if result == 0:
         lock.acquire()
-        print new_ip.ljust(15), ' port 80 is open'
+        print(new_ip.ljust(15), ' port 80 is open')
         routers.append((new_ip, 80))
         lock.release()
 
 
-print 'Searching for routers, please wait...'
+print('Searching for routers, please wait...')
 search_routers()

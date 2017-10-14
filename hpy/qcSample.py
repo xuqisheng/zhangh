@@ -19,24 +19,24 @@ bucket = u'zhangh214'
 # 1. 上传文件(默认不覆盖)
 #    将本地的py_demo.py上传到bucket的根分区下,并命名为py_demo.py
 #    默认不覆盖, 如果cos上文件存在,则会返回错误
-request = qcloud_cos.UploadFileRequest(bucket, u'/py_demo.py', u'py_demo2.py')
+request = qcloud_cos.UploadFileRequest(bucket, u'/demokit.py', u'py_demo2.py')
 upload_file_ret = cos_client.upload_file(request)
 print 'upload file ret:', repr(upload_file_ret)
 
 # 2. 上传文件(覆盖文件)
 #    将本地的py_demo2.py上传到bucket的根分区下,覆盖已上传的py_demo.py
-request = qcloud_cos.UploadFileRequest(bucket, u'/py_demo.py', u'py_demo2.py')
+request = qcloud_cos.UploadFileRequest(bucket, u'/demokit.py', u'py_demo2.py')
 request.set_insert_only(0)  # 设置允许覆盖
 upload_file_ret = cos_client.upload_file(request)
 print 'overwrite file ret:', repr(upload_file_ret)
 
 # 3. 获取文件属性
-request = qcloud_cos.StatFileRequest(bucket, u'/py_demo.py')
+request = qcloud_cos.StatFileRequest(bucket, u'/demokit.py')
 stat_file_ret = cos_client.stat_file(request)
 print 'stat file ret:', repr(stat_file_ret)
 
 # 4. 更新文件属性
-request = qcloud_cos.UpdateFileRequest(bucket, u'/py_demo.py')
+request = qcloud_cos.UpdateFileRequest(bucket, u'/demokit.py')
 
 request.set_biz_attr(u'这是个demo文件')           # 设置文件biz_attr属性
 request.set_authority(u'eWRPrivate')              # 设置文件的权限
@@ -51,17 +51,17 @@ update_file_ret = cos_client.update_file(request)
 print 'update file ret:', repr(update_file_ret)
 
 # 5. 更新后再次获取文件属性
-request = qcloud_cos.StatFileRequest(bucket, u'/py_demo.py')
+request = qcloud_cos.StatFileRequest(bucket, u'/demokit.py')
 stat_file_ret = cos_client.stat_file(request)
 print 'stat file ret:', repr(stat_file_ret)
 
 # 6. 移动文件, 将py_demo.py移动位sample_file_move.txt
-request = qcloud_cos.MoveFileRequest(bucket, u'/py_demo.py', u'/sample_file_move.txt')
+request = qcloud_cos.MoveFileRequest(bucket, u'/demokit.py', u'/sample_file_move.txt')
 stat_file_ret = cos_client.move_file(request)
 print 'move file ret:', repr(stat_file_ret)
 
 # 7. 删除文件
-request = qcloud_cos.DelFileRequest(bucket, u'/py_demo.py')
+request = qcloud_cos.DelFileRequest(bucket, u'/demokit.py')
 del_ret = cos_client.del_file(request)
 print 'del file ret:', repr(del_ret)
 
