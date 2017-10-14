@@ -255,11 +255,6 @@ print os.path.isfile(filename)
 #         print chardet.detect(filename)
         # print filename.decode('GB2312')
 
-import configparser
-
-config = configparser.ConfigParser()
-config.read('pycfg/qcloudcfg.ini')
-
-print(config.sections())
-secret_id = config.get('qcloud', 'secret_id')
-print(secret_id)
+url = 'http://ww1.site.cn/14d2e8ejw1exjogbxdxhj20ci0kuwex.jpg'
+file_name = url[-10:]
+print(file_name)
