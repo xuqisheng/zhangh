@@ -255,6 +255,8 @@ print os.path.isfile(filename)
 #         print chardet.detect(filename)
         # print filename.decode('GB2312')
 
-url = 'http://ww1.site.cn/14d2e8ejw1exjogbxdxhj20ci0kuwex.jpg'
-file_name = url[-10:]
-print(file_name)
+list1 = ['a','b','c','d']
+
+list1 = ['e','f','g','h']
+
+print(list1)
