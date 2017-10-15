@@ -2,6 +2,7 @@
 <project version="4">
   <component name="ProjectModuleManager">
     <modules>
+      <module fileurl="file://$PROJECT_DIR$/../erya/.idea/erya.iml" filepath="$PROJECT_DIR$/../erya/.idea/erya.iml" />
       <module fileurl="file://$PROJECT_DIR$/../jumpserver/.idea/jumpserver.iml" filepath="$PROJECT_DIR$/../jumpserver/.idea/jumpserver.iml" />
       <module fileurl="file://$PROJECT_DIR$/.idea/zhangh.iml" filepath="$PROJECT_DIR$/.idea/zhangh.iml" />
     </modules>

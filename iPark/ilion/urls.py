@@ -10,7 +10,7 @@
 """
 from django.conf.urls import url
 
-from views_hello import *
+from .views_hello import *
 from . import views
 
 urlpatterns = [
