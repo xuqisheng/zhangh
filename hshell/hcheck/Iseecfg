@@ -1,6 +1,6 @@
 #!/bin/bash
 #
-. /root/imode/cfg/.imode_aliases
+#. /root/imode/cfg/.imode_aliases
 #
 # -----------------------------------------------------------------------------
 # function:
@@ -22,6 +22,9 @@
 # -----------------------------------------------------------------------------
 
 # 
+shopt -s expand_aliases
+export HBLACKBOX2=1
+export LANG=zh_CN.UTF-8
 
 if [ -z "$1" ]; then
    /root/mode/modemsg iseecfg "Please provide sql file or directory!"
@@ -66,36 +69,45 @@ else
    exit
 fi
 
-Hserver="$2"
-if [ "$Hserver" = "allservers" ]; then
-   /root/mode/confirm "Sql file(s) will be executed on all registered servers.Continue" hello || exit 
-   Hserver=".*"
-   Hserverdes="all servers"
-elif [ -z "$Hserver" ]; then
-   /root/mode/modemsg iseecfg "Please provide server parameters!"
-   exit
-else
-   Hserverdes="server $2"
-fi
+#Hserver="$2"
+#if [ "$Hserver" = "allservers" ]; then
+#   /root/mode/confirm "Sql file(s) will be executed on all registered servers.Continue" hello || exit
+#   Hserver=".*"
+#   Hserverdes="all servers"
+#elif [ -z "$Hserver" ]; then
+#   /root/mode/modemsg iseecfg "Please provide server parameters!"
+#   exit
+#else
+#   Hserverdes="server $2"
+#fi
 
-Hdatabase=${3:-portal}
+#Hdatabase=${3:-portal}
+
+#/root/mode/updatedb.sh $1 $Hdatabase
+
+{
+/root/mode/updatedb.sh $1
+/root/mode/updatedb.sh $1 portal_f
+/root/mode/updatedb.sh $1 portal_f_pms
+/root/mode/updatedb.sh $1 portal_ipms
+/root/mode/updatedb.sh $1 portal_pms
+}
+
+#Htar=/root/mode/tmp/iseecfgFIX.tar.gz
+#Hdir=/root/mode/tmp/iseecfgFIX
+#tar czvf $Htar "$1" >/dev/null 2>&1
+#
+#if /root/mode/confirm "SQL(s) will be executed in database $Hdatabase at $Hserverdes right away.Continue" hello; then
+#   for i in `cat /root/Iservers.txt | grep -v "^#" | grep -E "^$Hserver$"`; do
+#      echo " ============================ $i ============================"
+#      echo
+#      scp $Htar $i:/root/mode/tmp
+#      ssh $i "mkdir -p $Hdir;rm -fR $Hdir/*;tar xzvf $Htar -C $Hdir >/dev/null 2>&1;/root/mode/updatedb.sh $Hdir $Hdatabase"
+#      ssh $i "rm -fR $Htar $Hdir"
+#   done
+#fi
+#rm -fR $Htar
 
 #
-
-Htar=/root/mode/tmp/iseecfgFIX.tar.gz
-Hdir=/root/mode/tmp/iseecfgFIX
-tar czvf $Htar "$1" >/dev/null 2>&1
-
-if /root/mode/confirm "SQL(s) will be executed in database $Hdatabase at $Hserverdes right away.Continue" hello; then  
-   for i in `cat /root/Iservers.txt | grep -v "^#" | grep -E "^$Hserver$"`; do
-      echo " ============================ $i ============================"
-      echo
-      scp $Htar $i:/root/mode/tmp
-      ssh $i "mkdir -p $Hdir;rm -fR $Hdir/*;tar xzvf $Htar -C $Hdir >/dev/null 2>&1;/root/mode/updatedb.sh $Hdir $Hdatabase"
-      ssh $i "rm -fR $Htar $Hdir"
-   done
-fi
-rm -fR $Htar
-
-#
+# ansible hdlsapp -m command -a "/root/hcheck/Iseecfg /root/hcheck/chksql allservers"
 
