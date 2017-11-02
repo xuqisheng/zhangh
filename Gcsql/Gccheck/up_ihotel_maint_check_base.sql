@@ -64,7 +64,7 @@ BEGIN
 	END IF;
 
 	INSERT INTO tmp_check_base SELECT NULL,'A',CONCAT('code_transaction:','  无效的arrange_code =  ',CONCAT(arrange_code,descript)) FROM code_transaction a WHERE a.hotel_group_id = arg_hotel_group_id AND a.hotel_id = arg_hotel_id AND a.is_halt = 'F' AND NOT EXISTS(SELECT 1 FROM code_base b WHERE  b.hotel_id = arg_hotel_id AND b.hotel_group_id = arg_hotel_group_id AND b.parent_code='arrangement_bill' AND a.arrange_code=b.code);
-	INSERT INTO tmp_check_base SELECT NULL,'A',CONCAT('code_transaction:','  Rebate & reason 不匹配  ',CONCAT(CODE,' ',descript,'',is_rebate,' ',is_need_reason)) FROM code_transaction WHERE hotel_group_id = arg_hotel_group_id AND hotel_id = arg_hotel_id AND is_rebate='T' AND is_need_reason<>'T' AND is_halt = 'F';
+	-- INSERT INTO tmp_check_base SELECT NULL,'A',CONCAT('code_transaction:','  Rebate & reason 不匹配  ',CONCAT(CODE,' ',descript,'',is_rebate,' ',is_need_reason)) FROM code_transaction WHERE hotel_group_id = arg_hotel_group_id AND hotel_id = arg_hotel_id AND is_rebate='T' AND is_need_reason<>'T' AND is_halt = 'F';
 	INSERT INTO tmp_check_base SELECT NULL,'A',CONCAT('检查 code_transaction : arrange_code 字段存在空值或空字符串,请注意修改') FROM code_transaction WHERE hotel_group_id = arg_hotel_group_id AND hotel_id = arg_hotel_id AND (arrange_code='' OR arrange_code IS NULL) AND is_halt = 'F';
 
 	-- 费用&付款部分
@@ -76,7 +76,6 @@ BEGIN
 	INSERT INTO tmp_check_base SELECT NULL,'A',CONCAT('code_transaction:','  非法的内部码 = ',CONCAT(a.code,'  ',a.descript,a.cat_sum)) FROM code_transaction a WHERE a.hotel_group_id = arg_hotel_group_id AND a.hotel_id = arg_hotel_id AND a.arrange_code<'9' AND a.is_halt = 'F' AND NOT EXISTS(SELECT 1 FROM code_base b WHERE  b.hotel_id = arg_hotel_id AND b.hotel_group_id = arg_hotel_group_id AND b.parent_code='production_category' AND a.cat_sum=b.code);
 	INSERT INTO tmp_check_base SELECT NULL,'A',CONCAT('code_transaction:','  非法的付款类别 = ',CONCAT(a.code,'  ',a.descript,' ',a.category_code)) FROM code_transaction a WHERE a.hotel_group_id = arg_hotel_group_id AND a.hotel_id = arg_hotel_id AND a.arrange_code>'9' AND a.is_halt = 'F' AND NOT EXISTS(SELECT 1 FROM code_base b WHERE  b.hotel_id = arg_hotel_id AND b.hotel_group_id = arg_hotel_group_id AND b.parent_code='payment_category' AND a.category_code=b.code);
 	INSERT INTO tmp_check_base SELECT NULL,'A',CONCAT('code_transaction:','  折扣类付款 reason error = ',CONCAT(a.code,'  ',a.descript,' ',a.category_code)) FROM code_transaction a WHERE a.hotel_group_id = arg_hotel_group_id AND a.hotel_id = arg_hotel_id AND a.arrange_code>'9' AND a.cat_posting='ENT' AND a.is_need_reason<>'T' AND a.is_halt = 'F';
-	INSERT INTO tmp_check_base SELECT NULL,'A',CONCAT('code_transaction:','  非折扣类付款 reason error = ',CONCAT(a.code,'  ',a.descript,' ',a.category_code)) FROM code_transaction a WHERE a.hotel_group_id = arg_hotel_group_id AND a.hotel_id = arg_hotel_id AND a.arrange_code>'9' AND a.cat_posting<>'ENT' AND a.is_need_reason='T' AND a.is_halt = 'F';
 	INSERT INTO tmp_check_base SELECT NULL,'A',CONCAT('code_transaction:','  非法的内部码 = ',CONCAT(a.code,'  ',a.descript,' ',a.cat_posting)) FROM code_transaction a WHERE a.hotel_group_id = arg_hotel_group_id AND a.hotel_id = arg_hotel_id AND a.arrange_code>'9' AND NOT EXISTS(SELECT 1 FROM code_base b WHERE  b.hotel_id = arg_hotel_id AND b.hotel_group_id = arg_hotel_group_id AND b.parent_code='payment_flag' AND a.cat_posting=b.code);
 	INSERT INTO tmp_check_base SELECT NULL,'A',CONCAT('code_transaction:','  不能做为定金 = ',CONCAT(a.code,'  ',a.descript,' ',a.cat_posting)) FROM code_transaction a WHERE a.hotel_group_id = arg_hotel_group_id AND a.hotel_id = arg_hotel_id AND a.arrange_code>'9' AND (a.cat_posting='TA' OR a.cat_posting='TF') AND a.cat_bal<>'T' AND a.is_halt = 'F';
 
@@ -105,8 +104,8 @@ BEGIN
 		AND NOT EXISTS(SELECT 1 FROM code_base b WHERE b.hotel_group_id = arg_hotel_group_id AND b.hotel_id = arg_hotel_id AND b.parent_code='ar_category' AND b.code=a.ar_category);
 
 	-- 销售部分
-	INSERT INTO tmp_check_base SELECT NULL,'B',CONCAT('sales_man:','  不存在的销售组别= ',CONCAT(a.sales_man,' ',c.name)) FROM sales_man_business a,sales_man c WHERE a.hotel_group_id = arg_hotel_group_id AND a.hotel_id = arg_hotel_id AND a.sales_man=c.code AND c.hotel_group_id = arg_hotel_group_id AND c.hotel_id=0
-		AND (a.sales_group IS NULL OR NOT EXISTS(SELECT 1 FROM sales_group b WHERE b.hotel_group_id = arg_hotel_group_id AND b.hotel_id = arg_hotel_id AND a.sales_group=b.code));
+	-- INSERT INTO tmp_check_base SELECT NULL,'B',CONCAT('sales_man:','  不存在的销售组别= ',CONCAT(a.sales_man,' ',c.name)) FROM sales_man_business a,sales_man c WHERE a.hotel_group_id = arg_hotel_group_id AND a.hotel_id = arg_hotel_id AND a.sales_man=c.code AND c.hotel_group_id = arg_hotel_group_id AND c.hotel_id=0
+	-- 	AND (a.sales_group IS NULL OR NOT EXISTS(SELECT 1 FROM sales_group b WHERE b.hotel_group_id = arg_hotel_group_id AND b.hotel_id = arg_hotel_id AND a.sales_group=b.code));
  	INSERT INTO tmp_check_base SELECT NULL,'A',CONCAT('code_ratecode:',' 房价码定义:包含无效的市场码 ',a.code,' 市场码 ',a.market) FROM code_ratecode a WHERE a.hotel_group_id = arg_hotel_group_id AND a.hotel_id = arg_hotel_id
 		AND ((a.market IS NOT NULL AND a.market <>'') AND NOT EXISTS(SELECT 1 FROM code_base b WHERE b.hotel_group_id = arg_hotel_group_id AND b.hotel_id = arg_hotel_id AND b.parent_code='market_code' AND a.market=b.code));
  	INSERT INTO tmp_check_base SELECT NULL,'A',CONCAT('code_ratecode:',' 房价码定义:包含无效的来源码 ',a.code,' 来源码 ',a.market) FROM code_ratecode a WHERE a.hotel_group_id = arg_hotel_group_id AND a.hotel_id = arg_hotel_id
@@ -130,18 +129,25 @@ BEGIN
 
 	-- 默认值
 	IF var_client_version = 'IHOTEL' THEN
-		INSERT INTO tmp_check_base SELECT NULL,'A',CONCAT('master:',' 主单默认市场码 ',a.value_default,' 不存在') FROM sys_constraint a WHERE a.hotel_group_id = arg_hotel_group_id AND a.hotel_id = arg_hotel_id AND (a.parent_code='SubFitMaster.master_fit' OR a.parent_code='EditResrv.resrvBase_fit' OR a.parent_code='EditResrv.resrvBase_group')
+		INSERT INTO tmp_check_base SELECT NULL,'A',CONCAT('master:',' 主单默认市场码 ',a.value_default,' 不存在') FROM sys_constraint a WHERE a.hotel_group_id = arg_hotel_group_id AND a.hotel_id = arg_hotel_id
+			AND a.parent_code IN ('SubFitMaster.master_fit','EditResrv.resrvBase_fit','EditResrv.resrvBase_group')
 			AND a.code='market' AND NOT EXISTS(SELECT 1 FROM code_base b WHERE b.hotel_group_id = arg_hotel_group_id AND b.hotel_id = arg_hotel_id AND b.parent_code='market_code' AND a.value_default=b.code);
-		INSERT INTO tmp_check_base SELECT NULL,'A',CONCAT('master:',' 主单默认来源码 ',a.value_default,' 不存在') FROM sys_constraint a WHERE a.hotel_group_id = arg_hotel_group_id AND a.hotel_id = arg_hotel_id AND (a.parent_code='SubFitMaster.master_fit' OR a.parent_code='EditResrv.resrvBase_fit' OR a.parent_code='EditResrv.resrvBase_group')
+		INSERT INTO tmp_check_base SELECT NULL,'A',CONCAT('master:',' 主单默认来源码 ',a.value_default,' 不存在') FROM sys_constraint a WHERE a.hotel_group_id = arg_hotel_group_id AND a.hotel_id = arg_hotel_id
+			AND a.parent_code IN ('SubFitMaster.master_fit','EditResrv.resrvBase_fit','EditResrv.resrvBase_group')
 			AND a.code='src' AND NOT EXISTS(SELECT 1 FROM code_base b WHERE b.hotel_group_id = arg_hotel_group_id AND b.hotel_id = arg_hotel_id AND b.parent_code='src_code' AND a.value_default=b.code);
-		INSERT INTO tmp_check_base SELECT NULL,'A',CONCAT('master:',' 主单默认房价码 ',a.value_default,' 不存在') FROM sys_constraint a WHERE a.hotel_group_id = arg_hotel_group_id AND a.hotel_id = arg_hotel_id AND (a.parent_code='SubFitMaster.master_fit' OR a.parent_code='EditResrv.resrvBase_fit' OR a.parent_code='EditResrv.resrvBase_group')
+		INSERT INTO tmp_check_base SELECT NULL,'A',CONCAT('master:',' 主单默认房价码 ',a.value_default,' 不存在') FROM sys_constraint a WHERE a.hotel_group_id = arg_hotel_group_id AND a.hotel_id = arg_hotel_id
+			AND a.parent_code IN ('SubFitMaster.master_fit','EditResrv.resrvBase_fit','EditResrv.resrvBase_group')
 			AND a.code='rateCode' AND NOT EXISTS(SELECT 1 FROM code_ratecode b WHERE b.hotel_group_id = arg_hotel_group_id AND b.hotel_id = arg_hotel_id AND a.value_default=b.code);
-		INSERT INTO tmp_check_base SELECT NULL,'A',CONCAT('master:',' 主单默认渠道码 ',a.value_default,' 不存在') FROM sys_constraint a WHERE a.hotel_group_id = arg_hotel_group_id AND a.hotel_id = arg_hotel_id AND (a.parent_code='SubFitMaster.master_fit' OR a.parent_code='EditResrv.resrvBase_fit' OR a.parent_code='EditResrv.resrvBase_group')
+		INSERT INTO tmp_check_base SELECT NULL,'A',CONCAT('master:',' 主单默认渠道码 ',a.value_default,' 不存在') FROM sys_constraint a WHERE a.hotel_group_id = arg_hotel_group_id AND a.hotel_id = arg_hotel_id
+			AND a.parent_code IN ('SubFitMaster.master_fit','EditResrv.resrvBase_fit','EditResrv.resrvBase_group')
 			AND a.code='channel' AND NOT EXISTS(SELECT 1 FROM code_base b WHERE b.hotel_group_id = arg_hotel_group_id AND b.hotel_id = arg_hotel_id AND b.parent_code='channel' AND a.value_default=b.code);
-		INSERT INTO tmp_check_base SELECT NULL,'A',CONCAT('master:',' 主单默认预订类型 ',a.value_default,' 不存在') FROM sys_constraint a WHERE a.hotel_group_id = arg_hotel_group_id AND a.hotel_id = arg_hotel_id AND (a.parent_code='SubFitMaster.master_fit' OR a.parent_code='EditResrv.resrvBase_fit' OR a.parent_code='EditResrv.resrvBase_group')
+		INSERT INTO tmp_check_base SELECT NULL,'A',CONCAT('master:',' 主单默认预订类型 ',a.value_default,' 不存在') FROM sys_constraint a WHERE a.hotel_group_id = arg_hotel_group_id AND a.hotel_id = arg_hotel_id
+			AND a.parent_code IN ('SubFitMaster.master_fit','EditResrv.resrvBase_fit','EditResrv.resrvBase_group')
 			AND a.code='rsvType' AND NOT EXISTS(SELECT 1 FROM code_rsv_type b WHERE b.hotel_group_id = arg_hotel_group_id AND b.hotel_id = arg_hotel_id AND a.value_default=b.code);
-		INSERT INTO tmp_check_base SELECT NULL,'A',CONCAT('master:',' 主单默认付款方式 ',a.value_default,' 不存在') FROM sys_constraint a WHERE a.hotel_group_id = arg_hotel_group_id AND a.hotel_id = arg_hotel_id AND (a.parent_code='SubFitMaster.master_fit' OR a.parent_code='EditResrv.resrvBase_fit' OR a.parent_code='EditResrv.resrvBase_group')
+		INSERT INTO tmp_check_base SELECT NULL,'A',CONCAT('master:',' 主单默认付款方式 ',a.value_default,' 不存在') FROM sys_constraint a WHERE a.hotel_group_id = arg_hotel_group_id AND a.hotel_id = arg_hotel_id
+			AND a.parent_code IN ('SubFitMaster.master_fit','EditResrv.resrvBase_fit','EditResrv.resrvBase_group')
 			AND a.code='payCode' AND NOT EXISTS(SELECT 1 FROM code_transaction b WHERE b.hotel_group_id = arg_hotel_group_id AND b.hotel_id = arg_hotel_id AND a.value_default=b.code);
+
 		INSERT INTO tmp_check_base SELECT NULL,'A',CONCAT('sys_option: ',a.descript,' ',a.set_value,' 不存在') FROM sys_option a WHERE a.hotel_group_id = arg_hotel_group_id AND a.hotel_id = arg_hotel_id AND a.catalog='report' AND a.item='real_room_sta_report_code'
 			AND NOT EXISTS(SELECT 1 FROM report_center b WHERE b.hotel_group_id = arg_hotel_group_id AND b.hotel_id = arg_hotel_id AND b.code=a.set_value);
 		INSERT INTO tmp_check_base SELECT NULL,'A',CONCAT('sys_option: ',a.descript,' ',a.set_value,' 不存在') FROM sys_option a WHERE a.hotel_group_id = arg_hotel_group_id AND a.hotel_id = arg_hotel_id AND a.catalog='report' AND a.item='room_sta_report_code'
@@ -191,10 +197,12 @@ BEGIN
  	INSERT INTO tmp_check_base SELECT NULL,'A',CONCAT('sys_option: ',a.descript,' ',a.set_value,' 不存在') FROM sys_option a WHERE a.hotel_group_id = arg_hotel_group_id AND a.hotel_id = arg_hotel_id AND a.catalog='audit' AND a.item='ta_code_for_room_night'
 		AND NOT EXISTS(SELECT 1 FROM code_transaction b WHERE b.hotel_group_id = arg_hotel_group_id AND b.hotel_id = arg_hotel_id AND a.set_value=b.code);
 
-	INSERT INTO tmp_check_base SELECT NULL,'B',CONCAT('sys_option: ',a.descript,' ',a.set_value,' 不存在') FROM sys_option a WHERE a.hotel_group_id = arg_hotel_group_id AND a.hotel_id = arg_hotel_id AND a.catalog='account' AND a.item='business_accnt'
-			AND NOT EXISTS(SELECT 1 FROM master_base b WHERE b.hotel_group_id = arg_hotel_group_id AND b.hotel_id = arg_hotel_id AND b.rsv_class='H' AND b.id=a.set_value);
-	INSERT INTO tmp_check_base SELECT NULL,'B',CONCAT('sys_option: ',a.descript,' ',a.set_value,' 不存在') FROM sys_option a WHERE a.hotel_group_id = arg_hotel_group_id AND a.hotel_id = arg_hotel_id AND a.catalog='account' AND a.item='roomAccnt_accnt'
-			AND NOT EXISTS(SELECT 1 FROM master_base b WHERE b.hotel_group_id = arg_hotel_group_id AND b.hotel_id = arg_hotel_id AND b.rsv_class='H' AND b.id=a.set_value);
+	-- INSERT INTO tmp_check_base SELECT NULL,'B',CONCAT('sys_option: ',a.descript,' ',a.set_value,' 不存在') FROM sys_option a WHERE a.hotel_group_id = arg_hotel_group_id AND a.hotel_id = arg_hotel_id AND a.catalog='account' AND a.item='business_accnt'
+	-- 		AND NOT EXISTS(SELECT 1 FROM master_base b WHERE b.hotel_group_id = arg_hotel_group_id AND b.hotel_id = arg_hotel_id AND b.rsv_class='H' AND b.id=a.set_value);
+	IF EXISTS (SELECT 1 FROM master_base WHERE hotel_group_id = arg_hotel_group_id AND hotel_id = arg_hotel_id AND rsv_class='H' AND sta='I') THEN
+		INSERT INTO tmp_check_base SELECT NULL,'B',CONCAT('sys_option: ',a.descript,' ',a.set_value,' 不存在') FROM sys_option a WHERE a.hotel_group_id = arg_hotel_group_id AND a.hotel_id = arg_hotel_id AND a.catalog='account' AND a.item='roomAccnt_accnt'
+				AND NOT EXISTS(SELECT 1 FROM master_base b WHERE b.hotel_group_id = arg_hotel_group_id AND b.hotel_id = arg_hotel_id AND b.rsv_class='H' AND b.id=a.set_value);
+	END IF;
 
  	INSERT INTO tmp_check_base SELECT NULL,'A',CONCAT('sys_option: ',a.descript,' ',a.set_value,' 不存在') FROM sys_option a WHERE a.hotel_group_id = arg_hotel_group_id AND a.hotel_id = arg_hotel_id AND a.catalog='account' AND a.item='day_use_tacode'
 		AND NOT EXISTS(SELECT 1 FROM code_transaction b WHERE b.hotel_group_id = arg_hotel_group_id AND b.hotel_id = arg_hotel_id AND a.set_value=b.code);
