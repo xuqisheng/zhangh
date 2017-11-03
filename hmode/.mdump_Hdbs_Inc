@@ -1,0 +1,32 @@
+#!/bin/bash
+# --------------------------------------------------------------------------------------------
+# function:
+#           generate the incremental sql based on /root/mode/dump/Hdbs.sql 
+#
+# usages  :
+#          ./.mdump_Hdbs_Inc
+# remarks :
+#          The incremental sql file is /root/mode/dump/Hdbs_Inc.sql
+# --------------------------------------------------------------------------------------------
+
+#
+
+Hbinfile=`/root/mode/dumpattr -b /root/mode/dump/Hdbs.sql`
+if [ -z "$Hbinfile" ]; then
+   /root/mode/modemsg mdump_Hdbs_Inc "No base dump /root/mode/dump/Hdbs.sql!" more
+   exit 1
+fi
+
+#
+
+{
+   echo 
+   echo "############# .mdump_Hdbs_Inc #############"
+   echo 
+   echo "Generating incremental sql /root/mode/dump/Hdbs_Inc.sql began at `LANG=en_US;date`"
+   /root/mode/dumpattr -i $Hbinfile > /root/mode/dump/Hdbs_Inc.sql
+   echo "Generating incremental sql /root/mode/dump/Hdbs_Inc.sql ended at `LANG=en_US;date`"
+
+} 2>&1 | tee -a /root/mode/logs/Hdbs.log 
+
+#

@@ -1,0 +1,14 @@
+#!/bin/bash 
+
+#
+
+Hlsample=`ls -ld /usr/local/tomcat* 2>/dev/null | grep -E "^l" | awk '{print $NF}' | sed -re "s/^(.*)\/.*$/\1/" | sort | uniq`
+if [ `echo "$Hlsample" | wc -l` -eq 1 ]; then
+   if echo "$Hlsample" | grep -E "^/" >/dev/null; then
+      echo $Hlsample
+   fi
+fi
+
+# end
+
+

@@ -1,0 +1,49 @@
+#!/bin/bash
+# --------------------------------------------------------------------------------------------
+# function:
+#           generate a complete sql dump which is used as the base dump of database migration 
+#
+# usages  :
+#          ./.mdump_Hdbs 
+# remarks :
+#          The dump file is /root/mode/dump/Hdbs.sql
+# --------------------------------------------------------------------------------------------
+
+
+#
+
+. /root/mode/mysqldip
+
+#
+Hdbs_to_dump=`/root/mode/seecfg -s $HMYSQLDIP  "show databases" | grep -Ev "^(information_schema|performance_schema)$"`
+Hdbs_reglist=`echo $Hdbs_to_dump |  sed -r -e "s/ /\|/g" -e "s/^(.*)$/\(\1\)/"`
+#
+Hdbs_MySQL_ver=`/root/mode/seecfg -s $HMYSQLDIP  "show variables like 'version'" | sed -re "s/^.*\t(.*)/\1/"`
+Hdbs_MySQL_vcm=`/root/mode/seecfg -s $HMYSQLDIP  "show variables like 'version_comment'" | sed -re "s/^.*\t(.*)/\1/"`
+#
+HDUMPNAME=/root/mode/dump/Hdbs.sql
+#
+if [ -n "$Hdbs_to_dump" ]; then
+   # 
+
+   {
+   echo 
+   echo "############# .mdump_Hdbs $HMYSQLDIP2  #############"
+   echo 
+   echo "Dump whole databases at $HMYSQLDIP2 to '$HDUMPNAME' began at `LANG=en_US;date`"
+   
+   echo "# mode generated header" > /root/mode/dump/Hdbs.sql
+   echo "# mode MySQL Ver::::$Hdbs_MySQL_ver" >> /root/mode/dump/Hdbs.sql
+   echo "# mode MySQL VerC:::$Hdbs_MySQL_vcm" >> /root/mode/dump/Hdbs.sql
+   echo "# mode reg_db_list::$Hdbs_reglist"   >> /root/mode/dump/Hdbs.sql
+   mysqldump -uroot $Hmodepass -h$HMYSQLDIP --opt --single-transaction --master-data=2 -F -R --add-drop-database --databases $Hdbs_to_dump |
+   grep -a -Ev "^/\*\!40000 DROP DATABASE IF EXISTS \`mysql\`\*/;$" >> /root/mode/dump/Hdbs.sql
+   echo "Dump whole databases at $HMYSQLDIP2 to '$HDUMPNAME' ended at `LANG=en_US;date`"
+
+   } 2>&1 | tee -a /root/mode/logs/Hdbs.log 
+fi
+
+# end
+
+
+

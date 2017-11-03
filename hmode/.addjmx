@@ -1,0 +1,29 @@
+#!/bin/bash 
+
+#
+
+if [ -f /etc/.mode_Ifeelscared ]; then
+   if [ -n "$CATALINA_HOME" ]; then
+      CATALINA_OPTS="$CATALINA_OPTS -Dcom.sun.management.jmxremote"
+      CATALINA_OPTS="$CATALINA_OPTS -Dcom.sun.management.jmxremote.ssl=false"
+      CATALINA_OPTS="$CATALINA_OPTS -Dcom.sun.management.jmxremote.authenticate=false"
+      # ip
+      HCATA_IP=`cat /etc/.mode_Ifeelscared`
+      if [ -z "$HCATA_IP" ]; then
+         HCATA_IP=`/root/mode/getips | head -n 1`
+      fi
+      CATALINA_OPTS="$CATALINA_OPTS -Djava.rmi.server.hostname=$HCATA_IP"
+      # port 
+      Hdwnp=$(cat $CATALINA_HOME/conf/server.xml|grep -E "<Server port=\"([0-9]+)\" shutdown=" | sed -re "s/.*\"([0-9]+)\".*/\1/")
+      Hjmxp=`echo $Hdwnp | sed -re "s/^./7/"`
+      #
+      CATALINA_OPTS="$CATALINA_OPTS -Dcom.sun.management.jmxremote.port=$Hjmxp"
+      if /usr/local/jdk6/bin/java -version 2>&1 | grep -Pi "java version \"1\.[789]\." >/dev/null; then
+         CATALINA_OPTS="$CATALINA_OPTS -Dcom.sun.management.jmxremote.rmi.port=$Hjmxp"
+      fi
+      export CATALINA_OPTS
+   fi
+fi
+
+#
+
