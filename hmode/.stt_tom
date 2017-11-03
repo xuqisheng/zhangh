@@ -57,7 +57,11 @@ Hhryloop_limit=300
 while [ $Hhryloop -lt $Hhryloop_limit ]; do
    sleep $Hhryloop_intv
    Htomsta=`/root/mode/tctomcat $Hhrytomcat 2>/dev/null`
-   if echo $Htomsta | grep -E '^up' >/dev/null; then
+   if cat $Htailtmp 2>/dev/null | grep -E "(Port busy [0-9]+ java\.net\.BindException|Error starting endpoint|StandardServer.await: create)" >/dev/null; then
+      # conflict ports
+      Hstartdone="CP"
+      break
+   elif echo $Htomsta | grep -E '^up' >/dev/null; then
       # check process port status
       Hstartdone="1"
       echo "Mode start mark(started by process check) `LANG=en_US;date`"  >> /usr/local/$Hhrytomcat/logs/catalina.out
@@ -75,7 +79,10 @@ while [ $Hhryloop -lt $Hhryloop_limit ]; do
          #    1.not yet at the 'start' stage;
          #    2.has been killed by oom-killer or someone.
          # ----------------------------------------------------------------
-         :
+         if [ $[$Hhryloop*$Hhryloop_intv] -ge 50 ]; then
+             Hstartdone="BKL"
+             break
+         fi
       fi
    fi
    Hhryloop=$[$Hhryloop+1]
@@ -89,11 +96,11 @@ done
 
 #
 
-cat $Htailtmp 2>/dev/null | 
-grep -Pi '.*Context \[/[^ ]+\] startup failed due to previous errors' |
-sed -re "s/.*Context \[(\/[^ ]+)\] startup failed due to previous errors/\1/" > /root/mode/.tomlogs/$Hhrytomcat
-
-if cat $Htailtmp 2>/dev/null | grep -E 'Mode trun_log event' >/dev/null; then
+if ! cat $Htailtmp 2>/dev/null | grep -E 'Mode trun_log event' >/dev/null; then
+   cat $Htailtmp 2>/dev/null | 
+   grep -E 'Context \[/[^ ]+\] startup failed due to previous errors' |
+   sed -re "s/^.*Context \[(\/[^ ]+)\] startup failed due to previous errors.*$/\1/" > /root/mode/.tomlogs/$Hhrytomcat
+else
    # 
    # The file catalina.out was truncated by /root/mode/clrlogs,and the resulting contents were appended to our incremental file $Htailtmp.
    # This is not as we wish. 
@@ -101,18 +108,16 @@ if cat $Htailtmp 2>/dev/null | grep -E 'Mode trun_log event' >/dev/null; then
    #
    >/root/mode/.tomlogs/$Hhrytomcat
    Hcontextfile=/root/mode/tmp/Htomcontext$$.tmp
-   tail -n 10000 /usr/local/$Hhrytomcat/logs/catalina.out 2>/dev/null | grep -Pi "(Mode start mark |.*Context \[/[^ ]+\] startup failed due to previous errors)" > $Hcontextfile
-   Hblackmark=`cat $Hcontextfile 2>/dev/null | grep -Pn "Mode start mark " | tail -n 1 | sed -re "s/^([0-9]+):.*/\1/"`
+   tail -n 10000 /usr/local/$Hhrytomcat/logs/catalina.out 2>/dev/null | grep -E "(Mode start mark |Context \[/[^ ]+\] startup failed due to previous errors)" > $Hcontextfile
+   Hblackmark=`cat $Hcontextfile 2>/dev/null | grep -En "Mode start mark " | tail -n 1 | sed -re "s/^([0-9]+):.*/\1/"`
    if [ "$Hblackmark" != "" ]; then
       cat $Hcontextfile 2>/dev/null | sed -n "$Hblackmark,$ p" | 
-      grep -Pi '.*Context \[/[^ ]+\] startup failed due to previous errors' |
-      sed -re "s/.*Context \[(\/[^ ]+)\] startup failed due to previous errors/\1/" > /root/mode/.tomlogs/$Hhrytomcat
+      grep -E 'Context \[/[^ ]+\] startup failed due to previous errors' |
+      sed -re "s/^.*Context \[(\/[^ ]+)\] startup failed due to previous errors.*$/\1/" > /root/mode/.tomlogs/$Hhrytomcat
    fi
    rm -f $Hcontextfile
 fi
-
 rm -f $Htailtmp
-
 
 #
 
@@ -127,6 +132,10 @@ elif [ "$Hstartdone" = "00" ]; then
    /root/mode/modemsg "start_tomcat $Hhrytomcat" "Failed to start $Hhrytomcat!" 
    /root/mode/modemsg "start_tomcat $Hhrytomcat" "insufficient memory for tomcat to start!" 
    exit 1
+elif [ "$Hstartdone" = "CP" ]; then
+   /root/mode/modemsg "start_tomcat $Hhrytomcat" "Conflicting ports!please check tomcat configuration!" 
+elif [ "$Hstartdone" = "BKL" ]; then
+   /root/mode/modemsg "start_tomcat $Hhrytomcat" "Tomcat might be killed during start process!" 
 fi
 
 # one more check 

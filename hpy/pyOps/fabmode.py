@@ -29,43 +29,55 @@ env.password='zhangh'
 #     'root@192.168.0.63 3335' : 'passwd63'
 # }
 
+
 def get_message():
     run('cat /etc/issue;df;free')
+
 
 def seetom():
     # 远程切换目录
     with cd('/root/mode'):
         run("./seetom")
 
+
 def seecode():
     run("/root/mode/seecode")
+
 
 def jvstat():
     run('/root/mode/jvstat')
 
+
 def eval_app():
     run('/root/mode/eval_app -ll')
+
 
 def showlist():
     run("/root/mode/seecfg 'show processlist'")
 
+
 def showdb():
     run("/root/mode/seecfg 'show databases'")
+
 
 def showuser():
     run("/root/mode/.do1au")
 
+
 def getip():
     run("ifconfig")
 
+
 def shutdown():
     run("shutdown -h now")
+
 
 # 部署 mode
 def deploy_mode():
     # 这里加一步判断，是否已经部署mode
     get_mode()
     exec_mode()
+
 
 # 下载 mode 并 解压
 def get_mode():
@@ -75,6 +87,7 @@ def get_mode():
             run('wget http://www.ipms.cn:8090/packages.tar.gz')
             run('tar zxvf mode.tar.gz')
             run('tar zxvf packages.tar.gz')
+
 
 # 执行 mode 安装
 def exec_mode():
@@ -91,7 +104,8 @@ def exec_mode():
     # 删除上传的本地文件
     run('rm -Rf /root/mntOS.py')
 
-    print '^_^ Congratulations! Mode deployment is successful!'
+    print('^_^ Congratulations! Mode deployment is successful!')
+
 
 def ansible_com():
     # 定义文件路径
@@ -106,6 +120,7 @@ def ansible_com():
 
     #删除文件
     run('rm /' + file_name)
+
 
 # 通用函数:上传、解压、执行、删除文件
 def func_com():

@@ -60,12 +60,13 @@ while [ 1 ]; do
       
    #
 
-   Hportcnt=`echo "$Hntlp" | grep -E "( $Htprocess/java|\(\"java\",$Htprocess,[0-9]+\))" | grep -Ev ":[0-9]{5}" | wc -l`
+   Hdwnp=$(cat /usr/local/$1/conf/server.xml|grep -E "<Server port=\"([0-9]+)\" shutdown=" | sed -re "s/.*\"([0-9]+)\".*/\1/")
+   Hjmxp=`echo $Hdwnp | sed -re "s/^./7/"`
+   Hajpp=$(cat /usr/local/$1/conf/server.xml|grep -E "<Connector port=\"([0-9]+)\" protocol=\"AJP" | sed -re "s/.*\"([0-9]+)\" p.*/\1/")
 
    #
 
-   Hdwnp=$(cat /usr/local/$1/conf/server.xml|grep -E "<Server port=\"([0-9]+)\" shutdown=" | sed -re "s/.*\"([0-9]+)\".*/\1/")
-   Hajpp=$(cat /usr/local/$1/conf/server.xml|grep -E "<Connector port=\"([0-9]+)\" protocol=\"AJP" | sed -re "s/.*\"([0-9]+)\" p.*/\1/")
+   Hportcnt=`echo "$Hntlp" | grep -E "( $Htprocess/java|\(\"java\",$Htprocess,[0-9]+\))" | grep -Ev ":([0-9]{5}|$Hjmxp) " | wc -l`
 
    # "up" by method 1 --  process with all ports open 
 

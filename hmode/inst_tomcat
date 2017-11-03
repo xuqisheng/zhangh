@@ -11,7 +11,7 @@
 if [ -z "$1" -o "$1" = "apache" ]; then
    HTOMMODE=c
    HAPACHEMODE=apache
-elif echo "$1" | grep -E "^apache[1-7]$" >/dev/null; then
+elif echo "$1" | grep -E "^apache[1-9]$" >/dev/null; then
    HTOMMODE=c
    HAPACHEMODE=$1
 elif [ "$1" = "Nonclustertomcat" ]; then
@@ -165,6 +165,13 @@ rm -fR *
 tar xzvf /root/packages/tomcat6.tar.gz
 mv `ls` tomcat$Htomtail
 cp -fR tomcat$Htomtail /usr/local
+Htlbase=`/root/mode/.tlbase`
+if [ -n "$Htlbase" ]; then
+   if [ ! -e $Htlbase/tomcat$Htomtail ]; then
+      mv /usr/local/tomcat$Htomtail $Htlbase
+      ln -s $Htlbase/tomcat$Htomtail /usr/local/tomcat$Htomtail
+   fi
+fi
 /root/mode/.opt_tomcat tomcat$Htomtail
 
 #
@@ -279,6 +286,14 @@ else
       cat $Hhrytmpfi2 > /usr/local/tomcat$Htomtail/conf/server.xml 
       }
    fi
+fi
+
+# initial memory setting 
+
+if ! cat /usr/local/tomcat$Htomtail/bin/catalina.sh | grep -E "^JAVA_OPTS" | grep -v JSSE_OPTS > /dev/null; then
+   cat /usr/local/tomcat$Htomtail/bin/catalina.sh |
+   sed -re "/cygwin=false/ iJAVA_OPTS=\"-server -Xms60m -Xmx1000m -XX:MaxPermSize=256m -Duser.timezone=GMT+08 -XX:ReservedCodeCacheSize=128m -XX:+UseCodeCacheFlushing\"" > $Hhrytmpfi2
+   cp -f $Hhrytmpfi2 /usr/local/tomcat$Htomtail/bin/catalina.sh
 fi
 
 # add maxthread setting etc.

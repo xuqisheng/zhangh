@@ -195,7 +195,7 @@ while [ 1 ]; do
    Htprocess=`echo "$Htcmdline" | sed -re "s/^[^ ]+ +([0-9]+).*/\1/" | head -n 1`
 
    Hpcnt_1=`netstat -ntlp 2>/dev/null | grep -E " $Htprocess/java" | wc -l`
-   Hpcnt_2=`netstat -ntlp 2>/dev/null | grep -E " $Htprocess/java" | grep -E ":[0-9]{5}" | wc -l`
+   Hpcnt_2=`netstat -ntlp 2>/dev/null | grep -E " $Htprocess/java" | grep -E ":([0-9]{5}|7[0-9]{3}) " | wc -l`
    if [ $Hpcnt_1 -eq 0 ]; then
       # zombie tomcat
       if [ -n "$HHRYDEBUG" ]; then

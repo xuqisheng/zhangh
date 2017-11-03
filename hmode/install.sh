@@ -21,7 +21,7 @@ fi
 
 HAPACHENO="$1"
 if [ -f /etc/mclustermode ]; then
-   if ! echo "$HAPACHENO" | grep -E "^[1-7]?$" >/dev/null; then
+   if ! echo "$HAPACHENO" | grep -E "^[1-9]?$" >/dev/null; then
       exit 1
    fi 
 else

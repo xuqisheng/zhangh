@@ -17,12 +17,9 @@ Hhrytmpfile="/root/mode/tmp/hhrytommem$$.tmp"
 
 # tomcat memory allocation
 
-# ---------------------------------------------------------------------------------------------------------------
-# For noncluster tomcats such as web tomcats,we use fixed memory allocation mode "-Xmx1000m -XX:MaxPermSize=200m",
-# but calculate memory usage with Heapsize=400M and permsize=64M.
-# So comes 464M
-# ---------------------------------------------------------------------------------------------------------------
-HNTOMMEM=$[$HTOMNUMn*464]
+HNTOMMEM=$[$HTOMNUMn*$HnTOMfixsize]
+
+#
 
 if [ $[$HTOMNUMc+$HTOMNUMN] -gt 0 ]; then
    if [ $HTOMNUMc -gt 0 ]; then
@@ -73,14 +70,14 @@ for i in `ls -d tomcat*/ 2>/dev/null | sed -re "s/\/$//" `;do
     /root/mode/check_tomcat $i || continue
     if /root/mode/isctom $i || /root/mode/isNtom $i; then
        if [ "$HTOMMIXMODE" = "yES" ]; then
-          Htconfig="-Xms120m -Xmx${HCTOMMEM}m -XX:MaxPermSize=${HPERMMAX}m"
+          Htconfig="-Xms${HinitialTOMsize}m -Xmx${HCTOMMEM}m -XX:MaxPermSize=${HPERMMAX}m"
        else
           HMAXNEW=1000
           Hnewsize=$[($HCTOMMEM-1000)*($HMAXNEW-500)/1500+500]
           Htconfig="-Xms${HCTOMMEM}m -Xmx${HCTOMMEM}m -Xmn${Hnewsize}m -XX:MaxPermSize=${HPERMMAX}m"
        fi
     else
-       Htconfig="-Xms120m -Xmx1000m -XX:MaxPermSize=200m"
+       Htconfig="-Xms${HinitialTOMsize}m -Xmx1000m -XX:MaxPermSize=256m"
     fi
 
     # --------------------------------------------------------------------------
@@ -116,6 +113,10 @@ for i in `ls -d tomcat*/ 2>/dev/null | sed -re "s/\/$//" `;do
        sed -re "/cygwin=false/ iJAVA_OPTS=\"-server $Htconfig\"" > $Hhrytmpfile
     fi
     cp -f $Hhrytmpfile /usr/local/$i/bin/catalina.sh 
+    #
+    if ! cat /usr/local/$i/bin/catalina.sh | grep -E "/root/mode/\.addjmx" >/dev/null; then
+       sed -ci -re "/^# For OS400/ i # mode added script\n. /root/mode/.addjmx\n" /usr/local/$i/bin/catalina.sh
+    fi
 done
 
 # delete tmp file

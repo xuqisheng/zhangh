@@ -13,8 +13,8 @@ else
       Hcmode=set
       Hsetsta=$2
    fi
-   if cat /usr/local/$Htomcat/conf/server.xml | grep -E "<!-- apache[1-7]? -->" >/dev/null; then
-      Hapachemode=`cat /usr/local/$Htomcat/conf/server.xml | grep -E "<!-- apache[1-7]? -->" | sed -re "s/.*<!-- (apache[1-7]?) -->.*/\1/" | head -n 1`
+   if cat /usr/local/$Htomcat/conf/server.xml | grep -E "<!-- apache[1-9]? -->" >/dev/null; then
+      Hapachemode=`cat /usr/local/$Htomcat/conf/server.xml | grep -E "<!-- apache[1-9]? -->" | sed -re "s/.*<!-- (apache[1-9]?) -->.*/\1/" | head -n 1`
    else
       Hapachemode=apache
    fi

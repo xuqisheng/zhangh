@@ -1,17 +1,42 @@
 #!/bin/bash
 
 /root/mode/skip_pv "$1" "$2" "$3" && exit 0
-Hwaitforother_limit=100
+Hhost=`hostname`
+Hwaitforother_limit_1=60
+Hwaitforother_limit_2=120
+Hwaitforother_limit_mysql_1=60
+Hwaitforother_limit_mysql_2=600
 Hwaitforother_count=0
 while [ 1 ]; do
    Hret=`/root/mode/modepv1 "$1" "$2" "$3"`
    if [ "$Hret" != "success" ]; then
       if echo "$Hret" | grep -E "^waitforother" >/dev/null; then
          Hwaitforother_count=$[$Hwaitforother_count+1]
-         if [ $Hwaitforother_count -ge $Hwaitforother_limit ]; then
-            /root/mode/modelog "$0 $1 $2 '$3' [threshold 'Hwaitforother_limit=$Hwaitforother_limit' reached]"
-            echo "blackbox2: mpv $1 " | mail -s "Wait alert(`/root/mode/getpip`)(`/root/mode/getips|head -n 1`)($Hhost)...... `LANG=en_US;date`" 625835738@qq.com
-            exit 0
+         #
+         if [ "$1" = "mysql" ]; then     
+            if [ $Hwaitforother_count -ge $Hwaitforother_limit_mysql_2 ]; then
+               /root/mode/modelog "$0 $1 $2 '$3' [threshold 'Hwaitforother_limit_mysql_2=$Hwaitforother_limit_mysql_2' reached]"
+               echo "blackbox2: mpv $1 " | mail -s "Wait alert(`/root/mode/.modesid`)(`/root/mode/getpip`)(`/root/mode/getips|head -n 1`)($Hhost)...... `LANG=en_US;date`" 625835738@qq.com
+               exit 0
+            elif [ $Hwaitforother_count -ge $Hwaitforother_limit_mysql_1 ]; then
+               /root/mode/modemsg modepv "Waiting for another mysql start/stop process to completely finish ...... $Hwaitforother_count" more
+               # idcheck message
+               if cat /root/mode/logs/idcheck.log 2>/dev/null | grep 'idcheck fix'>/dev/null; then
+                  if ! cat /root/mode/logs/idcheck.log 2>/dev/null | tail -n 10 | sed -re "/^ *$/ d" | tail -n 1 | grep -E "^Checking completed" >/dev/null; then
+                     /root/mode/modemsg modepv "It seems the idcheck part in /root/mode/mysql script is in progress" more
+                     # extra wait 
+                     sleep 2
+                  fi
+               fi
+            fi
+         else
+            if [ $Hwaitforother_count -ge $Hwaitforother_limit_2 ]; then
+               /root/mode/modelog "$0 $1 $2 '$3' [threshold 'Hwaitforother_limit_2=$Hwaitforother_limit_2' reached]"
+               echo "blackbox2: mpv $1 " | mail -s "Wait alert(`/root/mode/.modesid`)(`/root/mode/getpip`)(`/root/mode/getips|head -n 1`)($Hhost)...... `LANG=en_US;date`" 625835738@qq.com
+               exit 0
+            elif [ $Hwaitforother_count -ge $Hwaitforother_limit_1 ]; then
+               /root/mode/modemsg modepv "Waiting for another $1 process to complete ...... $Hwaitforother_count" more
+            fi
          fi
       fi
       HMODEPV_WAITBASE=`echo $Hret | sed -re "s/.* +(.*)/\1/"`

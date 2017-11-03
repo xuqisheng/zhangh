@@ -14,10 +14,10 @@ for i in `ls -d tomcat*/ 2>/dev/null | sed -re "s/\/$//" `;do
    /root/mode/check_tomcat $i || continue
    if /root/mode/isctom $i; then
       # get cluster 
-      if ! cat /usr/local/$i/conf/server.xml | grep -E "<!-- apache[1-7] -->" >/dev/null; then
+      if ! cat /usr/local/$i/conf/server.xml | grep -E "<!-- apache[1-9] -->" >/dev/null; then
          Hamode=apache
       else
-         Hamode=`cat /usr/local/$i/conf/server.xml | grep -E "<!-- apache[1-7]? -->" | sed -re "s/.*<!-- (apache[1-7]?) -->.*/\1/" | head -n 1`
+         Hamode=`cat /usr/local/$i/conf/server.xml | grep -E "<!-- apache[1-9]? -->" | sed -re "s/.*<!-- (apache[1-9]?) -->.*/\1/" | head -n 1`
       fi
       # calculate standard mcast
       Hmcasttomcat=$i

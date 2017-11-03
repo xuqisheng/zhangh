@@ -191,8 +191,36 @@ if ! /root/mode/comdump "$HDUMPNAME"; then
    exit 1 
 fi
 
+#  
 
-if [ "$HDBNAME" = 'mysql' -o "$HDBNAME" = 'performance_schema' ]; then
+HDBNAME_mon=$HDBNAME
+Hdbs_reglist=`cat $HDUMPNAME 2>/dev/null | head -n 40 | grep -E "^# mode reg_db_list::" | sed -re "s/^# mode reg_db_list::(.*)/\1/"` 
+if [ -n "$Hdbs_reglist" ]; then
+   # MySQL server version at $HMYSQLDIP
+   Hdbs_MySQL_ver1=`/root/mode/seecfg -s $HMYSQLDIP  "show variables like 'version'" | sed -re "s/^.*\t(.*)/\1/"`
+   Hdbs_MySQL_vcm1=`/root/mode/seecfg -s $HMYSQLDIP  "show variables like 'version_comment'" | sed -re "s/^.*\t(.*)/\1/"`
+   # MySQL server version in dump $HDUMPNAME
+   Hdbs_MySQL_ver2=`cat $HDUMPNAME 2>/dev/null | head -n 40 | grep -E "^# mode MySQL Ver::::" | sed -re "s/^# mode MySQL Ver::::(.*)/\1/"`
+   Hdbs_MySQL_vcm2=`cat $HDUMPNAME 2>/dev/null | head -n 40 | grep -E "^# mode MySQL VerC:::" | sed -re "s/^# mode MySQL VerC:::(.*)/\1/"`
+   # MySQL server version check  
+   if [ "$Hdbs_MySQL_ver1" != "$Hdbs_MySQL_ver2" -o "$Hdbs_MySQL_vcm1" != "$Hdbs_MySQL_vcm2" ]; then
+      /root/mode/modemsg mload " MySQL server version check failed!" more
+      exit 1
+   fi 
+   if [ `/root/mode/seecfg -s $HMYSQLDIP "show processlist" | wc -l` -ge 2 ]; then
+      /root/mode/modemsg mload "There shoud be no other conections to MySQL server at $HMYSQLDIP2!" more
+      exit 1
+   fi
+   if [ `/root/mode/traceps "crond"` != 'suc' ]; then
+      # confirmation
+      /root/mode/confirm "Are you sure to load '$HDUMPNAME' into MySQL server at $HMYSQLDIP2" hellohby || 
+      {
+         [ $HISTAR -eq 1 ] && rm -fR "$HTMPSQLDIR"
+         exit 1 
+      }
+   fi
+   HDBNAME_mon="$Hdbs_reglist"
+elif [ "$HDBNAME" = 'mysql' -o "$HDBNAME" = 'performance_schema' ]; then
    # system database check
    if ! echo "$HOPTIONS" | grep -E -e "(-S)(-|$)" >/dev/null; then
       /root/mode/modemsg mload "You must use the -S option to load '$HDBNAME' at $HMYSQLDIP2!" more
@@ -260,7 +288,7 @@ echo
 echo -n "^-^"
 while [ 1 ];do
    sleep 5
-   /root/mode/monload $Hlprocess $HMYSQLDIP $HDBNAME || break
+   /root/mode/monload $Hlprocess $HMYSQLDIP $HDBNAME_mon || break
 done
 echo -n "^-^"
 echo

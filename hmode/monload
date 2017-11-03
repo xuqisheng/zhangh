@@ -12,6 +12,14 @@ if ! ps -ef | grep -E "^[^ ]+ +$1 +.*seecfg" >/dev/null; then
    exit 1
 fi
 
+#
+
+if echo "$3" | grep -E "^\(" >/dev/null; then
+   H3="$3"
+else
+   H3="($3)"
+fi
+
 # local ip addresses 
 
 if [ "$2" = "localhost" ]; then
@@ -27,13 +35,13 @@ fi
 Hinsmark="(INSERT INTO|insert  into)"
 Hmlfile=/root/mode/tmp/hmonload$$.tmp
 /root/mode/seecfg $2 "show processlist" > $Hmlfile
-if cat $Hmlfile | grep -Pi  "^(\|[^\|]*){2}\| *$Hlip *\| *$3 *(\|[^\|]*){3}\| *$Hinsmark \`" > /dev/null; then
+if cat $Hmlfile | grep -Pi  "^(\|[^\|]*){2}\| *$Hlip *\| *$H3 *(\|[^\|]*){3}\| *$Hinsmark \`" > /dev/null; then
     Hletter=$(
     LANG=en_US;
     cat $Hmlfile | 
-    grep -Pi "^(\|[^\|]*){2}\| *$Hlip *\| *$3 *(\|[^\|]*){3}\| *$Hinsmark \`" |
+    grep -Pi "^(\|[^\|]*){2}\| *$Hlip *\| *$H3 *(\|[^\|]*){3}\| *$Hinsmark \`" |
     head -n 1 |
-    sed -re "s/^(\|[^\|]*){2}\| *$Hlip *\| *$3 *(\|[^\|]*){3}\| *$Hinsmark \`(.).*/\5/" |
+    sed -re "s/^(\|[^\|]*){2}\| *$Hlip *\| *$H3 *(\|[^\|]*){3}\| *$Hinsmark \`(.).*/\6/" |
     tr "A-Z" "a-z")
     echo -n "$Hletter"
 fi

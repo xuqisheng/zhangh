@@ -62,7 +62,7 @@ if [ -f /root/mode/proc/tomcat ]; then
       elif [ "$k" = "$Htompno" ]; then
          continue
       fi
-      if ps -ef | grep -P "^[^ ]+ +$k +.*/$i +$j( |$)" | grep -v grep >/dev/null; then
+      if ps -ef | grep -E "^[^ ]+ +$k +.*/$i +$j( |$)" | grep -v grep >/dev/null; then
          echo "$i $j $k" >> /root/mode/tmp/Htomps$$.tmp
       fi
    done

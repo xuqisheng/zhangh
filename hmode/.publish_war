@@ -31,7 +31,7 @@ elif echo $Htomapache | grep -E "^tomcat" >/dev/null; then
       exit 1
    fi
    Htamode='t'
-elif echo $Htomapache | grep -E "^apache[1-7]?$" >/dev/null; then
+elif echo $Htomapache | grep -E "^apache[1-9]?$" >/dev/null; then
    Hapachemode=$1
    Hapachetail=`echo $Htomapache | sed -re "s/apache(.*)/\1/"`
    if [ ! -d /usr/local/$Hapachemode/conf ]; then

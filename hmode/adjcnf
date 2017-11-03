@@ -96,7 +96,7 @@ fi
 
 /root/mode/mod_config "/etc/my.cnf" "bulk_insert_buffer_size=8M" "key_buffer_size"
 
-# buffers for innodb tables(per thread basic)
+# buffers for innodb tables(per thread basis)
 
 /root/mode/mod_config "/etc/my.cnf" "read_buffer_size=3M"
 /root/mode/mod_config "/etc/my.cnf" "sort_buffer_size=16M"

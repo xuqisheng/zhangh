@@ -131,37 +131,35 @@ Hmerrlog=`ls -1t /var/lib/mysql/*.err 2>/dev/null | head -n 1`
 [ -z "$Hmerrlog" ] && exit 
 
 # mark '[to be fixed by mode]' and save the marked file to /root/mode/tmp/Hoptimize$$.tmp
-cat $Hmerrlog 2>/dev/null | sed -re "s/^(.*Got error -1 when reading table .*')$/\1 [to be fixed by mode]/" > /root/mode/tmp/Hoptimize$$.tmp
+cat "$Hmerrlog" 2>/dev/null | sed -re "s/(Got error -1 when reading table .*')$/\1 [to be fixed by mode]/" > /root/mode/tmp/Hoptimize$$.tmp
 
-if [ -f "$Hmerrlog" ]; then 
-   if ! cmp /root/mode/tmp/Hoptimize$$.tmp  $Hmerrlog &>/dev/null; then
-      # save back to original file 
-      cp -f /root/mode/tmp/Hoptimize$$.tmp  $Hmerrlog
-      # log optimize_table event  
-      {
-         echo 
-         echo 
-         echo "#################################################################################################################"
-         echo "###################### tune_mysql -> optimize_table began at `LANG=en_US;date` #######################"
-         echo "#################################################################################################################"
-      } | tee -a /root/mode/logs/tune_mysql_optimize_table.log
-      # fix the marked tables
-      cat $Hmerrlog 2>/dev/null | grep -E '\[to be fixed by mode\]$' | sed -re "s/.*Got error -1 when reading table '\.\/([^\\\\]+)\/([^']+)'.*/\1 \2/" |
-      sort | uniq | 
-      while read -r Hop_db Hop_tb;do
-         # Use /root/mode/optimize_table to do optimization.
-         # Very large tables might not be optimized 
-         /root/mode/optimize_table localhost "$Hop_db" "$Hop_tb" 2>&1 | tee -a /root/mode/logs/tune_mysql_optimize_table.log
-         # we simply ignore the exit status 
-      done
-      # mark '[has been fixed by mode]' and save the marked file to /root/mode/tmp/Hoptimize$$.tmp
-      cat $Hmerrlog 2>/dev/null | sed -re "s/to be fixed by mode/has been fixed by mode/" > /root/mode/tmp/Hoptimize$$.tmp
-      # save back to original file 
-      cp -f /root/mode/tmp/Hoptimize$$.tmp  $Hmerrlog
-      {
-         echo "###################### tune_mysql -> optimize_table ended at `LANG=en_US;date` #######################"
-      } | tee -a /root/mode/logs/tune_mysql_optimize_table.log
-   fi
+if cat /root/mode/tmp/Hoptimize$$.tmp  | grep -E '\[to be fixed by mode\]$' >/dev/null; then
+   # save back to original file 
+   cp -f /root/mode/tmp/Hoptimize$$.tmp "$Hmerrlog"
+   # log optimize_table event  
+   {
+      echo 
+      echo 
+      echo "#################################################################################################################"
+      echo "###################### tune_mysql -> optimize_table began at `LANG=en_US;date` #######################"
+      echo "#################################################################################################################"
+   } | tee -a /root/mode/logs/tune_mysql_optimize_table.log
+   # fix the marked tables
+   cat "$Hmerrlog" 2>/dev/null | grep -E '\[to be fixed by mode\]$' | sed -re "s/^.*Got error -1 when reading table '\.\/([^\\\\]+)\/([^']+)'.*$/\1 \2/" |
+   sort | uniq | 
+   while read -r Hop_db Hop_tb;do
+      # Use /root/mode/optimize_table to do optimization.
+      # Very large tables might not be optimized 
+      /root/mode/optimize_table localhost "$Hop_db" "$Hop_tb" 2>&1 | tee -a /root/mode/logs/tune_mysql_optimize_table.log
+      # we simply ignore the exit status 
+   done
+   # mark '[has been fixed by mode]' and save the marked file to /root/mode/tmp/Hoptimize$$.tmp
+   cat "$Hmerrlog" 2>/dev/null | sed -re "s/to be fixed by mode/has been fixed by mode/" > /root/mode/tmp/Hoptimize$$.tmp
+   # save back to original file 
+   cp -f /root/mode/tmp/Hoptimize$$.tmp  "$Hmerrlog"
+   {
+      echo "###################### tune_mysql -> optimize_table ended at `LANG=en_US;date` #######################"
+   } | tee -a /root/mode/logs/tune_mysql_optimize_table.log
 fi
 
 # rm tmp file 

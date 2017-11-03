@@ -31,8 +31,8 @@ HTTLMEM=$[$HTTLMEM/1024]
 # various tomcat counts
 
 HTOMNUMc=`/root/mode/ctomno -c`
-HTOMNUMn=`/root/mode/ctomno -n`
-HTOMNUMN=`/root/mode/ctomno -N`
+HTOMNUMn=`/root/mode/ctomno -n 2>/dev/null`
+HTOMNUMN=`/root/mode/ctomno -N 2>/dev/null`
 
 # tomcat heap limit 
 
@@ -40,17 +40,34 @@ HTOMNUMN=`/root/mode/ctomno -N`
 
 # memory allocation
 
+# ---------------------------------------------------------------------------------------------------------------
+# For noncluster tomcats such as web tomcats,we use fixed memory allocation mode "-Xmx1000m -XX:MaxPermSize=256m"
+# ---------------------------------------------------------------------------------------------------------------
+if [ $[$HTOMNUMc+$HTOMNUMN] -eq 0 ]; then
+   # at most with noncluster tomcats
+   # We use new mode of estimation of noncluster tomcat memory usages
+   HnTOMfixsize=1000
+else
+   # with Noncluster tomcats or cluster tomcats
+   # We use compatible mode
+   HnTOMfixsize=464
+fi
+
 # -------------------------------------------------------------------------------------------
-# Notes:
+# initial heap size:120M -> 60M
+# -------------------------------------------------------------------------------------------
+HinitialTOMsize=60
+
 # -------------------------------------------------------------------------------------------
 # HPERMMAX  is used to configure cluster tomcat to avoid perm generation overflow
-# HPERMSIZE is used to calculate memory allocation
 # -------------------------------------------------------------------------------------------
 HPERMMAX=800
+
 # -------------------------------------------------------------------------------------------
-# change HPERMSIZE from 256M to 200M
+# HPERMSIZE is used to calculate memory allocation for cluster tomcat
 # -------------------------------------------------------------------------------------------
 HPERMSIZE=200
+
 # -------------------------------------------------------------------------------------------
 # HAPCSIZE is reserved for apache connections
 #          300M is former value
@@ -70,33 +87,65 @@ echo "HSQLPERCNT=30" >> /etc/modememp
 . /etc/modememp
 HPTOMMEM=$[$HTTLMEM*$HTOMPERCNT/100]
 HPSQLMEM=$[$HTTLMEM*$HSQLPERCNT/100]
+HpSQLMEM=$[$HTTLMEM*10/100]
 HADJMEM=0
 if [ "$HMEMMODE" = "max" ]; then
    if [ -x /usr/sbin/mysqld ] ; then
+      # with MySQL server
       if [ $[$HTOMNUMc+$HTOMNUMn+$HTOMNUMN] -eq 0 ]; then
          # no tomcats installed
          HADJMEM=$HPTOMMEM
-      elif [ $HTTLMEM -ge 4000 -a $[$HTOMNUMc+$HTOMNUMn+$HTOMNUMN] -le 10 ]; then
+      elif [ $[$HTOMNUMc+$HTOMNUMN] -eq 0 ]; then
+         # ------------------------------------------------------------------------------------------------------------------
+         # only noncluster tomcats installed(Neither Noncluster tomcats nor cluster tomcats installed)
+         # ------------------------------------------------------------------------------------------------------------------
+         # MySQL server -> tomcats 
+         # ------------------------------------------------------------------------------------------------------------------
+         HTOMMAXUSABLE=$[$HnTOMfixsize*$HTOMNUMn]
+         if [ $HTOMMAXUSABLE -gt $HPTOMMEM ]; then
+            # The maximal amount of memory which can be taken from MySQL server
+            HADJMEM_MOST=$[$HPSQLMEM-$HpSQLMEM]
+            if [ $HADJMEM_MOST -lt 0 ]; then
+               HADJMEM_MOST=0
+            fi
+            # The actual amount of memory which will be taken from MySQL server
+            if [ $[$HTOMMAXUSABLE-$HPTOMMEM] -ge $HADJMEM_MOST ]; then
+               HADJMEM=$[-$HADJMEM_MOST]
+            else
+               HADJMEM=$[$HPTOMMEM-$HTOMMAXUSABLE]
+            fi
+         fi
+      else
+         # ------------------------------------------------------------------------------------------------------------------
+         # At least Noncluster tomcats or cluster tomcats have been installed,noncluster tomcats may also have been installed
+         # ------------------------------------------------------------------------------------------------------------------
+         # tomcats -> MySQL server 
+         # ------------------------------------------------------------------------------------------------------------------
          if [ $[$HTOMNUMc+$HTOMNUMN] -gt 0 ]; then
             HCMAXMEM=$[$HTOMHLIMIT+$HPERMSIZE]
             if [ $HTOMNUMc -gt 0 ]; then
-               HTOMMAXUSABLE=$[$HCMAXMEM*($HTOMNUMc+$HTOMNUMN)+$HAPCSIZE+464*$HTOMNUMn]
+               HTOMMAXUSABLE=$[$HCMAXMEM*($HTOMNUMc+$HTOMNUMN)+$HAPCSIZE+$HnTOMfixsize*$HTOMNUMn]
             else
-               HTOMMAXUSABLE=$[$HCMAXMEM*($HTOMNUMc+$HTOMNUMN)+464*$HTOMNUMn]
+               HTOMMAXUSABLE=$[$HCMAXMEM*($HTOMNUMc+$HTOMNUMN)+$HnTOMfixsize*$HTOMNUMn]
             fi
          else
-            HTOMMAXUSABLE=$[464*$HTOMNUMn]
+            HTOMMAXUSABLE=$[$HnTOMfixsize*$HTOMNUMn]
          fi
          if [ $HPTOMMEM -gt $HTOMMAXUSABLE ]; then
             HADJMEM=$[$HPTOMMEM-$HTOMMAXUSABLE]
          fi
       fi
-   elif [ $[$HTOMNUMc+$HTOMNUMN+$HTOMNUMn] -gt 0 ]; then
-      HADJMEM=$[-$HPSQLMEM]
    else
-      # Neither tomcats nor MySQL server has been installed
-      # assume to install MySQL server
-      HADJMEM=$HPTOMMEM
+      # without MySQL server
+      if [ $[$HTOMNUMc+$HTOMNUMN+$HTOMNUMn] -gt 0 ]; then
+         # with tomcats
+         HMYSQL_TO_TOMCAT_ALL=1
+         HADJMEM=$[-$HPSQLMEM]
+      else
+         # Neither tomcats nor MySQL server has been installed
+         # assume to install MySQL server
+         HADJMEM=$HPTOMMEM
+      fi
    fi
 fi
 if [ $HADJMEM -gt 0 ]; then
@@ -104,7 +153,11 @@ if [ $HADJMEM -gt 0 ]; then
    HSQLMEM=$[$HPSQLMEM+$HADJMEM]
 elif [ $HADJMEM -lt 0 ]; then
    HTOMMEM=$[$HPTOMMEM-$HADJMEM]
-   HSQLMEM=$HPSQLMEM
+   if [ -n "$HMYSQL_TO_TOMCAT_ALL" ]; then
+      HSQLMEM=$HPSQLMEM
+   else
+      HSQLMEM=$[$HPSQLMEM+$HADJMEM]
+   fi
 else
    HTOMMEM=$HPTOMMEM
    HSQLMEM=$HPSQLMEM
@@ -144,7 +197,7 @@ if [ "$1" = "-l" ]; then
       HTOMDES="No tomcat"
    fi
    echo "($HTOMDES $Hhashave been installed)"
-   if [ $HADJMEM -lt 0 ]; then
+   if [ -n "$HMYSQL_TO_TOMCAT_ALL" ]; then
       echo -n "HSQLMEM 0 Mbytes"
    else
       echo -n "HSQLMEM ${HSQLMEM} Mbytes"

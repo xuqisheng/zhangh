@@ -26,9 +26,10 @@ Hhrymodtthread=/root/mode/tmp/hmodtthread$$.tmp
 
 #
 
-ls -1d /usr/local/$Hmytom/ 2>/dev/null |
-while read -r i; do
-   cd ${i}conf
+cd /usr/local
+for i in `ls -1d $Hmytom/ 2>/dev/null | sed -re "s/\/$//"`; do
+   /root/mode/check_tomcat $i || continue
+   cd /usr/local/${i}/conf
    cat server.xml | tr -d '\r' | 
    sed -re "s/^( *<Connector port=\"[0-9]+\" protocol=\"HTTP\/1\.1\"[ ]*)$/\1 maxThreads=\"300\"/" |
    sed -re "s/^( *<Connector port=\"[0-9]+\" protocol=\"AJP\/1\.3\" redirectPort=\"8443\")( *\/>)/\1 maxThreads=\"300\"\2/"|

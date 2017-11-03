@@ -2,7 +2,7 @@
 
 #
 
-if echo "$1" | grep -E "^apache[1-7]?$" >/dev/null; then
+if echo "$1" | grep -E "^apache[1-9]?$" >/dev/null; then
    Hapachemode=$1
    Hapachetail=`echo $1 | sed -re "s/apache(.*)/\1/"`
    shift

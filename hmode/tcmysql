@@ -13,6 +13,10 @@
 #                                                                                                     ------ hry ------
 # ---------------------------------------------------------------------------------------------------------------------
 
+# exclusive execution with wait mode
+
+/root/mode/modepv tcmysql $$ "/bin/bash .*/tcmysql"
+
 # no MySQL server at this machine
 
 if [ ! -x /usr/sbin/mysqld ]; then

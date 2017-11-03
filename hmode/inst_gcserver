@@ -44,6 +44,7 @@ else
    if [ -z "$Hnomoretest" ]; then
       cd /usr/local
       for i in `ls -1d tomcat*/ 2>/dev/null | sed -re "s/\/$//"`; do
+          /root/mode/check_tomcat $i 2>/dev/null || continue
           if ! /root/mode/isctom $i; then
              ln -s /root/mode/gcserver /etc/init.d/gcserver
              /sbin/chkconfig --add gcserver >/dev/null 2>&1

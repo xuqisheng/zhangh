@@ -14,10 +14,10 @@
 
 cd /usr/local/$1/conf
 if /root/mode/isctom $1; then
-   if ! cat server.xml | grep -E "<!-- apache[1-7] -->" >/dev/null; then
+   if ! cat server.xml | grep -E "<!-- apache[1-9] -->" >/dev/null; then
       echo -n "apache "
    else
-      echo -n `cat server.xml | grep -E "<!-- apache[1-7]? -->" | sed -re "s/.*<!-- (apache[1-7]?) -->.*/\1/" | head -n 1`
+      echo -n `cat server.xml | grep -E "<!-- apache[1-9]? -->" | sed -re "s/.*<!-- (apache[1-9]?) -->.*/\1/" | head -n 1`
    fi
 else
    if ! /root/mode/isNtom $1; then

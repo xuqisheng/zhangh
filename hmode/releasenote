@@ -1,5 +1,5 @@
 #!/bin/bash
-echo "mode4.0(2017.08.14 release)"
+echo "mode4.0(2017.10.24 release)"
 
 # add /root/mode/setmisc  ---- 2012.01.04 ----
 
@@ -1025,7 +1025,7 @@ echo "mode4.0(2017.08.14 release)"
 # enhance tompv                                                                  -- 2016-05-22 --
 
 # enhance modepv                                                                 -- 2016-05-23 --
-# enforce exclusiveness for basic/importent scripts                              -- 2016-05-23 --
+# enforce exclusiveness for basic/important scripts                              -- 2016-05-23 --
 
 # enhance kmproc                                                                 -- 2016-05-25 --
 
@@ -1438,4 +1438,44 @@ echo "mode4.0(2017.08.14 release)"
 # modify script ....publish_war....                                              -- 2017-08-14 --
 
 # modify ol_data,ideas_data and ezrms_data                                       -- 2017-08-14 --
+# enhance tune_mysql                                                             -- 2017-08-28 --
+# modify chkmhis                                                                 -- 2017-08-28 --
+# enhance clrcache                                                               -- 2017-08-31 --
+
+# -----------------------------------------------------------------------------------------------
+# tomcat memory related optimizations
+# -----------------------------------------------------------------------------------------------
+# enhance inst_tomcat (with initial memory setting of mode criteria)             -- 2017-09-02 --
+# enhance cpumem (add variables HnTOMfixsize and HinitialTOMsize)                -- 2017-09-02 -- 
+# enhance config_tomcat(use HnTOMfixsize & HinitialTOMsize instead of constants  -- 2017-09-02 --
+# -----------------------------------------------------------------------------------------------
+# adjustment for noncluster tomcat: 
+#                                  -XX:MaxPermSize   200M -> 256M                -- 2017-09-02 --
+#                                  -Xms              120m -> 60m                 -- 2017-09-02 --
+# -----------------------------------------------------------------------------------------------
+
+# new version of cpumem                                                          -- 2017-09-04 --
+# modify check_tomcat,apc_tom,getmcast,inst_gcserver and mod_tthread             -- 2017-09-05 --
+# modify cpumem                                                                  -- 2017-09-05 --
+# enhance .stt_tom (port conflict and oom-killer detection)                      -- 2017-09-05 --
+# add .addjmx                                                                    -- 2017-09-08 --
+# modify gettomp and config_tomcat                                               -- 2017-09-08 --
+# modify tctomcat and stop_tomcat                                                -- 2017-09-08 --
+
+# modify some apache related scripts (to support 10 apaches)                     -- 2017-09-12 --
+# enhance inst_tomcat                                                            -- 2017-09-13 --
+
+# add scripts .mdump_Hdbs and .mdump_Hdbs_Inc                                    -- 2017-09-21 --
+
+# enhance scripts .mdump_Hdbs,mload and monload                                  -- 2017-09-22 --
+
+# enhance .stt_tom and tomupdtl                                                  -- 2017-09-27 --
+# enhance montoms                                                                -- 2017-09-28 --
+
+# enhance scripts modepv,tcmysql and mysql                                       -- 2017-09-30 --
+
+# enhance montoms (new version of montoms)                                       -- 2017-10-12 --
+
+# enhance montoms (remove dgp&chenfeng from default maillist)                    -- 2017-10-23 --
+# modify clrcache (with some parameter adjustments)                              -- 2017-10-24 --
 

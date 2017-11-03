@@ -5,16 +5,16 @@
 
 
 if [ -z "$1" ]; then
-   /root/mode/modemsg check_tomcat "Please provide the tomcat name!" more 2>&1 && exit 1
+   /root/mode/modemsg check_tomcat "Please provide the tomcat name!" more && exit 1
 fi
 if [ ! -d "/usr/local/$1" ]; then
-   /root/mode/modemsg check_tomcat "Directory /usr/local/$1 doesn't exist!" more  2>&1 && exit 1
+   /root/mode/modemsg check_tomcat "Directory /usr/local/$1 doesn't exist!" more && exit 1
 fi
 if [ ! -f "/usr/local/$1/bin/catalina.sh" ]; then
-   /root/mode/modemsg check_tomcat "/usr/local/$1 is not a tomcat installation directory!" more 2>&1 && exit 1
+   /root/mode/modemsg check_tomcat "/usr/local/$1 is not a tomcat installation directory!" more && exit 1
 fi
 if ! echo "$1" | grep -E '^tomcat' >/dev/null; then
-   /root/mode/modemsg check_tomcat "$1 is not a name starting with 'tomcat'!" more 2>&1 && exit 1
+   /root/mode/modemsg check_tomcat "$1 is not a name starting with 'tomcat'!" more && exit 1
 fi
 if ! /root/mode/.tomdirs "$1" linemode | tail -n 1 | grep -E "/$1$" >/dev/null; then
    exit 1

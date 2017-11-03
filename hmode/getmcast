@@ -7,9 +7,11 @@
 export HHRYMCAST HHRYMCAST1 HHRYMPORT
 cd /usr/local
 if echo $1 | grep -E "^tomcat" >/dev/null; then
-   if /root/mode/isctom $1; then
-      HHRYMCAST=`cat $1/conf/server.xml | grep "22[48]\." | sed -re "s/^.*(22[48]\.[0-9]+\.[0-9]+\.[0-9]+).*/\1/"`
-      HHRYMPORT=`cat $1/conf/server.xml | grep -E "port=\"45[0-9]{3}\"" | sed -re "s/^.*port=\"(.*)\".*/\1/"`
+   if /root/mode/check_tomcat $1; then
+      if /root/mode/isctom $1; then
+         HHRYMCAST=`cat $1/conf/server.xml | grep "22[48]\." | sed -re "s/^.*(22[48]\.[0-9]+\.[0-9]+\.[0-9]+).*/\1/"`
+         HHRYMPORT=`cat $1/conf/server.xml | grep -E "port=\"45[0-9]{3}\"" | sed -re "s/^.*port=\"(.*)\".*/\1/"`
+      fi
    fi
 else
    for i in `ls -d tomcat*/ 2>/dev/null | sed -re "s/\/$//" `;do

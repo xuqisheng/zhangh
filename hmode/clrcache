@@ -43,22 +43,22 @@ HUSED4PT=`echo "($HUSED1-$HUSED2) * 100 / $HTTLMEM" | bc`
 #
 
 sysctl -w vm.dirty_writeback_centisecs=300 &>/dev/null
-sysctl -w vm.dirty_expire_centisecs=1000   &>/dev/null
-sysctl -w vm.dirty_background_ratio=5      &>/dev/null 
-sysctl -w vm.dirty_ratio=95                &>/dev/null
+sysctl -w vm.dirty_expire_centisecs=1800   &>/dev/null
+sysctl -w vm.dirty_background_ratio=10     &>/dev/null 
+sysctl -w vm.dirty_ratio=90                &>/dev/null
 if [ $HTTLSWP -gt 0 ]; then
    Hmin_free=20480
 else
    Hmin_free=10240
 fi
-if [ $HUSED2PT -lt 92 ]; then
+if [ $HUSED2PT -lt 92 -a $HUSED3 -eq 0 ]; then
    Hmin_free=$[$HTTLMEM*1/100]
 fi
 if [ $Hmin_free -ge 102400 ]; then
    Hmin_free=102400
 fi
 sysctl -w vm.min_free_kbytes=$Hmin_free    &>/dev/null
-sysctl -w vm.vfs_cache_pressure=200        &>/dev/null
+sysctl -w vm.vfs_cache_pressure=100        &>/dev/null
 
 # 
 
@@ -92,7 +92,7 @@ if [ $HUSED3 -le 0 ]; then
       # -----------------------------------------------------------
       # extra high usage of memory,always drop buffers/caches
       # -----------------------------------------------------------
-      # importent:we use $HUSED2PT instead of $HUSED1PT
+      # important:we use $HUSED2PT instead of $HUSED1PT
       # -----------------------------------------------------------
       if [ -f /etc/.mc1_pschk ]; then
          /root/mode/modemsg clrcache "pb$HUSED2PT:drop_cache task began at `LANG=en_US;date`"

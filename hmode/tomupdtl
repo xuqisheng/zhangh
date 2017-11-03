@@ -25,7 +25,7 @@ tail -n 2000 /usr/local/$Hhrytomcat/logs/catalina.out 2>/dev/null | grep -E "$Hs
 
 if grep -E 'wait millis [0-9]+, active ([0-9]+), maxActive \1,' $Htestfile >/dev/null; then
    # java -> mysql connection pool
-   Hblackmark=`cat $Htestfile 2>/dev/null | grep -Pn "Mode start mark " | tail -n 1 | sed -re "s/^([0-9]+):.*/\1/"`
+   Hblackmark=`cat $Htestfile 2>/dev/null | grep -En "Mode start mark " | tail -n 1 | sed -re "s/^([0-9]+):.*/\1/"`
    if [ "$Hblackmark" = "" ]; then
       Hpoolfull=1
    else
@@ -41,7 +41,7 @@ fi
 if [ $Hpoolfull -eq 0 ]; then
    if grep -E 'OutOfMemoryError' $Htestfile >/dev/null; then
       # OutOfMemoryError
-      Hblackmark=`cat $Htestfile 2>/dev/null | grep -Pn "Mode start mark " | tail -n 1 | sed -re "s/^([0-9]+):.*/\1/"`
+      Hblackmark=`cat $Htestfile 2>/dev/null | grep -En "Mode start mark " | tail -n 1 | sed -re "s/^([0-9]+):.*/\1/"`
       if [ "$Hblackmark" = "" ]; then
          # No 'Mode start mark '
          if cat $Htestfile | grep -E 'OutOfMemoryError' | grep -Ev 'OutOfMemoryError: GC overhead limit exceeded' >/dev/null; then

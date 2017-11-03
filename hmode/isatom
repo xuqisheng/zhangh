@@ -10,7 +10,7 @@
 cd /usr/local/$1/conf
 if /root/mode/isctom $1; then
    if [ "$2" = "" -o "$2" = "apache" ]; then
-      if ! cat server.xml | grep -E "<!-- apache[1-7] -->" >/dev/null; then
+      if ! cat server.xml | grep -E "<!-- apache[1-9] -->" >/dev/null; then
          exit 0
       else
          exit 1

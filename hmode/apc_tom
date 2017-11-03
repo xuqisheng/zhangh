@@ -11,7 +11,7 @@ fi
 Hcheckdate=`LANG=en_US;date`
 cd /usr/local
 for i in `ls -d tomcat*/ 2>/dev/null | sed -re "s/\/$//"`;do
-    /root/mode/check_tomcat $i || continue
+    /root/mode/check_tomcat $i 2>/dev/null || continue
     Htom_stat=`/root/mode/tctomcat $i 2>/dev/null`
     if [ "$Htom_stat" != "down" ]; then
        continue

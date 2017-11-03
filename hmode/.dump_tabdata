@@ -3,7 +3,7 @@
 # function:
 #          dump table content in text format which can be loaded using 'load data local infile 'xxx' into table yyy 
 # usages  :
-#          ./.dump_tabdata [<mysqldip>" <dbname> <tabname> [<wherepart>]
+#          ./.dump_tabdata [<mysqldip>] <dbname> <tabname> [<wherepart>]
 # e.g.    :
 #          ./.dump_tabdata              portal master_base "(hotel_group_id=1 and hotel_id=2)"
 #          ./.dump_tabdata              portal master_base "(hotel_group_id=1 and hotel_id=2) order by hotel_group_id,hotel_id"
