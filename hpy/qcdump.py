@@ -4,8 +4,10 @@
 '''
 操作腾讯云存储
 '''
+
 import os
 import threading, configparser
+'''
 from qcloud_cos import CosClient
 from qcloud_cos import UploadFileRequest
 from qcloud_cos import DelFileRequest
@@ -122,3 +124,5 @@ if __name__ == '__main__':
     # test.qc_create_folder()
     # test.qc_del_folder()
     # test.qc_list_folder()
+
+'''
