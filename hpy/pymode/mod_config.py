@@ -61,3 +61,8 @@ finally:
     if file_write or file_read:
         file_write.close()
         file_read.close()
+
+
+# 测试
+def abc():
+    pass
