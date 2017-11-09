@@ -19,30 +19,31 @@ BEGIN
 	-- 2017.3.28
 	-- ======================================================
 
-	SELECT descript,code INTO var_group_name,var_group_code FROM hotel_group WHERE id = arg_hotel_group_id;
-	SELECT descript,code INTO var_hotel_name,var_hotel_code FROM hotel WHERE hotel_group_id = arg_hotel_group_id AND id=arg_hotel_id;
+	SELECT descript,CODE INTO var_group_name,var_group_code FROM hotel_group WHERE id = arg_hotel_group_id;
+	SELECT descript,CODE INTO var_hotel_name,var_hotel_code FROM hotel WHERE hotel_group_id = arg_hotel_group_id AND id=arg_hotel_id;
 
 	-- 余额检查结果集
   	DROP TEMPORARY TABLE IF EXISTS tmp_check_balance;
 	CREATE TEMPORARY TABLE tmp_check_balance(
-		check_msg			VARCHAR(1000),
-		biz_date 			VARCHAR(20) DEFAULT '',
-		dai_last_bl			VARCHAR(10) DEFAULT '',
-		dai_till_bl			VARCHAR(10) DEFAULT '',
-		snap_last_bl		VARCHAR(10) DEFAULT '',
-		snap_till_bl		VARCHAR(10) DEFAULT '',
-		diff_last_bl		VARCHAR(10) DEFAULT '',
-		diff_till_bl		VARCHAR(10) DEFAULT '',
+		check_type		VARCHAR(20) DEFAULT '',
+		check_msg		VARCHAR(1000),
+		biz_date 		VARCHAR(20) DEFAULT '',
+		dai_last_bl		VARCHAR(10) DEFAULT '',
+		dai_till_bl		VARCHAR(10) DEFAULT '',
+		snap_last_bl	VARCHAR(10) DEFAULT '',
+		snap_till_bl	VARCHAR(10) DEFAULT '',
+		diff_last_bl	VARCHAR(10) DEFAULT '',
+		diff_till_bl	VARCHAR(10) DEFAULT '',
 		KEY index1(biz_date)
 	);
 
-	INSERT INTO tmp_check_balance(check_msg) SELECT CONCAT('检查日期：',DATE(NOW()),' 酒店 : ',var_hotel_code,' & ',var_hotel_name,' 集团 : ',var_group_code,' & ',var_group_name);
-	INSERT INTO tmp_check_balance(check_msg) SELECT GROUP_CONCAT('\n---------------------------------------------------------------------');
-    INSERT INTO tmp_check_balance(check_msg) SELECT '底表余额和快照表余额不一致';
+	INSERT INTO tmp_check_balance(check_type,check_msg) SELECT 'Base',CONCAT('检查日期：',DATE(NOW()),' 酒店 : ',var_hotel_code,' & ',var_hotel_name,' 集团 : ',var_group_code,' & ',var_group_name);
+	INSERT INTO tmp_check_balance(check_type,check_msg) SELECT 'Base',GROUP_CONCAT('\n---------------------------------------------------------------------');
+	INSERT INTO tmp_check_balance(check_msg) SELECT '底表余额和快照表余额不一致';
 	-- 检查底表余额和快照表余额不一致
-	INSERT INTO tmp_check_balance
+	INSERT INTO tmp_check_balance(check_msg,biz_date,dai_last_bl,dai_till_bl,snap_last_bl,snap_till_bl,diff_last_bl,diff_till_bl)
 	SELECT
-		'优先级 A : rep_dai_history & master_snapshot', 
+		'优先级 A : rep_dai_history & master_snapshot',
 		DATE(a.biz_date) biz_date,
 		IFNULL(SUM(a.last_bl),0) rep_dai_last_bl,
 		IFNULL(SUM(a.till_bl),0) rep_dai_till_bl,
@@ -52,13 +53,13 @@ BEGIN
 		(SELECT IFNULL(SUM(b.till_charge - b.till_pay),0) FROM master_snapshot b WHERE b.hotel_group_id=a.hotel_group_id AND b.hotel_id=a.hotel_id  AND b.biz_date_begin < a.biz_date AND b.biz_date_end >=a.biz_date)
 		AS snapshot_till_bl,
 
-		IFNULL(SUM(a.last_bl),0) 
-		- 
+		IFNULL(SUM(a.last_bl),0)
+		-
 		(SELECT IFNULL(SUM(b.last_charge - b.last_pay),0) FROM master_snapshot b WHERE b.hotel_group_id=a.hotel_group_id AND b.hotel_id=a.hotel_id  AND b.biz_date_end>=a.biz_date AND b.biz_date_begin<a.biz_date)
 		AS diff_last_bl,
 
-		IFNULL(SUM(a.till_bl),0) 
-		- 
+		IFNULL(SUM(a.till_bl),0)
+		-
 		(SELECT IFNULL(SUM(b.till_charge - b.till_pay),0) FROM master_snapshot b WHERE b.hotel_group_id=a.hotel_group_id AND b.hotel_id=a.hotel_id  AND b.biz_date_begin < a.biz_date AND b.biz_date_end >=a.biz_date)
 		AS diff_till_bl
 
@@ -70,9 +71,9 @@ BEGIN
 
 	INSERT INTO tmp_check_balance(check_msg) SELECT '底表的本日发生收回和快照表不一致';
 	-- 检查底表的本日发生收回是否和快照表一致
-	INSERT INTO tmp_check_balance
-	SELECT 
-		'优先级 A : rep_dai_history & master_snapshot',	
+	INSERT INTO tmp_check_balance(check_msg,biz_date,dai_last_bl,dai_till_bl,snap_last_bl,snap_till_bl,diff_last_bl,diff_till_bl)
+	SELECT
+		'优先级 A : rep_dai_history & master_snapshot',
 		DATE(a.biz_date) biz_date,
 		IFNULL(SUM(a.debit),0) rep_dai_debit,
 
@@ -82,11 +83,11 @@ BEGIN
 
 		(SELECT IFNULL(SUM(b.pay_ttl),0) FROM master_snapshot b WHERE b.hotel_group_id=a.hotel_group_id AND b.hotel_id=a.hotel_id AND b.biz_date_begin = a.biz_date - INTERVAL 1 DAY ) AS snapshot_pay,
 
-		IFNULL(SUM(a.debit),0) - 
+		IFNULL(SUM(a.debit),0) -
 		(SELECT IFNULL(SUM(b.charge_ttl),0) FROM master_snapshot b WHERE b.hotel_group_id=a.hotel_group_id AND b.hotel_id=a.hotel_id AND b.biz_date_begin = a.biz_date - INTERVAL 1 DAY)
 		AS diff_debit_charge,
 
-		IFNULL(SUM(a.credit),0) - 
+		IFNULL(SUM(a.credit),0) -
 		(SELECT IFNULL(SUM(b.pay_ttl),0) FROM master_snapshot b WHERE b.hotel_group_id=a.hotel_group_id AND b.hotel_id=a.hotel_id AND b.biz_date_begin = a.biz_date - INTERVAL 1 DAY )
 		AS diff_credit_pay
 
@@ -99,14 +100,14 @@ BEGIN
 		INSERT INTO tmp_check_balance(check_msg) SELECT '检查底表余额是否连贯';
 		-- 检查底表余额是否连贯
 		INSERT INTO tmp_check_balance(check_msg,biz_date,dai_till_bl,snap_till_bl,diff_till_bl)
-		SELECT 
+		SELECT
 			'优先级 A :rep_dai_history',
 			DATE(a.biz_date) biz_date,
 			IFNULL(SUM(a.last_bl),0) AS lastbl_of_thisday,
 			(SELECT IFNULL(SUM(b.till_bl),0) FROM rep_dai_history b WHERE b.hotel_group_id=a.hotel_group_id AND b.hotel_id=a.hotel_id AND (b.classno='02000' OR b.classno='03000') AND b.biz_date=ADDDATE(a.biz_date,-1))
 			AS tillbl_of_lastday,
 
-			IFNULL(SUM(a.last_bl),0) - 
+			IFNULL(SUM(a.last_bl),0) -
 			(SELECT IFNULL(SUM(b.till_bl),0) FROM rep_dai_history b WHERE b.hotel_group_id=a.hotel_group_id AND b.hotel_id=a.hotel_id AND (b.classno='02000' OR b.classno='03000') AND b.biz_date=ADDDATE(a.biz_date,-1))
 			AS diff_2balances
 
@@ -118,8 +119,8 @@ BEGIN
 
 	INSERT INTO tmp_check_balance(check_msg) SELECT '本日余额=上日余额+本日发生-本日收回 不成立';
 	-- 检查 本日余额=上日余额+本日发生-本日收回
-	INSERT INTO tmp_check_balance
-	SELECT 
+	INSERT INTO tmp_check_balance(check_msg,biz_date,dai_last_bl,dai_till_bl,snap_last_bl,snap_till_bl,diff_last_bl,diff_till_bl)
+	SELECT
 			'优先级 A :rep_dai_history',
 			DATE(a.biz_date) biz_date,
 			IFNULL(SUM(last_bl),0) AS lastbl,
@@ -139,22 +140,23 @@ BEGIN
 	-- 检查快照表的上日余额是否和实际余额一致
 	INSERT INTO tmp_check_balance(check_msg,biz_date,dai_till_bl,snap_till_bl,diff_till_bl)
 	SELECT CONCAT('优先级 A :宾客余额 帐号: ',a.master_id,' 名字: ',a.name),
-		a.biz_date_begin,a.till_balance,(b.charge-b.pay) AS master_balance,a.till_balance - (b.charge-b.pay) AS diff FROM master_snapshot a,master_base_till b 
-		WHERE a.hotel_group_id=arg_hotel_group_id AND a.hotel_id=arg_hotel_id AND a.biz_date_begin<(SELECT SUBDATE(biz_date,1) FROM audit_flag WHERE hotel_group_id = arg_hotel_group_id AND hotel_id = arg_hotel_id) AND a.biz_date_end>=(SELECT SUBDATE(biz_date,1) FROM audit_flag WHERE hotel_group_id = arg_hotel_group_id AND hotel_id = arg_hotel_id) 
+		a.biz_date_begin,a.till_balance,(b.charge-b.pay) AS master_balance,a.till_balance - (b.charge-b.pay) AS diff FROM master_snapshot a,master_base_till b
+		WHERE a.hotel_group_id=arg_hotel_group_id AND a.hotel_id=arg_hotel_id AND a.biz_date_begin<(SELECT SUBDATE(biz_date,1) FROM audit_flag WHERE hotel_group_id = arg_hotel_group_id AND hotel_id = arg_hotel_id) AND a.biz_date_end>=(SELECT SUBDATE(biz_date,1) FROM audit_flag WHERE hotel_group_id = arg_hotel_group_id AND hotel_id = arg_hotel_id)
 		AND a.master_type<>'armaster' AND a.master_id=b.id AND b.hotel_group_id=arg_hotel_group_id AND b.hotel_id=arg_hotel_id AND a.till_balance<>b.charge-b.pay;
 
 	INSERT INTO tmp_check_balance(check_msg,biz_date,dai_till_bl,snap_till_bl,diff_till_bl)
 	SELECT CONCAT('优先级 A :应收余额 帐号: ',a.master_id,' 名字: ',a.name),
-		a.biz_date_begin,a.till_balance,(b.charge-b.pay) AS master_balance,a.till_balance - (b.charge-b.pay) AS diff FROM master_snapshot a,master_base_till b 
-		WHERE a.hotel_group_id=arg_hotel_group_id AND a.hotel_id=arg_hotel_id AND a.biz_date_begin<(SELECT SUBDATE(biz_date,1) FROM audit_flag WHERE hotel_group_id = arg_hotel_group_id AND hotel_id = arg_hotel_id) AND a.biz_date_end>=(SELECT SUBDATE(biz_date,1) FROM audit_flag WHERE hotel_group_id = arg_hotel_group_id AND hotel_id = arg_hotel_id) 
+		a.biz_date_begin,a.till_balance,(b.charge-b.pay) AS master_balance,a.till_balance - (b.charge-b.pay) AS diff FROM master_snapshot a,master_base_till b
+		WHERE a.hotel_group_id=arg_hotel_group_id AND a.hotel_id=arg_hotel_id AND a.biz_date_begin<(SELECT SUBDATE(biz_date,1) FROM audit_flag WHERE hotel_group_id = arg_hotel_group_id AND hotel_id = arg_hotel_id) AND a.biz_date_end>=(SELECT SUBDATE(biz_date,1) FROM audit_flag WHERE hotel_group_id = arg_hotel_group_id AND hotel_id = arg_hotel_id)
 		AND a.master_type<>'armaster' AND a.master_id=b.id AND b.hotel_group_id=arg_hotel_group_id AND b.hotel_id=arg_hotel_id AND a.till_balance<>b.charge-b.pay;
 
-	INSERT INTO tmp_check_balance(check_msg) SELECT GROUP_CONCAT('\n---------------------------------------------------------------------');
-	INSERT INTO tmp_check_balance(check_msg) SELECT '检查结束...';
+	INSERT INTO tmp_check_balance(check_type,check_msg) SELECT 'Base',GROUP_CONCAT('\n---------------------------------------------------------------------');
+	INSERT INTO tmp_check_balance(check_type,check_msg) SELECT 'Base','检查结束...';
 
-	IF EXISTS (SELECT 1 FROM tmp_check_balance) THEN
-		SELECT * FROM tmp_check_balance;
-	END IF;
+
+	DELETE FROM tmp_check_balance WHERE check_type='' AND dai_last_bl='' AND dai_till_bl='' AND snap_last_bl='' AND snap_till_bl='' AND diff_last_bl='' AND diff_till_bl='';
+
+	SELECT check_msg,biz_date,dai_last_bl,dai_till_bl,snap_last_bl,snap_till_bl,diff_last_bl,diff_till_bl FROM tmp_check_balance;
 
  	DROP TEMPORARY TABLE IF EXISTS tmp_check_balance;
 

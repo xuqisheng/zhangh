@@ -40,7 +40,7 @@ CREATE TABLE `grp_sales_detail` (
   `persons` 		decimal(12,2) DEFAULT '0.00',
   PRIMARY KEY (`id`),
   KEY `Index_2` (`hotel_group_id`,`hotel_id`,`biz_date`,`type`,`classstr`),
-  KEY `Index_3` (`hotel_group_id`,`biz_date`,`type`)
+  KEY `Index_3` (`hotel_group_id`,`biz_date`,`type`),
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='分析维度： 市场码、来源码、渠道码、预定类型';
 
 
