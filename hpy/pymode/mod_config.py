@@ -17,7 +17,7 @@ config_file = sys.argv[1:][0]
 # 文件的值
 config_item = sys.argv[1:][1]
 # 文件中分类，用于判断值添加在什么位置
-after_item  = sys.argv[1:][2]
+# after_item  = sys.argv[1:][2]
 
 # 检查配置文件是否存在
 if config_file is None:
@@ -61,8 +61,3 @@ finally:
     if file_write or file_read:
         file_write.close()
         file_read.close()
-
-
-# 测试
-def abc():
-    pass
