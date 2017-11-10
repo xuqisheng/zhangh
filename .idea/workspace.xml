@@ -2,1176 +2,16 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="2db055e1-a4a6-47ff-880d-352ce7a0a644" name="Default" comment="">
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/hshell/mode/impfile/linux/32/grep" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/hshell/mode/impfile/linux/64/grep" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/hshell/mode/impfile/xtrabackup/32/xbstream" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/hshell/mode/impfile/xtrabackup/64/xbstream" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/hshell/mode/upgrade_mysql" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/hshell/mode/.addjmx" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/hshell/mode/.adjdate" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/hshell/mode/.autopub" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/hshell/mode/.deltb" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/hshell/mode/.do1au" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/hshell/mode/.dump_tabdata" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/hshell/mode/.grpdel" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/hshell/mode/.grpdmp" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/hshell/mode/.htldel" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/hshell/mode/.htldmp" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/hshell/mode/.htlrm" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/hshell/mode/.htltool" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/hshell/mode/.inst_mysql_55" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/hshell/mode/.inst_mysql_56" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/hshell/mode/.inst_pt" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/hshell/mode/.jgettomp" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/hshell/mode/.jseetom" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/hshell/mode/.jtomdirs" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/hshell/mode/.mdump_Hdbs" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/hshell/mode/.mdump_Hdbs_Inc" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/hshell/mode/.modesid" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/hshell/mode/.modmcast" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/hshell/mode/.muldmp_base" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/hshell/mode/.muldmp_grpdata" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/hshell/mode/.muldmp_htldata" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/hshell/mode/.netok" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/hshell/mode/.opt_tomcat" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/hshell/mode/.pis" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/hshell/mode/.ps_exit" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/hshell/mode/.pt_stat" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/hshell/mode/.publish_war" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/hshell/mode/.publish_war_sjj" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/hshell/mode/.publish_wfl" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/hshell/mode/.repl_jar" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/hshell/mode/.stt_tom" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/hshell/mode/.tlbase" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/hshell/mode/.tomdirs" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/hshell/mode/.update_apache" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/hshell/mode/.upgrade_mysql_5.1.57_to_5.5.50" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/hshell/mode/.upgrade_mysql_to_5.5.50" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/hshell/mode/.upgrade_mysql_to_5.6.35" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/hshell/mode/Iseecfg" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/hshell/mode/addctom" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/hshell/mode/adjcnf" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/hshell/mode/adjmlog" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/hshell/mode/apache_mtd" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/hshell/mode/apachectl" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/hshell/mode/apachemode" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/hshell/mode/apc_tom" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/hshell/mode/apcfull" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/hshell/mode/appblk" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/hshell/mode/appips" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/hshell/mode/appmtu" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/hshell/mode/appserver" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/hshell/mode/badsql_query_time" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/hshell/mode/badsql_rows_sent" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/hshell/mode/beac" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/hshell/mode/check_tomcat" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/hshell/mode/chkmhis" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/hshell/mode/chkmlog" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/hshell/mode/clrcache" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/hshell/mode/clrlogs" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/hshell/mode/comdump" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/hshell/mode/config_apache" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/hshell/mode/config_apache_more" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/hshell/mode/config_apaches" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/hshell/mode/config_mem" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/hshell/mode/config_mysql" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/hshell/mode/config_sshd" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/hshell/mode/config_tomcat" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/hshell/mode/confirm" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/hshell/mode/cpucores" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/hshell/mode/cpufreq" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/hshell/mode/cpuinf" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/hshell/mode/cpumem" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/hshell/mode/cstdlogs" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/hshell/mode/ctomno" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/hshell/mode/dbcmp" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/hshell/mode/dbinit" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/hshell/mode/dbsync" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/hshell/mode/disusb" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/hshell/mode/dlhotel" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/hshell/mode/dlsql" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/hshell/mode/dumpattr" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/hshell/mode/dumpnamepv" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/hshell/mode/dupndx" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/hshell/mode/dupndx1" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/hshell/mode/each" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/hshell/mode/eval_app" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/hshell/mode/ezrms_data" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/hshell/mode/filter_dump" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/hshell/mode/find_tables" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/hshell/mode/fix_cnf" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/hshell/mode/fixhosts" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/hshell/mode/gcmode" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/hshell/mode/gcserver" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/hshell/mode/getadr" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/hshell/mode/getips" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/hshell/mode/getmcast" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/hshell/mode/getmtu" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/hshell/mode/getmtu1" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/hshell/mode/getpip" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/hshell/mode/getstrips" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/hshell/mode/gettomp" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/hshell/mode/gsip" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/hshell/mode/health_check" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/hshell/mode/health_check_cpu" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/hshell/mode/health_check_disk" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/hshell/mode/health_check_memory" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/hshell/mode/host" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/hshell/mode/htlman" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/hshell/mode/idcheck" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/hshell/mode/ideas_data" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/hshell/mode/imode/.cdb_config" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/hshell/mode/imode/.colldata" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/hshell/mode/imode/.colldata1" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/hshell/mode/imode/.colldata_db" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/hshell/mode/imode/.colldata_db1" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/hshell/mode/imode/.colldata_db2" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/hshell/mode/imode/.colldata_db_cw" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/hshell/mode/imode/.colldata_portetc" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/hshell/mode/imode/.doauthbr" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/hshell/mode/imode/.doauthnew" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/hshell/mode/imode/.doauthnew_old" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/hshell/mode/imode/.doauthnewytlx" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/hshell/mode/imode/.doautx" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/hshell/mode/imode/.doauwfl" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/hshell/mode/imode/.dohfint" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/hshell/mode/imode/.dop" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/hshell/mode/imode/.execadjcnf" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/hshell/mode/imode/.gsurl1" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/hshell/mode/imode/.hau" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/hshell/mode/imode/.inst_ss5" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/hshell/mode/imode/.publish_war" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/hshell/mode/imode/.seepis" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/hshell/mode/imode/.sm" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/hshell/mode/imode/.testhost" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/hshell/mode/imode/ah_prim" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/hshell/mode/imode/ah_prim2" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/hshell/mode/imode/apcstat" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/hshell/mode/imode/bd/.addsdc" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/hshell/mode/imode/bnx2" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/hshell/mode/imode/cdb_new" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/hshell/mode/imode/cdrop" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/hshell/mode/imode/cfg/.imode_aliases" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/hshell/mode/imode/cfg/task.cfg" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/hshell/mode/imode/chkau" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/hshell/mode/imode/chktom" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/hshell/mode/imode/chktom2" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/hshell/mode/imode/ci" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/hshell/mode/imode/cii" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/hshell/mode/imode/cind" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/hshell/mode/imode/cind_new" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/hshell/mode/imode/cld_time_5" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/hshell/mode/imode/cld_time_6" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/hshell/mode/imode/cloudcheck" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/hshell/mode/imode/createdbs" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/hshell/mode/imode/cremote" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/hshell/mode/imode/dfdo" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/hshell/mode/imode/dlcyst/dlcyst" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/hshell/mode/imode/dlcyst/dlcyst1" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/hshell/mode/imode/dlhs/dlhs1" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/hshell/mode/imode/dlhs/dlhs2" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/hshell/mode/imode/do1024" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/hshell/mode/imode/do1rel" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/hshell/mode/imode/do4z" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/hshell/mode/imode/do58" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/hshell/mode/imode/doA" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/hshell/mode/imode/doEP" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/hshell/mode/imode/doI" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/hshell/mode/imode/doJ" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/hshell/mode/imode/doN" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/hshell/mode/imode/doT" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/hshell/mode/imode/doTM" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/hshell/mode/imode/doaf" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/hshell/mode/imode/doal" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/hshell/mode/imode/doali" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/hshell/mode/imode/doapp" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/hshell/mode/imode/doat" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/hshell/mode/imode/dobad" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/hshell/mode/imode/dobadsql" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/hshell/mode/imode/dobjybappmtu" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/hshell/mode/imode/doblk" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/hshell/mode/imode/dobup" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/hshell/mode/imode/dobv" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/hshell/mode/imode/dochkau" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/hshell/mode/imode/dochktom" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/hshell/mode/imode/docom" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/hshell/mode/imode/docurl" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/hshell/mode/imode/docw" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/hshell/mode/imode/dodang" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/hshell/mode/imode/dodhc" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/hshell/mode/imode/doevapp" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/hshell/mode/imode/doext4" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/hshell/mode/imode/dogc" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/hshell/mode/imode/dogcerr" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/hshell/mode/imode/dogetnip" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/hshell/mode/imode/dogst" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/hshell/mode/imode/dohc" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/hshell/mode/imode/dohp" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/hshell/mode/imode/doindex" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/hshell/mode/imode/doip" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/hshell/mode/imode/doipfrag" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/hshell/mode/imode/doipfrag2" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/hshell/mode/imode/doipstat" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/hshell/mode/imode/dokeep" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/hshell/mode/imode/doloop" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/hshell/mode/imode/domisc" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/hshell/mode/imode/domthread" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/hshell/mode/imode/domthread1" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/hshell/mode/imode/donbny" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/hshell/mode/imode/donetstat" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/hshell/mode/imode/donews2" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/hshell/mode/imode/donewstat" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/hshell/mode/imode/donneterr" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/hshell/mode/imode/donotx" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/hshell/mode/imode/doo" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/hshell/mode/imode/doorder" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/hshell/mode/imode/dopro" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/hshell/mode/imode/dopt" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/hshell/mode/imode/dopt_inst" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/hshell/mode/imode/doq" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/hshell/mode/imode/doroutine" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/hshell/mode/imode/doroutine1" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/hshell/mode/imode/doroutinejf" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/hshell/mode/imode/dosshc" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/hshell/mode/imode/dossl" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/hshell/mode/imode/dostat" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/hshell/mode/imode/doswap" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/hshell/mode/imode/dosx" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/hshell/mode/imode/dosyn" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/hshell/mode/imode/dotall" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/hshell/mode/imode/dotb" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/hshell/mode/imode/dotcp" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/hshell/mode/imode/dotcp1" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/hshell/mode/imode/dotd" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/hshell/mode/imode/dotom" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/hshell/mode/imode/dotomjf" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/hshell/mode/imode/dotoms" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/hshell/mode/imode/dotop" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/hshell/mode/imode/doudp" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/hshell/mode/imode/doudp1" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/hshell/mode/imode/doupjk" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/hshell/mode/imode/dover" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/hshell/mode/imode/dovm58" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/hshell/mode/imode/dovm58new" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/hshell/mode/imode/dovm58old" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/hshell/mode/imode/doweb" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/hshell/mode/imode/dozpj" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/hshell/mode/imode/dumpdir" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/hshell/mode/imode/e1000e" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/hshell/mode/imode/execinc" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/hshell/mode/imode/gbapp" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/hshell/mode/imode/gbsql_query_time" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/hshell/mode/imode/gbsql_rows_examined" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/hshell/mode/imode/gbsql_rows_sent" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/hshell/mode/imode/gc_and" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/hshell/mode/imode/gc_di" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/hshell/mode/imode/gc_do_bysc" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/hshell/mode/imode/gc_do_bysshc" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/hshell/mode/imode/gc_dodb2_bysshc" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/hshell/mode/imode/gc_dodb_bysshc" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/hshell/mode/imode/gc_dodb_y" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/hshell/mode/imode/gc_doslowtop" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/hshell/mode/imode/gc_dotop" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/hshell/mode/imode/gc_dp" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/hshell/mode/imode/gc_generate_deploy_example" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/hshell/mode/imode/gc_generate_products" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/hshell/mode/imode/gc_get_hotelcode_hotelgroupcode" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/hshell/mode/imode/gc_get_hotels" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/hshell/mode/imode/gc_get_nhtl" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/hshell/mode/imode/gc_get_urls" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/hshell/mode/imode/gc_ins_hotelcode_hotelgroupcode" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/hshell/mode/imode/gc_ins_hotels" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/hshell/mode/imode/gc_ins_newhtl" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/hshell/mode/imode/gc_modetasks" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/hshell/mode/imode/gc_or" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/hshell/mode/imode/gc_reg_col" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/hshell/mode/imode/gc_rm_scode" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/hshell/mode/imode/gc_rm_sshc" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/hshell/mode/imode/gc_sc_sgc" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/hshell/mode/imode/gc_sc_sshc" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/hshell/mode/imode/gc_sc_sshmac" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/hshell/mode/imode/gc_sdata_bygcode" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/hshell/mode/imode/gc_sdata_bysshc" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/hshell/mode/imode/gc_see_qcache" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/hshell/mode/imode/gc_set_dp" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/hshell/mode/imode/gc_sort_qcache" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/hshell/mode/imode/gc_sshc_sc" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/hshell/mode/imode/gc_sshc_sshmac" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/hshell/mode/imode/gc_sshc_topquery_time" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/hshell/mode/imode/gc_sshc_topsent" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/hshell/mode/imode/gc_sshmac_ok" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/hshell/mode/imode/genndx" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/hshell/mode/imode/getdumps" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/hshell/mode/imode/getnip" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/hshell/mode/imode/getput" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/hshell/mode/imode/getputs" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/hshell/mode/imode/gservers" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/hshell/mode/imode/gservers_inc" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/hshell/mode/imode/gsfwall" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/hshell/mode/imode/gsurl" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/hshell/mode/imode/gsurl1" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/hshell/mode/imode/gsurl2" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/hshell/mode/imode/gsurl3" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/hshell/mode/imode/gsurl4" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/hshell/mode/imode/icheck" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/hshell/mode/imode/im" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/hshell/mode/imode/iseecfg" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/hshell/mode/imode/jiedaierr" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/hshell/mode/imode/jjdc-dev" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/hshell/mode/imode/kmproc1" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/hshell/mode/imode/lcrel" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/hshell/mode/imode/lcs" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/hshell/mode/imode/lt" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/hshell/mode/imode/mdoroutine" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/hshell/mode/imode/mdump" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/hshell/mode/imode/mload" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/hshell/mode/imode/mname" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/hshell/mode/imode/modauto" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/hshell/mode/imode/mon_gc_exceptions" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/hshell/mode/imode/mon_gc_groupcode_1" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/hshell/mode/imode/mon_gc_groupcode_2" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/hshell/mode/imode/mon_gc_report" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/hshell/mode/imode/mon_gc_sc" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/hshell/mode/imode/mon_gc_serverinfo_byapps" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/hshell/mode/imode/mon_gc_serverinfo_byssh" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/hshell/mode/imode/mon_gc_ssh" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/hshell/mode/imode/mon_gc_ssh_short" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/hshell/mode/imode/mon_gc_sshset" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/hshell/mode/imode/monab" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/hshell/mode/imode/monsrv" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/hshell/mode/imode/monstat" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/hshell/mode/imode/mrdoroutine" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/hshell/mode/imode/mrel2" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/hshell/mode/imode/mrels" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/hshell/mode/imode/ndxcmp" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/hshell/mode/imode/ob/old_update_apache" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/hshell/mode/imode/ob/scanmysql" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/hshell/mode/imode/ob/upapache" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/hshell/mode/imode/ob/x64_normal_apache" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/hshell/mode/imode/oo.sh" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/hshell/mode/imode/psping" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/hshell/mode/imode/qcache_adj" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/hshell/mode/imode/releasenote" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/hshell/mode/imode/rep_indexes" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/hshell/mode/imode/repl_jar" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/hshell/mode/imode/schtab" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/hshell/mode/imode/schtab1" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/hshell/mode/imode/schtab2" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/hshell/mode/imode/schtab_hisrep" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/hshell/mode/imode/sdoroutine" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/hshell/mode/imode/seecfg" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/hshell/mode/imode/seecode" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/hshell/mode/imode/seecon" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/hshell/mode/imode/seejf" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/hshell/mode/imode/seepms" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/hshell/mode/imode/ser" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/hshell/mode/imode/setcode" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/hshell/mode/imode/setdpstat" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/hshell/mode/imode/setssh" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/hshell/mode/imode/slc" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/hshell/mode/imode/srchsql" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/hshell/mode/imode/srchstr" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/hshell/mode/imode/stcmysql" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/hshell/mode/imode/tb" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/hshell/mode/imode/tcpu" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/hshell/mode/imode/testspd" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/hshell/mode/imode/testtrap" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/hshell/mode/imode/tg3" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/hshell/mode/imode/timemon" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/hshell/mode/imode/tlnew" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/hshell/mode/imode/tm" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/hshell/mode/imode/tm1" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/hshell/mode/imode/tm2" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/hshell/mode/imode/updatedb.sh" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/hshell/mode/imode/wy" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/hshell/mode/imode/yettoaudit" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/hshell/mode/impfile/ant/build.xml" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/hshell/mode/impfile/apache/ht.txt" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/hshell/mode/impfile/apache/robots.txt" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/hshell/mode/impfile/fix_tencent/mode_bashrc_segment" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/hshell/mode/impfile/java/javaenv" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/hshell/mode/impfile/jktomcat/parms" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/hshell/mode/impfile/linux/greptestsample" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/hshell/mode/impfile/mysql/db.opt" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/hshell/mode/impfile/mysql/my.cnf" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/hshell/mode/impfile/mysql/my.cnf.ext" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/hshell/mode/impfile/mysql/mysqlsta" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/hshell/mode/impfile/mysql/sqllogbin.sql" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/hshell/mode/impfile/mysql/types/b" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/hshell/mode/impfile/mysql/types/c" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/hshell/mode/impfile/mysql/types/d" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/hshell/mode/impfile/mysql/types/n" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/hshell/mode/impfile/mysql/types/t" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/hshell/mode/impfile/ol_sql_base/00001.accnt_ta_code.sql" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/hshell/mode/impfile/ol_sql_base/00002.code_transaction.sql" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/hshell/mode/impfile/sql/resbuild.sql" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/hshell/mode/impfile/xtrabackup/innobackupex" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/hshell/mode/inst_com" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/hshell/mode/inst_gcserver" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/hshell/mode/inst_java" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/hshell/mode/inst_misc" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/hshell/mode/inst_mysql" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/hshell/mode/inst_mysql_service" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/hshell/mode/inst_tomcat" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/hshell/mode/inst_xtra" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/hshell/mode/install.sh" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/hshell/mode/isNtom" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/hshell/mode/isatom" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/hshell/mode/isblsql" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/hshell/mode/isctom" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/hshell/mode/isdump" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/hshell/mode/javamon" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/hshell/mode/jvstat" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/hshell/mode/kdthread" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/hshell/mode/kmproc" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/hshell/mode/kpfile" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/hshell/mode/lbugfix" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/hshell/mode/ltcmysql" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/hshell/mode/mdscp" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/hshell/mode/mdump" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/hshell/mode/mdumpzlf" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/hshell/mode/mload" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/hshell/mode/mnthosts" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/hshell/mode/mntmail" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/hshell/mode/mod_config" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/hshell/mode/mod_fldname" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/hshell/mode/mod_flds" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/hshell/mode/mod_tthread" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/hshell/mode/modedtask" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/hshell/mode/modegate" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/hshell/mode/modelog" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/hshell/mode/modemsg" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/hshell/mode/modepv" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/hshell/mode/modepv1" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/hshell/mode/modewait" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/hshell/mode/modmysql" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/hshell/mode/mondump" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/hshell/mode/monload" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/hshell/mode/montoms" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/hshell/mode/mrel" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/hshell/mode/mssh" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/hshell/mode/msysctl" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/hshell/mode/mtypeno" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/hshell/mode/mtypesel" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/hshell/mode/mtypesel0" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/hshell/mode/mysql" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/hshell/mode/mysqldip" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/hshell/mode/ndxcmp" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/hshell/mode/netfix" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/hshell/mode/netpath" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/hshell/mode/nmlizeip" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/hshell/mode/ol_data" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/hshell/mode/optimize_table" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/hshell/mode/ptmode" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/hshell/mode/qcache_adj" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/hshell/mode/reconfig_cnf" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/hshell/mode/releasenote" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/hshell/mode/rep_config" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/hshell/mode/rmbom" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/hshell/mode/rmdump" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/hshell/mode/sbadsql" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/hshell/mode/sbadsql_rows_sent" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/hshell/mode/sdump" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/hshell/mode/seeapc" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/hshell/mode/seecfg" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/hshell/mode/seecode" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/hshell/mode/seegrp" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/hshell/mode/seetom" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/hshell/mode/set_cron" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/hshell/mode/setdsta" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/hshell/mode/setpath" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/hshell/mode/settz" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/hshell/mode/setwsta" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/hshell/mode/showme" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/hshell/mode/skip_pv" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/hshell/mode/sload" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/hshell/mode/sql/0.basic/0.check_uniqueness/a0001.rep_jie_classno_uniqueness.sql" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/hshell/mode/sql/0.basic/0.check_uniqueness/a0001.rep_jie_history_classno_uniqueness.sql" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/hshell/mode/sql/0.basic/1.create_index/a0001_account_create_index_ghab.sql" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/hshell/mode/sql/0.basic/1.create_index/a0001_ar_detail_create_index_ghab.sql" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/hshell/mode/sql/0.basic/1.create_index/a0001_master_snapshot_create_index_indexmode1.sql" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/hshell/mode/sql/0.basic/1.create_index/a0001_master_snapshot_create_index_indexmode2.sql" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/hshell/mode/sql/0.basic/1.create_index/a0002_pos_deptjie_history_indexmode1.sql" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/hshell/mode/sql/0.basic/1.create_index/a0002_pos_deptjie_history_indexmode2.sql" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/hshell/mode/sql/0.basic/1.create_index/a0003_pos_deptdai_history_indexmode1.sql" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/hshell/mode/sql/0.basic/1.create_index/a0003_pos_deptdai_history_indexmode2.sql" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/hshell/mode/sql/0.basic/1.create_index/a0004_rep_dai_history_indexmode1.sql" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/hshell/mode/sql/0.basic/1.create_index/a0004_rep_dai_history_indexmode2.sql" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/hshell/mode/sql/0.basic/1.create_index/a0005_rep_jie_history_indexmode1.sql" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/hshell/mode/sql/0.basic/1.create_index/a0005_rep_jie_history_indexmode2.sql" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/hshell/mode/sql/0.basic/1.create_index/a0005_rep_jie_indexmode1.sql" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/hshell/mode/sql/0.basic/1.create_index/a0006_rep_jiedai_history_indexmode1.sql" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/hshell/mode/sql/0.basic/1.create_index/a0006_rep_jiedai_history_indexmode2.sql" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/hshell/mode/sql/0.basic/2.code_check/c00010.pos_deptdai_code_validity.sql" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/hshell/mode/sql/0.basic/2.code_check/c00010.pos_deptjie_code_validity.sql" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/hshell/mode/sql/0.basic/3.biz_month/00.biz_month_index.sql" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/hshell/mode/sql/0.basic/3.biz_month/01.biz_month_validity_completeness.sql" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/hshell/mode/sql/0.basic/3.biz_month/02.biz_month_validity_overlapped_month.sql" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/hshell/mode/sql/0.basic/3.biz_month/03.biz_month_validity_month.sql" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/hshell/mode/sql/0.basic/3.biz_month/04.biz_month_validity_order.sql" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/hshell/mode/sql/0.basic/3.biz_month/05.biz_month_validity_warning.sql" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/hshell/mode/sql/3.audit/02.pos_dish_balance_check.sql" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/hshell/mode/sql/3.audit/02.pos_menu_balance_check.sql" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/hshell/mode/sql/3.audit/03.pos_deptjie_vs_pos_deptdai.sql" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/hshell/mode/sql/3.audit/03.pos_menu_ghid_check.sql" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/hshell/mode/sql/3.audit/04.master_snapshot_addcolumn.sql" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/hshell/mode/sql/3.audit/04.master_snapshot_cfill_plen.sql" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/hshell/mode/sql/3.audit/04.master_snapshot_date_gaps.sql" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/hshell/mode/sql/3.audit/04.master_snapshot_overlapped_period.sql" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/hshell/mode/sql/3.audit/05.master_snapshot_detail_consistency_balance.sql" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/hshell/mode/sql/3.audit/05.master_snapshot_detail_consistency_charge.sql" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/hshell/mode/sql/3.audit/05.master_snapshot_detail_consistency_charge_detail.sql" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/hshell/mode/sql/3.audit/05.master_snapshot_detail_consistency_lastpart.sql" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/hshell/mode/sql/3.audit/05.master_snapshot_detail_consistency_pay.sql" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/hshell/mode/sql/3.audit/05.master_snapshot_detail_consistency_pay_detail.sql" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/hshell/mode/sql/3.audit/05.master_snapshot_detail_consistency_tillpart.sql" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/hshell/mode/sql/3.audit/05.master_snapshot_detail_continuity.sql" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/hshell/mode/sql/3.audit/05.master_snapshot_summary_consistency.sql" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/hshell/mode/sql/3.audit/05.master_snapshot_summary_continuity.sql" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/hshell/mode/sql/3.audit/06.master_snapshot_reser_last_charge.sql" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/hshell/mode/sql/3.audit/06.master_snapshot_reser_last_pay.sql" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/hshell/mode/sql/3.audit/06.master_snapshot_reser_orderonly_charge_ttl.sql" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/hshell/mode/sql/3.audit/06.master_snapshot_reser_orderonly_pay_ttl.sql" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/hshell/mode/sql/3.audit/06.master_snapshot_reser_till_charge.sql" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/hshell/mode/sql/3.audit/06.master_snapshot_reser_till_pay.sql" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/hshell/mode/sql/3.audit/07.master_snapshot_vs_account_balance_1.sql" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/hshell/mode/sql/3.audit/07.master_snapshot_vs_account_balance_2.sql" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/hshell/mode/sql/3.audit/07.master_snapshot_vs_account_charge_pay.sql" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/hshell/mode/sql/3.audit/07.master_snapshot_vs_ar_account_charge_pay.sql" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/hshell/mode/sql/3.audit/08.rep_dai_credits_consistency_horizontal.sql" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/hshell/mode/sql/3.audit/09.rep_dai_credit01_consistency_vertical.sql" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/hshell/mode/sql/3.audit/09.rep_dai_credit02_consistency_vertical.sql" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/hshell/mode/sql/3.audit/09.rep_dai_credit03_consistency_vertical.sql" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/hshell/mode/sql/3.audit/09.rep_dai_credit04_consistency_vertical.sql" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/hshell/mode/sql/3.audit/09.rep_dai_credit05_consistency_vertical.sql" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/hshell/mode/sql/3.audit/09.rep_dai_credit06_consistency_vertical.sql" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/hshell/mode/sql/3.audit/09.rep_dai_credit07_consistency_vertical.sql" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/hshell/mode/sql/3.audit/09.rep_dai_sumcre_consistency_vertical.sql" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/hshell/mode/sql/3.audit/09.rep_dai_summary_consistency.sql" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/hshell/mode/sql/3.audit/09.rep_dai_summary_continuity.sql" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/hshell/mode/sql/3.audit/10.rep_dai_vs_master_snapshot_balance.sql" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/hshell/mode/sql/3.audit/10.rep_dai_vs_master_snapshot_debitcredit.sql" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/hshell/mode/sql/3.audit/11.rep_dai_vs_master_snapshot_balance.sql" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/hshell/mode/srvman" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/hshell/mode/start_tomcat" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/hshell/mode/stop_tomcat" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/hshell/mode/sxmlrep" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/hshell/mode/tabprop" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/hshell/mode/tbcmp" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/hshell/mode/tcmysql" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/hshell/mode/tcp_recycle" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/hshell/mode/tctomcat" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/hshell/mode/testdb" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/hshell/mode/testkey" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/hshell/mode/testmysql" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/hshell/mode/testobject" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/hshell/mode/testobjects" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/hshell/mode/tfile" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/hshell/mode/tom/bin/start_this" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/hshell/mode/tom/bin/stop_this" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/hshell/mode/tomcatsafe" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/hshell/mode/tomhl" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/hshell/mode/tompv" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/hshell/mode/tomtoact" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/hshell/mode/tomtop" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/hshell/mode/tomupdtl" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/hshell/mode/traceps" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/hshell/mode/trun_log" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/hshell/mode/tspeed" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/hshell/mode/tune_app" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/hshell/mode/tune_mysql" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/hshell/mode/tutf8" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/hshell/mode/updatedb.sh" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/hshell/mode/updateprop" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/hshell/mode/withyou" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/hshell/mode/xbback" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/hshell/mode/xbrestore" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/hshell/mode/xbrmhis" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/hmode/.addjmx" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/hmode/.adjdate" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/hmode/.autopub" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/hmode/.deltb" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/hmode/.do1au" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/hmode/.dump_tabdata" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/hmode/.grpdel" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/hmode/.grpdmp" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/hmode/.htldel" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/hmode/.htldmp" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/hmode/.htlrm" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/hmode/.htltool" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/hmode/.inst_mysql_55" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/hmode/.inst_mysql_56" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/hmode/.inst_pt" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/hmode/.jgettomp" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/hmode/.jseetom" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/hmode/.jtomdirs" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/hmode/.mdump_Hdbs" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/hmode/.mdump_Hdbs_Inc" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/hmode/.modesid" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/hmode/.modmcast" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/hmode/.muldmp_base" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/hmode/.muldmp_grpdata" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/hmode/.muldmp_htldata" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/hmode/.netok" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/hmode/.opt_tomcat" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/hmode/.pis" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/hmode/.ps_exit" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/hmode/.pt_stat" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/hmode/.publish_war" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/hmode/.publish_war_sjj" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/hmode/.publish_wfl" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/hmode/.repl_jar" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/hmode/.stt_tom" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/hmode/.tlbase" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/hmode/.tomdirs" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/hmode/.update_apache" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/hmode/.upgrade_mysql_5.1.57_to_5.5.50" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/hmode/.upgrade_mysql_to_5.5.50" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/hmode/.upgrade_mysql_to_5.6.35" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/hmode/Iseecfg" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/hmode/addctom" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/hmode/adjcnf" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/hmode/adjmlog" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/hmode/apache_mtd" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/hmode/apachectl" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/hmode/apachemode" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/hmode/apc_tom" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/hmode/apcfull" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/hmode/appblk" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/hmode/appips" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/hmode/appmtu" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/hmode/appserver" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/hmode/badsql_query_time" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/hmode/badsql_rows_sent" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/hmode/beac" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/hmode/check_tomcat" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/hmode/chkmhis" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/hmode/chkmlog" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/hmode/clrcache" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/hmode/clrlogs" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/hmode/comdump" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/hmode/config_apache" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/hmode/config_apache_more" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/hmode/config_apaches" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/hmode/config_mem" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/hmode/config_mysql" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/hmode/config_sshd" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/hmode/config_tomcat" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/hmode/confirm" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/hmode/cpucores" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/hmode/cpufreq" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/hmode/cpuinf" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/hmode/cpumem" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/hmode/cstdlogs" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/hmode/ctomno" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/hmode/dbcmp" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/hmode/dbinit" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/hmode/dbsync" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/hmode/disusb" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/hmode/dlhotel" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/hmode/dlsql" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/hmode/dumpattr" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/hmode/dumpnamepv" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/hmode/dupndx" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/hmode/dupndx1" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/hmode/each" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/hmode/eval_app" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/hmode/ezrms_data" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/hmode/filter_dump" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/hmode/find_tables" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/hmode/fix_cnf" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/hmode/fixhosts" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/hmode/gcmode" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/hmode/gcserver" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/hmode/getadr" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/hmode/getips" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/hmode/getmcast" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/hmode/getmtu" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/hmode/getmtu1" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/hmode/getpip" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/hmode/getstrips" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/hmode/gettomp" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/hmode/gsip" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/hmode/health_check" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/hmode/health_check_cpu" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/hmode/health_check_disk" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/hmode/health_check_memory" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/hmode/host" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/hmode/htlman" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/hmode/idcheck" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/hmode/ideas_data" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/hmode/imode/.cdb_config" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/hmode/imode/.colldata" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/hmode/imode/.colldata1" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/hmode/imode/.colldata_db" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/hmode/imode/.colldata_db1" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/hmode/imode/.colldata_db2" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/hmode/imode/.colldata_db_cw" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/hmode/imode/.colldata_portetc" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/hmode/imode/.doauthbr" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/hmode/imode/.doauthnew" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/hmode/imode/.doauthnew_old" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/hmode/imode/.doauthnewytlx" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/hmode/imode/.doautx" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/hmode/imode/.doauwfl" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/hmode/imode/.dohfint" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/hmode/imode/.dop" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/hmode/imode/.execadjcnf" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/hmode/imode/.gsurl1" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/hmode/imode/.hau" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/hmode/imode/.inst_ss5" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/hmode/imode/.publish_war" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/hmode/imode/.seepis" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/hmode/imode/.sm" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/hmode/imode/.testhost" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/hmode/imode/ah_prim" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/hmode/imode/ah_prim2" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/hmode/imode/apcstat" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/hmode/imode/bd/.addsdc" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/hmode/imode/bnx2" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/hmode/imode/cdb_new" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/hmode/imode/cdrop" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/hmode/imode/cfg/.imode_aliases" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/hmode/imode/cfg/task.cfg" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/hmode/imode/chkau" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/hmode/imode/chktom" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/hmode/imode/chktom2" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/hmode/imode/ci" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/hmode/imode/cii" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/hmode/imode/cind" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/hmode/imode/cind_new" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/hmode/imode/cld_time_5" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/hmode/imode/cld_time_6" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/hmode/imode/cloudcheck" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/hmode/imode/createdbs" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/hmode/imode/cremote" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/hmode/imode/dfdo" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/hmode/imode/dlcyst/dlcyst" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/hmode/imode/dlcyst/dlcyst1" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/hmode/imode/dlhs/dlhs1" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/hmode/imode/dlhs/dlhs2" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/hmode/imode/do1024" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/hmode/imode/do1rel" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/hmode/imode/do4z" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/hmode/imode/do58" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/hmode/imode/doA" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/hmode/imode/doEP" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/hmode/imode/doI" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/hmode/imode/doJ" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/hmode/imode/doN" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/hmode/imode/doT" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/hmode/imode/doTM" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/hmode/imode/doaf" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/hmode/imode/doal" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/hmode/imode/doali" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/hmode/imode/doapp" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/hmode/imode/doat" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/hmode/imode/dobad" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/hmode/imode/dobadsql" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/hmode/imode/dobjybappmtu" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/hmode/imode/doblk" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/hmode/imode/dobup" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/hmode/imode/dobv" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/hmode/imode/dochkau" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/hmode/imode/dochktom" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/hmode/imode/docom" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/hmode/imode/docurl" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/hmode/imode/docw" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/hmode/imode/dodang" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/hmode/imode/dodhc" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/hmode/imode/doevapp" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/hmode/imode/doext4" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/hmode/imode/dogc" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/hmode/imode/dogcerr" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/hmode/imode/dogetnip" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/hmode/imode/dogst" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/hmode/imode/dohc" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/hmode/imode/dohp" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/hmode/imode/doindex" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/hmode/imode/doip" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/hmode/imode/doipfrag" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/hmode/imode/doipfrag2" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/hmode/imode/doipstat" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/hmode/imode/dokeep" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/hmode/imode/doloop" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/hmode/imode/domisc" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/hmode/imode/domthread" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/hmode/imode/domthread1" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/hmode/imode/donbny" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/hmode/imode/donetstat" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/hmode/imode/donews2" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/hmode/imode/donewstat" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/hmode/imode/donneterr" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/hmode/imode/donotx" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/hmode/imode/doo" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/hmode/imode/doorder" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/hmode/imode/dopro" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/hmode/imode/dopt" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/hmode/imode/dopt_inst" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/hmode/imode/doq" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/hmode/imode/doroutine" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/hmode/imode/doroutine1" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/hmode/imode/doroutinejf" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/hmode/imode/dosshc" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/hmode/imode/dossl" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/hmode/imode/dostat" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/hmode/imode/doswap" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/hmode/imode/dosx" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/hmode/imode/dosyn" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/hmode/imode/dotall" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/hmode/imode/dotb" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/hmode/imode/dotcp" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/hmode/imode/dotcp1" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/hmode/imode/dotd" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/hmode/imode/dotom" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/hmode/imode/dotomjf" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/hmode/imode/dotoms" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/hmode/imode/dotop" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/hmode/imode/doudp" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/hmode/imode/doudp1" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/hmode/imode/doupjk" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/hmode/imode/dover" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/hmode/imode/dovm58" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/hmode/imode/dovm58new" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/hmode/imode/dovm58old" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/hmode/imode/doweb" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/hmode/imode/dozpj" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/hmode/imode/dumpdir" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/hmode/imode/e1000e" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/hmode/imode/execinc" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/hmode/imode/gbapp" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/hmode/imode/gbsql_query_time" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/hmode/imode/gbsql_rows_examined" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/hmode/imode/gbsql_rows_sent" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/hmode/imode/gc_and" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/hmode/imode/gc_di" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/hmode/imode/gc_do_bysc" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/hmode/imode/gc_do_bysshc" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/hmode/imode/gc_dodb2_bysshc" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/hmode/imode/gc_dodb_bysshc" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/hmode/imode/gc_dodb_y" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/hmode/imode/gc_doslowtop" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/hmode/imode/gc_dotop" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/hmode/imode/gc_dp" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/hmode/imode/gc_generate_deploy_example" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/hmode/imode/gc_generate_products" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/hmode/imode/gc_get_hotelcode_hotelgroupcode" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/hmode/imode/gc_get_hotels" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/hmode/imode/gc_get_nhtl" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/hmode/imode/gc_get_urls" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/hmode/imode/gc_ins_hotelcode_hotelgroupcode" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/hmode/imode/gc_ins_hotels" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/hmode/imode/gc_ins_newhtl" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/hmode/imode/gc_modetasks" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/hmode/imode/gc_or" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/hmode/imode/gc_reg_col" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/hmode/imode/gc_rm_scode" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/hmode/imode/gc_rm_sshc" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/hmode/imode/gc_sc_sgc" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/hmode/imode/gc_sc_sshc" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/hmode/imode/gc_sc_sshmac" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/hmode/imode/gc_sdata_bygcode" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/hmode/imode/gc_sdata_bysshc" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/hmode/imode/gc_see_qcache" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/hmode/imode/gc_set_dp" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/hmode/imode/gc_sort_qcache" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/hmode/imode/gc_sshc_sc" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/hmode/imode/gc_sshc_sshmac" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/hmode/imode/gc_sshc_topquery_time" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/hmode/imode/gc_sshc_topsent" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/hmode/imode/gc_sshmac_ok" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/hmode/imode/genndx" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/hmode/imode/getdumps" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/hmode/imode/getnip" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/hmode/imode/getput" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/hmode/imode/getputs" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/hmode/imode/gservers" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/hmode/imode/gservers_inc" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/hmode/imode/gsfwall" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/hmode/imode/gsurl" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/hmode/imode/gsurl1" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/hmode/imode/gsurl2" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/hmode/imode/gsurl3" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/hmode/imode/gsurl4" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/hmode/imode/icheck" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/hmode/imode/im" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/hmode/imode/iseecfg" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/hmode/imode/jiedaierr" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/hmode/imode/jjdc-dev" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/hmode/imode/kmproc1" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/hmode/imode/lcrel" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/hmode/imode/lcs" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/hmode/imode/lt" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/hmode/imode/mdoroutine" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/hmode/imode/mdump" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/hmode/imode/mload" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/hmode/imode/mname" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/hmode/imode/modauto" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/hmode/imode/mon_gc_exceptions" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/hmode/imode/mon_gc_groupcode_1" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/hmode/imode/mon_gc_groupcode_2" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/hmode/imode/mon_gc_report" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/hmode/imode/mon_gc_sc" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/hmode/imode/mon_gc_serverinfo_byapps" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/hmode/imode/mon_gc_serverinfo_byssh" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/hmode/imode/mon_gc_ssh" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/hmode/imode/mon_gc_ssh_short" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/hmode/imode/mon_gc_sshset" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/hmode/imode/monab" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/hmode/imode/monsrv" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/hmode/imode/monstat" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/hmode/imode/mrdoroutine" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/hmode/imode/mrel2" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/hmode/imode/mrels" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/hmode/imode/ndxcmp" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/hmode/imode/ob/old_update_apache" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/hmode/imode/ob/scanmysql" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/hmode/imode/ob/upapache" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/hmode/imode/ob/x64_normal_apache" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/hmode/imode/oo.sh" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/hmode/imode/psping" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/hmode/imode/qcache_adj" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/hmode/imode/releasenote" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/hmode/imode/rep_indexes" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/hmode/imode/repl_jar" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/hmode/imode/schtab" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/hmode/imode/schtab1" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/hmode/imode/schtab2" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/hmode/imode/schtab_hisrep" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/hmode/imode/sdoroutine" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/hmode/imode/seecfg" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/hmode/imode/seecode" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/hmode/imode/seecon" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/hmode/imode/seejf" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/hmode/imode/seepms" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/hmode/imode/ser" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/hmode/imode/setcode" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/hmode/imode/setdpstat" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/hmode/imode/setssh" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/hmode/imode/slc" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/hmode/imode/srchsql" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/hmode/imode/srchstr" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/hmode/imode/stcmysql" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/hmode/imode/tb" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/hmode/imode/tcpu" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/hmode/imode/testspd" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/hmode/imode/testtrap" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/hmode/imode/tg3" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/hmode/imode/timemon" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/hmode/imode/tlnew" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/hmode/imode/tm" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/hmode/imode/tm1" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/hmode/imode/tm2" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/hmode/imode/updatedb.sh" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/hmode/imode/wy" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/hmode/imode/yettoaudit" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/hmode/impfile/ant/build.xml" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/hmode/impfile/apache/ht.txt" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/hmode/impfile/apache/robots.txt" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/hmode/impfile/fix_tencent/mode_bashrc_segment" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/hmode/impfile/java/javaenv" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/hmode/impfile/jktomcat/parms" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/hmode/impfile/linux/32/grep" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/hmode/impfile/linux/64/grep" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/hmode/impfile/linux/greptestsample" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/hmode/impfile/mysql/db.opt" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/hmode/impfile/mysql/my.cnf" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/hmode/impfile/mysql/my.cnf.ext" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/hmode/impfile/mysql/mysqlsta" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/hmode/impfile/mysql/sqllogbin.sql" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/hmode/impfile/mysql/types/b" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/hmode/impfile/mysql/types/c" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/hmode/impfile/mysql/types/d" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/hmode/impfile/mysql/types/n" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/hmode/impfile/mysql/types/t" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/hmode/impfile/ol_sql_base/00001.accnt_ta_code.sql" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/hmode/impfile/ol_sql_base/00002.code_transaction.sql" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/hmode/impfile/sql/resbuild.sql" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/hmode/impfile/xtrabackup/32/xbstream" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/hmode/impfile/xtrabackup/64/xbstream" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/hmode/impfile/xtrabackup/innobackupex" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/hmode/inst_com" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/hmode/inst_gcserver" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/hmode/inst_java" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/hmode/inst_misc" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/hmode/inst_mysql" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/hmode/inst_mysql_service" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/hmode/inst_tomcat" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/hmode/inst_xtra" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/hmode/install.sh" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/hmode/isNtom" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/hmode/isatom" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/hmode/isblsql" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/hmode/isctom" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/hmode/isdump" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/hmode/javamon" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/hmode/jvstat" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/hmode/kdthread" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/hmode/kmproc" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/hmode/kpfile" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/hmode/lbugfix" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/hmode/ltcmysql" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/hmode/mdscp" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/hmode/mdump" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/hmode/mdumpzlf" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/hmode/mload" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/hmode/mnthosts" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/hmode/mntmail" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/hmode/mod_config" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/hmode/mod_fldname" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/hmode/mod_flds" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/hmode/mod_tthread" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/hmode/modedtask" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/hmode/modegate" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/hmode/modelog" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/hmode/modemsg" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/hmode/modepv" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/hmode/modepv1" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/hmode/modewait" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/hmode/modmysql" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/hmode/mondump" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/hmode/monload" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/hmode/montoms" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/hmode/mrel" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/hmode/mssh" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/hmode/msysctl" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/hmode/mtypeno" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/hmode/mtypesel" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/hmode/mtypesel0" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/hmode/mysql" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/hmode/mysqldip" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/hmode/ndxcmp" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/hmode/netfix" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/hmode/netpath" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/hmode/nmlizeip" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/hmode/ol_data" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/hmode/optimize_table" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/hmode/ptmode" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/hmode/qcache_adj" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/hmode/reconfig_cnf" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/hmode/releasenote" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/hmode/rep_config" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/hmode/rmbom" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/hmode/rmdump" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/hmode/sbadsql" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/hmode/sbadsql_rows_sent" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/hmode/sdump" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/hmode/seeapc" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/hmode/seecfg" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/hmode/seecode" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/hmode/seegrp" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/hmode/seetom" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/hmode/set_cron" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/hmode/setdsta" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/hmode/setpath" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/hmode/settz" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/hmode/setwsta" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/hmode/showme" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/hmode/skip_pv" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/hmode/sload" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/hmode/sql/0.basic/0.check_uniqueness/a0001.rep_jie_classno_uniqueness.sql" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/hmode/sql/0.basic/0.check_uniqueness/a0001.rep_jie_history_classno_uniqueness.sql" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/hmode/sql/0.basic/1.create_index/a0001_account_create_index_ghab.sql" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/hmode/sql/0.basic/1.create_index/a0001_ar_detail_create_index_ghab.sql" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/hmode/sql/0.basic/1.create_index/a0001_master_snapshot_create_index_indexmode1.sql" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/hmode/sql/0.basic/1.create_index/a0001_master_snapshot_create_index_indexmode2.sql" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/hmode/sql/0.basic/1.create_index/a0002_pos_deptjie_history_indexmode1.sql" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/hmode/sql/0.basic/1.create_index/a0002_pos_deptjie_history_indexmode2.sql" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/hmode/sql/0.basic/1.create_index/a0003_pos_deptdai_history_indexmode1.sql" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/hmode/sql/0.basic/1.create_index/a0003_pos_deptdai_history_indexmode2.sql" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/hmode/sql/0.basic/1.create_index/a0004_rep_dai_history_indexmode1.sql" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/hmode/sql/0.basic/1.create_index/a0004_rep_dai_history_indexmode2.sql" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/hmode/sql/0.basic/1.create_index/a0005_rep_jie_history_indexmode1.sql" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/hmode/sql/0.basic/1.create_index/a0005_rep_jie_history_indexmode2.sql" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/hmode/sql/0.basic/1.create_index/a0005_rep_jie_indexmode1.sql" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/hmode/sql/0.basic/1.create_index/a0006_rep_jiedai_history_indexmode1.sql" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/hmode/sql/0.basic/1.create_index/a0006_rep_jiedai_history_indexmode2.sql" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/hmode/sql/0.basic/2.code_check/c00010.pos_deptdai_code_validity.sql" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/hmode/sql/0.basic/2.code_check/c00010.pos_deptjie_code_validity.sql" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/hmode/sql/0.basic/3.biz_month/00.biz_month_index.sql" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/hmode/sql/0.basic/3.biz_month/01.biz_month_validity_completeness.sql" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/hmode/sql/0.basic/3.biz_month/02.biz_month_validity_overlapped_month.sql" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/hmode/sql/0.basic/3.biz_month/03.biz_month_validity_month.sql" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/hmode/sql/0.basic/3.biz_month/04.biz_month_validity_order.sql" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/hmode/sql/0.basic/3.biz_month/05.biz_month_validity_warning.sql" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/hmode/sql/3.audit/02.pos_dish_balance_check.sql" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/hmode/sql/3.audit/02.pos_menu_balance_check.sql" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/hmode/sql/3.audit/03.pos_deptjie_vs_pos_deptdai.sql" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/hmode/sql/3.audit/03.pos_menu_ghid_check.sql" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/hmode/sql/3.audit/04.master_snapshot_addcolumn.sql" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/hmode/sql/3.audit/04.master_snapshot_cfill_plen.sql" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/hmode/sql/3.audit/04.master_snapshot_date_gaps.sql" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/hmode/sql/3.audit/04.master_snapshot_overlapped_period.sql" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/hmode/sql/3.audit/05.master_snapshot_detail_consistency_balance.sql" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/hmode/sql/3.audit/05.master_snapshot_detail_consistency_charge.sql" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/hmode/sql/3.audit/05.master_snapshot_detail_consistency_charge_detail.sql" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/hmode/sql/3.audit/05.master_snapshot_detail_consistency_lastpart.sql" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/hmode/sql/3.audit/05.master_snapshot_detail_consistency_pay.sql" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/hmode/sql/3.audit/05.master_snapshot_detail_consistency_pay_detail.sql" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/hmode/sql/3.audit/05.master_snapshot_detail_consistency_tillpart.sql" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/hmode/sql/3.audit/05.master_snapshot_detail_continuity.sql" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/hmode/sql/3.audit/05.master_snapshot_summary_consistency.sql" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/hmode/sql/3.audit/05.master_snapshot_summary_continuity.sql" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/hmode/sql/3.audit/06.master_snapshot_reser_last_charge.sql" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/hmode/sql/3.audit/06.master_snapshot_reser_last_pay.sql" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/hmode/sql/3.audit/06.master_snapshot_reser_orderonly_charge_ttl.sql" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/hmode/sql/3.audit/06.master_snapshot_reser_orderonly_pay_ttl.sql" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/hmode/sql/3.audit/06.master_snapshot_reser_till_charge.sql" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/hmode/sql/3.audit/06.master_snapshot_reser_till_pay.sql" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/hmode/sql/3.audit/07.master_snapshot_vs_account_balance_1.sql" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/hmode/sql/3.audit/07.master_snapshot_vs_account_balance_2.sql" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/hmode/sql/3.audit/07.master_snapshot_vs_account_charge_pay.sql" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/hmode/sql/3.audit/07.master_snapshot_vs_ar_account_charge_pay.sql" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/hmode/sql/3.audit/08.rep_dai_credits_consistency_horizontal.sql" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/hmode/sql/3.audit/09.rep_dai_credit01_consistency_vertical.sql" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/hmode/sql/3.audit/09.rep_dai_credit02_consistency_vertical.sql" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/hmode/sql/3.audit/09.rep_dai_credit03_consistency_vertical.sql" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/hmode/sql/3.audit/09.rep_dai_credit04_consistency_vertical.sql" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/hmode/sql/3.audit/09.rep_dai_credit05_consistency_vertical.sql" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/hmode/sql/3.audit/09.rep_dai_credit06_consistency_vertical.sql" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/hmode/sql/3.audit/09.rep_dai_credit07_consistency_vertical.sql" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/hmode/sql/3.audit/09.rep_dai_sumcre_consistency_vertical.sql" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/hmode/sql/3.audit/09.rep_dai_summary_consistency.sql" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/hmode/sql/3.audit/09.rep_dai_summary_continuity.sql" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/hmode/sql/3.audit/10.rep_dai_vs_master_snapshot_balance.sql" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/hmode/sql/3.audit/10.rep_dai_vs_master_snapshot_debitcredit.sql" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/hmode/sql/3.audit/11.rep_dai_vs_master_snapshot_balance.sql" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/hmode/srvman" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/hmode/start_tomcat" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/hmode/stop_tomcat" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/hmode/sxmlrep" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/hmode/tabprop" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/hmode/tbcmp" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/hmode/tcmysql" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/hmode/tcp_recycle" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/hmode/tctomcat" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/hmode/testdb" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/hmode/testkey" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/hmode/testmysql" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/hmode/testobject" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/hmode/testobjects" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/hmode/tfile" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/hmode/tom/bin/start_this" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/hmode/tom/bin/stop_this" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/hmode/tomcatsafe" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/hmode/tomhl" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/hmode/tompv" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/hmode/tomtoact" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/hmode/tomtop" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/hmode/tomupdtl" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/hmode/traceps" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/hmode/trun_log" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/hmode/tspeed" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/hmode/tune_app" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/hmode/tune_mysql" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/hmode/tutf8" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/hmode/updatedb.sh" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/hmode/updateprop" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/hmode/upgrade_mysql" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/hmode/withyou" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/hmode/xbback" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/hmode/xbrestore" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/hmode/xbrmhis" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/hshell/adjcnf" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/hshell/clrcache" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/hshell/clrlog" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/hshell/comdump" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/hshell/config_mysql" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/hshell/cpumem" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/hshell/dlsql" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/hshell/rmdump" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/hshell/setpath" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/hshell/withyou" afterPath="" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/workspace.xml" afterPath="$PROJECT_DIR$/.idea/workspace.xml" />
     </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
@@ -1428,7 +268,14 @@
       <option name="project" value="LOCAL" />
       <updated>1510220788203</updated>
     </task>
-    <option name="localTasksCounter" value="7" />
+    <task id="LOCAL-00007" summary="zhangh">
+      <created>1510299067316</created>
+      <option name="number" value="00007" />
+      <option name="presentableId" value="LOCAL-00007" />
+      <option name="project" value="LOCAL" />
+      <updated>1510299067316</updated>
+    </task>
+    <option name="localTasksCounter" value="8" />
     <servers />
   </component>
   <component name="TodoView">
@@ -1443,7 +290,7 @@
   <component name="ToolWindowManager">
     <frame x="-8" y="-8" width="1936" height="1056" extended-state="6" />
     <layout>
-      <window_info id="Project" active="true" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.1924307" sideWeight="0.5" order="0" side_tool="false" content_ui="combo" x="832" y="234" width="256" height="571" />
+      <window_info id="Project" active="true" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.19189766" sideWeight="0.5" order="0" side_tool="false" content_ui="combo" x="832" y="234" width="256" height="571" />
       <window_info id="TODO" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.32924107" sideWeight="0.5" order="6" side_tool="false" content_ui="tabs" />
       <window_info id="Event Log" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.51380044" sideWeight="0.5021075" order="7" side_tool="true" content_ui="tabs" />
       <window_info id="Version Control" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.22346368" sideWeight="0.49789253" order="8" side_tool="false" content_ui="tabs" />
@@ -1484,174 +331,6 @@
     <watches-manager />
   </component>
   <component name="editorHistoryManager">
-    <entry file="file://$PROJECT_DIR$/hmode/adjcnf">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="0">
-          <caret line="0" column="0" lean-forward="false" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/hmode/mod_config">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="1501">
-          <caret line="79" column="16" lean-forward="false" selection-start-line="79" selection-start-column="6" selection-end-line="79" selection-end-column="16" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/hpy/pymode/mod_config.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="893">
-          <caret line="47" column="29" lean-forward="false" selection-start-line="47" selection-start-column="29" selection-end-line="47" selection-end-column="29" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/hmode/adjcnf">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="0">
-          <caret line="0" column="0" lean-forward="false" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/hmode/mod_config">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="1501">
-          <caret line="79" column="16" lean-forward="false" selection-start-line="79" selection-start-column="6" selection-end-line="79" selection-end-column="16" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/hpy/pymode/mod_config.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="912">
-          <caret line="49" column="29" lean-forward="false" selection-start-line="49" selection-start-column="29" selection-end-line="49" selection-end-column="29" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/hmode/imode/icheck">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="152">
-          <caret line="8" column="0" lean-forward="false" selection-start-line="8" selection-start-column="0" selection-end-line="8" selection-end-column="19" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/hshell/hcheck/Iseecfg">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="1349">
-          <caret line="71" column="0" lean-forward="false" selection-start-line="71" selection-start-column="1" selection-end-line="81" selection-end-column="3" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/hshell/hcheck/icheck.yml">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="418">
-          <caret line="22" column="18" lean-forward="false" selection-start-line="22" selection-start-column="18" selection-end-line="22" selection-end-column="18" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/../erya/erya/urls.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="0">
-          <caret line="0" column="0" lean-forward="false" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/../erya/accounts/models.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="0">
-          <caret line="0" column="0" lean-forward="false" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/Gcsql/Gcmigrate/iHotel-V5/30 ihotel_up_report_import_v5.sql">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="-3135">
-          <caret line="0" column="0" lean-forward="false" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/Gcsql/Gcmigrate/iHotel-X5/iHotel-X50301-FJJL/30 ihotel_up_bal_maint_x5.sql">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="998">
-          <caret line="130" column="4" lean-forward="true" selection-start-line="130" selection-start-column="4" selection-end-line="130" selection-end-column="4" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/hshell/clrlog">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="380">
-          <caret line="20" column="0" lean-forward="true" selection-start-line="20" selection-start-column="0" selection-end-line="20" selection-end-column="0" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/hshell/docheck">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="209">
-          <caret line="11" column="137" lean-forward="false" selection-start-line="11" selection-start-column="125" selection-end-line="11" selection-end-column="137" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/hshell/dokeep">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="570">
-          <caret line="30" column="15" lean-forward="false" selection-start-line="30" selection-start-column="2" selection-end-line="30" selection-end-column="15" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/hmode/imode/iseecfg">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="57">
-          <caret line="3" column="1" lean-forward="true" selection-start-line="3" selection-start-column="1" selection-end-line="3" selection-end-column="1" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/hmode/imode/cfg/.imode_aliases">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="19">
-          <caret line="1" column="0" lean-forward="false" selection-start-line="1" selection-start-column="0" selection-end-line="2" selection-end-column="18" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/hshell/hcheck/chksql/00001.yettoaudit.sql">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="0">
-          <caret line="0" column="0" lean-forward="false" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/hshell/hcheck/chksql/00002.jiedai.sql">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="-2066">
-          <caret line="0" column="0" lean-forward="false" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/hshell/hcheck/icheck" />
-    <entry file="file://$PROJECT_DIR$/hshell/hcheck/Iseecfg">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="1349">
-          <caret line="71" column="0" lean-forward="false" selection-start-line="71" selection-start-column="1" selection-end-line="81" selection-end-column="3" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/hmode/imode/icheck">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="152">
-          <caret line="8" column="0" lean-forward="false" selection-start-line="8" selection-start-column="0" selection-end-line="8" selection-end-column="19" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/Gcsql/Gcpos/up_ihotel_pos_change_pccode.sql">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="151">
-          <caret line="114" column="49" lean-forward="false" selection-start-line="114" selection-start-column="49" selection-end-line="114" selection-end-column="49" />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/hshell/hcheck/icheck.yml">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="214">
@@ -1798,6 +477,246 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="361">
           <caret line="61" column="87" lean-forward="false" selection-start-line="61" selection-start-column="87" selection-end-line="61" selection-end-column="87" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/hshell/adjcnf">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="-798">
+          <caret line="0" column="0" lean-forward="false" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/hshell/clrcache">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="-1012">
+          <caret line="0" column="0" lean-forward="false" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/hshell/comdump">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="152">
+          <caret line="8" column="2" lean-forward="true" selection-start-line="8" selection-start-column="2" selection-end-line="8" selection-end-column="2" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/hshell/config_mysql">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="-803">
+          <caret line="0" column="0" lean-forward="false" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/hshell/cpumem">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="-855">
+          <caret line="0" column="0" lean-forward="false" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/hshell/dbacfg">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="0">
+          <caret line="0" column="0" lean-forward="false" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/hshell/demo_lftp">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="0">
+          <caret line="0" column="0" lean-forward="false" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/hshell/demo_sftp">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="0">
+          <caret line="0" column="0" lean-forward="false" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/hshell/dlsql">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="0">
+          <caret line="0" column="0" lean-forward="false" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/hshell/hlog">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="0">
+          <caret line="0" column="0" lean-forward="false" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/hshell/info_cpu">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="0">
+          <caret line="0" column="0" lean-forward="false" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/hshell/rmdump">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="-57">
+          <caret line="0" column="0" lean-forward="false" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/hshell/setpath">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="-62">
+          <caret line="0" column="0" lean-forward="false" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/hshell/sshset">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="0">
+          <caret line="0" column="0" lean-forward="false" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/hshell/sshrsa.sh">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="0">
+          <caret line="0" column="0" lean-forward="false" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/hshell/withyou">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="0">
+          <caret line="0" column="0" lean-forward="false" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/hshell/scpfile">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="-195">
+          <caret line="0" column="0" lean-forward="false" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/hshell/scpihotel">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="0">
+          <caret line="0" column="0" lean-forward="false" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/hshell/dbapp">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="-803">
+          <caret line="0" column="0" lean-forward="false" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/hshell/scpdump">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="0">
+          <caret line="0" column="0" lean-forward="false" selection-start-line="0" selection-start-column="0" selection-end-line="1" selection-end-column="0" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/hshell/dohotelfind">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="0">
+          <caret line="0" column="0" lean-forward="false" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/hshell/dohotelvalid">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="0">
+          <caret line="0" column="0" lean-forward="false" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/hshell/dokeep">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="0">
+          <caret line="0" column="0" lean-forward="false" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/hshell/info_machine">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="-494">
+          <caret line="0" column="0" lean-forward="false" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/hshell/dolinux_user">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="0">
+          <caret line="0" column="0" lean-forward="false" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/hshell/migratecfg">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="0">
+          <caret line="0" column="0" lean-forward="false" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/hshell/migratedb">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="0">
+          <caret line="0" column="0" lean-forward="false" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/hshell/probeip">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="0">
+          <caret line="0" column="0" lean-forward="false" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/hshell/pstrace">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="0">
+          <caret line="0" column="0" lean-forward="false" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/hshell/recoverdb">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="-803">
+          <caret line="0" column="0" lean-forward="false" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
           <folding />
         </state>
       </provider>
