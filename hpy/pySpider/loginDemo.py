@@ -8,7 +8,7 @@
 @time   :2017/7/13 13:02
 @remark : 模拟登录公司老的JIRA
 """
-import cookielib
+import http.cookiejar
 import json
 import urllib
 import urllib2
@@ -43,7 +43,7 @@ def login_url(website):
     # for item in cookie:
     #     print 'name:' + item.name + '-value:' + item.value
     #
-    print response.read()
+    print(response.read())
 
 
 def login_request(website):
@@ -52,7 +52,7 @@ def login_request(website):
     seesion = requests.Session()
     reponse = seesion.post(website, params=payload, headers=headers)
     # print reponse.text
-    print reponse.status_code
+    print(reponse.status_code)
 
 
 def login_ihotel(webindex, inttype):
@@ -63,7 +63,7 @@ def login_ihotel(webindex, inttype):
     reponse = seesion.post(website, params=payload)
     result = reponse.json()
     for item in result['listTypeDto']:
-        print item['code'],item['descript']
+        print(item['code'],item['descript'])
 
 
 def register(webindex, inttype):
@@ -84,7 +84,7 @@ def register(webindex, inttype):
     # reponse = requests.post(website, params=payload, headers=headers)
     reponse = requests.post(website, data=payload, headers=headers)
     result = reponse.text
-    print result
+    print(result)
 
 if __name__ == '__main__':
     register('http://192.168.0.28:8102/ipmsmember/membercard/', 'registerMemberCardWithOutVerify')
