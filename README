@@ -1,10 +1,9 @@
 zhangh  文件根目录
 GcOps   工作中常用的运维脚本、文件
-Gcsql   GreenCloud的MySQL脚本
+Gcsql   GC的MySQL脚本
 hbox    常用安装包,比如 tar包
 hdoc    一些文件、手册等资料
-hmode   mode shell脚本
 hpy     python脚本
-hshell  自己编写的shell脚本
+hshell  shell脚本
 XRsql   foxhis的sybase脚本
 
