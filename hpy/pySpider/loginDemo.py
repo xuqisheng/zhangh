@@ -87,8 +87,8 @@ def register(webindex, inttype):
     print(result)
 
 if __name__ == '__main__':
-    register('http://192.168.0.28:8102/ipmsmember/membercard/', 'registerMemberCardWithOutVerify')
-    # login_url('http://192.168.0.7:9394/secure/Dashboard.jspa')
+    # register('http://192.168.0.28:8102/ipmsmember/membercard/', 'registerMemberCardWithOutVerify')
+    login_url('http://192.168.0.7:9394/secure/Dashboard.jspa')
     # login_request('http://192.168.0.7:9394/secure/Dashboard.jspa')
     # login_ihotel('http://192.168.0.28:8102/ipmsmember/membercard/', 'getAllCardType')
 
