@@ -153,6 +153,9 @@ BEGIN
 		INSERT INTO tmp_check_base SELECT NULL,'A',CONCAT('sys_option: ',a.descript,' ',a.set_value,' 不存在') FROM sys_option a WHERE a.hotel_group_id = arg_hotel_group_id AND a.hotel_id = arg_hotel_id AND a.catalog='report' AND a.item='room_sta_report_code'
 			AND NOT EXISTS(SELECT 1 FROM report_center b WHERE b.hotel_group_id = arg_hotel_group_id AND b.hotel_id = arg_hotel_id AND b.code=a.set_value);
 
+		INSERT INTO tmp_check_base SELECT NULL,'A',CONCAT('sys_option: ',a.descript,' ',a.set_value,' 不存在') FROM sys_option a WHERE a.hotel_group_id = arg_hotel_group_id AND a.hotel_id = arg_hotel_id AND a.catalog='audit' AND a.item='rep_night_charge'
+			AND NOT EXISTS(SELECT 1 FROM report_center b WHERE b.hotel_group_id = arg_hotel_group_id AND b.hotel_id = arg_hotel_id AND a.set_value=b.code);
+
 	ELSEIF (var_client_version='THEF' OR var_client_version='THEK') THEN
 		INSERT INTO tmp_check_base SELECT NULL,'A',CONCAT('sys_option: ',a.descript,' ',a.set_value,' 不存在') FROM sys_option a WHERE a.hotel_group_id = arg_hotel_group_id AND a.hotel_id = arg_hotel_id AND a.catalog='account' AND a.item='accredit_default_code'
 			AND NOT EXISTS(SELECT 1 FROM code_transaction b WHERE b.hotel_group_id = arg_hotel_group_id AND b.hotel_id = arg_hotel_id AND b.arrange_code>'9' AND b.code=a.set_value);
@@ -210,8 +213,6 @@ BEGIN
 		AND NOT EXISTS(SELECT 1 FROM code_transaction b WHERE b.hotel_group_id = arg_hotel_group_id AND b.hotel_id = arg_hotel_id AND a.set_value=b.code);
  	INSERT INTO tmp_check_base SELECT NULL,'A',CONCAT('sys_option: ',a.descript,' ',a.set_value,' 不存在') FROM sys_option a WHERE a.hotel_group_id = arg_hotel_group_id AND a.hotel_id = arg_hotel_id AND a.catalog='audit' AND a.item='ta_code_for_extra_bed'
 		AND NOT EXISTS(SELECT 1 FROM code_transaction b WHERE b.hotel_group_id = arg_hotel_group_id AND b.hotel_id = arg_hotel_id AND a.set_value=b.code);
- 	INSERT INTO tmp_check_base SELECT NULL,'A',CONCAT('sys_option: ',a.descript,' ',a.set_value,' 不存在') FROM sys_option a WHERE a.hotel_group_id = arg_hotel_group_id AND a.hotel_id = arg_hotel_id AND a.catalog='audit' AND a.item='rep_night_charge'
-		AND NOT EXISTS(SELECT 1 FROM report_center b WHERE b.hotel_group_id = arg_hotel_group_id AND b.hotel_id = arg_hotel_id AND a.set_value=b.code);
 
  	INSERT INTO tmp_check_base SELECT NULL,'A',CONCAT('sys_option: ',a.descript,' ',a.set_value,' 不存在') FROM sys_option a WHERE a.hotel_group_id = arg_hotel_group_id AND a.hotel_id = arg_hotel_id AND a.catalog='account' AND a.item='round_ta_pccode'
 		AND NOT EXISTS(SELECT 1 FROM code_transaction b WHERE b.hotel_group_id = arg_hotel_group_id AND b.hotel_id = arg_hotel_id AND a.set_value=b.code);
@@ -223,7 +224,7 @@ BEGIN
 		INSERT INTO tmp_check_base SELECT NULL,'A',CONCAT('sys_option : 自动夜审时间必须大于22点') FROM sys_option WHERE hotel_group_id = arg_hotel_group_id AND hotel_id = arg_hotel_id AND catalog='audit' AND item = 'audit_time_limit' AND set_value <= 22;
 	END IF;
 
-	INSERT INTO tmp_check_base SELECT NULL,'A',CONCAT('sys_option : 夜审时间必须大于21点') FROM sys_option WHERE hotel_group_id = arg_hotel_group_id AND hotel_id = arg_hotel_id AND catalog='audit' AND item = 'audit_time_limit' AND set_value < 21;
+	--   INSERT INTO tmp_check_base SELECT NULL,'A',CONCAT('sys_option : 夜审时间必须大于21点') FROM sys_option WHERE hotel_group_id = arg_hotel_group_id AND hotel_id = arg_hotel_id AND catalog='audit' AND item = 'audit_time_limit' AND set_value < 21;
 
 
 	-- 会计日期 检查
