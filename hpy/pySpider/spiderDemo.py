@@ -2,11 +2,11 @@
 # coding:utf8
 
 
-import urllib2
+# import urllib2
 
-req = urllib2.urlopen('http://www.baidu.com')
-print req.getcode()
-print len(req.read())
+# req = urllib2.urlopen('http://www.baidu.com')
+# print req.getcode()
+# print len(req.read())
 
 # req1 = urllib2.urlopen('http://www.ihotel.cn')
 # print req1.getcode()
@@ -50,3 +50,16 @@ print len(req.read())
 
 # for link in links:
 #     print link.name,link['href'],link.get_text()
+
+import urllib.request
+
+file = urllib.request.urlopen("http://www.baidu.com")
+# 读取方式一
+# data = file.read()
+# print(data)
+# 读取方式二
+# dataline = file.readline()
+# print(dataline)
+# 读取方式三
+# datalines = file.readlines()
+# print(datalines)
