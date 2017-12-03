@@ -133,6 +133,21 @@ BEGIN
 	UPDATE rep_jiedai a,tmp_dairep_bal b SET a.last_charge = IFNULL(b.last_charge,0) + IFNULL(a.last_credit,0),a.till_charge = IFNULL(b.till_charge,0) + IFNULL(a.till_credit,0) WHERE a.hotel_group_id = b.hotel_group_id AND	
 	a.hotel_id = b.hotel_id  AND a.hotel_group_id = arg_hotel_group_id AND a.hotel_id = arg_hotel_id AND a.biz_date = b.biz_date AND a.biz_date = var_bdate AND a.classno = b.classno;
 	
+	-- 修复试算平衡表的上日余额
+	-- 取修复后底表的宾客上日余额修复试算平衡表的宾客上日余额
+	SELECT last_bl INTO var_amount1 FROM rep_dai WHERE hotel_group_id = arg_hotel_group_id AND hotel_id = arg_hotel_id AND biz_date = var_bdate AND classno='02000';	
+	UPDATE rep_trial_balance SET amount = var_amount1,amount_m = var_amount1,amount_y = var_amount1 WHERE hotel_group_id = arg_hotel_group_id AND hotel_id = arg_hotel_id AND biz_date = var_bdate AND item_type='10' AND item_code='*'; 
+	UPDATE rep_trial_balance SET amount = 0,amount_m = 0,amount_y = 0 WHERE hotel_group_id = arg_hotel_group_id AND hotel_id = arg_hotel_id AND biz_date = var_bdate AND item_type='50' AND item_code='}}}}}'; 	
+	UPDATE rep_trial_balance_history SET amount = var_amount1,amount_m = var_amount1,amount_y = var_amount1 WHERE hotel_group_id = arg_hotel_group_id AND hotel_id = arg_hotel_id AND biz_date = var_bdate AND item_type='10' AND item_code='*'; 
+	UPDATE rep_trial_balance_history SET amount = 0,amount_m = 0,amount_y = 0 WHERE hotel_group_id = arg_hotel_group_id AND hotel_id = arg_hotel_id AND biz_date = var_bdate AND item_type='50' AND item_code='}}}}}'; 	
+	
+	-- 取修复后底表的应收上日余额修复试算平衡表的应收上日余额
+	SELECT last_bl INTO var_amount1 FROM rep_dai WHERE hotel_group_id = arg_hotel_group_id AND hotel_id = arg_hotel_id AND biz_date = var_bdate AND classno='03000';	
+	UPDATE rep_trial_balance SET amount = var_amount1,amount_m = var_amount1,amount_y = var_amount1 WHERE hotel_group_id = arg_hotel_group_id AND hotel_id = arg_hotel_id AND biz_date = var_bdate AND item_type='60' AND item_code='1*'; 
+	UPDATE rep_trial_balance SET amount = 0,amount_m = 0,amount_y = 0 WHERE hotel_group_id = arg_hotel_group_id AND hotel_id = arg_hotel_id AND biz_date = var_bdate AND item_type='65' AND item_code='}}}}}';	
+	UPDATE rep_trial_balance_history SET amount = var_amount1,amount_m = var_amount1,amount_y = var_amount1 WHERE hotel_group_id = arg_hotel_group_id AND hotel_id = arg_hotel_id AND biz_date = var_bdate AND item_type='60' AND item_code='1*'; 
+	UPDATE rep_trial_balance_history SET amount = 0,amount_m = 0,amount_y = 0 WHERE hotel_group_id = arg_hotel_group_id AND hotel_id = arg_hotel_id AND biz_date = var_bdate AND item_type='65' AND item_code='}}}}}';	
+	
 END$$
 
 DELIMITER ;
