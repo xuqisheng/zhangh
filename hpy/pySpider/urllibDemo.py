@@ -52,38 +52,38 @@
 #     print link.name,link['href'],link.get_text()
 
 import urllib.request
+import urllib.error
 
 # 常规方式，不带header
-# file = urllib.request.urlopen("http://www.baidu.com")
+file = urllib.request.urlopen("http://www.baidu.com")
 # 读取方式一
-# data = file.read()
-# print(data)
+data = file.read()
+print(data)
 # 读取方式二
-# dataline = file.readline()
-# print(dataline)
+dataline = file.readline()
+print(dataline)
 # 读取方式三
-# datalines = file.readlines()
-# print(datalines)
+datalines = file.readlines()
+print(datalines)
 
 # 带header的读取方式，模仿浏览器
-# url = "http://www.baidu.com"
-# headers = ("User-Agent","Mozilla/5.0 (Windows NT 10.0; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/55.0.2883.87 UBrowser/6.2.3831.407 Safari/537.36")
-
-# opener = urllib.request.build_opener()
-# opener.addheaders = [headers]
-# data = opener.open(url).read()
-# print(data)
+url = "http://www.baidu.com"
+headers = ("User-Agent","Mozilla/5.0 (Windows NT 10.0; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/55.0.2883.87 UBrowser/6.2.3831.407 Safari/537.36")
+opener = urllib.request.build_opener()
+opener.addheaders = [headers]
+data = opener.open(url).read()
+print(data)
 
 # POST方式认证登录
-# url = "http://www.baidu.com"
-# postdata = urllib.parse.urlencode({
-#     "name":"huilead",
-#     "pass":"abc123"
-# }).encode('utf-8')
-# req = urllib.request.Request(url,postdata)
-# req.add_header("User-Agent","Mozilla/5.0 (Windows NT 10.0; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/55.0.2883.87 UBrowser/6.2.3831.407 Safari/537.36")
-# data = urllib.request.urlopen(req).read()
-# print(data)
+url = "http://www.baidu.com"
+postdata = urllib.parse.urlencode({
+    "name":"huilead",
+    "pass":"abc123"
+}).encode('utf-8')
+req = urllib.request.Request(url,postdata)
+req.add_header("User-Agent","Mozilla/5.0 (Windows NT 10.0; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/55.0.2883.87 UBrowser/6.2.3831.407 Safari/537.36")
+data = urllib.request.urlopen(req).read()
+print(data)
 
 # 使用代理方式进行爬虫
 url = "http://www.baidu.com"
@@ -93,3 +93,9 @@ opener = urllib.request.build_opener(proxy,urllib.request.HTTPHandler)
 urllib.request.install_opener(opener)
 data = urllib.request.urlopen(url).read().decode('utf-8')
 print(len(data)
+
+# URLError错误捕捉
+try:
+    urllib.request.urlopen("http://blog.csdn.net")
+except urllib.error.URLError as e:
+    print(e.reason)
