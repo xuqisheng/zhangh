@@ -14,3 +14,4 @@ import urllib.request
 
 def craw(url, page):
     html1 = str(urllib.request.urlopen(url).read())
+    result=aaa
