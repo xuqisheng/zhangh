@@ -24,14 +24,22 @@ BEGIN
 	DECLARE var_num 		INT;	
 	DECLARE var_datestr	 	CHAR(8);
 	DECLARE var_begin_date	DATETIME;
-	DECLARE var_end_date	DATETIME;	
+	DECLARE var_end_date	DATETIME;
+	DECLARE var_min_year	INT;
 	
  	DECLARE c_cursor CURSOR FOR SELECT id FROM hotel WHERE hotel_group_id=arg_hotel_group_id ORDER BY id;	
 	DECLARE CONTINUE HANDLER FOR SQLSTATE '02000' SET done_cursor = 1; 
  
-	SET var_year = arg_year_begin;
 	SET var_num = 0;
 	SET var_month = 1;
+
+	SELECT MIN(biz_year) INTO var_min_year FROM biz_month WHERE hotel_group_id=arg_hotel_group_id;
+	IF var_min_year >= arg_year_begin THEN
+		SET arg_year_begin = var_min_year;
+		SET var_year = var_min_year;
+	ELSE
+		SET var_year = arg_year_begin;
+	END IF;
  
 	OPEN c_cursor ;
 	SET done_cursor = 0;
