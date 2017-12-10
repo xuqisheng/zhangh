@@ -11,7 +11,7 @@
 import re
 import urllib.request
 import http.cookiejar
-
+import requests
 
 # 爬取京东图片
 def jd_craw_photo(url, page):
@@ -52,6 +52,26 @@ def jd_craw_photo(url, page):
             if hasattr(e,"reason"):
                 x += 1
         x += 1
+
+# 使用requests库对京东图片的下载
+def jd_craw_photo_requests(url, page):
+    r = requests.get(url)
+    html_str = r.text
+    pattern_plist = '<div id="plist".+? <div class="page clearfix">'
+    # 加入re.S 否则无匹配结果
+    result_plist = re.compile(pattern_plist,re.S).findall(html_str)[0]
+    pattern_jpg = '<img width="220" height="220" data-img="1" src="//(.+?\.jpg)"'
+    imagelist = re.compile(pattern_jpg).findall(result_plist)
+    x = 1
+    for imageurl in imagelist:
+        imagename = "d://myweb/"+str(page)+str(x)+".jpg"
+        imageurl = "http://"+imageurl
+        # 图片下载
+        with open(imagename,'wb') as f:
+            f.write(requests.get(imageurl).content)
+            f.close()
+        x += 1
+
 
 # 爬取CSDN的blog主页所有链接
 def csdn_craw_link(url):
