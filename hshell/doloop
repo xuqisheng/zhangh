@@ -8,7 +8,13 @@
 #
 #. /root/imode/cfg/.imode_aliases
 #
-for i in `cat /root/zhangh/hshell/sshcodes.txt | grep -v "^#" | grep -E "^${1:-.*}$"`; do
+for i in `cat /root/sshcodes.txt | grep -v "^#" | grep -E "^${1:-.*}$"`; do
+  
   echo $i
   #scp -4 -l 8192 -p /mode.tar.gz $i:/ && ssh -4 $i "echo 'starting...';cd /;tar xzvf mode.tar.gz >/dev/null 2>&1;echo ok" 2>/dev/null
+  ssh $i "mkdir /root/checksql"
+  scp -Cp /root/up_ihotel_insert_checkrep.sql $i:/root/checksql
+  ssh $i "/root/mode/updatedb.sh /root/checksql portal_group"
+  ssh $i "rm -Rf /root/checksql"
+
 done
