@@ -1,0 +1,22 @@
+#!/bin/bash
+# ===============================================
+# Function:
+#    
+# Date:
+#   :
+# ===============================================
+#
+#. /root/imode/cfg/.imode_aliases
+#
+for i in `cat /root/sshcodes.txt | grep -v "^#" | grep -E "^${1:-.*}$"`; do
+  echo $i
+  ssh $i "mkdir /root/checksql"
+  scp -Cp /root/up_ihotel_maint*.sql $i:/root/checksql
+
+  # 取出需执行的库
+  for j in `ssh $i "/root/mode/seecfg -s 'show databases'" | grep "portal" | grep -v "portal_group" | grep -v "portal_member"`; do
+    ssh $i "/root/mode/updatedb.sh /root/checksql $j"
+  done
+
+  ssh $i "rm -Rf /root/checksql"
+done
