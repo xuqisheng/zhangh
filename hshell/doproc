@@ -16,6 +16,7 @@ for i in `cat /root/sshcodes.txt | grep -v "^#" | grep -E "^${1:-.*}$"`; do
   # 取出需执行的库
   for j in `ssh $i "/root/mode/seecfg -s 'show databases'" | grep "portal" | grep -v "portal_group" | grep -v "portal_member"`; do
     ssh $i "/root/mode/updatedb.sh /root/checksql $j"
+#    ssh $i "/root/mode/seecfg \"SELECT b.id,b.code,b.descript,a.server_ip FROM pos_ip a,hotel b WHERE a.server_ip LIKE '%115.159.112.225%' AND b.hotel_group_id=a.hotel_group_id GROUP BY a.hotel_id\" $j"
   done
 
   ssh $i "rm -Rf /root/checksql"
