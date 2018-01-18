@@ -230,7 +230,7 @@ BEGIN
 		INSERT INTO tmp_check_base SELECT NULL,'A',CONCAT('sys_option : item=audit_time_limit 自动夜审时间必须大于22点') FROM sys_option WHERE hotel_group_id = arg_hotel_group_id AND hotel_id = arg_hotel_id AND catalog='audit' AND item = 'audit_time_limit' AND set_value <= 22;
 	END IF;
 
-	--   INSERT INTO tmp_check_base SELECT NULL,'A',CONCAT('sys_option : 夜审时间必须大于21点') FROM sys_option WHERE hotel_group_id = arg_hotel_group_id AND hotel_id = arg_hotel_id AND catalog='audit' AND item = 'audit_time_limit' AND set_value < 21;
+	INSERT INTO tmp_check_base SELECT NULL,'A',CONCAT('sys_option : 夜审时间必须大于20点') FROM sys_option WHERE hotel_group_id = arg_hotel_group_id AND hotel_id = arg_hotel_id AND catalog='audit' AND item = 'audit_time_limit' AND set_value < 20;
 
 
 	-- 会计日期 检查
