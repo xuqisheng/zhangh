@@ -1,51 +1,51 @@
-ar ĞÅÓÃ±ê¼ÇÃ»ÓĞÏÔÊ¾  accredit -- extraflag
-Ô¤¶©µ¥µç»°´íÎó
-ÌØÒª£¬¿Í·¿²¼ÖÃ-- ¶ÔÕÕ±í
+ar ä¿¡ç”¨æ ‡è®°æ²¡æœ‰æ˜¾ç¤º  accredit -- extraflag
+é¢„è®¢å•ç”µè¯é”™è¯¯
+ç‰¹è¦ï¼Œå®¢æˆ¿å¸ƒç½®-- å¯¹ç…§è¡¨
 
 up_map_accnt.accnt_old, accnt_new -- accnt_type in (masster_si,_r, consume )
 master.srqs, amenti.., feature 
 master_base 
 
-·¿¼ÛÂë¶ÔÓ¦ - ÍêÈ«Ò»ÖÂ£¬¿ÉÄÜÃ»ÓĞ½øĞĞ¶ÔÕÕ×ª»» -- ÄÇ¸öÕÊ»§ÓĞÎÊÌâ£¿- ºË²éÃ»ÎÊÌâ  
-ÊĞ³¡Âë¶ÔÓ¦ - ÍêÈ«Ò»ÖÂ£¬¿ÉÄÜÃ»ÓĞ½øĞĞ¶ÔÕÕ×ª»» -- µÈĞÂµÄ¶ÔÕÕ±í
-À´Ô´Âë¶ÔÓ¦ - ÍêÈ«Ò»ÖÂ£¬¿ÉÄÜÃ»ÓĞ½øĞĞ¶ÔÕÕ×ª»»
+æˆ¿ä»·ç å¯¹åº” - å®Œå…¨ä¸€è‡´ï¼Œå¯èƒ½æ²¡æœ‰è¿›è¡Œå¯¹ç…§è½¬æ¢ -- é‚£ä¸ªå¸æˆ·æœ‰é—®é¢˜ï¼Ÿ- æ ¸æŸ¥æ²¡é—®é¢˜  
+å¸‚åœºç å¯¹åº” - å®Œå…¨ä¸€è‡´ï¼Œå¯èƒ½æ²¡æœ‰è¿›è¡Œå¯¹ç…§è½¬æ¢ -- ç­‰æ–°çš„å¯¹ç…§è¡¨
+æ¥æºç å¯¹åº” - å®Œå…¨ä¸€è‡´ï¼Œå¯èƒ½æ²¡æœ‰è¿›è¡Œå¯¹ç…§è½¬æ¢
 
-Áª·¿ - Ô¤¶©²¿·Ö 
-Ô¤¶©µ¥ÉÏÃæÃ»ÓĞĞÕÃû2 
-
-
-Ô¤¶©ÕÒ²»µ½Ô¤¶©µ¥ 
-
-Ô¤¶©×´Ì¬µÄÉı¼¶
-
-Òµ¼¨
-»áÔ± 
-
-¿ÍÊ·µ¼ÈëÄ¿Ç°Ö÷ÒªÈÏÖ¤¼ş£¬µ¼ÖÂÓĞĞ©Òµ¼¨ºÃµÄ¿Í»§ĞÅÏ¢Ã»ÓĞµ¼Èë£¬±ÈÈç  ²ñĞ¤·ç ÀÏÏµÍ³ÓĞ5¸ö£¬ÎÒÃÇ½ö½öµ¼Èë9290250ºÅÂë 
-¿Í»§µ¼Èë£ºÓĞĞ©µØÖ· Ê¡Öİ³ÇÊĞÃ»ÓĞµ¼ÈëºÃ 
-Ç±ÔÚ×´Ì¬Ã»ÓĞµ¼Èë 
-Ğ­Òé¹«Ë¾¸½¼ÓĞÅÏ¢µÄ£ºÁªÏµÈË¡¢Ö°Îñ¡¢ÉúÈÕÏ²ºÃ£¬¶øÇÒÊÇÁ½¸öÁªÏµÈË
-×éºÏ²éÑ¯È±ÉÙÀà±ğ1µÄ²éÑ¯ÏîÄ¿ 
-Ğ­Òé¹«Ë¾±à¼­£¬È±ÉÙclass2-4µÄ±à¼­ 
-Ê×´ÎÈë×¡ºÍ×î½üÈë×¡ 
-
-ÏúÊÛÔ±Ö»ÄÜ²é¿´×Ô¼ºµÄ
-Ğ­Òé¹«Ë¾ÁĞ±íÔö¼Ó±êÇ© - ÍÅ¶Ó»áÒé -- ĞèÒªµ¼Èëµµ°¸£¡£¡£¡
-Òµ¼¨£º²»Òªµã»÷Ë¢ĞÂ¡¢1-12ÔÂ·İÓÃ·¿Íí£¬²»ÓÃÊÕÈë
-
-ĞÅÓÃÔö¼Ó²Ù×÷²úÉúÖ÷¼üÖØ¸´´íÎó 
-£¨ar£©ĞÅÓÃÀïÃæ¸¶¿î´úÂëÓÃ¡®C¿¨¡¯µÄ£¬ÕÊºÅ¿ÉÄÜÃ»ÓĞÌîĞ´»òÕß²»¹æ·¶£¬È¡ÏûµÄÊ±ºò»á±¨´íÎó
+è”æˆ¿ - é¢„è®¢éƒ¨åˆ† 
+é¢„è®¢å•ä¸Šé¢æ²¡æœ‰å§“å2 
 
 
-¿Í·¿×´Ì¬ÖØ½¨proc - ¹ùµÏÊ¤
-±ö¿Íµµ°¸- Ö¤¼şÒ»Ñù£¬ĞÕÃû²»Ò»Ñù£¬¶ªÊ§ÁË 
+é¢„è®¢æ‰¾ä¸åˆ°é¢„è®¢å• 
+
+é¢„è®¢çŠ¶æ€çš„å‡çº§
+
+ä¸šç»©
+ä¼šå‘˜ 
+
+å®¢å²å¯¼å…¥ç›®å‰ä¸»è¦è®¤è¯ä»¶ï¼Œå¯¼è‡´æœ‰äº›ä¸šç»©å¥½çš„å®¢æˆ·ä¿¡æ¯æ²¡æœ‰å¯¼å…¥ï¼Œæ¯”å¦‚  æŸ´è‚–é£ è€ç³»ç»Ÿæœ‰5ä¸ªï¼Œæˆ‘ä»¬ä»…ä»…å¯¼å…¥9290250å·ç  
+å®¢æˆ·å¯¼å…¥ï¼šæœ‰äº›åœ°å€ çœå·åŸå¸‚æ²¡æœ‰å¯¼å…¥å¥½ 
+æ½œåœ¨çŠ¶æ€æ²¡æœ‰å¯¼å…¥ 
+åè®®å…¬å¸é™„åŠ ä¿¡æ¯çš„ï¼šè”ç³»äººã€èŒåŠ¡ã€ç”Ÿæ—¥å–œå¥½ï¼Œè€Œä¸”æ˜¯ä¸¤ä¸ªè”ç³»äºº
+ç»„åˆæŸ¥è¯¢ç¼ºå°‘ç±»åˆ«1çš„æŸ¥è¯¢é¡¹ç›® 
+åè®®å…¬å¸ç¼–è¾‘ï¼Œç¼ºå°‘class2-4çš„ç¼–è¾‘ 
+é¦–æ¬¡å…¥ä½å’Œæœ€è¿‘å…¥ä½ 
+
+é”€å”®å‘˜åªèƒ½æŸ¥çœ‹è‡ªå·±çš„
+åè®®å…¬å¸åˆ—è¡¨å¢åŠ æ ‡ç­¾ - å›¢é˜Ÿä¼šè®® -- éœ€è¦å¯¼å…¥æ¡£æ¡ˆï¼ï¼ï¼
+ä¸šç»©ï¼šä¸è¦ç‚¹å‡»åˆ·æ–°ã€1-12æœˆä»½ç”¨æˆ¿æ™šï¼Œä¸ç”¨æ”¶å…¥
+
+ä¿¡ç”¨å¢åŠ æ“ä½œäº§ç”Ÿä¸»é”®é‡å¤é”™è¯¯ 
+ï¼ˆarï¼‰ä¿¡ç”¨é‡Œé¢ä»˜æ¬¾ä»£ç ç”¨â€˜Cå¡â€™çš„ï¼Œå¸å·å¯èƒ½æ²¡æœ‰å¡«å†™æˆ–è€…ä¸è§„èŒƒï¼Œå–æ¶ˆçš„æ—¶å€™ä¼šæŠ¥é”™è¯¯
+
+
+å®¢æˆ¿çŠ¶æ€é‡å»ºproc - éƒ­è¿ªèƒœ
+å®¾å®¢æ¡£æ¡ˆ- è¯ä»¶ä¸€æ ·ï¼Œå§“åä¸ä¸€æ ·ï¼Œä¸¢å¤±äº† 
 guest -> company 
 
-¿Í·¿¿ÉÓÃÒ³Ãæ- Ëø¶¨·¿Ë«»÷Ã÷Ï¸²»¶Ô£»¸½ÊôĞÅÏ¢²»ÕıÈ·-ÏÂ°ë²¿·Ö 
+å®¢æˆ¿å¯ç”¨é¡µé¢- é”å®šæˆ¿åŒå‡»æ˜ç»†ä¸å¯¹ï¼›é™„å±ä¿¡æ¯ä¸æ­£ç¡®-ä¸‹åŠéƒ¨åˆ† 
 
-Ë®¹ûµ¥-Î÷²ÍÌü£» ÏÊ»¨µ¥- 
-µç»°½Ó¿Ú- ¼Æ·Ñ²»×¼£» Â©µ¥£» 
-ĞĞÕşÂ¥²ãÏÂÎç²è -- ÈçºÎĞ´ÌáÈ¡ÏÂÎç²èµÄsql 
+æ°´æœå•-è¥¿é¤å…ï¼› é²œèŠ±å•- 
+ç”µè¯æ¥å£- è®¡è´¹ä¸å‡†ï¼› æ¼å•ï¼› 
+è¡Œæ”¿æ¥¼å±‚ä¸‹åˆèŒ¶ -- å¦‚ä½•å†™æå–ä¸‹åˆèŒ¶çš„sql 
 
 SELECT  * FROM rsv_src AS a WHERE hotel_group_id = 2 AND hotel_id = 9 AND occ_flag IN ('RF','RG') AND DATE(rsv_arr_date) <> arr_date;
 
@@ -56,7 +56,7 @@ update rsv_src set rsv_dep_date = CONCAT(DATE_FORMAT(rsv_dep_date,'%Y:%m:%d'),' 
 
 
 
--- ÏúÊÛÔ±Ğ­Òé¹«Ë¾ÏÔÊ¾ÏŞÖÆ 
+-- é”€å”®å‘˜åè®®å…¬å¸æ˜¾ç¤ºé™åˆ¶ 
 SELECT a.* FROM company_base a, company_type b 
 WHERE a.id=b.company_id
 	AND b.hotel_group_id=2 AND b.hotel_id=9
@@ -68,11 +68,11 @@ WHERE a.id=b.company_id
 
 DESC company_type; 
 SELECT id, saleman FROM company_type WHERE hotel_id=9 AND saleman<>'';
-SELECT * FROM USER WHERE NAME='ÁõÃÀºì';
+SELECT * FROM USER WHERE NAME='åˆ˜ç¾çº¢';
 SELECT  * FROM sales_man_business WHERE login_user='SM02'
 SELECT  * FROM sales_man WHERE CODE='SM02'
 
--- arĞÅÓÃĞŞÕı 
+-- arä¿¡ç”¨ä¿®æ­£ 
 SELECT a.id, a.arno, b.name, a.credit, 
 	IFNULL((SELECT SUM(c.amount) FROM accredit c 
 				WHERE c.hotel_group_id=2 AND c.hotel_id=9
@@ -104,7 +104,7 @@ DESC ar_master;
 
 SELECT * FROM accredit; 
 
--- Áª·¿ĞÅÏ¢ĞŞÕı 
+-- è”æˆ¿ä¿¡æ¯ä¿®æ­£ 
 UPDATE master_base SET link_id=id 
 	WHERE hotel_group_id=2 AND hotel_id=9 ;  
 
@@ -120,16 +120,16 @@ SET a.link_id=d.accnt_new
 UPDATE master_base SET pkg_link_id=link_id 
 	WHERE hotel_group_id=2 AND hotel_id=9; 
 
--- Éí·İÖ¤ºÅÂë£¬¶à¸öµµ°¸¡£µ¼ÖÂÌáÈ¡ĞÕÃû´íÎó 
-SELECT * FROM master_guest WHERE id_no='440106196410060392'; NAME='Ğì½ğ¸»';
+-- èº«ä»½è¯å·ç ï¼Œå¤šä¸ªæ¡£æ¡ˆã€‚å¯¼è‡´æå–å§“åé”™è¯¯ 
+SELECT * FROM master_guest WHERE id_no='440106196410060392'; NAME='å¾é‡‘å¯Œ';
 DESC master_guest; 
 
 SELECT * FROM guest WHERE id_no='440106196410060392';
 SELECT * FROM guest_base WHERE id=1566717;
 
-ÏúÊÛÔ±ÏÔÊ¾Ğ­Òé¹«Ë¾·¶Î§
+é”€å”®å‘˜æ˜¾ç¤ºåè®®å…¬å¸èŒƒå›´
 SELECT a.id,b.sta,a.name,a.name2,b.code1,b.code2,b.code3,a.nation,a.nation AS nationDescript,b.valid_begin,b.valid_end,a.phone,a.fax,a.linkman1,b.saleman,c.name saleman_name,
-CASE WHEN d.times_in > 120 THEN 'ÖØÒª' WHEN  d.times_in <= 120 AND  d.times_in > 60 THEN 'ÖĞ' ELSE 'µÍ' END AS imp_level
+CASE WHEN d.times_in > 120 THEN 'é‡è¦' WHEN  d.times_in <= 120 AND  d.times_in > 60 THEN 'ä¸­' ELSE 'ä½' END AS imp_level
 FROM company_base a,company_type b 
 LEFT JOIN sales_man c ON c.hotel_group_id = 2 AND c.hotel_id = 0 AND b.saleman = c.code 
 LEFT JOIN company_production d ON d.hotel_group_id = b.hotel_group_id AND d.hotel_id = b.hotel_id AND b.company_id = d.company_id 
@@ -143,7 +143,7 @@ AND (b.saleman = 'SM02' OR
                    AND y.login_user = 'SM02'))
  ORDER BY b.sta DESC,b.modify_datetime DESC
 
--- C¿¨arÕÊ»§µÄĞÅÓÃÈ¥µô¿¨ºÅ 
+-- Cå¡arå¸æˆ·çš„ä¿¡ç”¨å»æ‰å¡å· 
 SELECT a.id,b.name,a.arno, b.coding, c.card_no 
 FROM ar_master a, ar_master_guest b, accredit c 
 WHERE a.hotel_group_id=2 AND a.hotel_id=9 
@@ -161,7 +161,7 @@ WHERE a.hotel_group_id=2 AND a.hotel_id=9
 	AND c.ta_code='9930'; 
 
 
--- ¸üĞÂ Ğ­Òé¹«Ë¾µØÖ·µÄÊ¡·İ state 
+-- æ›´æ–° åè®®å…¬å¸åœ°å€çš„çœä»½ state 
 INSERT up_map_code 
 	SELECT 2, 9, 'prvcode', CODE, descript, '', descript 
 	FROM migrate_db.prvcode
@@ -189,7 +189,7 @@ WHERE a.hotel_group_id=2 AND a.hotel_id=0
 	AND a.state=b.code_old AND b.cat='prvcode'; 
 	
 	
--- ĞŞ²¹arÖ÷µ¥ÁªÏµÈË
+-- ä¿®è¡¥arä¸»å•è”ç³»äºº
 UPDATE ar_master_guest a, up_map_accnt b, migrate_db.ar_master c, migrate_db.guest d
 SET a.linkman=d.liason 
 WHERE a.hotel_group_id=2 AND a.hotel_id=9 
@@ -198,7 +198,7 @@ WHERE a.hotel_group_id=2 AND a.hotel_id=9
 	AND b.accnt_type ='armst'
 	AND a.linkman='' AND d.liason<>'';
 	
--- ĞŞ¸ÄÖ÷µ¥µç»°
+-- ä¿®æ”¹ä¸»å•ç”µè¯
 UPDATE master_guest a, up_map_accnt b, migrate_db.master c SET a.phone=c.phone 
 WHERE a.hotel_group_id=2 AND a.hotel_id=9 
 	AND b.hotel_group_id=2 AND b.hotel_id=9 
@@ -283,7 +283,7 @@ WHERE a.hotel_group_id=2 AND a.hotel_id=9
 	AND a.amenities<>c.amenities; 
 
 
--- ĞŞ²¹Ö÷µ¥Ç©Ö¤¡¢Èë¾³¿Ú°¶µÈ 
+-- ä¿®è¡¥ä¸»å•ç­¾è¯ã€å…¥å¢ƒå£å²¸ç­‰ 
 UPDATE master_guest a, up_map_accnt b, migrate_db.master c, migrate_db.guest d 
 SET a.visa_type=d.visaid, a.visa_end=d.visaend, a.enter_port=d.rjplace, a.enter_date_end=d.rjdate
 WHERE a.hotel_group_id=2 AND a.hotel_id=9 
@@ -303,7 +303,7 @@ WHERE a.hotel_group_id=2 AND a.hotel_id=14
 	AND b.accnt_type IN ('master_si', 'master_r', 'comsume')
 	AND d.rjplace <>'';
 
--- ĞŞ²¹Ö÷µ¥¿Í·¿ÌØÕ÷ 
+-- ä¿®è¡¥ä¸»å•å®¢æˆ¿ç‰¹å¾ 
 UPDATE master_guest a, up_map_accnt b, migrate_db.master c, migrate_db.guest d SET a.feature=d.feature 
 WHERE a.hotel_group_id=2 AND a.hotel_id=9 
 	AND b.hotel_group_id=2 AND b.hotel_id=9 
@@ -312,7 +312,7 @@ WHERE a.hotel_group_id=2 AND a.hotel_id=9
 	AND b.accnt_type IN ('master_si', 'master_r', 'comsume')
 	AND a.feature='' AND d.feature <>'';
 
--- ĞŞ²¹arÖ÷µ¥ÁªÏµÈË
+-- ä¿®è¡¥arä¸»å•è”ç³»äºº
 UPDATE ar_master_guest a, up_map_accnt b, migrate_db.ar_master c, migrate_db.guest d
 SET a.linkman=d.liason 
 WHERE a.hotel_group_id=2 AND a.hotel_id=9 
