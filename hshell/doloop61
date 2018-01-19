@@ -1,0 +1,20 @@
+#!/bin/bash
+# ===============================================
+# Function: 传入指定IP地址，执行sql语句
+#    
+# Date:
+#   :
+# ===============================================
+#
+#. /root/imode/cfg/.imode_aliases
+#
+
+  ssh $1 "mkdir /root/checksql"
+  scp -Cp /root/xxx.sql $1:/root/checksql
+
+  for i in `ssh $1 "/root/mode/seecfg -s 'show databases'" | grep "portal" | grep -v "portal_group" | grep -v "portal_member"`; do
+    ssh $1 "/root/mode/updatedb.sh /root/checksql $i"
+  done  
+
+  ssh $1 "rm -Rf /root/checksql"
+
