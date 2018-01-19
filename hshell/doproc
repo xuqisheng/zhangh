@@ -9,7 +9,8 @@
 #. /root/imode/cfg/.imode_aliases
 #
 for i in `cat /root/sshcodes.txt | grep -v "^#" | grep -E "^${1:-.*}$"`; do
-  echo $i
+  IPmsg=`cat /etc/hosts | grep $i`
+  echo $IPmsg
   ssh $i "mkdir /root/checksql"
   scp -Cp /root/up_ihotel_maint*.sql $i:/root/checksql
 

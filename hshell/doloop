@@ -10,7 +10,8 @@
 #
 for i in `cat /root/sshcodes.txt | grep -v "^#" | grep -E "^${1:-.*}$"`; do
   
-  echo $i
+  IPmsg=`cat /etc/hosts | grep $i`
+  echo $IPmsg
   #scp -4 -l 8192 -p /mode.tar.gz $i:/ && ssh -4 $i "echo 'starting...';cd /;tar xzvf mode.tar.gz >/dev/null 2>&1;echo ok" 2>/dev/null
   ssh $i "mkdir /root/checksql"
   scp -Cp /root/up_ihotel_insert_checkrep.sql $i:/root/checksql
