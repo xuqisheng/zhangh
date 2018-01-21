@@ -13,7 +13,7 @@ import urllib.request
 import http.cookiejar
 import requests
 
-# 使用requests库对图片的下载
+# 找出当前页中所有的子url并调用函数进行图片下载
 def xp_craw_photo_requests(url, page):
     r = requests.get(url)
     r.encoding='utf-8'
@@ -31,7 +31,9 @@ def xp_craw_photo_requests(url, page):
             sub_url = "http://w3.afulyu.info/pw/" + href_url
             # print(sub_url)   
             xp_sub_downpic(sub_url,page)
-    
+
+
+# 图片过滤下载    
 def xp_sub_downpic(url,page):
     r = requests.get(url)
     r.encoding = 'utf-8'
@@ -43,15 +45,13 @@ def xp_sub_downpic(url,page):
     pattern_pic = 'img src=\"(.+?)\"'
     result_picurl = re.compile(pattern_pic).findall(result1)
     # print(result_picurl)
-    x = 1
     for downpicurl in result_picurl:
         pic_pattern = '\/([0-9]+.jpg)'
         picname = "d://PicDown/" + re.compile(pic_pattern).findall(downpicurl)[0]
         # print(picname)
         with open(picname,'wb') as f:
             f.write(requests.get(downpicurl).content)
-            f.close()
-        x += 1      
+            f.close()     
 
 if __name__ == '__main__':
     # xp1024
