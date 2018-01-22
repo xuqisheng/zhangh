@@ -47,11 +47,14 @@ def xp_sub_downpic(url,page):
     # print(result_picurl)
     for downpicurl in result_picurl:
         pic_pattern = '\/([0-9]+.jpg)'
-        picname = "d://PicDown/" + re.compile(pic_pattern).findall(downpicurl)[0]
-        # print(picname)
-        with open(picname,'wb') as f:
-            f.write(requests.get(downpicurl).content)
-            f.close()     
+        try:
+            picname = "d://PicDown/" + re.compile(pic_pattern).findall(downpicurl)[0]
+            with open(picname,'wb') as f:
+                f.write(requests.get(downpicurl).content)
+                f.close()  
+        except Exception as e:
+            print(str(e))
+            continue    
 
 if __name__ == '__main__':
     # xp1024
