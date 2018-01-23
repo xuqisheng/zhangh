@@ -12,29 +12,31 @@ import re
 import urllib.request
 import http.cookiejar
 import requests
+import threading
 
 # 找出当前页中所有的子url并调用函数进行图片下载
 def xp_craw_photo_requests(url, page):
-    r = requests.get(url)
-    r.encoding='utf-8'
-    html_str = r.text
-    # print(html_str)
-    pattern_plist = '<tr align="center" class="tr3 t_one">.+? target="_blank">'
-    # 加入re.S 否则无匹配结果
-    result_plist = re.compile(pattern_plist,re.S).findall(html_str)
-    # print(result_plist)
-    href_str = 'href=\"(.+?)\"'
-    href_result = re.compile(href_str).findall("".join(result_plist))
-    html_str = "html"
-    for href_url in href_result:
-        if href_url.find(html_str) >= 0 :
-            sub_url = "http://w3.afulyu.info/pw/" + href_url
-            # print(sub_url)   
-            xp_sub_downpic(sub_url,page)
-
+    for i in range(1,page + 1):
+        mainurl = url + str(i)
+        r = requests.get(mainurl)
+        r.encoding='utf-8'
+        html_str = r.text
+        # print(html_str)
+        pattern_plist = '<tr align="center" class="tr3 t_one">.+? target="_blank">'
+        # 加入re.S 否则无匹配结果
+        result_plist = re.compile(pattern_plist,re.S).findall(html_str)
+        # print(result_plist)
+        href_str = 'href=\"(.+?)\"'
+        href_result = re.compile(href_str).findall("".join(result_plist))
+        html_str = "html"
+        for href_url in href_result:
+            if href_url.find(html_str) >= 0 :
+                sub_url = "http://w3.afulyu.info/pw/" + href_url
+                # print(sub_url)   
+                xp_sub_downpic(sub_url)
 
 # 图片过滤下载    
-def xp_sub_downpic(url,page):
+def xp_sub_downpic(url):
     r = requests.get(url)
     r.encoding = 'utf-8'
     html_str = r.text
@@ -56,10 +58,16 @@ def xp_sub_downpic(url,page):
             print(str(e))
             continue    
 
-if __name__ == '__main__':
-    # xp1024
-    for i in range(1,2):
-        # url = "http://w3.afulyu.info/pw/thread.php?fid=16&page="+str(i)
-        xp_craw_photo_requests(url,i)
-    # xp_sub_downpic("http://w3.afulyu.info/pw/htm_data/16/1801/974234.html",1)
+threads = []
+t1 = threading.Thread(target=xp_craw_photo_requests,args=("http://w3.afulyu.info/pw/thread.php?fid=15&page=",2))
+threads.append(t1)
+t2 = threading.Thread(target=xp_craw_photo_requests,args=("http://w3.afulyu.info/pw/thread.php?fid=16&page=",2))
+threads.append(t2)
 
+if __name__ == '__main__':
+    for t in threads:
+        t.setDaemon(True)
+        t.start()
+    t.join()
+
+    print("PicDown is Finish!!!")
