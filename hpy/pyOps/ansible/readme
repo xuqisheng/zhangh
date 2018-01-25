@@ -294,6 +294,14 @@ playbook是由一个或多个“play”组成的列表。play的主要功能在�
 
 - hosts: local
   remote_user: root
+  remote_user: root
+  gather_facts: no
+  
   tasks:
   - name: echo hi
     shell: echo "hi"
+
+
+- 常用示例
+ansible XXX -m command -a "/root/mode/seecode"
+ansible XXX -m command -a "/root/mode/seecfg \"CALL up_ihotel_maint_check_base(2,9)\" portal_pms"
