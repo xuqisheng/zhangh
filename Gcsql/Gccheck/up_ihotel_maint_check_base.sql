@@ -235,17 +235,17 @@ BEGIN
 
 	-- 会计日期 检查
     INSERT INTO tmp_check_base SELECT NULL,'A',CONCAT("month not between 1 and 12: ",a.biz_year,' ',a.biz_month)
-		from biz_month a where a.hotel_group_id = arg_hotel_group_id AND a.hotel_id = arg_hotel_id and not (a.biz_month >=1 and a.biz_month <= 12);
+		from biz_month a where a.hotel_group_id = arg_hotel_group_id AND a.hotel_id = arg_hotel_id and not (a.biz_month >=1 and a.biz_month <= 12) AND biz_year >= 2017;
 
     INSERT INTO tmp_check_base SELECT NULL,'A',CONCAT("end_date should be greater than or equal to begin_date: ",a.biz_year,' ',a.biz_month)
-		from biz_month a where a.hotel_group_id = arg_hotel_group_id AND a.hotel_id = arg_hotel_id and a.end_date < a.begin_date;
+		from biz_month a where a.hotel_group_id = arg_hotel_group_id AND a.hotel_id = arg_hotel_id and a.end_date < a.begin_date AND biz_year >= 2017;
 
     INSERT INTO tmp_check_base SELECT NULL,'A',CONCAT("date overlapped with: ",a.biz_year,' ',a.biz_month)
-		from biz_month a where a.hotel_group_id = arg_hotel_group_id AND a.hotel_id = arg_hotel_id and a.end_date < (select max(b.end_date) from biz_month b where b.hotel_group_id = arg_hotel_group_id AND b.hotel_id = arg_hotel_id) and
+		from biz_month a where a.hotel_group_id = arg_hotel_group_id AND a.hotel_id = arg_hotel_id and biz_year >= 2017 and a.end_date < (select max(b.end_date) from biz_month b where b.hotel_group_id = arg_hotel_group_id AND b.hotel_id = arg_hotel_id) and
            exists (select 1 from biz_month b where b.hotel_group_id = arg_hotel_group_id AND b.hotel_id = arg_hotel_id and (b.begin_date >= a.begin_date and b.begin_date <= a.end_date) and b.id <> a.id );
 
     INSERT INTO tmp_check_base SELECT NULL,'A',CONCAT("date gap occurred between end_date and next begin_date: ",a.biz_year,' ',a.biz_month)
-		from biz_month a where a.hotel_group_id = arg_hotel_group_id AND a.hotel_id = arg_hotel_id and a.end_date < (select max(b.end_date) from biz_month b where b.hotel_group_id = arg_hotel_group_id AND b.hotel_id = arg_hotel_id) and
+		from biz_month a where a.hotel_group_id = arg_hotel_group_id AND a.hotel_id = arg_hotel_id AND biz_year >= 2017 and a.end_date < (select max(b.end_date) from biz_month b where b.hotel_group_id = arg_hotel_group_id AND b.hotel_id = arg_hotel_id) and
            (select date(min(b.begin_date)) from  biz_month b where b.hotel_group_id = arg_hotel_group_id AND b.hotel_id = arg_hotel_id and b.begin_date > a.begin_date) > date_add(a.end_date,interval 1 day);
 
     -- 餐饮接口配置表检查
