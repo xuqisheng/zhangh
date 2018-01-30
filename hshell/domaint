@@ -2,7 +2,7 @@
 # ===============================================
 # Function:
 #      工程检查脚本
-#      ./domaint IP hotelcode
+#      ./domaint IP groupcode hotelcode
 # Date:
 #     2018.1.30
 # ===============================================
@@ -18,8 +18,8 @@ for HDNAME in `ssh $1 "/root/mode/seecfg -s 'show databases'" | grep "portal" | 
     #     ssh $1 "/root/mode/modemsg domaint \" This is a line !!! \" more"
     #     ssh $1 "/root/mode/seecfg \"CALL up_ihotel_maint_check_balance($GROUPID,$HOTELID)\" $HDNAME"
     # done
-    for GROUPID in `ssh $1 "/root/mode/seecfg -s \"select id from hotel_group order by id\" $HDNAME"`; do
-        for HOTELID in `ssh $1 "/root/mode/seecfg -s \"select id from hotel where hotel_group_id = $GROUPID and if('$2' is null,1=1,code like '%$2%') order by id\" $HDNAME"`; do
+    for GROUPID in `ssh $1 "/root/mode/seecfg -s \"select id from hotel_group where if('$2' is null,1=1,code like '%$2%') order by id\" $HDNAME"`; do
+        for HOTELID in `ssh $1 "/root/mode/seecfg -s \"select id from hotel where hotel_group_id = $GROUPID and if('$3' is null,1=1,code like '%$3%') order by id\" $HDNAME"`; do
             # echo $GROUPID "<--->" $HOTELID
             ssh $1 "/root/mode/seecfg \"CALL up_ihotel_maint_check_base($GROUPID,$HOTELID)\" $HDNAME"
             ssh $1 "/root/mode/modemsg domaint \" This is a line !!! \" more"
