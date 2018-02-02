@@ -59,9 +59,9 @@ def xp_sub_downpic(url):
             continue    
 
 threads = []
-t1 = threading.Thread(target=xp_craw_photo_requests,args=("http://w3.afulyu.info/pw/thread.php?fid=15&page=",2))
+t1 = threading.Thread(target=xp_craw_photo_requests,args=("http://w3.afulyu.info/pw/thread.php?fid=15&page=",3))
 threads.append(t1)
-t2 = threading.Thread(target=xp_craw_photo_requests,args=("http://w3.afulyu.info/pw/thread.php?fid=16&page=",2))
+t2 = threading.Thread(target=xp_craw_photo_requests,args=("http://w3.afulyu.info/pw/thread.php?fid=16&page=",3))
 threads.append(t2)
 
 if __name__ == '__main__':
