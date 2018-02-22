@@ -35,7 +35,7 @@ def xp_craw_photo_requests(url, page):
                 # print(sub_url)   
                 xp_sub_downpic(sub_url)
 
-# 图片过滤下载    
+# 过滤下载    
 def xp_sub_downpic(url):
     r = requests.get(url)
     r.encoding = 'utf-8'
@@ -44,25 +44,27 @@ def xp_sub_downpic(url):
     pattern1 = '<div class="tpc_content" id="read_tpc">.+?</div>'
     result1 = re.compile(pattern1,re.S).findall(html_str)[0]
     # print(result1)
-    pattern_pic = 'img src=\"(.+?)\"'
-    result_picurl = re.compile(pattern_pic).findall(result1)
-    # print(result_picurl)
-    for downpicurl in result_picurl:
-        pic_pattern = '\/([0-9]+.jpg)'
-        try:
-            picname = "d://PicDown/" + re.compile(pic_pattern).findall(downpicurl)[0]
-            with open(picname,'wb') as f:
-                f.write(requests.get(downpicurl).content)
-                f.close()  
-        except Exception as e:
-            print(str(e))
-            continue    
+    pattern_dorcel = "Marc Dorcel"
+    if re.compile(pattern_dorcel).findall(result1):
+        pattern_pic = 'a href=\"(.+?)\".+?target="_blank"'
+        result_picurl = re.compile(pattern_pic).findall(result1) 
+        if len(result_picurl) >=2:
+            result_picurl.pop(0)
+        print(result_picurl)  
+        # for downpicurl in result_picurl:
+        #     pic_pattern = '\/([0-9a-zA-Z]+.html)'
+        #     try:
+        #         picname = "d://" + re.compile(pic_pattern).findall(downpicurl)[0]
+        #         with open(picname,'wb') as f:
+        #             f.write(requests.get(downpicurl).content)
+        #             f.close()  
+        #     except Exception as e:
+        #         print(str(e))
+        #         continue    
 
 threads = []
-t1 = threading.Thread(target=xp_craw_photo_requests,args=("http://w3.afulyu.info/pw/thread.php?fid=15&page=",3))
+t1 = threading.Thread(target=xp_craw_photo_requests,args=("http://w3.afulyu.info/pw/thread.php?fid=7&page=",30))
 threads.append(t1)
-t2 = threading.Thread(target=xp_craw_photo_requests,args=("http://w3.afulyu.info/pw/thread.php?fid=16&page=",3))
-threads.append(t2)
 
 if __name__ == '__main__':
     for t in threads:
@@ -70,4 +72,4 @@ if __name__ == '__main__':
         t.start()
     t.join()
 
-    print("PicDown is Finished!!!")
+    print("Torrent Download is Finished!!!")
